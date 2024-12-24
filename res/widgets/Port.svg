@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 24 24.000001"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="b" x1="12" y1="20" x2="12" y2="6" gradientUnits="userSpaceOnUse" >
+      <stop index="0" offset="0" stop-color="#e5e5e5" />
+      <stop index="1" offset="1" stop-color="#a6a6a6" />
+    </linearGradient>
+  </defs>
+  <g>
+    <circle id="port-bezel" fill="#595959" cx="12" cy="12" r="11.75" />
+    <circle id="port-jack" fill="#c0c0c0" cx="12" cy="12" r="10.5" />
+    <circle id="port-jack-edge" fill="url(#b)" cx="12" cy="12" r="9" />
+    <circle id="port-ring" fill="#808080" cx="12" cy="12" r="8" />
+    <circle id="port-sleeve" fill="#404040" cx="12" cy="12" r="5.25" />
+    <circle id="port-hole" fill="#000000" cx="12" cy="12" r="4" />
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="100"
+   height="7"
+   viewBox="0 0 100 7"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g>
+    <rect
+       style="fill:#c32222"
+       width="100"
+       height="7"
+       x="0"
+       y="0" />
+    <rect width="2.33" height="7" x="2.191" y="0" />
+    <rect width="2.33" height="7" x="6.849" y="0" />
+    <rect width="2.33" height="7" x="11.506" y="0" />
+    <rect width="2.33" height="7" x="18.492" y="0" />
+    <rect width="2.33" height="7" x="23.150" y="0" />
+    <rect width="2.33" height="7" x="30.136" y="0" />
+    <rect width="2.33" height="7" x="34.793" y="0" />
+    <rect width="2.33" height="7" x="39.452" y="0" />
+    <rect width="2.33" height="7" x="46.438" y="0" />
+    <rect width="2.33" height="7" x="51.095" y="0" />
+    <rect width="2.33" height="7" x="58.082" y="0" />
+    <rect width="2.33" height="7" x="62.739" y="0" />
+    <rect width="2.33" height="7" x="67.397" y="0" />
+    <rect width="2.33" height="7" x="74.383" y="0" />
+    <rect width="2.33" height="7" x="79.041" y="0" />
+    <rect width="2.33" height="7" x="86.027" y="0" />
+    <rect width="2.33" height="7" x="90.685" y="0" />
+    <rect width="2.33" height="7" x="95.342" y="0" />
+  </g>
+</svg>

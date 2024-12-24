@@ -1,0 +1,43 @@
+{
+  "slug": "pachde-CHEM",
+  "name": "pachde",
+  "version": "2.0.0",
+  "license": "MIT",
+  "brand": "pachde",
+  "author": "pachde",
+  "authorEmail": "pcdempsey@live.com",
+  "authorUrl": "",
+  "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/index.md",
+  "sourceUrl": "https://github.com/Paul-Dempsey/pachde-CHEM",
+  "donateUrl": "https://venmo.com/u/pcdempsey",
+  "changelogUrl": "",
+  "minRackVersion": "2.4.0",
+  "modules": [
+    {
+      "slug": "chem-blank",
+      "name": "CHEM",
+      "description": "Generic blank panel",
+      "tags": [
+        "Visual",
+        "Blank"
+      ]
+    },
+    {
+      "slug": "chem-core",
+      "name": "CHEM Core",
+      "description": "CHEM Core for Haken Eagan Matrix",
+      "tags": [
+        "Controller"
+      ]
+    },
+    {
+      "slug": "chem-preset",
+      "name": "CHEM Preset",
+      "description": "CHEM Presets for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    }
+  ]
+}
