@@ -10,7 +10,7 @@ struct MidiDeviceHolder : IMidiDeviceHolder
     std::string device_claim;
     Module * module = nullptr;
 
-    MidiDeviceHolder(Module * parent) {
+    void setParent(Module * parent) {
         module = parent;
     }
 

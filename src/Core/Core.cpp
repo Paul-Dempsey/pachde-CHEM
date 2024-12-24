@@ -4,6 +4,10 @@ Model *modelCore = createModel<CoreModule, CoreModuleWidget>("chem-core");
 
 CoreModule::CoreModule()
 {
+    haken_midi.setParent(this);
+    controller1.setParent(this);
+    controller2.setParent(this);
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configOutput(Outputs::OUT_READY, "Ready");
 }

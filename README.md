@@ -1,6 +1,8 @@
 # pachde-CHEM
 
-CHEM (**C**ontrol the **H**aken **E**agan **M**atrix) is the successor to #d **HC One**.
+![CHEM Repository splash card](doc/image/repo-card.png)
+
+CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to #d **HC One**.
 Haken EaganMatrix firmware version 10.40 added many features and improvements to the MIDI protocol.
 The changes are big enough to warrant a redesign of the modularization and user interface, hence a new plugin.
 
