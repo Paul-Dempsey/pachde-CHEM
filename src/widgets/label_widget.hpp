@@ -1,24 +1,27 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "../services/text.hpp"
+#include "../services/svgtheme.hpp"
 
 namespace pachde {
 
 enum class TextAlignment { Left, Center, Right };
 
-struct BasicTextLabel: Widget
+struct BasicTextLabel: Widget, IApplyTheme
 {
     std::string _text;
     NVGcolor _color;
     TextAlignment _align;
     float _text_height;
     bool _bold;
+    const char * _text_key;
 
     BasicTextLabel()
     :   _color(RampGray(G_90)),
         _align(TextAlignment::Left),
         _text_height(12.f),
-        _bold(true)
+        _bold(true),
+        _text_key("ctl-label")
     {
     }
     std::string getText() { return _text; }
@@ -60,6 +63,16 @@ struct BasicTextLabel: Widget
         nvgRestore(vg);
     }
 
+    // IApplyTheme
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_text_key));
+        if (!isColorVisible(_color)) {
+            _color = RampGray(G_85);
+        }
+        return true;
+    }
+
     void draw(const DrawArgs& args) override
     {
         Widget::draw(args);
@@ -72,6 +85,11 @@ struct DynamicTextLabel : BasicTextLabel
     bool _bright = false;
     bool _lazy = false;
     bool _dirt = false;
+
+    DynamicTextLabel()
+    {
+        _text_key = "dytext";
+    }
 
     void bright(bool lit = true) { _bright = lit; }
 

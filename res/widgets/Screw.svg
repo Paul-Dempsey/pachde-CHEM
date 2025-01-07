@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg version="1.0"
+<svg version="1.0" height="15" width="15"
 	 xmlns:cc="http://creativecommons.org/ns#"
 	 xmlns:svg="http://www.w3.org/2000/svg"
 	 xmlns="http://www.w3.org/2000/svg"
-	 viewBox="0 0 15 14.9989" enable-background="new 0 0 15 14.9989" xml:space="preserve">
+	 viewBox="0 0 15 15" >
 <linearGradient id="grim" gradientUnits="userSpaceOnUse" x1="219.99944" y1="6477.3999" x2="232.99944" y2="6477.3999" gradientTransform="matrix(6.123234e-17 1 1 -6.123234e-17 -6469.8999 -219)">
 	<stop  offset="0" style="stop-color:#ABA9A9"/>
 	<stop  offset="1" style="stop-color:#8F8F8F"/>

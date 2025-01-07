@@ -4,7 +4,15 @@
         "theme": {
             "panel" : { "fill": "#3a6378" },
 
+            "hexoid": { "fill": "brand" },
+            "CHEM": {"fill": "brand"},
+            "pachde": {"fill": "brand"},
+
             "dytext": { "fill": "#e9e862"},
+            "curpreset": { "fill": "brand" },
+            "midi-in": { "fill" : "#e9e862" },
+            "midi-bar":  { "stroke" : "#0c4138" },
+
             "tab-label":       { "fill": "g75" },
             "tab-label-hi":    { "fill": "g85" },
             "preset":          { "fill": "g70" },

@@ -13,7 +13,9 @@ SOURCES += src/chem.cpp
 
 # services
 SOURCES += src/services/colors.cpp
-SOURCES += src/services/em_device.cpp
+SOURCES += src/services/midi_devices.cpp
+SOURCES += src/services/MidiDeviceBroker.cpp
+SOURCES += src/services/MidiDeviceHolder.cpp
 SOURCES += src/services/misc.cpp
 SOURCES += src/services/svgtheme.cpp
 SOURCES += src/services/text.cpp

@@ -1,39 +1,44 @@
 #include "../chem.hpp"
-#include "../services/em_device.hpp"
+#include "../services/midi_devices.hpp"
 #include "../widgets/MidiPicker.hpp"
-
+#include "../widgets/label_widget.hpp"
 using namespace pachde;
 
-struct MidiDeviceHolder : IMidiDeviceHolder
+struct MidiInput : midi::Input
 {
-    std::shared_ptr<pachde::MidiDeviceConnection> connection = nullptr;
-    std::string device_claim;
-    Module * module = nullptr;
+    uint64_t received_count = 0;
 
-    void setParent(Module * parent) {
-        module = parent;
-    }
-
-    // IMidiDeviceHolder
-    void setMidiDeviceClaim(const std::string& claim) override
+    uint64_t received() { return received_count; }
+    void onMessage(const midi::Message& message) override
     {
-        if (0 == device_claim.compare(claim)) return;
-        if (!device_claim.empty()) {
-            if (module) {
-                MidiDeviceBroker::get()->revoke_claim(module->getId());
-            }
-        }
-        device_claim = claim;
+        ++received_count;
     }
-    const std::string& getMidiDeviceClaim() override  { return device_claim; }
 };
 
-struct CoreModule : ChemModule
+struct CoreModuleWidget;
+
+struct CoreModule : ChemModule, IMidiDeviceNotify
 {
+
+    enum class MidiDevice { Unknown, Haken, Midi1, Midi2 };
     bool ready = false;
+    CoreModuleWidget* ui = nullptr;
+
     MidiDeviceHolder haken_midi;
     MidiDeviceHolder controller1;
     MidiDeviceHolder controller2;
+
+    MidiDevice MidiDeviceIdentifier(const MidiDeviceHolder* holder) {
+        if (holder == &haken_midi) return MidiDevice::Haken;
+        if (holder == &controller1) return MidiDevice::Midi1;
+        if (holder == &controller2) return MidiDevice::Midi2;
+        return MidiDevice::Unknown;
+    }
+
+    MidiInput haken_midi_in;
+    midi::Output haken_midi_out;
+    MidiInput controller1_midi_in;
+    MidiInput controller2_midi_in;
 
     enum Params {
        NUM_PARAMS
@@ -47,12 +52,30 @@ struct CoreModule : ChemModule
     };
     enum Lights {
         L_READY,
+        L_ROUND_Y,
+        L_ROUND_INITIAL,
+        L_ROUND,
+        L_ROUND_RELEASE,
         NUM_LIGHTS
     };
 
     CoreModule();
-    void processLights(const ProcessArgs &args);
+    virtual ~CoreModule();
+
+    bool isHakenConnected() { return nullptr != haken_midi.connection; }
+    bool isController1Connected() { return nullptr != controller1.connection; }
+    bool isController2Connected() { return nullptr != controller2.connection; }
+
+    // IMidiDeviceNotify
+    void onMidiDeviceChange(const MidiDeviceHolder* source) override;
+
+    // rack::Module
+    void dataFromJson(json_t* root) override;
+    json_t* dataToJson() override;
     void process(const ProcessArgs &args) override;
+
+    // impl
+    void processLights(const ProcessArgs &args);
 };
 
 struct CoreModuleWidget : ChemModuleWidget
@@ -61,11 +84,16 @@ struct CoreModuleWidget : ChemModuleWidget
     MidiPicker* haken_picker = nullptr;
     MidiPicker* controller1_picker = nullptr;
     MidiPicker* controller2_picker = nullptr;
-    
+    StaticTextLabel* haken_device_label = nullptr;
+    StaticTextLabel* controller1_device_label = nullptr;
+    StaticTextLabel* controller2_device_label = nullptr;
+    StaticTextLabel* preset_label = nullptr;
+
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-core.svg"); }
     MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device);
 
     CoreModuleWidget(CoreModule *module);
+    virtual ~CoreModuleWidget();
 
     void draw(const DrawArgs& args) override;
     void step() override;

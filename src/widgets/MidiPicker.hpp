@@ -2,7 +2,7 @@
 #pragma once
 #include <rack.hpp>
 #include "../plugin.hpp"
-#include "../services/em_device.hpp"
+#include "../services/midi_devices.hpp"
 #include "TipWidget.hpp"
 
 using namespace ::rack;
@@ -15,8 +15,7 @@ struct MidiPicker : TipWidget
 
     widget::FramebufferWidget* fb;
     widget::SvgWidget* sw;
-    IMidiDeviceHolder* setter;
-    std::shared_ptr<MidiDeviceConnection> connection;
+    MidiDeviceHolder* setter;
     bool is_em;
 
     MidiPicker() : setter(nullptr), is_em(false)
@@ -31,12 +30,9 @@ struct MidiPicker : TipWidget
         fb->setDirty(true);
     }
 
-    void setCallback(IMidiDeviceHolder * callback) {
-        assert(callback);
-        setter = callback;
-    }
-    void setConnection(std::shared_ptr<MidiDeviceConnection> conn) {
-        connection = conn;
+    void setDeviceHolder(MidiDeviceHolder * holder) {
+        assert(holder);
+        setter = holder;
     }
 
     void onButton(const ButtonEvent& e) override
@@ -51,46 +47,81 @@ struct MidiPicker : TipWidget
     void appendContextMenu(Menu* menu) override
     {
         if (!setter) return;
-
-        menu->addChild(createMenuLabel( is_em ? "Eagan Matrix device" : "MIDI controller"));
-        menu->addChild(new MenuSeparator);
-        menu->addChild(createMenuItem("Reset (auto)", "", [=](){ setter->setMidiDeviceClaim(""); }));
-
         auto broker = MidiDeviceBroker::get();
         broker->sync();
 
-        auto current_claim = connection ? connection->info.spec() : "";
 
-        broker->scan_while(
-            [=](const std::shared_ptr<MidiDeviceConnection> conn) {
-                if (!is_em || is_EMDevice(conn->info.input_device_name)) {
+        menu->addChild(createMenuLabel( is_em ? "Eagan Matrix device" : "MIDI controller"));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuItem("Reset (none)", "", [=](){
+            auto claim = setter->getClaim(); 
+            if (!claim.empty()) {
+                broker->revokeClaim(claim);
+            }
+            setter->clear();
+        }));
+
+        auto current_claim = setter->getClaim();
+
+        auto connections = EnumerateMidiConnections(false);
+        if (is_em) {
+            for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
+                auto conn = *it;
+                if (is_EMDevice(conn->info.input_device_name)) {
                     auto item_claim = conn->info.spec();
                     bool mine = (0 == current_claim.compare(item_claim));
-                    bool unavailable = mine ? false : !broker->is_available(item_claim);
+                    bool unavailable = mine ? false : !broker->available(item_claim);
 
                     menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
                         [=](){ return mine; },
-                        [=](){ setter->setMidiDeviceClaim(item_claim); }, unavailable));
+                        [=](){
+                            if (!current_claim.empty()) {
+                                broker->revokeClaim(current_claim);
+                            }
+                            if (broker->claimDevice(item_claim, setter)) {
+                                setter->connect(conn);
+                            }
+                        }, unavailable));
                 }
-                return true;
             }
-        );
-        if (is_em) {
             menu->addChild(new MenuSeparator);
             menu->addChild(createSubmenuItem("Any MIDI device (advanced)", "", [=](Menu * menu){
-                broker->scan_while(
-                    [=](const std::shared_ptr<MidiDeviceConnection> conn) {
-                        auto item_claim = conn->info.spec();
-                        bool mine = (0 == current_claim.compare(item_claim));
-                        bool unavailable = mine ? false : !broker->is_available(item_claim);
+                for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
+                    auto conn = *it;
+                    auto item_claim = conn->info.spec();
+                    bool mine = (0 == current_claim.compare(item_claim));
+                    bool unavailable = mine ? false : !broker->available(item_claim);
 
-                        menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
-                            [=](){ return mine; },
-                            [=](){ setter->setMidiDeviceClaim(item_claim); }, unavailable));
-                        return true;
-                    }
-                );
+                    menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
+                        [=](){ return mine; },
+                        [=](){
+                            if (!current_claim.empty()) {
+                                broker->revokeClaim(current_claim);
+                            }
+                            if (broker->claimDevice(item_claim, setter)) {
+                                setter->connect(conn);
+                            }
+                        }, unavailable));
+                }
             }));
+        } else {
+            for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
+                auto conn = *it;
+                auto item_claim = conn->info.spec();
+                bool mine = (0 == current_claim.compare(item_claim));
+                bool unavailable = mine ? false : !broker->available(item_claim);
+
+                menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
+                    [=](){ return mine; },
+                    [=](){
+                        if (!current_claim.empty()) {
+                            broker->revokeClaim(current_claim);
+                        }
+                        if (broker->claimDevice(item_claim, setter)) {
+                            setter->connect(conn);
+                        }
+                    }, unavailable));
+            }
         }
     }
 };
