@@ -29,19 +29,23 @@ CoreModule::~CoreModule() {
     broker->unRegisterDeviceHolder(&controller2);
 }
 
-void UpdateMidiDevice(MidiInput* input, rack::midi::Output * out, const MidiDeviceHolder* source, StaticTextLabel *label)
+void HandleMidiDeviceChange(MidiInput* input, rack::midi::Output * output, const MidiDeviceHolder* source, StaticTextLabel *label)
 {
     if (source->connection) {
         input->setDriverId(source->connection->driver_id);
         input->setDeviceId(source->connection->input_device_id);
-        if (out) out->setDeviceId(source->connection->output_device_id);
+        if (output) {
+            output->setDeviceId(source->connection->output_device_id);
+        }
         if (label) {
             label->text(source->connection->info.friendly(TextFormatLength::Short));
         }
     } else {
         input->setDeviceId(-1);
         input->setDeviceId(-1);
-        if (out) out->setDeviceId(-1);
+        if (output) {
+            output->setDeviceId(-1);
+        }
         if (label) {
             label->text("");
         }
@@ -54,13 +58,13 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     switch (id) {
     case MidiDevice::Haken: {
         ready = false;
-        UpdateMidiDevice(&haken_midi_in, &haken_midi_out, source, ui ? ui->haken_device_label : nullptr);
+        HandleMidiDeviceChange(&haken_midi_in, &haken_midi_out, source, ui ? ui->haken_device_label : nullptr);
     } break;
     case MidiDevice::Midi1: {
-        UpdateMidiDevice(&controller1_midi_in, nullptr, source, ui ? ui->controller1_device_label : nullptr);
+        HandleMidiDeviceChange(&controller1_midi_in, nullptr, source, ui ? ui->controller1_device_label : nullptr);
     } break;
     case MidiDevice::Midi2: {
-        UpdateMidiDevice(&controller2_midi_in, nullptr, source, ui ? ui->controller2_device_label : nullptr); 
+        HandleMidiDeviceChange(&controller2_midi_in, nullptr, source, ui ? ui->controller2_device_label : nullptr); 
     } break;
     default: break;
     }

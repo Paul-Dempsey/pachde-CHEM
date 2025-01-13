@@ -18,7 +18,11 @@ void MidiDeviceHolder::connect(std::shared_ptr<MidiDeviceConnection> connection)
 {
     this->connection = connection;
     if (connection) {
-        this->device_claim = connection->info.spec();
+        if (this->device_claim.empty()) {
+            this->device_claim = connection->info.spec();
+        } else {
+            assert(0 == this->device_claim.compare(connection->info.spec()));
+        }
     }
     notifyChanged();
 }

@@ -17,10 +17,10 @@ struct MidiInput : midi::Input
 
 struct CoreModuleWidget;
 
+enum class MidiDevice { Unknown, Haken, Midi1, Midi2 };
+
 struct CoreModule : ChemModule, IMidiDeviceNotify
 {
-
-    enum class MidiDevice { Unknown, Haken, Midi1, Midi2 };
     bool ready = false;
     CoreModuleWidget* ui = nullptr;
 
@@ -28,7 +28,8 @@ struct CoreModule : ChemModule, IMidiDeviceNotify
     MidiDeviceHolder controller1;
     MidiDeviceHolder controller2;
 
-    MidiDevice MidiDeviceIdentifier(const MidiDeviceHolder* holder) {
+    MidiDevice MidiDeviceIdentifier(const MidiDeviceHolder* holder)
+    {
         if (holder == &haken_midi) return MidiDevice::Haken;
         if (holder == &controller1) return MidiDevice::Midi1;
         if (holder == &controller2) return MidiDevice::Midi2;

@@ -85,13 +85,15 @@ struct MidiDeviceConnection
 
 std::vector<std::shared_ptr<MidiDeviceConnection>> EnumerateMidiConnections(bool emOnly);
 
-
 struct IMidiDeviceNotify {
     virtual void onMidiDeviceChange(const MidiDeviceHolder* source) = 0;
 };
 
 struct MidiDeviceHolder
 {
+    MidiDeviceHolder & operator=(const MidiDeviceHolder &) = delete;
+    MidiDeviceHolder(const MidiDeviceHolder&) = delete;
+
     std::shared_ptr<MidiDeviceConnection> connection;
     std::string device_claim;
     IMidiDeviceNotify * client;
