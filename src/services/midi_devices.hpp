@@ -5,7 +5,7 @@
 #include "misc.hpp"
 namespace pachde {
 
-const char CLAIM_SEPARATOR = '?';
+const char CLAIM_SEPARATOR = '~';
 struct MidiDeviceHolder; // forward reference
 enum class TextFormatLength { Short, Long, Compact, Abbreviated };
 bool ExcludeDriver(const std::string & name);
@@ -20,7 +20,7 @@ struct MidiDeviceConnectionInfo
     std::string input_device_name;
     std::string output_device_name;
     int sequence;
-    std::string claim; // generated on demand
+    std::string claim_spec; // generated on demand
 
     explicit MidiDeviceConnectionInfo()
     : sequence(-1)
@@ -41,7 +41,7 @@ struct MidiDeviceConnectionInfo
     int nth() const { return sequence; }
 
     void clear() {
-        claim.clear();
+        claim_spec.clear();
         driver_name.clear();
         input_device_name.clear();
         output_device_name.clear();
@@ -53,7 +53,7 @@ struct MidiDeviceConnectionInfo
             && !driver_name.empty();
     }
     bool parse(const std::string & spec);
-    std::string spec() const;
+    std::string claim() const;
     std::string friendly(TextFormatLength length) const;
 };
 
@@ -79,7 +79,7 @@ struct MidiDeviceConnection
     }
 
     bool is_same_connection(std::shared_ptr<MidiDeviceConnection> other) const {
-        return 0 == info.spec().compare(other->info.spec());
+        return 0 == info.claim().compare(other->info.claim());
     }
 };
 

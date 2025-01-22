@@ -1,6 +1,6 @@
 #include "plugin.hpp"
 
-Plugin *pluginInstance;
+Plugin *pluginInstance(nullptr);
 
 void init(Plugin *p)
 {
@@ -8,7 +8,7 @@ void init(Plugin *p)
 	p->addModel(modelBlank);
 	p->addModel(modelCore);
 	p->addModel(modelPreset);
-
+	p->addModel(modelPlay);
 }
 
 bool isPeerModule(Module* me, Module* candidate)
@@ -20,6 +20,7 @@ bool isPeerModule(Module* me, Module* candidate)
     return (me->model != model) && (
             (model == modelCore)
             || (model == modelPreset)
+            || (model == modelPlay)
             // add new models here
         );
 }
@@ -50,6 +51,7 @@ bool initThemeEngine()
 		}
 	});
 
+	// load colors first, so that themes can refer to colors
  	bool ok = theme_engine.load(asset::plugin(pluginInstance, "res/themes/colors.json"));
 	if (!ok) return false;
 
@@ -62,4 +64,10 @@ bool initThemeEngine()
 		if (!ok) break;
 	} 
 	return ok;
+}
+
+bool reloadThemes()
+{
+	theme_engine.clear();
+	return initThemeEngine();
 }

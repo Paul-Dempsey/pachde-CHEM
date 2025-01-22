@@ -1,4 +1,8 @@
 #include "Core.hpp"
+#include "../em/PresetId.hpp"
+#include "../services/ModuleBroker.hpp"
+
+using namespace pachde;
 
 Model *modelCore = createModel<CoreModule, CoreModuleWidget>("chem-core");
 
@@ -19,7 +23,7 @@ CoreModule::CoreModule()
     configLight(L_ROUND_INITIAL, "Round initial");
     configLight(L_ROUND, "Rounding");
     configLight(L_ROUND_RELEASE, "Round on release");
-    configOutput(Outputs::OUT_READY, "Ready");
+    configOutput(Outputs::OUT_READY, "Ready trigger");
 }
 
 CoreModule::~CoreModule() {
@@ -28,6 +32,7 @@ CoreModule::~CoreModule() {
     broker->unRegisterDeviceHolder(&controller1);
     broker->unRegisterDeviceHolder(&controller2);
 }
+
 
 void HandleMidiDeviceChange(MidiInput* input, rack::midi::Output * output, const MidiDeviceHolder* source, StaticTextLabel *label)
 {
@@ -52,6 +57,13 @@ void HandleMidiDeviceChange(MidiInput* input, rack::midi::Output * output, const
     }
 }
 
+void CoreModule::notify_connection_changed()
+{
+    for (auto item : clients) {
+        item->onConnectionChange();
+    }
+}
+
 void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 {
     auto id = MidiDeviceIdentifier(source);
@@ -59,6 +71,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     case MidiDevice::Haken: {
         ready = false;
         HandleMidiDeviceChange(&haken_midi_in, &haken_midi_out, source, ui ? ui->haken_device_label : nullptr);
+        notify_connection_changed();
     } break;
     case MidiDevice::Midi1: {
         HandleMidiDeviceChange(&controller1_midi_in, nullptr, source, ui ? ui->controller1_device_label : nullptr);
@@ -98,6 +111,27 @@ json_t* CoreModule::dataToJson()
     return root;
 }
 
+void CoreModule::register_client(IChemClient* client)
+{
+    if (clients.cend() == std::find(clients.cbegin(), clients.cend(), client)) {
+        clients.push_back(client);
+    }
+}
+
+void CoreModule::unregister_client(IChemClient* client)
+{
+    auto item = std::find(clients.cbegin(), clients.cend(), client);
+    if (item != clients.cend())
+    {
+        clients.erase(item);
+    }
+}
+
+bool CoreModule::host_has_client(IChemClient* client)
+{
+    auto item = std::find(clients.cbegin(), clients.cend(), client);
+    return item != clients.cend();
+}
 
 const uint64_t PROCESS_LIGHT_INTERVAL = 120;
 

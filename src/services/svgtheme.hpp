@@ -156,6 +156,9 @@ public:
     // true if any themes are available after calling load.
     bool isLoaded() { return !themes.empty(); }
 
+    // Reinitialize engine to empty
+    void clear();
+
     // Get a theme by name
     std::shared_ptr<SvgTheme> getTheme(const std::string& name);
 

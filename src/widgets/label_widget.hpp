@@ -2,6 +2,11 @@
 #pragma once
 #include "../services/text.hpp"
 #include "../services/svgtheme.hpp"
+using namespace svg_theme;
+
+// $TODO: labels need to be cleaned up:
+// - reduce the number of label types
+// - use a text style struct for alignment, height, bold, color, theme key?
 
 namespace pachde {
 
@@ -119,6 +124,12 @@ struct DynamicTextLabel : BasicTextLabel
             }
         }
     }
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        auto result = BasicTextLabel::applyTheme(theme_engine, theme);
+        _dirt = true;
+        return result;
+    }
     void drawLayer(const DrawArgs& args, int layer) override
     {
         Widget::drawLayer(args, layer);
@@ -161,7 +172,7 @@ inline DynamicTextLabel* createLazyDynamicTextLabel(
     return w;
 }
 
-struct StaticTextLabel: Widget
+struct StaticTextLabel: Widget, IApplyTheme
 {
     FramebufferWidget* _fb = nullptr;
     BasicTextLabel* _label = nullptr;
@@ -206,6 +217,10 @@ struct StaticTextLabel: Widget
         _label->style(size, bold, alignment);
         dirty();
     }
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        return _label->applyTheme(theme_engine, theme);
+    }
     void draw(const DrawArgs& args) override
     {
         Widget::draw(args);
@@ -240,10 +255,12 @@ TWidget* createStaticTextLabel(
     math::Vec pos,
     float width,
     std::string text,
+    SvgThemeEngine& engine, 
+    std::shared_ptr<SvgTheme> theme,
+    const char* textKey,
     TextAlignment alignment = TextAlignment::Center,
     float text_height = 12.f,
-    bool bold = true,
-    const NVGcolor& color = RampGray(G_90)
+    bool bold = true
     )
 {
     TWidget* w = createWidget<TWidget>(pos);
@@ -253,7 +270,12 @@ TWidget* createStaticTextLabel(
     }
     w->text(text);
     w->style(text_height, bold, alignment);
-    w->color(color);
+    if (textKey && theme) {
+        w->_label->_text_key = textKey;
+    } else {
+        w->color(RampGray(G_90));
+    }
+    w->applyTheme(engine, theme);
     return w;
 }
 

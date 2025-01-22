@@ -1,4 +1,5 @@
 #include "../chem.hpp"
+#include "../chem-core.hpp"
 #include "../services/midi_devices.hpp"
 #include "../widgets/MidiPicker.hpp"
 #include "../widgets/label_widget.hpp"
@@ -19,7 +20,7 @@ struct CoreModuleWidget;
 
 enum class MidiDevice { Unknown, Haken, Midi1, Midi2 };
 
-struct CoreModule : ChemModule, IMidiDeviceNotify
+struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost
 {
     bool ready = false;
     CoreModuleWidget* ui = nullptr;
@@ -40,6 +41,10 @@ struct CoreModule : ChemModule, IMidiDeviceNotify
     midi::Output haken_midi_out;
     MidiInput controller1_midi_in;
     MidiInput controller2_midi_in;
+
+    std::vector<IChemClient*> clients;
+
+    bool pending_connection() { return !haken_midi.device_claim.empty() && nullptr == haken_midi.connection; }
 
     enum Params {
        NUM_PARAMS
@@ -67,6 +72,8 @@ struct CoreModule : ChemModule, IMidiDeviceNotify
     bool isController1Connected() { return nullptr != controller1.connection; }
     bool isController2Connected() { return nullptr != controller2.connection; }
 
+    void notify_connection_changed();
+
     // IMidiDeviceNotify
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
@@ -74,6 +81,18 @@ struct CoreModule : ChemModule, IMidiDeviceNotify
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void process(const ProcessArgs &args) override;
+
+    // IChemHost
+    void register_client(IChemClient* client) override;
+    void unregister_client(IChemClient* client) override;
+    bool host_has_client(IChemClient* client) override;
+    bool host_ready() override { return this->ready; }
+    std::shared_ptr<MidiDeviceConnection> host_connection() override {
+        return haken_midi.connection;
+    }
+    const PresetDescription* host_preset() override {
+        return nullptr;
+    }
 
     // impl
     void processLights(const ProcessArgs &args);

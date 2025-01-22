@@ -16,6 +16,7 @@ SOURCES += src/services/colors.cpp
 SOURCES += src/services/midi_devices.cpp
 SOURCES += src/services/MidiDeviceBroker.cpp
 SOURCES += src/services/MidiDeviceHolder.cpp
+SOURCES += src/services/midi-message.cpp
 SOURCES += src/services/misc.cpp
 SOURCES += src/services/svgtheme.cpp
 SOURCES += src/services/text.cpp
@@ -29,6 +30,7 @@ SOURCES += src/Blank/Blank.cpp
 SOURCES += src/Core/Core.cpp
 SOURCES += src/Core/Core-ui.cpp
 SOURCES += src/Preset/Preset.cpp
+SOURCES += src/Play/Play.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

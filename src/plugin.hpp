@@ -13,8 +13,10 @@ extern Plugin* pluginInstance;
 extern Model* modelBlank;
 extern Model* modelCore;
 extern Model* modelPreset;
+extern Model* modelPlay;
 
 // Theming
 
 extern svg_theme::SvgThemeEngine theme_engine;
 bool initThemeEngine();
+bool reloadThemes();

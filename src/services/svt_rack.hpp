@@ -22,6 +22,9 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
 //
 void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes);
 
+// send Dirty event to widget
+void sendDirty(Widget* widget);
+
 // ---------------------------------------------------------------------------
 // Themed Widget creation
 // These templates assume a themed widget has a constructor of the form WidgetT(svg_theme::SvgThemeEngine & engine, svg_theme::SvgTheme theme)

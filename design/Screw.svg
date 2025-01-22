@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg version="1.0"
-	 xmlns:cc="http://creativecommons.org/ns#"
-	 xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg"
-	 viewBox="0 0 15 14.9989" enable-background="new 0 0 15 14.9989" xml:space="preserve">
-<linearGradient id="grim" gradientUnits="userSpaceOnUse" x1="219.99944" y1="6477.3999" x2="232.99944" y2="6477.3999" gradientTransform="matrix(6.123234e-17 1 1 -6.123234e-17 -6469.8999 -219)">
-	<stop  offset="0" stop-color="#699eb8"/>
-	<stop  offset="1" stop-color="#3a6378"/>
-</linearGradient>
-<circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.49944" r="6.5"/>
+	xmlns:cc="http://creativecommons.org/ns#" 
+	xmlns:svg="http://www.w3.org/2000/svg"
+	xmlns="http://www.w3.org/2000/svg" 
+	viewBox="0 0 15 15">
+	<defs>
+		<linearGradient id="grim" gradientUnits="userSpaceOnUse" 
+			x1="6" y1="1" x2="7.5" y2="15">
+			<stop offset="0" stop-color="#947d4b" />
+			<stop offset="1" stop-color="#675632" />
+		</linearGradient>
+		<linearGradient id="gbevel" gradientUnits="userSpaceOnUse"
+			x1="6" y1="0" x2="7.5" y2="14">
+			<stop offset="0" stop-color="#ac9461" />
+			<stop offset="1" stop-color="#76633b" />
+		</linearGradient>
+		<linearGradient id="gface" gradientUnits="userSpaceOnUse"
+			x1="6" y1="0" x2="7.5" y2="12">
+			<stop offset="0" stop-color="#a39066" />
+			<stop offset="1" stop-color="#78643a" />
+		</linearGradient>
+	</defs>
+	<circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.5" r="6.5" />
+	<circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.5" r="5.8" />
+	<circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.36" />
 
-<linearGradient id="gbevel" gradientUnits="userSpaceOnUse" x1="220.68697" y1="6477.3999" x2="232.31085" y2="6477.3999" gradientTransform="matrix(6.123234e-17 1 1 -6.123234e-17 -6469.8999 -219)">
-	<stop  offset="0" stop-color="#8cc2dd"/>
-	<stop  offset="1" stop-color="#294756"/>
-</linearGradient>
-<circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.49891" r="5.81194"/>
-
-<linearGradient id="gface" gradientUnits="userSpaceOnUse" x1="221.13403" y1="6477.3999" x2="231.86378" y2="6477.3999" gradientTransform="matrix(6.123234e-17 1 1 -6.123234e-17 -6469.8999 -219)">
-	<stop  offset="0" stop-color="#699eb8"/>
-	<stop  offset="1" stop-color="#3a6378"/>
-</linearGradient>
-<circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.36487"/>
-
-<path id="screw-slot" fill="#264352" d="M10.96889,6.80997L9.00528,6.57471C8.70384,6.5386,8.46626,6.30092,8.43027,5.99947L8.19598,4.03719
+	<path id="screw-slot" fill="#675633" d="M10.96889,6.80997L9.00528,6.57471C8.70384,6.5386,8.46626,6.30092,8.43027,5.99947L8.19598,4.03719
 	c-0.01021-0.08553-0.08276-0.14993-0.1689-0.14993H6.97294c-0.08613,0-0.15867,0.06438-0.16889,0.1499l-0.23484,1.9634
 	C6.53315,6.30204,6.29544,6.5397,5.99394,6.57569L4.03118,6.81003c-0.08554,0.01021-0.14993,0.08276-0.14993,0.1689v1.0542
 	c0,0.08613,0.06438,0.15866,0.1499,0.16889l1.96299,0.2348C6.29557,8.47287,6.5332,8.7105,6.56925,9.01193l0.23479,1.96293
 	c0.01023,0.08552,0.08277,0.1499,0.16889,0.1499h1.0542c0.08612,0,0.15865-0.06436,0.16889-0.14986l0.23521-1.96318
 	c0.03611-0.30139,0.27372-0.53895,0.57512-0.57499l1.96249-0.2347c0.08552-0.01023,0.1499-0.08276,0.1499-0.16889V6.97886
-	C11.11875,6.89275,11.05439,6.82022,10.96889,6.80997z"/>
+	C11.11875,6.89275,11.05439,6.82022,10.96889,6.80997z" />
 </svg>

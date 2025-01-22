@@ -58,7 +58,6 @@ bool MidiDeviceBroker::claimDevice(const std::string claim, MidiDeviceHolder* cl
 
 void MidiDeviceBroker::revokeClaim(const std::string& claim)
 {
-    assert(!claim.empty());
     claims.erase(claim);
 }
 
@@ -70,11 +69,21 @@ void MidiDeviceBroker::revokeClaim(MidiDeviceHolder* claimant) {
     }
 }
 
+// reconcile currently available devices with claimed devices
 void MidiDeviceBroker::sync()
 {
-    // reconcile currently available devices with claimed devices
+    std::map<std::string,std::shared_ptr<MidiDeviceConnection>> connections;
     for (auto connection : EnumerateMidiConnections(false)) {
+        connections.insert(std::make_pair(connection->info.claim(), connection));
+    }
 
+    // bind registered holder claims
+    for (auto holder: holders) {
+        auto holder_claim = holder->getClaim();
+        auto cit = connections.find(holder_claim);
+        if (cit != connections.cend()) {
+            holder->connect(cit->second);
+        }
     }
 }
 

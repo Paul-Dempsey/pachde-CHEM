@@ -36,6 +36,7 @@ void ChemModuleWidget::setThemeName(const std::string& name)
 
     svg_theme::ApplyChildrenTheme(this, theme_engine, svg_theme);
     getChemModule()->setThemeName(name);
+    sendDirty(this);
 }
 
 void ChemModuleWidget::step()
@@ -57,8 +58,6 @@ void ChemModuleWidget::draw(const DrawArgs& args)
     ModuleWidget::draw(args);
     if (showGrid) {
         auto vg = args.vg;
-        //drawCrossLine(vg, RACK_GRID_WIDTH+2, RACK_GRID_HEIGHT - 60);
-
         NVGcolor co = Overlay(GetStockColor(StockColor::Gold), 0.35f);
 
         for (float x = 0.f; x < box.size.x; x += 7.5f) {
@@ -84,4 +83,9 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
         "Show grid", "",
         [this]() { return showGrid; },
         [this]() { showGrid = !showGrid; }));
+
+    menu->addChild(createMenuItem("Reload themes", "", [this]() {
+        reloadThemes();
+        setThemeName(getThemeName());
+    }));
 }

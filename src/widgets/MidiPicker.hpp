@@ -68,7 +68,7 @@ struct MidiPicker : TipWidget
             for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
                 auto conn = *it;
                 if (is_EMDevice(conn->info.input_device_name)) {
-                    auto item_claim = conn->info.spec();
+                    auto item_claim = conn->info.claim();
                     bool mine = (0 == current_claim.compare(item_claim));
                     bool unavailable = mine ? false : !broker->available(item_claim);
 
@@ -88,7 +88,7 @@ struct MidiPicker : TipWidget
             menu->addChild(createSubmenuItem("Any MIDI device (advanced)", "", [=](Menu * menu){
                 for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
                     auto conn = *it;
-                    auto item_claim = conn->info.spec();
+                    auto item_claim = conn->info.claim();
                     bool mine = (0 == current_claim.compare(item_claim));
                     bool unavailable = mine ? false : !broker->available(item_claim);
 
@@ -107,7 +107,7 @@ struct MidiPicker : TipWidget
         } else {
             for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
                 auto conn = *it;
-                auto item_claim = conn->info.spec();
+                auto item_claim = conn->info.claim();
                 bool mine = (0 == current_claim.compare(item_claim));
                 bool unavailable = mine ? false : !broker->available(item_claim);
 

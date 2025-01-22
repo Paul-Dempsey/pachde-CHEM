@@ -3,10 +3,35 @@
         "name": "Light",
         "theme": {
             "panel": { "fill": "rack-white" },
+            "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
 
             "hexoid": { "fill": "#c78d11" },
             "CHEM": { "fill": "#c78d11" },
             "pachde": { "fill": "#c78d11" },
+            "title": {"fill": "brand", "opacity": 0.4},
+
+            "rbtn-punch": {"fill": "#000000"},
+            "rbtn-bezel": {"fill": "#404040" },
+            "rbtn-taper": { "fill": { "gradient": [{ "index":0, "color":"#d9d9d9"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#bfbfbf"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"#666666"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#8c8c8c"}, { "index":1, "color":"#595959"}]}},
+
+            "qbtn-punch" :   { "fill": "#080808" },
+
+            "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#d1d1d1"}, { "index":1, "color":"#3e3e3e"}]}},
+            "qbtn-hi-l":  { "fill": "#8c8c8c" },
+            "qbtn-hi-r":  { "fill": "#666666" },
+            "qbtn-hi-t":  { "fill": "#d9d9d9" },
+            "qbtn-hi-b":  { "fill": "#343434" },
+            "qbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#494a4a"}]}},
+
+            "qbtn-dn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#3d3d3d"}, { "index":1, "color":"#575757"}]}},
+            "qbtn-dn-hi-l":  { "fill": "#666666" },
+            "qbtn-dn-hi-r":  { "fill": "#8c8c8c" },
+            "qbtn-dn-hi-t":  { "fill": "#3d3d3d" },
+            "qbtn-dn-hi-b":  { "fill": "#c8c6c6" },
+            "qbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#a6a6a6"}, { "index":1, "color":"#5b5b5b"}]}},
 
             "dytext": { "fill": "#457aa6"},
             "curpreset": { "fill": "brand" },
@@ -19,6 +44,7 @@
             "preset-selected": { "fill": "brand" },
             "grid-bg":         { "fill": "#d6d6d6" },
             "grid-line":       { "stroke": "rack-white" },
+            "preset-grip":     { "fill":"#9d9131", "opacity": 0.2 },
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
@@ -34,7 +60,7 @@
             "button-inset": { "fill": { "gradient": [{"index":0, "offset":0, "color": "#c0c0c0"}, {"index":1, "offset":1, "color": "#404040"}]}},
             "button-face":  { "fill": { "gradient": [{"index":0, "offset":0, "color": "#e6e6e6"}, {"index":1, "offset":1, "color": "#b0b0b0"}]}},
 
-            "port-bezel":     { "fill": "#595959" },
+            "port-bezel":     { "fill": "debug" },
             "port-ring":      { "fill": "#808080" },
             "port-jack":      { "fill": "#c0c0c0" },
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
@@ -46,8 +72,8 @@
 
             "alpha-knob-bg": { "fill" : { "gradient" : [{ "index": 0, "offset":0, "color":"#4095bf" }, { "index": 1, "offset":1, "color":"#204a5f" }]}},
 
-            "screw-rim":   { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#aba9a9" }, { "index": 1, "offset": 1, "color": "#8f8f8f" }]}},
-            "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#c2c2c2" }]}},
+            "screw-rim":   { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#cacaca" }, { "index": 1, "offset": 1, "color": "#9d9d9d" }]}},
+            "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#b8b8b8" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#ebebeb" }, { "index": 1, "offset": 1, "color": "#cccccc" }]}},
             "screw-slot":  { "fill": "#8c8c8c" },
 

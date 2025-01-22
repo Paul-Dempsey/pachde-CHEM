@@ -113,9 +113,9 @@ bool MidiDeviceConnectionInfo::parse(const std::string & spec)
     return true;
 }
 
-std::string MidiDeviceConnectionInfo::spec() const
+std::string MidiDeviceConnectionInfo::claim() const
 {
-    if (claim.empty()) {
+    if (claim_spec.empty()) {
         auto s = input_device_name;
         s.push_back(CLAIM_SEPARATOR);
         s.append(output_device_name);
@@ -127,9 +127,9 @@ std::string MidiDeviceConnectionInfo::spec() const
         } else {
             s.append(format_string("%d", sequence));
         }
-        const_cast<MidiDeviceConnectionInfo*>(this)->claim = s;
+        const_cast<MidiDeviceConnectionInfo*>(this)->claim_spec = s;
     }
-    return claim;
+    return claim_spec;
 }
 
 std::string MidiDeviceConnectionInfo::friendly(TextFormatLength length) const

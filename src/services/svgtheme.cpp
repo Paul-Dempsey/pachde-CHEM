@@ -120,6 +120,13 @@ std::string format_string(const char *fmt, ...)
 
 const PackedColor OPAQUE_BLACK = 255 << 24;
 
+void SvgThemeEngine::clear()
+{
+    themes.clear();
+    colors.clear();
+    svgs.clear();
+}
+
 std::shared_ptr<SvgTheme> SvgThemeEngine::getTheme(const std::string& name)
 {
     auto r = std::find_if(themes.begin(), themes.end(), [=](const std::shared_ptr<SvgTheme> theme) {
@@ -659,34 +666,42 @@ PackedColor SvgThemeEngine::getStockColor(const char *name)
     if (it == colors.end()) return NoColor;
     return it->second;
 }
+
 // -----------------------------------------------------------------------
+// svt_rack
+//
+
+void sendDirty(Widget* widget)
+{
+	EventContext cDirty;
+	Widget::DirtyEvent eDirty;
+	eDirty.context = &cDirty;
+	widget->onDirty(eDirty);
+}
 
 bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr<SvgTheme> theme, bool top)
 {
     bool modified = false;
 
-    auto change = dynamic_cast<svg_theme::IApplyTheme*>(widget);
-    if (change && change->applyTheme(themes, theme)) {
-        modified = true;
-    }
-
     for (Widget* child : widget->children) {
-        change = dynamic_cast<svg_theme::IApplyTheme*>(child);
-        if (change && change->applyTheme(themes, theme)) {
-            modified = true;
-        }
         if (!child->children.empty()) {
             if (ApplyChildrenTheme(child, themes, theme, false)) {
                 modified = true;
             }
         }
+        // themed = dynamic_cast<svg_theme::IApplyTheme*>(child);
+        // if (themed && themed->applyTheme(themes, theme)) {
+        //     modified = true;
+        // }
+    }
+
+    auto themed = dynamic_cast<svg_theme::IApplyTheme*>(widget);
+    if (themed && themed->applyTheme(themes, theme)) {
+        modified = true;
     }
 
     if (top && modified) {
-        EventContext cDirty;
-        Widget::DirtyEvent eDirty;
-        eDirty.context = &cDirty;
-        widget->onDirty(eDirty);
+        sendDirty(widget);
     }
 
     return modified;

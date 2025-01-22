@@ -6,7 +6,7 @@
   <g>
     <circle
        id="cop-bezel"
-       fill="#ffffff" fill-opacity="0.2"
+       fill="#ffffff" fill-opacity="0.15"
        cx="8" cy="8" r="8" />
     <circle
        id="cop-hole"

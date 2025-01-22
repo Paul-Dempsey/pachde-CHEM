@@ -1,21 +1,35 @@
 #include "../plugin.hpp"
 #include "../chem.hpp"
+#include "../chem-core.hpp"
 #include "../services/colors.hpp"
 #include "../widgets/themed_widgets.hpp"
 using namespace pachde;
 
-struct PresetModule : ChemModule
+struct PresetModule : ChemModule, IChemClient
 {
-    // void dataFromJson(json_t* root) override {
-    //     ChemModule::dataFromJson(root);
-    // }
+    std::string core_claim;
 
-    // json_t* dataToJson() override {
-    //     json_t* root = ChemModule::dataToJson();
-    //     return root;
-    // }
+    // IChemClient
+    rack::engine::Module* client_module() override { return this; }
+
+    void releaseHost() override {}
+    void onPresetChange() override
+    {
+    }
+    void onConnectionChange() override
+    {
+    }
+
+    void dataFromJson(json_t* root) override {
+        ChemModule::dataFromJson(root);
+        
+    }
+
+    json_t* dataToJson() override {
+        json_t* root = ChemModule::dataToJson();
+        return root;
+    }
 };
-
 
 
 struct PresetModuleWidget : ChemModuleWidget

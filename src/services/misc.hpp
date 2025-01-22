@@ -77,6 +77,46 @@ const char * InitStateName(InitState state);
 //     bool any() { return !empty(); }
 // };
 
+class WallTimer
+{
+    double start_time;
+    double interval;
+
+public:
+    WallTimer() : interval(0.0) { }
+    WallTimer(double timeout) : interval(timeout) { }
+
+    void set_interval(double interval) { 
+        assert(interval > 0.0);
+        this->interval = interval;
+    }
+
+    void run() {
+        assert(interval > 0.0);
+        start_time = rack::system::getTime();
+    }
+
+    void start(double interval) {
+        this->interval = interval;
+        run();
+    }
+
+    // For one-shots: return true when interval has elapsed.
+    // Call start() to begin a new interval
+    bool finished() { return rack::system::getTime() - start_time >= interval; }
+
+    // For periodic intervals: returns true once when time passes the interval and resets.
+    bool lap()
+    {
+        auto current = rack::system::getTime();
+        bool lapped = current - start_time >= interval;
+        if (lapped) {
+            start_time = current;
+        }
+        return lapped;
+    }
+};
+
 struct RateTrigger
 {
     float rate_ms;
