@@ -1,7 +1,7 @@
 #include "../plugin.hpp"
 #include "../chem.hpp"
 #include "../services/colors.hpp"
-#include "../widgets/themed_widgets.hpp"
+#include "../widgets/themed-widgets.hpp"
 using namespace pachde;
 
 struct PlayModule : ChemModule

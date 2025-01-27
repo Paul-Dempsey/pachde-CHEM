@@ -80,12 +80,32 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 
     menu->addChild(new MenuSeparator); 
     menu->addChild(createCheckMenuItem(
-        "Show grid", "",
+        "Grid", "",
         [this]() { return showGrid; },
         [this]() { showGrid = !showGrid; }));
 
     menu->addChild(createMenuItem("Reload themes", "", [this]() {
         reloadThemes();
-        setThemeName(getThemeName());
+        this->setThemeName(getThemeName());
     }));
+}
+
+// ---------------------------------------------------------------------------
+// utils
+//
+
+NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback)
+{
+    assert(color_name);
+    if (theme.empty()) return fallback;
+    auto co = fromPacked(theme_engine.getFillColor(theme, color_name));
+    return isColorVisible(co) ? co : fallback;
+}
+
+NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback)
+{
+    assert(color_name);
+    if (theme.empty()) return GetStockColor(fallback);
+    auto co = fromPacked(theme_engine.getFillColor(theme, color_name));
+    return isColorVisible(co) ? co : GetStockColor(fallback);
 }

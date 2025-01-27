@@ -2,7 +2,7 @@
 #include "../chem.hpp"
 #include "../chem-core.hpp"
 #include "../services/colors.hpp"
-#include "../widgets/themed_widgets.hpp"
+#include "../widgets/themed-widgets.hpp"
 using namespace pachde;
 
 struct PresetModule : ChemModule, IChemClient
@@ -12,11 +12,10 @@ struct PresetModule : ChemModule, IChemClient
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
 
-    void releaseHost() override {}
     void onPresetChange() override
     {
     }
-    void onConnectionChange() override
+    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override
     {
     }
 

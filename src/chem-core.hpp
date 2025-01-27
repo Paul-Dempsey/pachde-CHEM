@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "em/preset.hpp"
-#include "services/midi_devices.hpp"
+#include "services/midi-devices.hpp"
 
 namespace pachde {
 
@@ -15,16 +15,15 @@ struct IChemHost
     virtual bool host_ready() = 0;
     virtual std::shared_ptr<MidiDeviceConnection> host_connection() = 0;
     virtual const PresetDescription* host_preset() = 0;
-
 };
+
+enum class ChemDevice { Unknown, Haken, Midi1, Midi2 };
 
 struct IChemClient
 {
     virtual rack::engine::Module* client_module() = 0;
-    virtual void releaseHost() = 0;
-
     virtual void onPresetChange() = 0;
-    virtual void onConnectionChange() = 0;
+    virtual void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) = 0;
 };
 
 

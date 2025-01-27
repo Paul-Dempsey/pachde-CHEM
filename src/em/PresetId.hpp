@@ -1,6 +1,4 @@
 #pragma once
-#include <rack.hpp>
-#include "../services/FixedStringBuffer.hpp"
 
 namespace pachde {
 
@@ -22,6 +20,7 @@ class PresetId {
 
 public:
     PresetId(){ id.data = 0; }
+    PresetId& operator=(const PresetId& other) { id = other.id; return *this; }
     PresetId(const PresetId& other) { id = other.id; }
     PresetId(uint32_t key) { id.data = key; }
     PresetId(uint8_t hi, uint8_t lo, uint8_t number) {
@@ -30,6 +29,7 @@ public:
         id.bytes.number = number;
         id.bytes.pad = 0;
     }
+    void clear() { id.data = 0; }
     RawPresetId& raw() { return id; }
     uint32_t key() { return id.data; }
     uint8_t bankHi() { return id.bytes.bank_hi; }

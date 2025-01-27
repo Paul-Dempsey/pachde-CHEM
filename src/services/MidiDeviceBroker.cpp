@@ -1,4 +1,4 @@
-#include "midi_devices.hpp"
+#include "midi-devices.hpp"
 
 namespace pachde {
 
@@ -85,6 +85,24 @@ void MidiDeviceBroker::sync()
             holder->connect(cit->second);
         }
     }
+}
+
+bool MidiDeviceBroker::bindAvailableEm(MidiDeviceHolder* holder)
+{
+    assert(std::find(holders.cbegin(), holders.cend(), holder) != holders.cend());
+
+    for (auto connection : EnumerateMidiConnections(true)) {
+        auto claim = connection->info.claim();
+        if (available(claim)) {
+            bool ok = claimDevice(claim, holder);
+            if (ok) {
+                holder->device_claim = claim;
+                holder->connection = connection;
+            }
+            return ok;
+        }
+    }
+    return false;
 }
 
 }

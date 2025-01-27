@@ -19,6 +19,8 @@ typedef enum {
     MidiStatus_SysEx           = 0xf0,
 } MidiStatus;
 
+int MessageBytes(uint8_t status_byte);
+
 #define STATUS_MASK   0xF0
 #define CHANNEL_MASK  0x0F
 
@@ -36,6 +38,7 @@ typedef union PackedMidiMessage {
 
 inline uint8_t midi_status(PackedMidiMessage msg) { return msg.bytes.status_byte & STATUS_MASK; }
 inline uint8_t midi_channel(PackedMidiMessage msg) { return msg.bytes.status_byte & CHANNEL_MASK; }
+inline uint8_t midi_cc(PackedMidiMessage msg) { return msg.bytes.data1; }
 
 PackedMidiMessage MakeRawBase(uint8_t status_byte, uint8_t value, uint8_t value2);
 PackedMidiMessage MakeRaw(uint8_t status, uint8_t channel, uint8_t value, uint8_t value2);

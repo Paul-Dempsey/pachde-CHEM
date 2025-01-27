@@ -35,8 +35,11 @@
 
             "dytext": { "fill": "#457aa6"},
             "curpreset": { "fill": "brand" },
-            "midi-in": { "fill" : "#39733a" },
-            "midi-bar": { "stroke" : "g70" },
+
+            "haken-in": { "fill": "#fac927" },
+            "haken-out": { "fill": "#4556e7" },
+            "c1-in": { "fill": "#27fae5" },
+            "c2-in": { "fill": "#27fae5" },
 
             "tab-label":       { "fill": "g50" },
             "tab-label-hi":    { "fill": "g20" },

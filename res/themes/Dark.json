@@ -37,10 +37,13 @@
             "midi-face"  : { "fill": "#1f1f1f" },
             "midi-label" : { "fill": "#d9d9d9" },
 
+            "haken-in": { "fill": "#54a754" },
+            "haken-out": { "fill": "#4556e7" },
+            "c1-in": { "fill": "#e744be" },
+            "c2-in": { "fill": "#e744be" },
+
             "dytext": { "fill": "#5d8ed7" },
             "curpreset": { "fill": "brand" },
-            "midi-in": { "fill" : "#54a754" },
-            "midi-bar":  { "stroke" : "#1f375c" },
 
             "tab-label":       { "fill": "g55" },
             "tab-label-hi":    { "fill": "g70" },

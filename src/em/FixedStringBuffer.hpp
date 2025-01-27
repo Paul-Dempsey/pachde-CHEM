@@ -16,7 +16,7 @@ public:
     FixedStringBuffer() { clear(); }
 
     bool empty() const { return end == data; }
-    const char * str() const { return data; }
+    const char *  str() const { return data; }
 
     void clear() {
         *data = 0;

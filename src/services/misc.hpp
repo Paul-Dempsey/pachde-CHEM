@@ -1,6 +1,5 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-
 #include <rack.hpp>
 #include <string>
 
@@ -12,7 +11,9 @@ namespace pachde {
 #endif
 
 std::string format_string(const char *fmt, ...);
-const char * printable(const std::string& s);
+size_t format_buffer(char * buffer, size_t length, const char* fmt, ...);
+const char * printable(const std::string& s); // returns a printable string, even if str is empty
+char printable(char ch);
 bool alpha_order(const std::string& a, const std::string& b); 
 std::size_t common_prefix_length(const std::string& alpha, const std::string& beta);
 std::size_t common_prefix_length_insensitive(const std::string& alpha, const std::string& beta);
@@ -37,15 +38,6 @@ inline bool in_range_limit(T value, T minimum, T limit) { return minimum <= valu
 
 bool GetBool(const json_t* root, const char* key, bool default_value);
 float GetFloat(const json_t* root, const char* key, float default_value);
-
-enum class InitState : uint8_t {
-    Uninitialized,
-    Pending,
-    Complete,
-    Broken
-};
-
-const char * InitStateName(InitState state);
 
 // enum Expansion {
 //     None  = 0x00,

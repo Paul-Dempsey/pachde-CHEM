@@ -1,6 +1,26 @@
 //#include <assert.h>
 #include "midi-message.h"
 
+int MessageBytes(uint8_t status_byte)
+{
+    switch (status_byte & 0xf0) {
+    case MidiStatus_NoteOff:
+    case MidiStatus_NoteOn:
+    case MidiStatus_PolyKeyPressure:
+    case MidiStatus_CC:
+        return 2;
+
+    case MidiStatus_ProgramChange:
+    case MidiStatus_ChannelPressure:
+        return 1;
+
+    case MidiStatus_PitchBend:
+        return 2;
+
+    default:
+        return 0;
+    }
+}
 
 PackedMidiMessage MakeRawBase(uint8_t status_byte, uint8_t value1, uint8_t value2)
 {

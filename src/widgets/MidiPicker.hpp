@@ -2,7 +2,7 @@
 #pragma once
 #include <rack.hpp>
 #include "../plugin.hpp"
-#include "../services/midi_devices.hpp"
+#include "../services/midi-devices.hpp"
 #include "TipWidget.hpp"
 
 using namespace ::rack;

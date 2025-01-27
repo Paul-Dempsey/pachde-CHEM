@@ -4,82 +4,230 @@
 
 using namespace pachde;
 
-Model *modelCore = createModel<CoreModule, CoreModuleWidget>("chem-core");
-
-CoreModule::CoreModule()
+void RelayMidiToEM::doMessage(PackedMidiMessage message)
 {
-    haken_midi.subscribe(this);
-    controller1.subscribe(this);
-    controller2.subscribe(this);
+    core->em.onMessage(message);
+}
 
-    auto broker = MidiDeviceBroker::get();
-    broker->registerDeviceHolder(&haken_midi);
-    broker->registerDeviceHolder(&controller1);
-    broker->registerDeviceHolder(&controller2);
-
+CoreModule::CoreModule() : in_reboot(false), heartbeat(false), loop(0)
+{
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configLight(L_READY, "Haken device ready");
     configLight(L_ROUND_Y, "Round on Y");
     configLight(L_ROUND_INITIAL, "Round initial");
     configLight(L_ROUND, "Rounding");
     configLight(L_ROUND_RELEASE, "Round on release");
+    configLight(L_PULSE, "Loopback pulse");
+
     configOutput(Outputs::OUT_READY, "Ready trigger");
+
+    to_em.core = this;
+    tasks.setCoreModule(this);
+    em.subscribeEMEvents(this);
+    haken_midi_out.setEm(&em);
+
+    haken_midi.subscribe(this);
+    controller1.subscribe(this);
+    controller2.subscribe(this);
+
+    haken_midi_in.addTarget(&to_em);
+    controller1_midi_in.addTarget(&haken_midi_out);
+    controller2_midi_in.addTarget(&haken_midi_out);
+
+    auto broker = MidiDeviceBroker::get();
+    broker->registerDeviceHolder(&haken_midi);
+    broker->registerDeviceHolder(&controller1);
+    broker->registerDeviceHolder(&controller2);
+
+    enable_logging(true);
+    tasks.subscribeChange(this);
 }
 
 CoreModule::~CoreModule() {
+    //haken_midi_in.clear();
+    controller1_midi_in.clear();
+    controller2_midi_in.clear();
+    controller1.unsubscribe(this);
+    controller2.unsubscribe(this);
     auto broker = MidiDeviceBroker::get();
     broker->unRegisterDeviceHolder(&haken_midi);
     broker->unRegisterDeviceHolder(&controller1);
     broker->unRegisterDeviceHolder(&controller2);
 }
 
-
-void HandleMidiDeviceChange(MidiInput* input, rack::midi::Output * output, const MidiDeviceHolder* source, StaticTextLabel *label)
+void CoreModule::enable_logging(bool enable)
 {
-    if (source->connection) {
-        input->setDriverId(source->connection->driver_id);
-        input->setDeviceId(source->connection->input_device_id);
-        if (output) {
-            output->setDeviceId(source->connection->output_device_id);
-        }
-        if (label) {
-            label->text(source->connection->info.friendly(TextFormatLength::Short));
-        }
+    log_midi = enable;
+    if (enable){
+        haken_midi_out.setLogger(&midilog);
+        haken_midi_in.setLogger("<<H", &midilog);
+        controller1_midi_in.setLogger("<C1", &midilog);
+        controller2_midi_in.setLogger("<C2", &midilog);
     } else {
-        input->setDeviceId(-1);
-        input->setDeviceId(-1);
-        if (output) {
-            output->setDeviceId(-1);
-        }
-        if (label) {
-            label->text("");
+        haken_midi_out.setLogger(nullptr);
+        haken_midi_in.setLogger("", nullptr);
+        controller1_midi_in.setLogger("", nullptr);
+        controller2_midi_in.setLogger("", nullptr);
+        midilog.close();
+    }
+}
+
+void CoreModule::reboot()
+{
+    if (in_reboot) return;
+    in_reboot = true;
+    haken_midi_in.reset();
+    haken_midi_out.output.reset();
+    haken_midi_out.output.channel = -1;
+    haken_midi_out.ring.clear();
+    controller1_midi_in.reset();
+    controller1_midi_in.ring.clear();
+    controller2_midi_in.reset();
+    controller2_midi_in.ring.clear();
+    em.reset();
+    tasks.refresh();
+}
+
+void CoreModule::send_midi_rate(HakenMidiRate rate)
+{
+    haken_midi_out.sendMidiRate(rate);
+}
+
+void CoreModule::restore_midi_rate()
+{
+    if (HakenMidiRate::Full != tasks.midi_rate) {
+        haken_midi_out.sendMidiRate(HakenMidiRate::Full);
+        tasks.midi_rate = HakenMidiRate::Full;
+    }
+}
+
+// IHandleEmEvents
+void CoreModule::onLoopDetect(uint8_t cc, uint8_t value)
+{
+    ++loop;
+    //if (0 == (loop & 1)) {
+        heartbeat = !heartbeat;
+        getLight(L_PULSE).setBrightness(heartbeat ? 0.f : value);
+   // }
+}
+
+void CoreModule::onEditorReply(uint8_t reply)
+{
+    tasks.complete_task(HakenTask::HeartBeat);
+//    getLight(L_PULSE).setBrightnessSmooth(0.f, 4.f * APP->engine->getSampleTime());
+}
+
+void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
+{
+}
+
+void CoreModule::onPresetChanged()
+{
+    auto task = tasks.get_task(HakenTask::PresetInfo);
+    if (task->pending()) {
+        task->complete();
+    }
+    task = tasks.get_task(HakenTask::LastPreset);
+    if (task->pending()) {
+        task->complete();
+    }
+}
+void CoreModule::onUserComplete()
+{
+    tasks.complete_task(HakenTask::UserPresets);
+}
+void CoreModule::onSystemComplete()
+{
+    tasks.complete_task(HakenTask::SystemPresets);
+}
+void CoreModule::onTaskMessage(uint8_t code)
+{
+}
+void CoreModule::onLED(uint8_t led)
+{
+}
+
+void CoreModule::onHakenTaskChange(HakenTask id)
+{
+    if (id == HakenTask::HeartBeat) {
+        auto task = tasks.get_task(id);
+        if (task->waiting()) {
+            heartbeat = !heartbeat;
+            getLight(L_PULSE).setBrightness(!heartbeat);
         }
     }
 }
 
-void CoreModule::notify_connection_changed()
+void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    for (auto item : clients) {
-        item->onConnectionChange();
+    for (auto client : clients) {
+        client->onConnectionChange(device, connection);
+    }
+}
+
+void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
+{
+    if (source->connection) {
+        input->setDriverId(source->connection->driver_id);
+        input->setDeviceId(source->connection->input_device_id);
+    } else {
+        input->reset();
     }
 }
 
 void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 {
-    auto id = MidiDeviceIdentifier(source);
+    auto sample_time = APP->engine->getSampleTime();
+    getLight(L_PULSE).setBrightnessSmooth(0.f, 10 * sample_time);
+    getLight(L_READY).setBrightnessSmooth(0.f, 20 * sample_time);
+
+    auto id = DeviceIdentifier(source);
     switch (id) {
-    case MidiDevice::Haken: {
-        ready = false;
-        HandleMidiDeviceChange(&haken_midi_in, &haken_midi_out, source, ui ? ui->haken_device_label : nullptr);
-        notify_connection_changed();
+    case ChemDevice::Haken: {
+        em.ready = false; // todo clear?
+        if (source->connection) {
+            haken_midi_in.setDriverId(source->connection->driver_id);
+            haken_midi_in.setDeviceId(source->connection->input_device_id);
+            haken_midi_out.output.setDeviceId(source->connection->output_device_id);
+            haken_midi_out.output.channel = -1;
+
+            logMessage("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            haken_midi_out.sendEditorPresent();
+            haken_midi_out.dispatch(DISPATCH_NOW);
+        } else {
+            logMessage("Core", "--- disconnect HAKEN");
+            haken_midi_in.reset();
+            haken_midi_out.output.reset();
+            haken_midi_out.output.channel = -1;
+        }
+        em.reset();
+        tasks.refresh();
+        notify_connection_changed(ChemDevice::Haken, source->connection);
     } break;
-    case MidiDevice::Midi1: {
-        HandleMidiDeviceChange(&controller1_midi_in, nullptr, source, ui ? ui->controller1_device_label : nullptr);
-    } break;
-    case MidiDevice::Midi2: {
-        HandleMidiDeviceChange(&controller2_midi_in, nullptr, source, ui ? ui->controller2_device_label : nullptr); 
-    } break;
-    default: break;
+
+    case ChemDevice::Midi1:
+        if (source->connection) {
+            logMessage("Core", format_string("+++ connect MIDI1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+        } else {
+            logMessage("Core", "--- disconnect Midi1");
+        }
+        HandleMidiDeviceChange(&controller1_midi_in, source);
+        notify_connection_changed(ChemDevice::Midi1, source->connection);
+        break;
+
+    case ChemDevice::Midi2:
+        if (source->connection) {
+            logMessage("Core", format_string("+++ connect MIDI2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+        } else {
+            logMessage("Core", "--- disconnect Midi2");
+        }
+        HandleMidiDeviceChange(&controller2_midi_in, source);
+        notify_connection_changed(ChemDevice::Midi2, source->connection);
+        break;
+
+    case ChemDevice::Unknown:
+        DEFAULT_UNREACHABLE
+        break;
     }
 }
 
@@ -88,7 +236,7 @@ void CoreModule::dataFromJson(json_t* root)
     ChemModule::dataFromJson(root);
     json_t* j;
 
-    j = json_object_get(root, "haken_device");
+    j = json_object_get(root, "haken-device");
     if (j) {
         haken_midi.setClaim(json_string_value(j));
     }
@@ -100,14 +248,20 @@ void CoreModule::dataFromJson(json_t* root)
     if (j) {
         controller2.setClaim(json_string_value(j));
     }
+    j = json_object_get(root, "log-midi");
+    if (j) {
+        log_midi = json_boolean_value(j);
+    }
+    enable_logging(log_midi);
 }
 
 json_t* CoreModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken_device", json_string(haken_midi.getClaim().c_str()));
+    json_object_set_new(root, "haken-device", json_string(haken_midi.getClaim().c_str()));
     json_object_set_new(root, "controller-1", json_string(controller1.getClaim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.getClaim().c_str()));
+    json_object_set_new(root, "log-midi", json_boolean(log_midi));
     return root;
 }
 
@@ -133,21 +287,37 @@ bool CoreModule::host_has_client(IChemClient* client)
     return item != clients.cend();
 }
 
-const uint64_t PROCESS_LIGHT_INTERVAL = 120;
 
+constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 120;
 void CoreModule::processLights(const ProcessArgs &args)
 {
-    getLight(L_READY).setBrightnessSmooth(this->ready ? 1.0f : 0.f, args.sampleTime * 20);
+    getLight(L_READY).setBrightnessSmooth(host_ready() ? 1.0f : 0.f, args.sampleTime * 20);
 }
 
 void CoreModule::process(const ProcessArgs &args)
 {
+    auto sample_time = args.sampleTime;
+    controller1_midi_in.dispatch(sample_time);
+    controller2_midi_in.dispatch(sample_time);
+    if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {
+        haken_midi_out.dispatch(DISPATCH_NOW);
+    }
+    haken_midi_in.dispatch(sample_time);
+    if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {
+        haken_midi_out.dispatch(DISPATCH_NOW);
+    } else {
+        haken_midi_out.dispatch(sample_time);
+    }
+
+    tasks.process(args);
+
+    if (getOutput(OUT_READY).isConnected()) {
+        getOutput(OUT_READY).setVoltage(host_ready() ? 10.0f : 0.0f);
+    }
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
         processLights(args);
     }
-
-    if (getOutput(OUT_READY).isConnected()) {
-        getOutput(OUT_READY).setVoltage(ready ? 10.0f : 0.0f);
-    }
 }
+
+Model *modelCore = createModel<CoreModule, CoreModuleWidget>("chem-core");
 

@@ -2,7 +2,7 @@
 #include <rack.hpp>
 #include "plugin.hpp"
 #include "services/colors.hpp"
-#include "widgets/themed_widgets.hpp"
+#include "widgets/themed-widgets.hpp"
 
 using namespace rack;
 using namespace svg_theme;
@@ -50,3 +50,6 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
     void appendContextMenu(Menu *menu) override;
 
 };
+
+NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback);
+NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback);

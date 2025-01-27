@@ -16,6 +16,15 @@ std::string format_string(const char *fmt, ...)
     return s;
 }
 
+size_t format_buffer(char * buffer, size_t length, const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    auto r = std::vsnprintf(buffer, length, fmt, args);
+    va_end(args);
+    return r;
+}
+
 // case-insensitive
 bool alpha_order(const std::string& a, const std::string& b)
 {
@@ -40,6 +49,11 @@ bool alpha_order(const std::string& a, const std::string& b)
 const char * printable(const std::string& s)
 {
     return s.empty() ? "" : s.c_str();
+}
+
+char printable(char ch)
+{
+    return (ch >= 32) ? ch : '-';
 }
 
 std::string spaceless(const std::string& str)
@@ -154,18 +168,6 @@ std::string TempName(const std::string& suffix) {
         random::get<uint32_t>(),
         suffix.empty() ? ".tmp" : suffix.c_str()
         );
-}
-
-
-
-const char * InitStateName(InitState state) {
-    switch (state) {
-    case InitState::Uninitialized: return "Not started";
-    case InitState::Pending: return "Pending";
-    case InitState::Complete: return "Complete";
-    case InitState::Broken: return "Broken";
-    default: return "(unknown)";
-    }
 }
 
 }

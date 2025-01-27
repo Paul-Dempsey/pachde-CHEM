@@ -1,50 +1,115 @@
 #include "../chem.hpp"
 #include "../chem-core.hpp"
-#include "../services/midi_devices.hpp"
+#include "../em/EaganMatrix.hpp"
+#include "../services/haken-midi.hpp"
+#include "../services/midi-devices.hpp"
+#include "../services/midi-io.hpp"
 #include "../widgets/MidiPicker.hpp"
-#include "../widgets/label_widget.hpp"
+#include "../widgets/label-widget.hpp"
+#include "../widgets/indicator-widget.hpp"
+#include "../widgets/blip-widget.hpp"
+#include "haken-task.hpp"
+//#include "midi-input-worker.hpp"
+
 using namespace pachde;
 
-struct MidiInput : midi::Input
-{
-    uint64_t received_count = 0;
+struct CoreModuleWidget;
+struct CoreModule;
 
-    uint64_t received() { return received_count; }
-    void onMessage(const midi::Message& message) override
-    {
-        ++received_count;
-    }
+struct RelayMidiToEM : IDoMidi
+{
+    CoreModule* core{nullptr};
+    void doMessage(PackedMidiMessage message) override;
 };
 
-struct CoreModuleWidget;
-
-enum class MidiDevice { Unknown, Haken, Midi1, Midi2 };
-
-struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost
+struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, IHakenTaskEvents
 {
-    bool ready = false;
     CoreModuleWidget* ui = nullptr;
 
     MidiDeviceHolder haken_midi;
     MidiDeviceHolder controller1;
     MidiDeviceHolder controller2;
 
-    MidiDevice MidiDeviceIdentifier(const MidiDeviceHolder* holder)
-    {
-        if (holder == &haken_midi) return MidiDevice::Haken;
-        if (holder == &controller1) return MidiDevice::Midi1;
-        if (holder == &controller2) return MidiDevice::Midi2;
-        return MidiDevice::Unknown;
-    }
-
     MidiInput haken_midi_in;
-    midi::Output haken_midi_out;
     MidiInput controller1_midi_in;
     MidiInput controller2_midi_in;
 
-    std::vector<IChemClient*> clients;
+    HakenMidiOutput haken_midi_out;
 
-    bool pending_connection() { return !haken_midi.device_claim.empty() && nullptr == haken_midi.connection; }
+    //MidiInputWorker midi_input_queue;
+
+    RelayMidiToEM to_em;
+    MidiLog midilog;
+    
+    EaganMatrix em;
+    bool log_midi;
+    bool in_reboot;
+    bool heartbeat;
+    uint64_t loop;
+
+    std::vector<IChemClient*> clients;
+    HakenTasks tasks;
+
+    // ------------------------------------------
+    CoreModule();
+    virtual ~CoreModule();
+
+    void enable_logging(bool enable);
+    void logMessage(const char *prefix, const char *info) {
+        midilog.logMessage(prefix, info);
+    }
+    bool pending_connection() { 
+        return !haken_midi.device_claim.empty() && nullptr == haken_midi.connection;
+    }
+
+    ChemDevice DeviceIdentifier(const MidiDeviceHolder* holder)
+    {
+        if (holder == &haken_midi) return ChemDevice::Haken;
+        if (holder == &controller1) return ChemDevice::Midi1;
+        if (holder == &controller2) return ChemDevice::Midi2;
+        return ChemDevice::Unknown;
+    }
+
+    bool isHakenConnected() { return nullptr != haken_midi.connection; }
+    bool isController1Connected() { return nullptr != controller1.connection; }
+    bool isController2Connected() { return nullptr != controller2.connection; }
+
+    void reboot();
+    void send_midi_rate(HakenMidiRate rate);
+    void restore_midi_rate();
+
+
+    // IMidiDeviceNotify
+    void onMidiDeviceChange(const MidiDeviceHolder* source) override;
+
+    // IChemHost
+    void register_client(IChemClient* client) override;
+    void unregister_client(IChemClient* client) override;
+    bool host_has_client(IChemClient* client) override;
+    bool host_ready() override { return this->em.ready; }
+    std::shared_ptr<MidiDeviceConnection> host_connection() override {
+        return haken_midi.connection;
+    }
+    const PresetDescription* host_preset() override {
+        return nullptr;
+    }
+
+    void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
+
+    // IHandleEmEvents
+    void onLoopDetect(uint8_t cc, uint8_t value) override;
+    void onEditorReply(uint8_t reply) override;
+    void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
+    void onPresetChanged() override;
+    void onUserComplete() override;
+    void onSystemComplete() override;
+    void onTaskMessage(uint8_t code) override;
+    void onLED(uint8_t led) override;
+
+    // IHakenTaskEvents
+    void onHakenTaskChange(HakenTask task) override;
+
+    // ----  Rack  ------------------------------------------
 
     enum Params {
        NUM_PARAMS
@@ -62,43 +127,35 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost
         L_ROUND_INITIAL,
         L_ROUND,
         L_ROUND_RELEASE,
+        L_PULSE,
+        //L_LED,
         NUM_LIGHTS
     };
 
-    CoreModule();
-    virtual ~CoreModule();
-
-    bool isHakenConnected() { return nullptr != haken_midi.connection; }
-    bool isController1Connected() { return nullptr != controller1.connection; }
-    bool isController2Connected() { return nullptr != controller2.connection; }
-
-    void notify_connection_changed();
-
-    // IMidiDeviceNotify
-    void onMidiDeviceChange(const MidiDeviceHolder* source) override;
-
-    // rack::Module
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-    void process(const ProcessArgs &args) override;
 
-    // IChemHost
-    void register_client(IChemClient* client) override;
-    void unregister_client(IChemClient* client) override;
-    bool host_has_client(IChemClient* client) override;
-    bool host_ready() override { return this->ready; }
-    std::shared_ptr<MidiDeviceConnection> host_connection() override {
-        return haken_midi.connection;
-    }
-    const PresetDescription* host_preset() override {
-        return nullptr;
-    }
-
-    // impl
     void processLights(const ProcessArgs &args);
+    void process(const ProcessArgs &args) override;
 };
 
-struct CoreModuleWidget : ChemModuleWidget
+enum ThemeColor {
+    coHakenMidiIn,
+    coHakenMidiOut,
+    coC1MidiIn,
+    coC2MidiIn,
+    coTaskUninitialized,
+    coTaskUnscheduled,
+    coTaskPending,
+    coTaskComplete,
+    coTaskDone,
+    coTaskWaiting,
+    coTaskBroken,
+    coWeird,
+    THEME_COLOR_SIZE
+};
+
+struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHakenTaskEvents
 {
     CoreModule* my_module = nullptr;
     MidiPicker* haken_picker = nullptr;
@@ -108,15 +165,67 @@ struct CoreModuleWidget : ChemModuleWidget
     StaticTextLabel* controller1_device_label = nullptr;
     StaticTextLabel* controller2_device_label = nullptr;
     StaticTextLabel* preset_label = nullptr;
+    StaticTextLabel* firmware_label = nullptr;
+    //StaticTextLabel* task_status_label = nullptr;
+    StaticTextLabel* em_status_label = nullptr;
+
+    Blip* blip = nullptr;
+    IndicatorWidget* mididevice_indicator = nullptr;
+    IndicatorWidget* heartbeat_indicator = nullptr;
+    IndicatorWidget* updates_indicator = nullptr;
+    IndicatorWidget* userpresets_indicator = nullptr;
+    IndicatorWidget* systempresets_indicator = nullptr;
+    IndicatorWidget* presetinfo_indicator = nullptr;
+    IndicatorWidget* lastpreset_indicator = nullptr;
+    IndicatorWidget* syncdevices_indicator = nullptr;
+
+    IndicatorWidget* widget_for_task(HakenTask task);
+
+
+    NVGcolor theme_colors[ThemeColor::THEME_COLOR_SIZE];
+    const NVGcolor& themeColor(ThemeColor index);
+    const NVGcolor& taskStateColor(TaskState state);
+    void set_theme_colors(const std::string& theme = "");
 
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-core.svg"); }
     MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device);
 
+    void createScrews(std::shared_ptr<SvgTheme> theme);
+    void createMidiPickers(std::shared_ptr<SvgTheme> theme);
+    void createIndicatorsCentered(float x, float y, float spread);
+    void createRoundingLeds(float x, float y, float spread);
+    void resetIndicators();
+
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
 
+    // IChemClient
+    rack::engine::Module* client_module() override { return my_module; }
+    void onPresetChange() override {}
+    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
+
+    // IHandleEmEvents
+    void onLoopDetect(uint8_t cc, uint8_t value) override;
+    void onEditorReply(uint8_t reply) override;
+    void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
+    void onPresetChanged() override;
+    void onUserComplete() override;
+    void onSystemComplete() override;
+    void onTaskMessage(uint8_t code) override;
+    void onLED(uint8_t led) override;
+
+    // IHakenTaskEvents
+    void onHakenTaskChange(HakenTask task) override;
+
+    void setThemeName(const std::string& name) override;
+    void drawMidiAnimation(const DrawArgs& args, bool halo);
+    void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
     void step() override;
     void appendContextMenu(Menu *menu) override;
 };
 
+inline const NVGcolor& CoreModuleWidget::themeColor(ThemeColor which) {
+    assert(which < ThemeColor::THEME_COLOR_SIZE);
+    return theme_colors[static_cast<size_t>(which)];
+}

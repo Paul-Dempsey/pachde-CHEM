@@ -46,6 +46,7 @@ NamedColor stock_colors[] = {
     { "#d blue medium", PackRGB(0x4e, 0x8b, 0xbf) },
     { "#d blue light", PackRGB(0xbd,0xd6,0xfc) },
     { "#d default port", toPacked(nvgHSL(210.f/360.f, 0.5f, 0.65f)) },
+    { "None", PackRGBA( 0, 0, 0, 0) },
     { "Black", PackRGB( 0, 0, 0) },
     { "5% Gray", PackRGB(0x0d, 0x0d, 0x0d) },
     { "10% Gray", PackRGB(0x1a, 0x1a, 0x1a) },
@@ -380,12 +381,12 @@ void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& st
     nvgStroke(vg);
 }
 
-void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled)
+void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled, float radius)
 {
     if (filled) {
-        Circle(vg, x, y, 2.25f, co);
+        Circle(vg, x, y, radius, co);
     } else {
-        OpenCircle(vg, x, y, 2.f, co, .5f);
+        OpenCircle(vg, x, y, radius - .25f, co, .5f);
     }
 }
 

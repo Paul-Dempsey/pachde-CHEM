@@ -1,10 +1,11 @@
 // Copyright (C) Paul Chase Dempsey
-#include "themed_widgets.hpp"
+#include "themed-widgets.hpp"
 #include "../services/colors.hpp"
 
 namespace pachde {
 
-void notifyChange(Widget* widget) {
+void notifyChange(Widget* widget)
+{
     EventContext ctx;
     Widget::ChangeEvent eChange;
     eChange.context = &ctx;

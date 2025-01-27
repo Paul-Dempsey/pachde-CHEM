@@ -1,5 +1,7 @@
 #pragma once
+#include <rack.hpp>
 #include "PresetId.hpp"
+using namespace ::rack;
 
 namespace pachde {
 
@@ -9,7 +11,13 @@ struct PresetDescription
     std::string name;
     std::string text;
 
-    PresetDescription(const PresetDescription & preset) = delete; // no copy constructor
+    PresetDescription() {}
+
+    void clear() {
+        id.clear();
+        name.clear();
+        text.clear();
+    }
 
     json_t* toJson();
     void fromJson(const json_t* root);
