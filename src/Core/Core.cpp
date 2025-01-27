@@ -76,16 +76,22 @@ void CoreModule::reboot()
 {
     if (in_reboot) return;
     in_reboot = true;
+
+    controller1_midi_in.ring.clear();
+    controller2_midi_in.ring.clear();
+    haken_midi_in.ring.clear();
+    haken_midi_out.ring.clear();
+
+    controller1_midi_in.reset();
+    controller2_midi_in.reset();
     haken_midi_in.reset();
+
     haken_midi_out.output.reset();
     haken_midi_out.output.channel = -1;
-    haken_midi_out.ring.clear();
-    controller1_midi_in.reset();
-    controller1_midi_in.ring.clear();
-    controller2_midi_in.reset();
-    controller2_midi_in.ring.clear();
+
     em.reset();
     tasks.refresh();
+    in_reboot = false;
 }
 
 void CoreModule::send_midi_rate(HakenMidiRate rate)
@@ -167,6 +173,7 @@ void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<Mi
 
 void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
 {
+    input->ring.clear();
     if (source->connection) {
         input->setDriverId(source->connection->driver_id);
         input->setDeviceId(source->connection->input_device_id);
@@ -185,6 +192,8 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     switch (id) {
     case ChemDevice::Haken: {
         em.ready = false; // todo clear?
+        haken_midi_in.ring.clear();
+        haken_midi_out.ring.clear();
         if (source->connection) {
             haken_midi_in.setDriverId(source->connection->driver_id);
             haken_midi_in.setDeviceId(source->connection->input_device_id);
@@ -309,6 +318,7 @@ void CoreModule::process(const ProcessArgs &args)
         haken_midi_out.dispatch(sample_time);
     }
 
+    // todo: after a reset, need to have a ~20sec pause before rescanning
     tasks.process(args);
 
     if (getOutput(OUT_READY).isConnected()) {

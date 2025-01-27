@@ -77,17 +77,17 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 
     menu->addChild(new MenuSeparator); 
     AppendThemeMenu(menu, this, theme_engine);
-
     menu->addChild(new MenuSeparator); 
+    menu->addChild(createMenuItem("Reload themes", "", [this]() {
+        reloadThemes();
+        this->setThemeName(getThemeName());
+    }));
+
     menu->addChild(createCheckMenuItem(
         "Grid", "",
         [this]() { return showGrid; },
         [this]() { showGrid = !showGrid; }));
 
-    menu->addChild(createMenuItem("Reload themes", "", [this]() {
-        reloadThemes();
-        this->setThemeName(getThemeName());
-    }));
 }
 
 // ---------------------------------------------------------------------------

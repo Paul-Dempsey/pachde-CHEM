@@ -30,6 +30,7 @@ SOURCES += src/services/svgtheme.cpp
 SOURCES += src/services/text.cpp
 
 # widgets
+SOURCES += src/widgets/blip-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 

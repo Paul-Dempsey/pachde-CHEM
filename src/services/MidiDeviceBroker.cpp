@@ -12,6 +12,12 @@ MidiDeviceBroker* MidiDeviceBroker::get()
     return brokerInstance;
 }
 
+bool MidiDeviceBroker::isPrimary(MidiDeviceHolder* holder)
+{
+    auto it = std::find(holders.cbegin(), holders.cend(), holder);
+    return it == holders.cbegin();
+}
+
 void MidiDeviceBroker::registerDeviceHolder(MidiDeviceHolder* holder)
 {
     assert(holders.cend() == std::find(holders.cbegin(), holders.cend(), holder));

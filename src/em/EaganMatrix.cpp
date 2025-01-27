@@ -36,6 +36,8 @@ void EaganMatrix::reset()
     pedal_fraction_ex = 0;
     editorReply = 0;
     led = 0;
+    notifyHardwareChanged();
+    notifyPresetChanged();
 }
 
 void EaganMatrix::subscribeEMEvents(IHandleEmEvents* client)

@@ -378,11 +378,16 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::SyncDevices: {
-            chem->logMessage("CHEM", "Task SyncDevices");
-            MidiDeviceBroker::get()->sync();
-            task->done();
-            notifyChange(HakenTask::SyncDevices);
-            current = next_task(current);
+            auto broker = MidiDeviceBroker::get();
+            if (broker->isPrimary(&chem->haken_midi)) {
+                chem->logMessage("CHEM", "Task SyncDevices");
+                broker->sync();
+                task->done();
+                notifyChange(HakenTask::SyncDevices);
+                current = next_task(current);
+            } else {
+                current = next_task(current);
+            }
        } break;
 
         case HakenTask::End:

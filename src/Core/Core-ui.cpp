@@ -1,15 +1,15 @@
 #include "Core.hpp"
 
 // Layout
+constexpr const float U1 = 15.f;
+constexpr const float UHALF = 7.5f;
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float PICKER_TOP = 128.f;
 constexpr const float PICKER_INTERVAL = 42.f;
 constexpr const float PICKER_LABEL_OFFSET = 14.f;
-constexpr const int MIDI_ANIMATION_MARGIN = 3;
 constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
 constexpr const float ROUND_LIGHT_SPREAD = 4.f;
-constexpr const float U1 = 15.f;
-constexpr const float UHALF = 7.5f;
+constexpr const int MIDI_ANIMATION_MARGIN = UHALF;
 
 CoreModuleWidget::~CoreModuleWidget()
 {
@@ -132,16 +132,21 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
                 auto broker = MidiDeviceBroker::get();
                 assert(broker);
                 broker->revokeClaim(&my_module->haken_midi);
-                my_module->haken_midi.clear();
                 broker->revokeClaim(&my_module->controller1);
-                my_module->controller1.clear();
                 broker->revokeClaim(&my_module->controller2);
+                my_module->haken_midi.clear();
+                my_module->controller1.clear();
                 my_module->controller2.clear();
             } else {
                 // drop connections
                 my_module->haken_midi.connect(nullptr);
                 my_module->controller1.connect(nullptr);
                 my_module->controller2.connect(nullptr);
+                my_module->haken_midi_in.reset();
+                my_module->haken_midi_out.output.reset();
+                my_module->haken_midi_out.output.channel = -1;
+                my_module->controller1_midi_in.reset();
+                my_module->controller2_midi_in.reset();
             }
         });
     }
@@ -240,7 +245,6 @@ void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<Mid
 // IHandleEmEvents
 void CoreModuleWidget::onLoopDetect(uint8_t cc, uint8_t value)
 {
-
 }
 
 void CoreModuleWidget::onEditorReply(uint8_t reply)
@@ -255,7 +259,7 @@ void CoreModuleWidget::onHardwareChanged(uint8_t hardware, uint16_t firmware_ver
 
 void CoreModuleWidget::onPresetChanged()
 {
-    preset_label->text(my_module->em.preset.name);
+    preset_label->text(my_module->host_preset()->name);
 }
 
 void CoreModuleWidget::onUserComplete() {}
@@ -289,10 +293,10 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
             em_status_label->text("");
             break;
         case Haken::beginSysNames:
-            em_status_label->text("Begin system preset names");
+            em_status_label->text("System preset names");
             break;
         case Haken::beginUserNames:
-            em_status_label->text("Begin user preset names");
+            em_status_label->text("User preset names");
             break;
         case Haken::endUserNames:
             em_status_label->text("");
@@ -376,48 +380,46 @@ void CoreModuleWidget::step()
 }
 
 inline float midi_animation_cx(uint64_t count) {
-    return static_cast<float>(MIDI_ANIMATION_MARGIN + ((count / 15) % (MODULE_WIDTH - 2*MIDI_ANIMATION_MARGIN)));
+    return static_cast<float>(MIDI_ANIMATION_MARGIN + ((count / 20) % (MODULE_WIDTH - 2*MIDI_ANIMATION_MARGIN)));
+}
+
+void drawDotHalo(NVGcontext* vg, float x, float y, const NVGcolor& co, bool halo)
+{
+    const float dotr = 1.75f;
+    const float halo_inner = 1.7f;
+    const float halo_outer = 4.5f;
+
+    if (halo) {
+        CircularHalo(vg, x, y, halo_inner, halo_outer, co);
+    }
+    Circle(vg, x, y, dotr, co);    
 }
 
 void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
 {
     float y = PICKER_TOP + MIDI_ANIMATION_OFFSET;
+    float x = midi_animation_cx(my_module->haken_midi_out.count());
     NVGcolor co = themeColor(ThemeColor::coHakenMidiOut);
-    float cx = 0; //midi_animation_cx(my_module->haken_midi_out.count());
-    if (halo) {
-        CircularHalo(args.vg, cx, y, 2.f, 8.5f, co);
-    }
-    Circle(args.vg, cx, y, 2.25f, co);
+    drawDotHalo(args.vg, x, y, co, halo);
 
     co = themeColor(ThemeColor::coHakenMidiIn);
-    cx = midi_animation_cx(my_module->haken_midi_in.count());
-    if (halo) {
-        CircularHalo(args.vg, cx, y, 2.f, 8.5f, co);
-    }
-    Circle(args.vg, cx, y, 2.25f, co);
+    x = midi_animation_cx(my_module->haken_midi_in.count());
+    drawDotHalo(args.vg, x, y, co, halo);
 
     y += PICKER_INTERVAL;
     if (my_module->isController1Connected()) {
         co = themeColor(ThemeColor::coC1MidiIn);
-        cx = midi_animation_cx(my_module->controller1_midi_in.count());
-        if (halo) {
-            CircularHalo(args.vg, cx, y, 2.f, 8.5f, co);
-        }
-        Circle(args.vg, cx, y, 2.25f, co);
+        x = midi_animation_cx(my_module->controller1_midi_in.count());
+        drawDotHalo(args.vg, x, y, co, halo);
     }
 
     y += PICKER_INTERVAL;
     if (my_module->isController2Connected()) {
         co = themeColor(ThemeColor::coC2MidiIn);
-        cx = midi_animation_cx(my_module->controller2_midi_in.count());
-        if (halo) {
-            CircularHalo(args.vg, cx, y, 2.f, 8.5f, co);
-        }
-        Circle(args.vg, cx, y, 2.25f, co);
+        x = midi_animation_cx(my_module->controller2_midi_in.count());
+        drawDotHalo(args.vg, x, y, co, halo);
     }
 }
-
-
 
 bool connected (CoreModule* core) {
     return core ? core->isHakenConnected() : false;
@@ -434,7 +436,6 @@ void CoreModuleWidget::drawLayer(const DrawArgs& args, int layer)
     }
 }
 
-
 void CoreModuleWidget::draw(const DrawArgs& args)
 {
     ChemModuleWidget::draw(args);
@@ -448,34 +449,65 @@ void CoreModuleWidget::draw(const DrawArgs& args)
 
 void CoreModuleWidget::appendContextMenu(Menu *menu)
 {
-    ChemModuleWidget::appendContextMenu(menu);
     if (my_module) {
-menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
         menu->addChild(new MenuSeparator);
-        menu->addChild(createMenuItem("Editor Present", "", [this]() {
-            my_module->haken_midi_out.sendEditorPresent();
-        }));
-        menu->addChild(createMenuItem("RequestUpdates", "", [this]() {
-            my_module->haken_midi_out.sendRequestUpdates();
-        }));
-        menu->addChild(createMenuItem("Request Configuration", "", [this]() {
-            my_module->haken_midi_out.sendRequestConfiguration();
-        }));
-        menu->addChild(createMenuItem("Request ConText", "", [this]() {
-            my_module->haken_midi_out.sendRequestConText();
-        }));
-        menu->addChild(createMenuItem("Request User", "", [this]() {
-            my_module->haken_midi_out.sendRequestUser();
-        }));
-        menu->addChild(createMenuItem("Request System", "", [this]() {
-            my_module->haken_midi_out.sendRequestSystem();
-        }));
-}));
-//        menu->addChild(new MenuSeparator);
         menu->addChild(createCheckMenuItem(
             "Log MIDI", "",
             [this]() { return my_module->log_midi; },
             [this]() { my_module->enable_logging(!my_module->log_midi); }));
+
+        menu->addChild(createSubmenuItem("Themes", "", [=](Menu* menu) {
+            ChemModuleWidget::appendContextMenu(menu);
+        }));
+        menu->addChild(createMenuItem("Previous sys preset", "", [this]() {
+            my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::decPreset);
+        }));
+        menu->addChild(createMenuItem("Next sys preset", "", [this]() {
+            my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::incPreset);
+        }));
+
+        menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {
+            menu->addChild(createMenuItem("Reset calibration", "", [this]() {
+                my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::doResetCalib);
+            }));
+            menu->addChild(createMenuItem("Refine calibration", "", [this]() {
+                my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::doRefineCalib);
+            }));
+            menu->addChild(createMenuItem("Factory calibration", "", [this]() {
+                my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::doFactCalib);
+            }));
+            menu->addChild(new MenuSeparator);
+            menu->addChild(createMenuItem("Surface alignment", "", [this]() {
+                my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::surfAlign);
+            }));
+        }));
+
+        menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
+            menu->addChild(new MenuSeparator);
+            menu->addChild(createMenuItem("Editor Hello", "", [this]() {
+                my_module->haken_midi_out.sendEditorPresent();
+            }));
+            menu->addChild(createMenuItem("Updates", "", [this]() {
+                my_module->haken_midi_out.sendRequestUpdates();
+            }));
+            menu->addChild(createMenuItem("Configuration", "", [this]() {
+                my_module->haken_midi_out.sendRequestConfiguration();
+            }));
+            // menu->addChild(createMenuItem("ConText", "", [this]() {
+            //     my_module->haken_midi_out.sendRequestConText();
+            // }));
+            menu->addChild(createMenuItem("User presets", "", [this]() {
+                my_module->haken_midi_out.sendRequestUser();
+            }));
+            menu->addChild(createMenuItem("System presets", "", [this]() {
+                my_module->haken_midi_out.sendRequestSystem();
+            }));
+            menu->addChild(new MenuSeparator);
+            menu->addChild(createMenuItem("Remake Mahling data", "", [this]() {
+                my_module->haken_midi_out.sendControlChange(Haken::ch16, Haken::ccTask, Haken::remakeSRMahl);
+            }));
+
+        }));
     
     }
 }

@@ -58,9 +58,6 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
     void logMessage(const char *prefix, const char *info) {
         midilog.logMessage(prefix, info);
     }
-    bool pending_connection() { 
-        return !haken_midi.device_claim.empty() && nullptr == haken_midi.connection;
-    }
 
     ChemDevice DeviceIdentifier(const MidiDeviceHolder* holder)
     {
@@ -70,9 +67,9 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
         return ChemDevice::Unknown;
     }
 
-    bool isHakenConnected() { return nullptr != haken_midi.connection; }
-    bool isController1Connected() { return nullptr != controller1.connection; }
-    bool isController2Connected() { return nullptr != controller2.connection; }
+    bool isHakenConnected() { return (haken_midi_out.output.deviceId != -1) && (nullptr != haken_midi.connection); }
+    bool isController1Connected() { return (-1 != controller1_midi_in.deviceId) && (nullptr != controller1.connection); }
+    bool isController2Connected() { return (-1 != controller2_midi_in.deviceId) && (nullptr != controller2.connection); }
 
     void reboot();
     void send_midi_rate(HakenMidiRate rate);
@@ -91,7 +88,7 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
         return haken_midi.connection;
     }
     const PresetDescription* host_preset() override {
-        return nullptr;
+        return &em.preset;
     }
 
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
