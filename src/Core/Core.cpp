@@ -21,6 +21,7 @@ CoreModule::CoreModule() : in_reboot(false), heartbeat(false), loop(0)
 
     configOutput(Outputs::OUT_READY, "Ready trigger");
 
+    ModuleBroker::get()->registerHost(this);
     to_em.core = this;
     tasks.setCoreModule(this);
     em.subscribeEMEvents(this);
@@ -45,6 +46,7 @@ CoreModule::CoreModule() : in_reboot(false), heartbeat(false), loop(0)
 
 CoreModule::~CoreModule() {
     //haken_midi_in.clear();
+    ModuleBroker::get()->unregisterHost(this);
     controller1_midi_in.clear();
     controller2_midi_in.clear();
     controller1.unsubscribe(this);
@@ -164,9 +166,10 @@ void CoreModule::onHakenTaskChange(HakenTask id)
     }
 }
 
+// IChemHost
 void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    for (auto client : clients) {
+    for (auto client : chem_clients) {
         client->onConnectionChange(device, connection);
     }
 }
@@ -274,33 +277,41 @@ json_t* CoreModule::dataToJson()
     return root;
 }
 
-void CoreModule::register_client(IChemClient* client)
+void CoreModule::register_chem_client(IChemClient* client)
 {
-    if (clients.cend() == std::find(clients.cbegin(), clients.cend(), client)) {
-        clients.push_back(client);
+    if (chem_clients.cend() == std::find(chem_clients.cbegin(), chem_clients.cend(), client)) {
+        chem_clients.push_back(client);
+        client->onConnectHost(this);
     }
 }
 
-void CoreModule::unregister_client(IChemClient* client)
+void CoreModule::unregister_chem_client(IChemClient* client)
 {
-    auto item = std::find(clients.cbegin(), clients.cend(), client);
-    if (item != clients.cend())
+    auto item = std::find(chem_clients.cbegin(), chem_clients.cend(), client);
+    if (item != chem_clients.cend())
     {
-        clients.erase(item);
+        chem_clients.erase(item);
     }
 }
 
-bool CoreModule::host_has_client(IChemClient* client)
+bool CoreModule::host_has_client(IChemClient* target)
 {
-    auto item = std::find(clients.cbegin(), clients.cend(), client);
-    return item != clients.cend();
+    // match by model
+    auto target_model = target->client_module()->getModel();
+    for (auto client : chem_clients) {
+        auto client_model = client->client_module()->getModel();
+        if (target_model == client_model) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
 constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 120;
 void CoreModule::processLights(const ProcessArgs &args)
 {
-    getLight(L_READY).setBrightnessSmooth(host_ready() ? 1.0f : 0.f, args.sampleTime * 20);
+    getLight(L_READY).setBrightnessSmooth(em.ready ? 1.0f : 0.f, args.sampleTime * 20);
 }
 
 void CoreModule::process(const ProcessArgs &args)
@@ -322,7 +333,7 @@ void CoreModule::process(const ProcessArgs &args)
     tasks.process(args);
 
     if (getOutput(OUT_READY).isConnected()) {
-        getOutput(OUT_READY).setVoltage(host_ready() ? 10.0f : 0.0f);
+        getOutput(OUT_READY).setVoltage(em.ready ? 10.0f : 0.0f);
     }
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
         processLights(args);

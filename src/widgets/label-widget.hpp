@@ -11,34 +11,67 @@ using namespace svg_theme;
 namespace pachde {
 
 enum class TextAlignment { Left, Center, Right };
+struct LabelStyle
+{
+    const char* key;
+    TextAlignment align;
+    float height;
+    bool bold;
+
+    LabelStyle()
+    :   key("label"),
+        align(TextAlignment::Left),
+        height(12.f),
+        bold(false)
+    {}
+    LabelStyle(const char * key, TextAlignment align = TextAlignment::Left, float height = 12.f, bool bold = false)
+    :   key(key),
+        align(align),
+        height(height),
+        bold(bold)
+    {}
+    LabelStyle& operator=(const LabelStyle&other) {
+        key = other.key;
+        align = other.align;
+        height = other.height;
+        bold = other.bold;
+        return *this;
+    }
+    LabelStyle(const LabelStyle& other)
+    :   key(other.key),
+        align(other.align),
+        height(other.height),
+        bold(other.bold)
+    {}
+
+    bool left() { return align == TextAlignment::Left; }
+    bool right() { return align == TextAlignment::Right; }
+    bool center() { return align == TextAlignment::Center; }
+};
 
 struct BasicTextLabel: Widget, IApplyTheme
 {
     std::string _text;
     NVGcolor _color;
-    TextAlignment _align;
-    float _text_height;
-    bool _bold;
-    const char * _text_key;
+    LabelStyle _style;
 
     BasicTextLabel()
-    :   _color(RampGray(G_90)),
-        _align(TextAlignment::Left),
-        _text_height(12.f),
-        _bold(true),
-        _text_key("ctl-label")
+    :   _color(RampGray(G_90))
     {
     }
     std::string getText() { return _text; }
+    bool left() { return _style.left(); }
+    bool right() { return _style.right(); }
+    bool centered() { return _style.center(); }
+    float text_height() { return _style.height; }
+    
     void setPos(Vec pos) { box.pos = pos; }
     void setSize(Vec size) { box.size = size; }
     void text(std::string text) { _text = text; }
-    void text_height(float height) { _text_height = height; box.size.y = height; }
-    void style(float height, bool bold = true, TextAlignment alignment = TextAlignment::Left)
-    {
-        _text_height = height;
-        _bold = bold;
-        _align = alignment;
+    void text_height(float height) { _style.height = height; box.size.y = height; }
+    void style(const LabelStyle &other) {
+        _style = other;
+        box.size.y = _style.height;
     }
     void color(const NVGcolor &new_color) { _color = new_color; }
     void render(const DrawArgs& args)
@@ -46,12 +79,12 @@ struct BasicTextLabel: Widget, IApplyTheme
         if (_text.empty()) return;
 
         auto vg = args.vg;
-        auto font = _bold ? GetPluginFontSemiBold() : GetPluginFontRegular();
+        auto font = _style.bold ? GetPluginFontSemiBold() : GetPluginFontRegular();
         if (!FontOk(font)) return;
 
         nvgSave(vg);
-        SetTextStyle(vg, font, _color, _text_height);
-        switch (_align) {
+        SetTextStyle(vg, font, _color, _style.height);
+        switch (_style.align) {
         case TextAlignment::Left:
             nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_LEFT);
             nvgText(vg, 0.f, 0.f, _text.c_str(), nullptr);
@@ -71,7 +104,7 @@ struct BasicTextLabel: Widget, IApplyTheme
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
-        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_text_key));
+        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_style.key));
         if (!isColorVisible(_color)) {
             _color = RampGray(G_85);
         }
@@ -84,93 +117,6 @@ struct BasicTextLabel: Widget, IApplyTheme
         render(args);
     }
 };
-
-struct DynamicTextLabel : BasicTextLabel
-{
-    bool _bright = false;
-    bool _lazy = false;
-    bool _dirt = false;
-
-    DynamicTextLabel()
-    {
-        _text_key = "dytext";
-    }
-
-    void bright(bool lit = true) { _bright = lit; }
-
-    std::function<std::string ()> _getText;
-    void setFetch(std::function<std::string ()> get)
-    {
-        _getText = get;
-    }
-    void setLazy() {
-        _dirt = _lazy = true;
-    }
-    void modified(bool changed = true)
-    {
-        _dirt = changed;
-    }
-    void setText(std::string text)
-    {
-        BasicTextLabel::text(text);
-        _dirt = true;
-    }
-    void refresh()
-    {
-        if (_getText) {
-            if (!_lazy || _dirt) {
-                BasicTextLabel::text(_getText());
-                _dirt = false;
-            }
-        }
-    }
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        auto result = BasicTextLabel::applyTheme(theme_engine, theme);
-        _dirt = true;
-        return result;
-    }
-    void drawLayer(const DrawArgs& args, int layer) override
-    {
-        Widget::drawLayer(args, layer);
-        if (1 != layer || !_bright) return;
-        refresh();
-        BasicTextLabel::render(args);
-    }
-    void draw(const DrawArgs& args) override
-    {
-        Widget::draw(args);
-        if (_bright) return;
-        refresh();
-        BasicTextLabel::render(args);
-    }
-};
-
-inline DynamicTextLabel* createLazyDynamicTextLabel(
-    Vec pos,
-    Vec size, 
-    std::function<std::string ()> get,
-    float text_height = 12.f,
-    bool bold = true,
-    TextAlignment alignment = TextAlignment::Center,
-    const NVGcolor &color = RampGray(G_90),
-    bool bright = false)
-{
-    auto w = new DynamicTextLabel();
-    w->setSize(size);
-    w->setPos(pos);
-    w->setLazy();
-    w->setFetch(get);
-    w->style(text_height, bold, alignment);
-    if (alignment == TextAlignment::Center) {
-        w->box.pos.x -= size.x * .5f;
-    }
-    w->color(color);
-    if (bright) {
-        w->bright();
-    }
-    return w;
-}
 
 struct StaticTextLabel: Widget, IApplyTheme
 {
@@ -212,9 +158,9 @@ struct StaticTextLabel: Widget, IApplyTheme
         _label->text_height(height);
         dirty();
     }
-    void style(float size, bool bold = true, TextAlignment alignment = TextAlignment::Left) {
-
-        _label->style(size, bold, alignment);
+    void style(const LabelStyle &other) {
+        _label->_style = other;
+        box.size.y = other.height;
         dirty();
     }
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
@@ -256,48 +202,40 @@ TWidget* createStaticTextLabel(
     float width,
     std::string text,
     SvgThemeEngine& engine, 
-    std::shared_ptr<SvgTheme> theme,
-    const char* textKey,
-    TextAlignment alignment = TextAlignment::Center,
-    float text_height = 12.f,
-    bool bold = true
+    std::shared_ptr<SvgTheme> theme
     )
 {
     TWidget* w = createWidget<TWidget>(pos);
-    w->setSize(Vec(width, text_height));
-    if (alignment == TextAlignment::Center) {
+    w->text(text);
+    w->color(RampGray(G_90));
+    if (w->_label->centered()) {
         w->setPos(Vec(w->box.pos.x - width*.5f, w->box.pos.y));
     }
-    w->text(text);
-    w->style(text_height, bold, alignment);
-    if (textKey && theme) {
-        w->_label->_text_key = textKey;
-    } else {
-        w->color(RampGray(G_90));
-    }
+    w->setSize(Vec(width, w->_label->text_height()));
     w->applyTheme(engine, theme);
     return w;
 }
 
-template<typename TWidget = DynamicTextLabel>
-TWidget* createDynamicLabel (
+template<typename TWidget = StaticTextLabel>
+TWidget* createStaticTextLabel(
     math::Vec pos,
     float width,
-    std::function<std::string ()> get,
-    TextAlignment alignment = TextAlignment::Center,
-    float text_height = 12.f,
-    bool bold = true,
-    const NVGcolor& text_color = RampGray(G_85)
+    std::string text,
+    SvgThemeEngine& engine, 
+    std::shared_ptr<SvgTheme> theme,
+    const LabelStyle& style
     )
 {
     TWidget* w = createWidget<TWidget>(pos);
-    w->setSize(Vec(width, text_height));
-    if (alignment == TextAlignment::Center) {
-        w->setPos(Vec(w->box.pos.x -= width *.5f, w->box.pos.y));
+    w->text(text);
+    w->_label->style(style);
+    w->color(RampGray(G_90));
+    if (w->_label->centered()) {
+        w->setPos(Vec(w->box.pos.x - width*.5f, w->box.pos.y));
     }
-    w->style(text_height, bold, alignment);
-    w->setFetch(get);
-    w->color(text_color);
+    w->setSize(Vec(width, w->_label->text_height()));
+    w->applyTheme(engine, theme);
     return w;
 }
+
 }

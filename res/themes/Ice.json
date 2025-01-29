@@ -55,6 +55,7 @@
             "ctl-glyph":   { "fill": "g70" },
             "ctl-disabled":{ "fill": "g50" },
             "ctl-label":   { "fill": "g60" },
+            "ctl-label-hi":{ "fill": "g85" },
             "menu":        { "fill" : "#63c663" },
 
             "button-bezel": { "fill": "g50"},
@@ -78,6 +79,8 @@
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#658fa4" }, { "index":1, "offset":1, "color": "#2c4b5a" } ] } },
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#528097" }, { "index":1, "offset":1, "color": "#33596b" } ] } },
             "screw-slot":  { "fill": "#264352" },
+            
+            "patty": { "fill": "#63c663" },
 
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },

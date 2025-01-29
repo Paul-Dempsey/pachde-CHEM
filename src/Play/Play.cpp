@@ -1,53 +1,29 @@
-#include "../plugin.hpp"
-#include "../chem.hpp"
-#include "../services/colors.hpp"
-#include "../widgets/themed-widgets.hpp"
+#include "Play.hpp"
 using namespace pachde;
 
-struct PlayModule : ChemModule
+void PlayModule::dataFromJson(json_t* root)
 {
-    // void dataFromJson(json_t* root) override {
-    //     ChemModule::dataFromJson(root);
-    // }
+    ChemModule::dataFromJson(root);
+    json_t* j = json_object_get(root, "haken-device");
+    if (j) {
+        device_claim = json_string_value(j);
+    }
+}
 
-    // json_t* dataToJson() override {
-    //     json_t* root = ChemModule::dataToJson();
-    //     return root;
-    // }
-};
-
-
-
-struct PlayModuleWidget : ChemModuleWidget
+json_t* PlayModule::dataToJson()
 {
-    PlayModule *my_module = nullptr;
+    json_t* root = ChemModule::dataToJson();
+    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    return root;
+}
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-play.svg"); }
-
-    PlayModuleWidget(PlayModule *module)
-    {
-        my_module = module;
-        setModule(module);
-
-        initThemeEngine();
-        auto theme = theme_engine.getTheme(getThemeName());
-        auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-
-        this->panelBorder = new PartnerPanelBorder();
-        replacePanelBorder(panel, this->panelBorder);
-        setPanel(panel);
-
-    }
-
-    void step() override
-    {
-        ChemModuleWidget::step();
-    }
-
-    void appendContextMenu(Menu *menu) override
-    {
-        ChemModuleWidget::appendContextMenu(menu);
-    }
-};
+// IChemClient
+::rack::engine::Module* PlayModule::client_module(){ return this; }
+void PlayModule::onConnectHost(IChemHost* host) {}
+void PlayModule::onPresetChange() { }
+void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
+{
+}
 
 Model *modelPlay = createModel<PlayModule, PlayModuleWidget>("chem-play");
+

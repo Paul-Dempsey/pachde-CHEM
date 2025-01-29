@@ -1,6 +1,7 @@
 #include "haken-task.hpp"
 #include "..\services\misc.hpp"
 #include "..\services\midi-io.hpp"
+#include "..\services\ModuleBroker.hpp"
 #include "Core.hpp"
 
 namespace pachde {
@@ -378,10 +379,10 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::SyncDevices: {
-            auto broker = MidiDeviceBroker::get();
-            if (broker->isPrimary(&chem->haken_midi)) {
+            auto broker = ModuleBroker::get();
+            if (broker->isPrimary(chem)) {
                 chem->logMessage("CHEM", "Task SyncDevices");
-                broker->sync();
+                MidiDeviceBroker::get()->sync();
                 task->done();
                 notifyChange(HakenTask::SyncDevices);
                 current = next_task(current);

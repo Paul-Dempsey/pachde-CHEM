@@ -18,6 +18,8 @@ struct ModuleBroker
     void unregisterHost(IChemHost* host);
     bool isPrimary(IChemHost* host);
     IChemHost* getPrimary();
+    bool try_bind_client(IChemClient* client);
+
 };
 
 }

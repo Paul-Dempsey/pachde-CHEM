@@ -8,7 +8,7 @@ ModuleBroker* main(nullptr);
 
 struct ModuleBroker::Internal
 {
-    std::vector<ChemHost*> hosts;
+    std::vector<IChemHost*> hosts;
     std::mutex mut;
 };
 
@@ -50,14 +50,24 @@ void ModuleBroker::unregisterHost(IChemHost* host)
 bool ModuleBroker::isPrimary(IChemHost* host)
 {
     if (my->hosts.empty()) return false;
-    return  (host == *my->hosts.cbegin());
+    return (host == *my->hosts.cbegin());
 }
 
 IChemHost* ModuleBroker::getPrimary()
 {
-    //if (my->hosts.empty()) return nullptr;
+    if (my->hosts.empty()) return nullptr;
     return *my->hosts.begin();
 }
 
+bool ModuleBroker::try_bind_client(IChemClient* client) {
+    if (my->hosts.empty()) return false;
+    for (auto host : my->hosts) {
+        if (!host->host_has_client(client)) {
+            host->register_chem_client(client);
+            return true;
+        }
+    }
+    return false;
+}
 
 }

@@ -22,7 +22,7 @@ The pachde line of software for Eagan Matrix devices is a labor of love. The pro
 Creating them requires an large investment of time and $$.
 You can show appreciation for the value these tools bring to your music-making, buy making a donation or leaving a tip.
 
-I dream of make standalone versions with responsive touch controls suitable for live performance available for the major platforms with touch support, such as iOS, Android, and Windows. This requires an investment in $$ for the hardware, tools, and licensing. Any donations you make go towards funding these prerequisites.
+I dream of making standalone versions with responsive touch controls suitable for live performance, available for the major platforms with touch support, such as iOS, Android, and Windows. This requires an investment in $$ for the hardware, tools, and SDK licensing. Any donations you make go towards funding these prerequisites.
 
 [Click to Show appreciation (VenMo)](https://venmo.com/u/pcdempsey). \
 Thank you!
@@ -31,7 +31,7 @@ Thank you!
 
 This repo is nominally MIT-licensed.
 
-If you make a derivative work using this source code profit, a contribution back to the author would be appreciated. Even though the license does not create a legal obligation to do so, it's just the right thing to do.
+If you make a derivative work using this source code for profit, a contribution back to the author would be appreciated. Even though the license does not create a legal obligation to do so, it's just the right thing to do.
 
 All graphics and documentation are Copyright (c) Paul Chase Dempsey.
 

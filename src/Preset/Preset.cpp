@@ -1,66 +1,34 @@
-#include "../plugin.hpp"
-#include "../chem.hpp"
-#include "../chem-core.hpp"
-#include "../services/colors.hpp"
-#include "../widgets/themed-widgets.hpp"
-using namespace pachde;
+#include "Preset.hpp"
 
-struct PresetModule : ChemModule, IChemClient
+void PresetModule::dataFromJson(json_t* root)
 {
-    std::string core_claim;
-
-    // IChemClient
-    rack::engine::Module* client_module() override { return this; }
-
-    void onPresetChange() override
-    {
+    ChemModule::dataFromJson(root);
+    json_t* j = json_object_get(root, "haken-device");
+    if (j) {
+        device_claim = json_string_value(j);
     }
-    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override
-    {
-    }
+}
 
-    void dataFromJson(json_t* root) override {
-        ChemModule::dataFromJson(root);
-        
-    }
-
-    json_t* dataToJson() override {
-        json_t* root = ChemModule::dataToJson();
-        return root;
-    }
-};
-
-
-struct PresetModuleWidget : ChemModuleWidget
+json_t* PresetModule::dataToJson()
 {
-    PresetModule *my_module = nullptr;
+    json_t* root = ChemModule::dataToJson();
+    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    return root;
+}
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-preset.svg"); }
-
-    PresetModuleWidget(PresetModule *module)
-    {
-        my_module = module;
-        setModule(module);
-
-        initThemeEngine();
-        auto theme = theme_engine.getTheme(getThemeName());
-        auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-
-        this->panelBorder = new PartnerPanelBorder();
-        replacePanelBorder(panel, this->panelBorder);
-        setPanel(panel);
-
-    }
-
-    void step() override
-    {
-        ChemModuleWidget::step();
-    }
-
-    void appendContextMenu(Menu *menu) override
-    {
-        ChemModuleWidget::appendContextMenu(menu);
-    }
-};
+// IChemClient
+rack::engine::Module* PresetModule::client_module()
+{
+    return this; 
+}
+void PresetModule::onConnectHost(IChemHost* host)
+{
+}
+void PresetModule::onPresetChange()
+{
+}
+void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
+{
+}
 
 Model *modelPreset = createModel<PresetModule, PresetModuleWidget>("chem-preset");

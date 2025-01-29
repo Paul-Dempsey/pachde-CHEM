@@ -213,7 +213,24 @@ struct TButton : SvgButton, IApplyTheme
         }
     }
 
+    virtual void appendContextMenu(ui::Menu* menu) {}
+
+    void createContextMenu() {
+        ui::Menu* menu = createMenu();
+    	appendContextMenu(menu);
+    }
 };
+
+template <class TButton>
+TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+    TButton * o  = new(TButton);
+    o->applyTheme(engine, theme);
+	o->box.pos = pos;
+    if (tip) {
+        o->describe(tip);
+    }
+    return o;
+}
 
 struct SmallRoundButtonSvg {
     static std::string up() { return "res/widgets/round-push-up.svg"; }
@@ -225,21 +242,20 @@ struct SquareButtonSvg {
     static std::string down() { return "res/widgets/square-push-down.svg"; }
 };
 
+struct LinkButtonSvg {
+    static std::string up() { return "res/widgets/link-button-up.svg"; }
+    static std::string down() { return "res/widgets/link-button-down.svg"; }
+};
+
 // struct SmallSquareButtonSvg {
 //     static std::string up() { return "res/widgets/square-push-sm-up.svg"; }
 //     static std::string down() { return "res/widgets/square-push-sm-down.svg"; }
 // };
 
+
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
-
-template <class TButton>
-TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
-    TButton * o  = new(TButton);
-    o->applyTheme(engine, theme);
-	o->box.pos = pos;
-    return o;
-}
+using LinkButton = TButton<LinkButtonSvg>;
 
 struct ThemeKnob : rack::RoundKnob, IApplyTheme
 {

@@ -56,6 +56,7 @@
             "ctl-glyph":   { "fill": "g20" },
             "ctl-disabled":{ "fill": "g50" },
             "ctl-label":   { "fill": "g20" },
+            "ctl-label-hi":{ "fill": "g10" },
             "menu":        { "fill" : "g20" },
 
             "button-bezel": { "fill": "#808080"},
@@ -79,6 +80,9 @@
             "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#b8b8b8" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#ebebeb" }, { "index": 1, "offset": 1, "color": "#cccccc" }]}},
             "screw-slot":  { "fill": "#8c8c8c" },
+
+            "patty": { "fill": "#333333" },
+            "patty-hover": { "fill": "#202020" },
 
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },

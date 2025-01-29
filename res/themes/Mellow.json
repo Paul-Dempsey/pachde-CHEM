@@ -59,6 +59,8 @@
             "ctl-glyph":   { "fill": "g70" },
             "ctl-disabled":{ "fill": "g50" },
             "ctl-label":   { "fill": "#3c321c" },
+            "ctl-label-hi":{ "fill": "#e1c485" },
+            "ctl-label-dn": { "fill": "#201a0b" },
             "menu":        { "fill" : "#3a68ac" },
 
             "button-bezel": { "fill": "g50"},
@@ -82,6 +84,9 @@
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#ac9461" }, { "index":1, "offset":1, "color": "#76633b" } ] } },
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#a39066" }, { "index":1, "offset":1, "color": "#78643a" } ] } },
             "screw-slot":  { "fill": "#675633" },
+
+            "patty": { "fill": "#63c663" },
+            "patty-hover": { "fill": "#63c663" },
 
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },

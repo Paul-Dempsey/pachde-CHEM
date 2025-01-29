@@ -1,56 +1,20 @@
-// Copyright (C) Paul Chase Dempsey
 #pragma once
-#include <rack.hpp>
-using namespace ::rack;
+#include "label-widget.hpp"
+#include "TipWidget.hpp"
+
 namespace pachde {
 
-struct TipHolder
+struct TipLabel : StaticTextLabel
 {
-    rack::ui::Tooltip* tip = nullptr;
-    std::string tip_text;
+    using BaseClass = StaticTextLabel;
 
-    ~TipHolder() {
-        destroyTip();
-    }
-
-    void setText(std::string text) {
-        tip_text = text;
-        if (tip) {
-            tip->onChange(widget::Widget::ChangeEvent{});
-        }
-    }
-
-    void createTip() {
-        if (!rack::settings::tooltips) return;
-        if (tip_text.empty()) return;
-        if (tip) return;
-        tip = new Tooltip;
-        tip->text = tip_text;
-        APP->scene->addChild(tip);
-    }
-
-    void destroyTip() {
-        if (!tip) return;
-        auto t = tip;
-        tip = nullptr;
-	    APP->scene->removeChild(t);
-        delete t;
-    }
-};
-
-struct TipWidget : Widget
-{
-    using BaseClass = Widget;
     TipHolder* tip_holder;
 
-    TipWidget() : tip_holder(nullptr) {}
-    virtual ~TipWidget() {
+    TipLabel() {}
+    virtual ~TipLabel() {
         if (tip_holder) delete tip_holder;
         tip_holder = nullptr;
     }
-    
-    bool hasText() { return tip_holder && !tip_holder->tip_text.empty(); }
-
     void describe(std::string text)
     {
         if (!tip_holder) {
@@ -58,13 +22,18 @@ struct TipWidget : Widget
         }
         tip_holder->setText(text);
     }
-
     void destroyTip() {
         if (tip_holder) { tip_holder->destroyTip(); }
     }
 
     void createTip() {
         if (tip_holder) { tip_holder->createTip(); }
+    }
+
+    void onHover(const HoverEvent& e) override
+    {
+        BaseClass::onHover(e);
+        e.consume(this);
     }
 
     void onEnter(const EnterEvent& e) override {
@@ -84,7 +53,7 @@ struct TipWidget : Widget
 
     void onDragEnd(const DragEndEvent& e) override
     {
-        BaseClass::onDragEnd(e);
+        StaticTextLabel::onDragEnd(e);
         destroyTip();
     }
 
@@ -104,6 +73,7 @@ struct TipWidget : Widget
     }
 
     virtual void appendContextMenu(ui::Menu* menu) {}
+
 };
 
 }

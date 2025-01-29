@@ -684,18 +684,12 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
     bool modified = false;
 
     for (Widget* child : widget->children) {
-        if (!child->children.empty()) {
-            if (ApplyChildrenTheme(child, themes, theme, false)) {
-                modified = true;
-            }
+        if (ApplyChildrenTheme(child, themes, theme, false)) {
+            modified = true;
         }
-        // themed = dynamic_cast<svg_theme::IApplyTheme*>(child);
-        // if (themed && themed->applyTheme(themes, theme)) {
-        //     modified = true;
-        // }
     }
 
-    auto themed = dynamic_cast<svg_theme::IApplyTheme*>(widget);
+    auto themed = dynamic_cast<IApplyTheme*>(widget);
     if (themed && themed->applyTheme(themes, theme)) {
         modified = true;
     }

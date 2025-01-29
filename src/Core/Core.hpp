@@ -47,7 +47,7 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
     bool heartbeat;
     uint64_t loop;
 
-    std::vector<IChemClient*> clients;
+    std::vector<IChemClient*> chem_clients;
     HakenTasks tasks;
 
     // ------------------------------------------
@@ -80,17 +80,16 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
     // IChemHost
-    void register_client(IChemClient* client) override;
-    void unregister_client(IChemClient* client) override;
+    void register_chem_client(IChemClient* client) override;
+    void unregister_chem_client(IChemClient* client) override;
     bool host_has_client(IChemClient* client) override;
-    bool host_ready() override { return this->em.ready; }
+    //bool host_ready() override { return this->em.ready; }
     std::shared_ptr<MidiDeviceConnection> host_connection() override {
         return haken_midi.connection;
     }
     const PresetDescription* host_preset() override {
         return &em.preset;
     }
-
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
 
     // IHandleEmEvents
@@ -197,8 +196,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     virtual ~CoreModuleWidget();
 
     // IChemClient
-    rack::engine::Module* client_module() override { return my_module; }
-    void onPresetChange() override {}
+    ::rack::engine::Module* client_module() override;
+    void onConnectHost(IChemHost* host) override;
+    void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // IHandleEmEvents

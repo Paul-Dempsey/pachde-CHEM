@@ -30,7 +30,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module)
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-
     this->panelBorder = new PartnerPanelBorder();
     replacePanelBorder(panel, this->panelBorder);
     setPanel(panel);
@@ -42,10 +41,10 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module)
     createRoundingLeds(RACK_GRID_WIDTH * 1.5f - 7.5f, 50.f, ROUND_LIGHT_SPREAD);
     createIndicatorsCentered((box.size.x * 0.5f) - ((6.f + 7.f * 9.f) * .5f), 354.f, 9.f);
 
+    LabelStyle style{"curpreset", TextAlignment::Center, 12.f};
+
     addChild(preset_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(box.size.x *.5f, 3.5f), box.size.x, "<preset>",
-        theme_engine, theme, "curpreset", TextAlignment::Center, 12.f, false
-        ));
+        Vec(box.size.x *.5f, 3.5f), box.size.x, "<preset>", theme_engine, theme, style));
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(box.size.x - RACK_GRID_WIDTH * 1.5f, 30, "LED"));
@@ -58,18 +57,19 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module)
     addChild(Center(createThemedColorOutput(Vec(RACK_GRID_WIDTH+2, RACK_GRID_HEIGHT - 50.f), my_module, CoreModule::OUT_READY, PORT_MAGENTA, theme_engine, theme)));
 
     y = RACK_GRID_HEIGHT - 50.f - 25.f;
+
+    style.key = "brand";
+    style.align = TextAlignment::Left;
+    style.height = 10.f;
+
     // addChild(task_status_label = createStaticTextLabel<StaticTextLabel>(
-    //     Vec(UHALF, y), box.size.x - 15.f, "",
-    //     theme_engine, theme, "brand", TextAlignment::Left, 10.f, false
-    //     ));
+    //     Vec(UHALF, y), box.size.x - 15.f, "", theme_engine, theme, style));
     // y -= 16.f;
     addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y), box.size.x - 15.f, "",
-        theme_engine, theme, "brand", TextAlignment::Left, 10.f, false
-        ));
+        Vec(UHALF, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
-        my_module->register_client(this);
+        my_module->register_chem_client(this);
         my_module->em.subscribeEMEvents(this);
         my_module->tasks.subscribeChange(this);
     }
@@ -97,33 +97,30 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         }
     }
 
+    LabelStyle style{"dytext", TextAlignment::Center, 10.f};
+
     addChild(firmware_label = createStaticTextLabel<StaticTextLabel>(
         Vec(box.size.x * .5f, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
-        theme, "dytext", TextAlignment::Center, 10.f, false
-        ));
+        theme, style));
+
+    style.align = TextAlignment::Left;
+    style.height = 14.f;
 
     addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 160.f, text,
-        theme_engine, theme, "dytext", TextAlignment::Left, 14.f, false
-        ));
+        Vec(UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, style));
     y += PICKER_INTERVAL;
     controller1_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1);
     addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "",
-        theme_engine, theme, "dytext", TextAlignment::Left, 14.f, false
-        ));
+        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
     y += PICKER_INTERVAL;
     controller2_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2);
     addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "",
-        theme_engine, theme, "dytext", TextAlignment::Left, 14.f, false
-        ));
+        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
     float x = 18.f;
     y += PICKER_INTERVAL;
-    auto w = Center(createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme));
-    w->describe("Reset MIDI\n(Ctrl+Click to clear)");
+    auto w = Center(createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(Ctrl+Click to clear)"));
     if (my_module) {
         w->setHandler([=](bool ctrl, bool shift) {
             if (ctrl) {
@@ -225,6 +222,16 @@ void CoreModuleWidget::setThemeName(const std::string& name)
 }
 
 // IChemClient
+rack::engine::Module* CoreModuleWidget::client_module()
+{
+    return my_module; 
+}
+void CoreModuleWidget::onConnectHost(IChemHost* host)
+{}
+
+void CoreModuleWidget::onPresetChange()
+{}
+
 void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
 {
     std::string nothing = "";
@@ -444,7 +451,6 @@ void CoreModuleWidget::draw(const DrawArgs& args)
     if (connected(my_module) && rack::settings::rackBrightness >= .95f) {
         drawMidiAnimation(args, false);
     }
-
 }
 
 void CoreModuleWidget::appendContextMenu(Menu *menu)
