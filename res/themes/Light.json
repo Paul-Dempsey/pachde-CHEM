@@ -79,7 +79,8 @@
             "screw-rim":   { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#cacaca" }, { "index": 1, "offset": 1, "color": "#9d9d9d" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#b8b8b8" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#ebebeb" }, { "index": 1, "offset": 1, "color": "#cccccc" }]}},
-            "screw-slot":  { "fill": "#8c8c8c" },
+            "screw-slot":  { "fill": "#a0a0a0" },
+            "slot-overlay": { "opacity": 0.2},
 
             "patty": { "fill": "#333333" },
             "patty-hover": { "fill": "#202020" },

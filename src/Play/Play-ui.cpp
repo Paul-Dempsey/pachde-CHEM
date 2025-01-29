@@ -2,6 +2,8 @@
 #include <ghc/filesystem.hpp>
 #include "../services/colors.hpp"
 #include "../services/open-file.hpp"
+#include "../widgets/draw-button.hpp"
+
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
@@ -62,11 +64,13 @@ PlayModuleWidget::PlayModuleWidget(PlayModule *module)
         Vec(15.f, 7.5), 148.f, "<playlist-file>", theme_engine, theme, style));
 
     style.height = 9.f;
+    style.align = TextAlignment::Center;
     addChild(page_label = createStaticTextLabel<StaticTextLabel>(
         Vec(187.5f, 35.f),  35.f, "1 of 1", theme_engine, theme, style));
 
     style.key = "curpreset";
     style.height = 14.f;
+    style.align = TextAlignment::Left;
     style.bold = true;
     addChild(temp_preset_label = createStaticTextLabel<StaticTextLabel>(
         Vec( 15.f, 345.f), 150.f, "<preset>", theme_engine, theme, style));
@@ -75,6 +79,16 @@ PlayModuleWidget::PlayModuleWidget(PlayModule *module)
     play_menu->setUi(this);
     play_menu->describe("Play actions menu");
     addChild(play_menu);
+
+    auto up = createWidgetCentered<UpButton>(Vec(186.f, 51.5f));
+    up->describe("Scroll up");
+    up->setHandler([this](bool c, bool s){});
+    addChild(up);
+
+    auto down = createWidgetCentered<DownButton>(Vec(186.f, 65.f));
+    down->describe("Scroll down");
+    down->setHandler([this](bool c, bool s){});
+    addChild(down);
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-15.f), theme_engine, theme, "Core link");
     link_button->setHandler([=](bool ctrl, bool shift) {

@@ -9,6 +9,7 @@ namespace pachde {
 
 struct Hamburger : TipWidget, IApplyTheme
 {
+    using base = TipWidget;
     uint8_t patties;
     NVGcolor patty_color;
     NVGcolor hover_color;
@@ -31,23 +32,23 @@ struct Hamburger : TipWidget, IApplyTheme
 
     void onHover(const HoverEvent& e) override
     {
-        TipWidget::onHover(e);
+        base::onHover(e);
         e.consume(this);
     }
     void onEnter(const EnterEvent& e) override
     {
-        TipWidget::onEnter(e);
+        base::onEnter(e);
         hovered = true;
     }
     void onLeave(const LeaveEvent& e) override
     {
-        TipWidget::onLeave(e);
+        base::onLeave(e);
         hovered = false;
     }
 
     void onButton(const ButtonEvent& e) override
     {
-        TipWidget::onButton(e);
+        base::onButton(e);
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
             createContextMenu();
             e.consume(this);

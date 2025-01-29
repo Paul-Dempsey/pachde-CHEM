@@ -1133,5 +1133,20 @@
             d="m 70.20241,234.75027 a 18.999999,18.999999 0 0 0 -19.000004,19 18.999999,18.999999 0 0 0 5.369827,13.17082 l 1.436233,-1.43623 a 16.945945,16.945945 0 0 1 -4.752006,-11.73459 16.945945,16.945945 0 0 1 16.94595,-16.94594 16.945945,16.945945 0 0 1 16.94594,16.94594 16.945945,16.945945 0 0 1 -4.752,11.73459 l 1.43623,1.43623 a 18.999999,18.999999 0 0 0 5.36983,-13.17082 18.999999,18.999999 0 0 0 -19,-19 z"
             inkscape:label="track" />
       </g>
+
+   <g id="rack-scheme-colors" transform="translate(22.5 350)">
+      <rect id="frame"             fill="#000000" stroke="#f2b120" width=134 height=14 x=-2 y= -2 stroke-width=.75 />
+      <rect id="SCHEME_BLACK"      fill="#000000" width=10 height=10 x="0"   y="0" />
+      <rect id="SCHEME_WHITE"      fill="#ffffff" width=10 height=10 x="12"  y="0" />
+      <rect id="SCHEME_RED"        fill="#ed2c24" width=10 height=10 x="24"  y="0" />
+      <rect id="SCHEME_ORANGE"     fill="#f2b120" width=10 height=10 x="36"  y="0" />
+      <rect id="SCHEME_YELLOW"     fill="#ffd714" width=10 height=10 x="48"  y="0" />
+      <rect id="SCHEME_GREEN"      fill="#90c73e" width=10 height=10 x="60"  y="0" />
+      <rect id="SCHEME_CYAN"       fill="#22e6ef" width=10 height=10 x="72"  y="0" />
+      <rect id="SCHEME_BLUE"       fill="#29b2ef" width=10 height=10 x="84"  y="0" />
+      <rect id="SCHEME_PURPLE"     fill="#d52bed" width=10 height=10 x="96"  y="0" />
+      <rect id="SCHEME_LIGHT_GRAY" fill="#e6e6e6" width=10 height=10 x="108"  y="0" />
+      <rect id="SCHEME_DARK_GRAY"  fill="#171717" width=10 height=10 x="120" y="0" />
+   </g>
    </g>
 </svg>

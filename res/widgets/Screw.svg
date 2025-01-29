@@ -1,34 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.0" height="15" width="15"
-	 xmlns:cc="http://creativecommons.org/ns#"
-	 xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg"
-	 viewBox="0 0 15 15" >
-<linearGradient id="grim" gradientUnits="userSpaceOnUse"
-	x1="6" y1="1" x2="7.5" y2="15">
-	<stop offset="0" stop-color="#cacaca"/>
-	<stop offset="1" stop-color="#9d9d9d"/>
-</linearGradient>
-<linearGradient id="gbevel" gradientUnits="userSpaceOnUse"
-	x1="6" y1="0" x2="7.5" y2="14">
-	<stop offset="0" stop-color="#f5f5f5"/>
-	<stop offset="1" stop-color="#b8b8b8"/>
-</linearGradient>
-<linearGradient id="gface" gradientUnits="userSpaceOnUse"
-	x1="6" y1="0" x2="7.5" y2="12">
-	<stop offset="0" stop-color="#ebebeb"/>
-	<stop offset="1" stop-color="#cccccc"/>
-</linearGradient>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.0" viewBox="0 0 15 15" 
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:svg="http://www.w3.org/2000/svg">
+   <sodipodi:namedview id="namedview6" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0"
+      inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1"
+      showguides="true" inkscape:zoom="82.260089" inkscape:cx="10.375627" inkscape:cy="7.5431477"
+      inkscape:window-width="3840" inkscape:window-height="2054" inkscape:window-x="3829" inkscape:window-y="-11"
+      inkscape:window-maximized="1" inkscape:current-layer="svg6" />
+   <linearGradient id="grim" gradientUnits="userSpaceOnUse"
+      x1="6" y1="1" x2="7.5" y2="15">
+      <stop offset="0" stop-color="#cacaca"/>
+      <stop offset="1" stop-color="#9d9d9d"/>
+   </linearGradient>
+   <linearGradient id="gbevel" gradientUnits="userSpaceOnUse"
+      x1="6" y1="0" x2="7.5" y2="14">
+      <stop offset="0" stop-color="#f5f5f5"/>
+      <stop offset="1" stop-color="#b8b8b8"/>
+   </linearGradient>
+   <linearGradient id="gface" gradientUnits="userSpaceOnUse"
+      x1="6" y1="0" x2="7.5" y2="12">
+      <stop offset="0" stop-color="#ebebeb"/>
+      <stop offset="1" stop-color="#cccccc"/>
+   </linearGradient>
+   <circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.5" r="6.5" />
+   <circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.5" r="5.8" />
+   <circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.36" />
 
-<circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.5" r="6.5"/>
-<circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.5" r="5.8"/>
-<circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.4"/>
-
-<path id="screw-slot" fill="#757474" d="M10.96889,6.80997L9.00528,6.57471C8.70384,6.5386,8.46626,6.30092,8.43027,5.99947L8.19598,4.03719
-	c-0.01021-0.08553-0.08276-0.14993-0.1689-0.14993H6.97294c-0.08613,0-0.15867,0.06438-0.16889,0.1499l-0.23484,1.9634
-	C6.53315,6.30204,6.29544,6.5397,5.99394,6.57569L4.03118,6.81003c-0.08554,0.01021-0.14993,0.08276-0.14993,0.1689v1.0542
-	c0,0.08613,0.06438,0.15866,0.1499,0.16889l1.96299,0.2348C6.29557,8.47287,6.5332,8.7105,6.56925,9.01193l0.23479,1.96293
-	c0.01023,0.08552,0.08277,0.1499,0.16889,0.1499h1.0542c0.08612,0,0.15865-0.06436,0.16889-0.14986l0.23521-1.96318
-	c0.03611-0.30139,0.27372-0.53895,0.57512-0.57499l1.96249-0.2347c0.08552-0.01023,0.1499-0.08276,0.1499-0.16889V6.97886
-	C11.11875,6.89275,11.05439,6.82022,10.96889,6.80997z"/>
+   <path id="screw-slot"
+      fill="#a0a0a0"
+      d="M 6.5 3.5 L 6.1582031 4.8613281 C 6.0623511 4.9161834 5.9705882 4.968249 5.875 5.0234375 L 4.5351562 4.6445312 L 3.5351562 6.3769531 L 4.5273438 7.328125 C 4.526856 7.4443046 4.5254118 7.5554477 4.5253906 7.671875 L 3.5351562 8.6347656 L 4.5351562 10.365234 L 5.8203125 9.9921875 C 5.9375011 10.060561 6.0501488 10.125359 6.1679688 10.193359 L 6.5 11.5 L 8.5 11.5 L 8.8125 10.210938 C 8.9355746 10.140598 9.0531082 10.072866 9.1757812 10.001953 L 10.464844 10.376953 L 11.464844 8.6445312 L 10.486328 7.6992188 C 10.486858 7.5643877 10.48838 7.4350811 10.488281 7.3007812 L 11.464844 6.3652344 L 10.464844 4.6347656 L 9.1269531 5.0175781 C 9.0245136 4.9579357 8.9265489 4.9008167 8.8242188 4.8417969 L 8.5 3.5 L 6.5 3.5 z " />
+   <path id="slot-overlay"
+      transform="scale(0.85,0.85)translate(1.4,1.4)"
+      fill="#000000" opacity="0.2"
+      d="M 6.6249799,4 6.3259076,5.1911621 c -0.083871,0.047998 -0.164163,0.093556 -0.2478027,0.1418457 l -1.1723633,-0.331543 -0.875,1.5158692 0.8681641,0.8322754 c -4.268e-4,0.1016571 -0.00169,0.1989073 -0.00171,0.3007812 l -0.8664551,0.8425293 0.875,1.5141601 1.1245118,-0.3264159 c 0.10254,0.059826 0.2011067,0.116525 0.3041992,0.176025 L 6.6249799,11 h 1.75 L 8.6484174,9.8720708 C 8.7561077,9.8105233 8.8589496,9.7512578 8.9662885,9.6892089 l 1.1279295,0.3281251 0.875,-1.5158692 -0.856201,-0.8271484 c 4.64e-4,-0.1179772 0.0018,-0.2311204 0.0018,-0.3486329 L 10.969259,6.5070801 10.09426,4.9929199 8.923605,5.3278808 C 8.8339293,5.2756937 8.7482102,5.2257146 8.6586714,5.1740723 L 8.3749799,4 Z" />
 </svg>

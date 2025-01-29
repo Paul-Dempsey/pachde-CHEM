@@ -117,6 +117,8 @@ struct ThemeSwitchV2 : app::SvgSwitch, IApplyTheme
 template<typename TSvg>
 struct TButton : SvgButton, IApplyTheme
 {
+    using Base = SvgButton;
+
     bool key_ctrl;
     bool key_shift;
     std::function<void(bool, bool)> handler;
@@ -179,26 +181,26 @@ struct TButton : SvgButton, IApplyTheme
     }
 
     void onEnter(const EnterEvent& e) override {
-        SvgButton::onEnter(e);
+        Base::onEnter(e);
         createTip();
     }
     void onLeave(const LeaveEvent& e) override {
-        SvgButton::onLeave(e);
+        Base::onLeave(e);
         destroyTip();
     }
     void onDragLeave(const DragLeaveEvent& e) override {
-        SvgButton::onDragLeave(e);
+        Base::onDragLeave(e);
         destroyTip();
     }
     void onDragEnd(const DragEndEvent& e) override
     {
-        SvgButton::onDragEnd(e);
+        Base::onDragEnd(e);
         destroyTip();
     }
 
     void onHoverKey(const HoverKeyEvent& e) override
     {
-        SvgButton::onHoverKey(e);
+        Base::onHoverKey(e);
         key_ctrl = (e.mods & RACK_MOD_MASK) & RACK_MOD_CTRL;
         key_shift = (e.mods & RACK_MOD_MASK) & GLFW_MOD_SHIFT;
     }
@@ -209,7 +211,7 @@ struct TButton : SvgButton, IApplyTheme
         if (handler) {
             handler(key_ctrl, key_shift);
         } else {
-            SvgButton::onAction(e);
+            Base::onAction(e);
         }
     }
 

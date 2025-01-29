@@ -53,7 +53,7 @@ struct TipLabel : StaticTextLabel
 
     void onDragEnd(const DragEndEvent& e) override
     {
-        StaticTextLabel::onDragEnd(e);
+        BaseClass::onDragEnd(e);
         destroyTip();
     }
 
