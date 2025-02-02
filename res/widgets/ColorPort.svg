@@ -4,18 +4,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <g>
-    <circle
-       id="cop-bezel"
-       fill="#ffffff" fill-opacity="0.15"
-       cx="8" cy="8" r="8" />
-    <circle
-       id="cop-hole"
-       fill="#141414"
-       cx="8" cy="8" r="3.25" />
-    <circle
-       id="cop-ring"
-       fill="none"
-       stroke="#808080" stroke-width="2"
-       cx="8" cy="8" r="4" />
+    <circle id="cop-bezel" fill="#ffffff" opacity="0.15" cx="8" cy="8" r="8" />
+    <circle id="cop-ring" fill="none" stroke="#808080" stroke-width="2" cx="8" cy="8" r="4" />
+    <circle id="cop-hole" fill="#141414" cx="8" cy="8" r="3.25" />
   </g>
 </svg>

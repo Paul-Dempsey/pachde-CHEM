@@ -16,6 +16,7 @@ struct PresetModule : ChemModule, IChemClient
 
     // IChemClient
     rack::engine::Module* client_module() override;
+    std::string client_claim() override;
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;

@@ -110,6 +110,8 @@ inline NVGcolor nvgHSLAf(float h, float s, float l, float a)
 // 8-bit (0-255) abgr packed into a uint32_t.
 typedef uint32_t PackedColor;
 
+inline bool isVisibleColor(PackedColor co) { return 0 != (co & 0xff000000); }
+
 inline PackedColor PackRGBA(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return r | (g << 8u) | (b << 16u) | (a << 24u);
 }
@@ -122,6 +124,13 @@ inline NVGcolor fromPacked(PackedColor co)
 {
     return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
 }
+
+inline NVGcolor fromPackedOrDefault(PackedColor co, const NVGcolor& fallback)
+{
+    if (!isVisibleColor(co)) return fallback;
+    return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
+}
+
 
 inline PackedColor toPacked(NVGcolor co) {
     return PackRGBA(
@@ -391,6 +400,7 @@ void Circle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& fill);
 void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& stroke, float stroke_width = 1.f);
 void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f);
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
+void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
 
 template <class TMenuItem = rack::ui::MenuEntry>
 rack::ui::MenuEntry* createColorMenuItem(

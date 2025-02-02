@@ -403,4 +403,15 @@ void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float 
     }
 }
 
+void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade)
+{
+    nvgBeginPath(vg);
+    nvgRect(vg, cx - halo_radius, cy - halo_radius, halo_radius * 2.f, halo_radius * 2.f);
+    NVGcolor icol = nvgTransRGBAf(haloColor, fade);
+    NVGcolor ocol = nvgTransRGBAf(haloColor, 0.f);
+    NVGpaint paint = nvgRadialGradient(vg, cx, cy, inner_radius, halo_radius, icol, ocol);
+    nvgFillPaint(vg, paint);
+    nvgFill(vg);
+}
+
 }

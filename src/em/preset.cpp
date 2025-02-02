@@ -1,4 +1,5 @@
 #include "preset.hpp"
+#include "../services/misc.hpp"
 
 namespace pachde {
 
@@ -9,7 +10,9 @@ json_t* PresetDescription::toJson()
     json_object_set_new(root, "lo", json_integer(id.bankLo()));
     json_object_set_new(root, "num", json_integer(id.number()));
     json_object_set_new(root, "name", json_stringn(name.c_str(), name.size()));
-    json_object_set_new(root, "text", json_stringn(text.c_str(), text.size()));
+    if (text.size()) {
+        json_object_set_new(root, "text", json_stringn(text.c_str(), text.size()));
+    }
     return root;
 }
 
@@ -37,6 +40,11 @@ void PresetDescription::fromJson(const json_t* root)
     if (j) {
         text = json_string_value(j);
     }
+}
+
+std::string PresetDescription::summary()
+{
+    return format_string("[%d.%d.%d] %s", id.bankHi(), id.bankLo(), id.number(), name);
 }
 
 }

@@ -1134,6 +1134,21 @@
             inkscape:label="track" />
       </g>
 
+   <g id="test-colors" transform="translate(20 328)">
+      <rect id="frame" fill="#df62a6" stroke="#8a7342" width=138 height=18 x=-2 y= -2 stroke-width=.75 />
+      <rect id="BLACK" fill="#000000" width=10 height=10 x="0"   y="2" />
+      <rect id="co1"   fill="#c04a00" width=10 height=10 x="12"  y="2" />
+      <rect id="co2"   fill="#ad4980" width=10 height=10 x="24"  y="2" />
+      <rect id="co3"   fill="#decc2f" width=10 height=10 x="36"  y="2" />
+      <rect id="co4"   fill="#3b6ab0" width=10 height=10 x="48"  y="2" />
+      <rect id="co5"   fill="#f4e88e" width=10 height=10 x="60"  y="2" />
+      <rect id="co6"   fill="#580051" width=10 height=10 x="72"  y="2" />
+      <rect id="co7"   fill="#052d68" width=10 height=10 x="84"  y="2" />
+      <rect id="co8"   fill="#f7d647" width=10 height=10 x="96"  y="2" />
+      <rect id="co9"   fill="#6f9de3" width=10 height=10 x="108" y="2" />
+      <rect id="WHITE" fill="#ffffff" width=10 height=10 x="120" y="2" />
+   </g>
+
    <g id="rack-scheme-colors" transform="translate(22.5 350)">
       <rect id="frame"             fill="#000000" stroke="#f2b120" width=134 height=14 x=-2 y= -2 stroke-width=.75 />
       <rect id="SCHEME_BLACK"      fill="#000000" width=10 height=10 x="0"   y="0" />

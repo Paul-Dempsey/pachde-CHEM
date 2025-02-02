@@ -104,7 +104,7 @@ struct BasicTextLabel: Widget, IApplyTheme
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
-        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_style.key));
+        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_style.key, true));
         if (!isColorVisible(_color)) {
             _color = RampGray(G_85);
         }

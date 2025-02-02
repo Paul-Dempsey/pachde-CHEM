@@ -44,18 +44,22 @@
             "tab-label-hi":    { "fill": "g85" },
             "preset":          { "fill": "g70" },
             "preset-selected": { "fill": "g85" },
-            "grid-bg":         { "fill": "#517a82" },
-            "grid-line":       { "stroke": "#3a6378" },
-            "preset-grip":     { "fill":"#9d9131", "opacity": 0.2 },
+            "grid-bg":         { "fill": "#325566" },
+            "grid-line":       { "stroke": "#233d4a" },
+            "grid-new":        { "fill": "#457aa6" },
+            "cur-dot":         { "fill": "#457aa6" },
+            "preset-grip":     { "fill":"#9d9131", "opacity": 0.4 },
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
 
-            "ctl-frame":   { "stroke": "g10" },
-            "ctl-glyph":   { "fill": "g70" },
-            "ctl-disabled":{ "fill": "g50" },
+            "ctl-frame":   { "stroke": "g50" },
+            "ctl-glyph":   { "fill": "g70", "stroke": "g70" },
+            "ctl-disabled":{ "fill": "g50", "stroke": "g50" },
             "ctl-label":   { "fill": "g60" },
             "ctl-label-hi":{ "fill": "g85" },
+            "ctl-bar":     { "stroke": "#5b8093"},
+
             "menu":        { "fill" : "#63c663" },
 
             "button-bezel": { "fill": "g50"},

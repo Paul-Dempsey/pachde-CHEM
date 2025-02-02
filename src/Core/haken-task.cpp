@@ -380,7 +380,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
 
         case HakenTask::SyncDevices: {
             auto broker = ModuleBroker::get();
-            if (broker->isPrimary(chem)) {
+            if (broker->is_primary(chem)) {
                 chem->logMessage("CHEM", "Task SyncDevices");
                 MidiDeviceBroker::get()->sync();
                 task->done();

@@ -21,6 +21,10 @@ rack::engine::Module* PresetModule::client_module()
 {
     return this; 
 }
+std::string PresetModule::client_claim()
+{
+    return device_claim;
+}
 void PresetModule::onConnectHost(IChemHost* host)
 {
 }

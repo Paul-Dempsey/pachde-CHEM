@@ -14,11 +14,14 @@ struct ModuleBroker
     ModuleBroker(const ModuleBroker&) = delete;
     static ModuleBroker* get();
 
-    void registerHost(IChemHost* host);
-    void unregisterHost(IChemHost* host);
-    bool isPrimary(IChemHost* host);
-    IChemHost* getPrimary();
+    void register_host(IChemHost* host);
+    void unregister_host(IChemHost* host);
+    bool is_primary(IChemHost* host);
+    IChemHost* get_primary();
     bool try_bind_client(IChemClient* client);
+    IChemHost* get_host(const std::string& claim);
+
+    void addHostPickerMenu(ui::Menu* menu, IChemClient* client);
 
 };
 

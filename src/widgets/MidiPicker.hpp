@@ -3,12 +3,13 @@
 #include <rack.hpp>
 #include "../plugin.hpp"
 #include "../services/midi-devices.hpp"
+#include "../services/svt_rack.hpp"
 #include "TipWidget.hpp"
 
 using namespace ::rack;
 namespace pachde {
 
-struct MidiPicker : TipWidget
+struct MidiPicker : TipWidget, IApplyTheme
 {
     MidiPicker & operator=(const MidiPicker &) = delete;
     MidiPicker(const MidiPicker&) = delete;
@@ -24,11 +25,17 @@ struct MidiPicker : TipWidget
         addChild(fb);
         sw = new widget::SvgWidget;
         fb->addChild(sw);
-        sw->setSvg(Svg::load(asset::plugin(pluginInstance, "res/widgets/midi-button.svg")));
+    }
+    
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        sw->setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/midi-button.svg"), theme));
         box.size = sw->box.size;
         fb->box.size = sw->box.size;
         fb->setDirty(true);
+        return true;
     }
+
 
     void setDeviceHolder(MidiDeviceHolder * holder) {
         assert(holder);

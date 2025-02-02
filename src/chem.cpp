@@ -67,6 +67,14 @@ void ChemModuleWidget::draw(const DrawArgs& args)
             Line(vg, 0.f, y, box.size.x, y, co, 0.5f);
         }
     }
+    if (hints) {
+        auto vg = args.vg;
+        NVGcolor co = Overlay(GetStockColor(StockColor::Aquamarine), 0.35f);
+        Line(vg, 0, 15, box.size.x, 15, co, .5f);
+        Line(vg, 0, box.size.y - 15, box.size.x, box.size.y - 15, co, .5f);
+        Line(vg, 15, 0, 15, box.size.y, co, .5f);
+        Line(vg, box.size.x - 15, 0, box.size.x - 15, box.size.y, co, .5f);
+    }
 }
 
 void ChemModuleWidget::appendContextMenu(Menu *menu)
@@ -87,6 +95,10 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
         "Grid", "",
         [this]() { return showGrid; },
         [this]() { showGrid = !showGrid; }));
+    menu->addChild(createCheckMenuItem(
+        "Layout help", "",
+        [this]() { return hints; },
+        [this]() { hints = !hints; }));
 
 }
 
@@ -98,7 +110,7 @@ NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const
 {
     assert(color_name);
     if (theme.empty()) return fallback;
-    auto co = fromPacked(theme_engine.getFillColor(theme, color_name));
+    auto co = fromPacked(theme_engine.getFillColor(theme, color_name, true));
     return isColorVisible(co) ? co : fallback;
 }
 
@@ -106,6 +118,6 @@ NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, Stock
 {
     assert(color_name);
     if (theme.empty()) return GetStockColor(fallback);
-    auto co = fromPacked(theme_engine.getFillColor(theme, color_name));
+    auto co = fromPacked(theme_engine.getFillColor(theme, color_name, true));
     return isColorVisible(co) ? co : GetStockColor(fallback);
 }

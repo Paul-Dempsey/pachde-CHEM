@@ -18,6 +18,8 @@ namespace svg_theme {
 // nanosvg colors are 8-bit (0-255) abgr packed into an unsigned int.
 typedef unsigned int PackedColor;
 const PackedColor NoColor = 0;
+bool isVisibleColor(PackedColor co);
+PackedColor applyOpacity(PackedColor color, float alpha);
 
 enum Severity { Info, Warn, Error, Critical };
 const char * SeverityName(Severity sev);
@@ -116,6 +118,20 @@ struct Style {
     bool isApplyStroke() { return stroke.isApplicable(); }
     bool isApplyOpacity() { return apply_opacity; }
     bool isApplyStrokeWidth() { return apply_stroke_width; }
+    PackedColor fill_color() {
+        return isApplyFill() ? fill.getColor() : NoColor;
+    }
+    PackedColor stroke_color() {
+        return isApplyStroke() ? stroke.getColor() : NoColor;
+    }
+    PackedColor fillWithOpacity() {
+        if (!isApplyFill()) return NoColor;
+        return (apply_opacity) ? applyOpacity(fill.getColor(), opacity) : fill.getColor();
+    }
+    PackedColor strokeWithOpacity() {
+        if (!isApplyStroke()) return NoColor;
+        return (apply_opacity) ? applyOpacity(stroke.getColor(), opacity) : stroke.getColor();
+    }
 };
 
 struct SvgTheme {
@@ -125,19 +141,21 @@ struct SvgTheme {
 
     std::shared_ptr<Style> getStyle(const std::string &name) {
         auto found = styles.find(name);
-        if (found != styles.end()) {
-            return found->second;
-        }
-        return nullptr;
+        return (found == styles.end()) ? nullptr : found->second;
     }
 
-    PackedColor getFillColor(const char *name)
+    PackedColor getFillColor(const char *name, bool with_opacity)
     {
         auto sty = getStyle(name);
-        if (sty && sty->fill.isApplicable()) {
-            return sty->fill.getColor();
-        }
-        return NoColor;
+        if (!sty) return NoColor;
+        return with_opacity ? sty->fillWithOpacity() : sty->fill_color();
+    }
+
+    PackedColor getStrokeColor(const char *name, bool with_opacity)
+    {
+        auto sty = getStyle(name);
+        if (!sty) return NoColor;
+        return with_opacity ? sty->strokeWithOpacity() : sty->stroke_color();
     }
 };
 
@@ -187,16 +205,24 @@ public:
     }
 
     PackedColor getStockColor(const char *name);
-    PackedColor getFillColor(const std::string& theme_name, const char *name)
+    PackedColor getFillColor(const std::string& theme_name, const char *name, bool with_opacity)
     {
         auto theme = getTheme(theme_name);
         if (theme) {
-            auto co = theme->getFillColor(name);
+            auto co = theme->getFillColor(name, with_opacity);
             if (co) return co;
         }
         return getStockColor(name);
     }
-
+    PackedColor getStrokeColor(const std::string& theme_name, const char *name, bool with_opacity)
+    {
+        auto theme = getTheme(theme_name);
+        if (theme) {
+            auto co = theme->getStrokeColor(name, with_opacity);
+            if (co) return co;
+        }
+        return getStockColor(name);
+    }
     void showCache();
 
 private:

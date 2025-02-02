@@ -43,6 +43,7 @@ struct MidiInput : midi::Input
     rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
     void queueMessage(PackedMidiMessage msg);
     void dispatch(float sampleTime);
+    void drop(int count);
     rack::dsp::Timer midi_timer;
 
     MidiInput(const MidiInput &) = delete; // no copy constructor

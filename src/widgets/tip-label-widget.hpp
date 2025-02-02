@@ -10,24 +10,33 @@ struct TipLabel : StaticTextLabel
 
     TipHolder* tip_holder;
 
-    TipLabel() {}
+    TipLabel() : tip_holder(nullptr) {}
+
     virtual ~TipLabel() {
         if (tip_holder) delete tip_holder;
         tip_holder = nullptr;
     }
-    void describe(std::string text)
+
+    void ensureTipHolder()
     {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
+    }
+
+    void describe(std::string text)
+    {
+        ensureTipHolder();
         tip_holder->setText(text);
     }
+
     void destroyTip() {
         if (tip_holder) { tip_holder->destroyTip(); }
     }
 
     void createTip() {
-        if (tip_holder) { tip_holder->createTip(); }
+        ensureTipHolder();
+        tip_holder->createTip();
     }
 
     void onHover(const HoverEvent& e) override

@@ -153,13 +153,13 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     switch (cc) {
     case Haken::ccBankH:
         if (in_preset) {
-            preset.id.raw().bytes.bank_hi = value;
+            preset.id.setBankHi(value);
         }
         break;
 
     case Haken::ccBankL: // category
         if (in_preset) {
-            preset.id.raw().bytes.bank_lo = value;
+            preset.id.setBankLo(value);
         }
         break;
 
@@ -289,7 +289,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
 
         case MidiStatus_ProgramChange:
             if (in_preset) {
-                preset.id.raw().bytes.number = msg.bytes.data1;
+                preset.id.setNumber(msg.bytes.data1);
                 in_preset = false;
                 ready = true;
                 notifyPresetChanged();

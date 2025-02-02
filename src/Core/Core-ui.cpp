@@ -44,7 +44,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module)
     LabelStyle style{"curpreset", TextAlignment::Center, 12.f};
 
     addChild(preset_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(box.size.x *.5f, 3.5f), box.size.x, "<preset>", theme_engine, theme, style));
+        Vec(box.size.x *.5f, 3.5f), box.size.x, "[preset]", theme_engine, theme, style));
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(box.size.x - RACK_GRID_WIDTH * 1.5f, 30, "LED"));
@@ -86,9 +86,9 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 {
     float y = PICKER_TOP;
-    haken_picker = createMidiPicker(UHALF, y, true, "Choose HAKEN device", &my_module->haken_midi);
+    haken_picker = createMidiPicker(UHALF, y, true, "Choose HAKEN device", &my_module->haken_midi, theme);
 
-    std::string text = "<Eagan Matrix Device>";
+    std::string text = "[Eagan Matrix Device]";
     if (my_module) {
         if (my_module->haken_midi.connection) {
             text = my_module->haken_midi.connection->info.friendly(TextFormatLength::Short);
@@ -109,12 +109,12 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
         Vec(UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, style));
     y += PICKER_INTERVAL;
-    controller1_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1);
+    controller1_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
     addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
         Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
     y += PICKER_INTERVAL;
-    controller2_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2);
+    controller2_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
     addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
         Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
@@ -184,9 +184,9 @@ void CoreModuleWidget::resetIndicators()
     syncdevices_indicator  ->setColor(co); syncdevices_indicator  ->setFill(false);
 }
 
-MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device)
+MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device, std::shared_ptr<SvgTheme> theme)
 {
-    auto picker = createWidget<MidiPicker>(Vec(x, y));
+    auto picker = createThemedWidget<MidiPicker>(Vec(x, y), theme_engine, theme);
     picker->describe(tip);
     picker->setDeviceHolder(device);
     picker->is_em = isEM;
@@ -225,6 +225,10 @@ void CoreModuleWidget::setThemeName(const std::string& name)
 rack::engine::Module* CoreModuleWidget::client_module()
 {
     return my_module; 
+}
+std::string CoreModuleWidget::client_claim()
+{
+    return my_module ? my_module->haken_midi.getClaim() : "";
 }
 void CoreModuleWidget::onConnectHost(IChemHost* host)
 {}

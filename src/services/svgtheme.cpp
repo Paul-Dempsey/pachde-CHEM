@@ -4,6 +4,18 @@
 
 namespace svg_theme {
 
+constexpr const uint32_t ALPHA_MASK = 0xff000000;
+
+bool isVisibleColor(PackedColor co)
+{
+    return 0 != (co & ALPHA_MASK);
+}
+
+PackedColor applyOpacity(PackedColor color, float alpha)
+{
+    return (color & ~ALPHA_MASK) | (static_cast<uint32_t>(alpha * 255) << 24);
+}
+
 const char * SeverityName(Severity sev) {
     switch (sev) {
         case Severity::Info: return "Info";
@@ -640,7 +652,6 @@ std::shared_ptr<::rack::window::Svg> SvgThemeEngine::loadSvg(const std::string& 
 	return svg;
 }
 
-
 bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, std::string filename, std::shared_ptr<rack::window::Svg>& svg) {
 	auto newSvg = this->loadSvg(filename, theme);
  
@@ -651,14 +662,12 @@ bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, std::string fil
 	return false;
 }
 
-
 void SvgThemeEngine::showCache() {
 	unsigned int n = 0;
 	for (auto entry : svgs) {
 		DEBUG("%u %s %p", ++n, entry.first.c_str(), (entry.second).get());
 	}
 }
-
 
 PackedColor SvgThemeEngine::getStockColor(const char *name)
 {

@@ -6,9 +6,10 @@ namespace pachde {
 
 struct TipHolder
 {
-    rack::ui::Tooltip* tip = nullptr;
+    rack::ui::Tooltip* tip;
     std::string tip_text;
 
+    TipHolder() : tip(nullptr) {}
     ~TipHolder() {
         destroyTip();
     }
@@ -51,11 +52,16 @@ struct TipWidget : Widget
     
     bool hasText() { return tip_holder && !tip_holder->tip_text.empty(); }
 
-    void describe(std::string text)
+    void ensureTipHolder()
     {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
+    }
+
+    void describe(std::string text)
+    {
+        ensureTipHolder();
         tip_holder->setText(text);
     }
 
@@ -64,6 +70,7 @@ struct TipWidget : Widget
     }
 
     void createTip() {
+        ensureTipHolder();
         if (tip_holder) { tip_holder->createTip(); }
     }
 

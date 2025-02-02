@@ -21,7 +21,7 @@ CoreModule::CoreModule() : in_reboot(false), heartbeat(false), loop(0)
 
     configOutput(Outputs::OUT_READY, "Ready trigger");
 
-    ModuleBroker::get()->registerHost(this);
+    ModuleBroker::get()->register_host(this);
     to_em.core = this;
     tasks.setCoreModule(this);
     em.subscribeEMEvents(this);
@@ -46,7 +46,7 @@ CoreModule::CoreModule() : in_reboot(false), heartbeat(false), loop(0)
 
 CoreModule::~CoreModule() {
     //haken_midi_in.clear();
-    ModuleBroker::get()->unregisterHost(this);
+    ModuleBroker::get()->unregister_host(this);
     controller1_midi_in.clear();
     controller2_midi_in.clear();
     controller1.unsubscribe(this);
@@ -139,6 +139,7 @@ void CoreModule::onPresetChanged()
     if (task->pending()) {
         task->complete();
     }
+    notify_preset_changed();
 }
 void CoreModule::onUserComplete()
 {
@@ -171,6 +172,12 @@ void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<Mi
 {
     for (auto client : chem_clients) {
         client->onConnectionChange(device, connection);
+    }
+}
+
+void CoreModule::notify_preset_changed() {
+    for (auto client : chem_clients) {
+        client->onPresetChange();
     }
 }
 
@@ -294,9 +301,8 @@ void CoreModule::unregister_chem_client(IChemClient* client)
     }
 }
 
-bool CoreModule::host_has_client(IChemClient* target)
+bool CoreModule::host_has_client_model(IChemClient* target)
 {
-    // match by model
     auto target_model = target->client_module()->getModel();
     for (auto client : chem_clients) {
         auto client_model = client->client_module()->getModel();
@@ -307,6 +313,21 @@ bool CoreModule::host_has_client(IChemClient* target)
     return false;
 }
 
+bool CoreModule::host_has_client(IChemClient* client)
+{
+    return chem_clients.cend() != std::find(chem_clients.cbegin(), chem_clients.cend(), client);
+}
+
+std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice device)
+{
+    switch (device)
+    {
+    case ChemDevice::Haken: return haken_midi.connection; break;
+    case ChemDevice::Midi1: return controller1.connection; break;
+    case ChemDevice::Midi2: return controller2.connection; break;
+    default: return nullptr;
+    }
+}
 
 constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 120;
 void CoreModule::processLights(const ProcessArgs &args)

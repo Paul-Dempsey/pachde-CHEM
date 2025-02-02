@@ -31,13 +31,23 @@ void MidiInput::dispatch(float sampleTime)
     }
 }
 
+void MidiInput::drop(int count)
+{
+    char buffer[100];
+    PackedMidiMessage trash[count];
+    if (log) {
+        format_buffer(buffer, 100, "!! Dropping %d messages out of %d queued", count, ring.size());
+        log->logMessage(printable(source_name), buffer);
+    }
+    ring.shiftBuffer(trash, count);
+}
+
 void MidiInput::queueMessage(PackedMidiMessage msg)
 {
     if (ring.full()) {
-        assert(false);
-    } else {
-        ring.push(msg);
+        drop(16);
     }
+    ring.push(msg);
 }
 
 void MidiInput::onMessage(const midi::Message& message)

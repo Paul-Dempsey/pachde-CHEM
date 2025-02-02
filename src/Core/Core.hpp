@@ -22,7 +22,7 @@ struct RelayMidiToEM : IDoMidi
     void doMessage(PackedMidiMessage message) override;
 };
 
-struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, IHakenTaskEvents
+struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents
 {
     CoreModuleWidget* ui = nullptr;
 
@@ -75,23 +75,25 @@ struct CoreModule : ChemModule, IMidiDeviceNotify, IChemHost, IHandleEmEvents, I
     void send_midi_rate(HakenMidiRate rate);
     void restore_midi_rate();
 
-
     // IMidiDeviceNotify
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
     // IChemHost
     void register_chem_client(IChemClient* client) override;
     void unregister_chem_client(IChemClient* client) override;
+    bool host_has_client_model(IChemClient* client) override;
     bool host_has_client(IChemClient* client) override;
     //bool host_ready() override { return this->em.ready; }
-    std::shared_ptr<MidiDeviceConnection> host_connection() override {
-        return haken_midi.connection;
+    std::shared_ptr<MidiDeviceConnection> host_connection(ChemDevice device) override;
+    std::string host_claim() override {
+        return haken_midi.getClaim();
     }
     const PresetDescription* host_preset() override {
         return &em.preset;
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
-
+    void notify_preset_changed();
+    
     // IHandleEmEvents
     void onLoopDetect(uint8_t cc, uint8_t value) override;
     void onEditorReply(uint8_t reply) override;
@@ -184,7 +186,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void set_theme_colors(const std::string& theme = "");
 
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-core.svg"); }
-    MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device);
+    MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device, std::shared_ptr<SvgTheme> theme);
 
     void createScrews(std::shared_ptr<SvgTheme> theme);
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);
@@ -197,6 +199,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
 
     // IChemClient
     ::rack::engine::Module* client_module() override;
+    std::string client_claim() override;
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;

@@ -32,39 +32,41 @@ struct Hamburger : TipWidget, IApplyTheme
 
     void onHover(const HoverEvent& e) override
     {
-        base::onHover(e);
         e.consume(this);
+        base::onHover(e);
     }
+
     void onEnter(const EnterEvent& e) override
     {
-        base::onEnter(e);
         hovered = true;
+        base::onEnter(e);
     }
+
     void onLeave(const LeaveEvent& e) override
     {
-        base::onLeave(e);
         hovered = false;
+        base::onLeave(e);
     }
 
     void onButton(const ButtonEvent& e) override
     {
-        base::onButton(e);
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
             createContextMenu();
             e.consume(this);
         }
+        base::onButton(e);
     }
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        patty_color = fromPacked(theme->getFillColor("patty"));
-        hover_color = fromPacked(theme->getFillColor("patty-hover"));
+        patty_color = fromPackedOrDefault(theme->getFillColor("patty", true), RampGray(G_50));
+        hover_color = fromPackedOrDefault(theme->getFillColor("patty-hover", true), RampGray(G_40));
         return true;
     }
 
     void draw(const DrawArgs& args) override
     {
-        TipWidget::draw(args);
+        Base::draw(args);
 
         auto vg = args.vg;
 

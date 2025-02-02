@@ -120,7 +120,7 @@ struct MidiDeviceBroker
     MidiDeviceBroker() {}
     static MidiDeviceBroker* get();
 
-    bool isPrimary(MidiDeviceHolder* holder);
+    bool is_primary(MidiDeviceHolder* holder);
     void registerDeviceHolder(MidiDeviceHolder* holder);
     void unRegisterDeviceHolder(MidiDeviceHolder* holder);
     void clear();

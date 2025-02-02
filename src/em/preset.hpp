@@ -13,6 +13,22 @@ struct PresetDescription
 
     PresetDescription() {}
 
+    PresetDescription(PresetId id, std::string name, std::string text)
+    : id(id), name(name), text(text)
+    {}
+
+    void init(const PresetDescription* source) {
+        if (source) {
+            id = source->id;
+            name = source->name;
+            text = source->text;
+        } else {
+            id = 0;
+            name = "";
+            text = "";
+        }
+    }
+
     void clear() {
         id.clear();
         name.clear();
@@ -21,6 +37,9 @@ struct PresetDescription
 
     json_t* toJson();
     void fromJson(const json_t* root);
+    std::string summary();
+
 };
+
 
 }

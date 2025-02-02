@@ -249,15 +249,15 @@ struct LinkButtonSvg {
     static std::string down() { return "res/widgets/link-button-down.svg"; }
 };
 
-// struct SmallSquareButtonSvg {
-//     static std::string up() { return "res/widgets/square-push-sm-up.svg"; }
-//     static std::string down() { return "res/widgets/square-push-sm-down.svg"; }
-// };
-
+struct HeartButtonSvg {
+    static std::string up() { return "res/widgets/heart-button.svg"; }
+    static std::string down() { return "res/widgets/heart-button-down.svg"; }
+};
 
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
+using HeartButton = TButton<HeartButtonSvg>;
 
 struct ThemeKnob : rack::RoundKnob, IApplyTheme
 {
