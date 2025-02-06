@@ -21,6 +21,7 @@ SOURCES += src/em/preset.cpp
 # services
 SOURCES += src/services/colors.cpp
 SOURCES += src/services/haken-midi.cpp
+SOURCES += src/services/HakenMidiOutput.cpp
 SOURCES += src/services/midi-devices.cpp
 SOURCES += src/services/midi-io.cpp
 SOURCES += src/services/MidiDeviceBroker.cpp
@@ -38,18 +39,17 @@ SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 
 # modules
-SOURCES += src/Blank/Blank.cpp
+SOURCES += src/modules/Blank/Blank.cpp
 
-SOURCES += src/Core/Core.cpp
-SOURCES += src/Core/Core-ui.cpp
-SOURCES += src/Core/haken-task.cpp
-# SOURCES += src/Core/midi-input-worker.cpp
+SOURCES += src/modules/Core/Core.cpp
+SOURCES += src/modules/Core/Core-ui.cpp
+SOURCES += src/modules/Core/haken-task.cpp
 
-SOURCES += src/Preset/Preset.cpp
-SOURCES += src/Preset/Preset-ui.cpp
+SOURCES += src/modules/Play/Play.cpp
+SOURCES += src/modules/Play/Play-ui.cpp
 
-SOURCES += src/Play/Play.cpp
-SOURCES += src/Play/Play-ui.cpp
+SOURCES += src/modules/Preset/Preset.cpp
+SOURCES += src/modules/Preset/Preset-ui.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

@@ -4,11 +4,14 @@
         "theme": {
             "panel" : { "fill": "dark-panel" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#1f1f1f"}, { "index":1, "color":"#080808"}]}},
+            "numbers": { "fill": "brand", "opacity":0 },
 
             "hexoid": { "fill": "brand" },
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
             "title": {"fill": "brand", "opacity": 0.4},
+            "detent0": { "stroke": "#000000" },
+            "detent1": { "stroke": "#808080" },
 
             "rbtn-punch": {"fill": "#080808"},
             "rbtn-bezel": {"fill": "#404040" },
@@ -16,7 +19,8 @@
             "rbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#bfbfbf"}, { "index":1, "color":"#333333"}]}},
             "rbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"#666666"}, { "index":1, "color":"#333333"}]}},
             "rbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#8c8c8c"}, { "index":1, "color":"#595959"}]}},
-
+            "rbtn-wire": { "opacity":0 },
+            
             "qbtn-punch" :   { "fill": "#080808" },
 
             "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#999999"}, { "index":1, "color":"#595959"}]}},
@@ -48,12 +52,15 @@
             "tab-label":       { "fill": "g55" },
             "tab-label-hi":    { "fill": "g70" },
             "preset":          { "fill": "g65" },
-            "preset-selected": { "fill": "g70" },
+            "preset-selected": { "fill": "#1e662a" },
+            "preset-seltext":  { "fill": "g85" },
+            "preset-grip":     { "fill":"#9d9131", "opacity": 0.4 },
+            "preset-drag" :    { "fill": "#9d9131" },
+            "preset-dragcur" : { "fill": "#9d9131", "opacity": 0.4 },
             "grid-bg":         { "fill": "g20" },
             "grid-line":       { "stroke": "dark-panel" },
             "grid-new":        { "fill": "#464060" },
-            "cur-dot":       { "fill": "#464060" },
-            "preset-grip":     { "fill":"#9d9131", "opacity": 0.4 },
+            "cur-dot":       { "fill": "#b036d8" },
             "heart":         { "fill": "#ee6161" },
             "heart-fill":    { "fill": "#bd0808" },
 
@@ -98,10 +105,20 @@
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#4C4C4C" }, { "index":1, "offset":1, "color": "#3B3B3B" }]}},
             "screw-slot":  { "fill":"#171717" },
 
+            "tsk-0":     { "fill":"#737373" },
+            "tsk-nsch":  { "fill":"#808080" },
+            "tsk-pend":  { "fill":"#aa40bf" },
+            "tsk-comp":  { "fill":"#32a732" },
+            "tsk-done":  { "fill":"#207520" },
+            "tsk-wait":  { "fill":"#3b6ab0" },
+            "tsk-na":    { "fill":"#89aed3" },
+            "tsk-broke": { "fill":"#fa0000" },
+
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },
             "m2": { "fill": "g50" },
 
+            "debug" : { "fill": "#fc59a5"},
             "x": { "fill": "#000000" }
         }
     }

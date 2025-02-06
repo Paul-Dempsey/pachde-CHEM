@@ -45,7 +45,7 @@ void PlayModule::dataFromJson(json_t* root)
         json_t* jp;
         size_t index;
         json_array_foreach(jar, index, jp) {
-            auto path = json_string_value(j);
+            auto path = json_string_value(jp);
             if (system::exists(path)) {
                 playlist_mru.push_back(path);
             }
@@ -64,9 +64,11 @@ json_t* PlayModule::dataToJson()
     
     auto jaru = json_array();
     int count = 0;
-    for (std::string& f: playlist_mru) {
-        if (++count > 20) break;
-        json_array_append_new(jaru, json_string(f.c_str()));
+    for (auto path: playlist_mru) {
+        if (system::exists(path)) {
+            json_array_append_new(jaru, json_string(path.c_str()));
+            if (++count > 20) break;
+        }
     }
     json_object_set_new(root, "history", jaru);
 

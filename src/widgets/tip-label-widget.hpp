@@ -24,6 +24,11 @@ struct TipLabel : StaticTextLabel
         }
     }
 
+    std::string description() {
+        if (!tip_holder) return "";
+        return tip_holder->tip_text;
+    }
+
     void describe(std::string text)
     {
         ensureTipHolder();

@@ -74,6 +74,11 @@ struct TipWidget : Widget
         if (tip_holder) { tip_holder->createTip(); }
     }
 
+    void onHover(const HoverEvent& e) override {
+        Base::onHover(e);
+        e.consume(this);
+    }
+
     void onEnter(const EnterEvent& e) override {
         Base::onEnter(e);
         createTip();

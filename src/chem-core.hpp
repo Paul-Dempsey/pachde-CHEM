@@ -2,6 +2,7 @@
 #include <rack.hpp>
 #include "em/preset.hpp"
 #include "services/midi-devices.hpp"
+#include "services/haken-midi.hpp"
 
 namespace pachde {
 
@@ -17,6 +18,7 @@ struct IChemHost
     virtual std::shared_ptr<MidiDeviceConnection> host_connection(ChemDevice device) = 0;
     virtual std::string host_claim() = 0;
     virtual const PresetDescription* host_preset() = 0;
+    virtual HakenMidi* host_haken() = 0;
 };
 
 struct IChemClient

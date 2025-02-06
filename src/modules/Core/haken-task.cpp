@@ -1,7 +1,7 @@
 #include "haken-task.hpp"
-#include "..\services\misc.hpp"
-#include "..\services\midi-io.hpp"
-#include "..\services\ModuleBroker.hpp"
+#include "../../services/misc.hpp"
+#include "../../services/midi-io.hpp"
+#include "../../services/ModuleBroker.hpp"
 #include "Core.hpp"
 
 namespace pachde {
@@ -48,6 +48,7 @@ const char * TaskStateName(TaskState state)
     case TaskState::Complete:       return "complete";
     case TaskState::Done:           return "done";
     case TaskState::Waiting:        return "waiting";
+    case TaskState::NotApplicable:  return "n/a";
     case TaskState::Broken:         return "broken";
     default: return "--";
     }
@@ -193,11 +194,11 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
         if ((task->budget > 0.f) && (task->time > task->budget)) {
             ++task->attempt;
             if (task->attempt > 3) {
-                chem->logMessage("CHEM", format_string("%s retries exhausted: rebooting", TaskName(task->id)).c_str());
+                chem->logMessage("CHEM", format_string("%s retries exhausted: rebooting", TaskName(task->id)));
                 chem->reboot();
                 notifyChange(task->id);
             } else {
-                chem->logMessage("CHEM", format_string("throttling %s", TaskName(task->id)).c_str());
+                chem->logMessage("CHEM", format_string("throttling %s", TaskName(task->id)));
                 back_off_midi_rate();
                 task->state = TaskState::Uninitialized;
                 return false;
@@ -217,7 +218,7 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
                 current = next_task(current);
             }
         } else {
-            chem->logMessage("CHEM", format_string("Task complete: %s", TaskName(task->id)).c_str());
+            chem->logMessage("CHEM", format_string("Task complete: %s", TaskName(task->id)));
             if (task->post_delay > 0.f) {
                 if (task->periodic) {
                     task->time = 0.f;
@@ -248,13 +249,18 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
     } break;
 
     case TaskState::Done: {
-        //notifyChange(task->id);
+        notifyChange(task->id);
+        current = next_task(current);
+        return true;
+    } break;
+
+    case TaskState::NotApplicable: {
         current = next_task(current);
         return true;
     } break;
 
     case TaskState::Broken: {
-        chem->logMessage("CHEM", format_string("Task broken: %s", TaskName(task->id)).c_str());
+        chem->logMessage("CHEM", format_string("Task broken: %s", TaskName(task->id)));
         notifyChange(task->id);
         task->refresh();
         return true;
@@ -315,67 +321,102 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 broker->sync();
                 if (chem->isHakenConnected()) {
                     task->done();
-                    notifyChange(HakenTask::MidiDevice);
-                    current = next_task(current);
+                } else if (broker->bindAvailableEm(&chem->haken_device)) {
+                    task->done();
                 } else {
-                    if (broker->bindAvailableEm(&Core(core)->haken_midi)) {
-                        task->done();
-                        notifyChange(HakenTask::MidiDevice);
-                        current = next_task(current);
-                    }
+                    task->not_applicable();
                 }
+                notifyChange(HakenTask::MidiDevice);
+                current = next_task(current);
             }
             break;
 
         case HakenTask::HeartBeat:
-            chem->logMessage("CHEM", "Starting task Heartbeat");
-            chem->haken_midi_out.sendEditorPresent();
-            chem->haken_midi_out.dispatch(DISPATCH_NOW);
-            task->pend();
-            notifyChange(HakenTask::HeartBeat);
+            if (chem->isHakenConnected()){
+                chem->logMessage("CHEM", "Starting task Heartbeat");
+                chem->haken_midi.editor_present();
+                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                task->pend();
+                notifyChange(HakenTask::HeartBeat);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::Updates:
-            chem->logMessage("CHEM", "Starting task Updates");
-            chem->haken_midi_out.sendRequestUpdates();
-            chem->haken_midi_out.dispatch(DISPATCH_NOW);
-            task->done();
-            notifyChange(HakenTask::Updates);
-            current = next_task(current);
+            if (chem->isHakenConnected()) {
+                chem->logMessage("CHEM", "Starting task Updates");
+                chem->haken_midi.request_updates();
+                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                task->done();
+                notifyChange(HakenTask::Updates);
+                current = next_task(current);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::UserPresets:
-            chem->logMessage("CHEM", "Starting task UserPresets");
-            assert(task->scheduled()); // should have been handled in process_task_timing
-            task->pend();
-            chem->haken_midi_out.sendRequestUser();
-            chem->haken_midi_out.dispatch(DISPATCH_NOW);
-            notifyChange(HakenTask::UserPresets);
+            if (chem->isHakenConnected()) {
+                chem->logMessage("CHEM", "Starting task UserPresets");
+                assert(task->scheduled()); // should have been handled in process_task_timing
+                task->pend();
+                chem->haken_midi.request_user();
+                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                notifyChange(HakenTask::UserPresets);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::SystemPresets:
-            chem->logMessage("CHEM", "Starting task SystemPresets");
-            assert(task->scheduled()); // should have been handled in process_task_timing
-            task->pend();
-            chem->haken_midi_out.sendRequestSystem();
-            chem->haken_midi_out.dispatch(DISPATCH_NOW);
-            notifyChange(HakenTask::SystemPresets);
+            if (chem->isHakenConnected()) {
+                chem->logMessage("CHEM", "Starting task SystemPresets");
+                assert(task->scheduled()); // should have been handled in process_task_timing
+                assert(chem->isHakenConnected());
+                task->pend();
+                chem->haken_midi.request_system();
+                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                notifyChange(HakenTask::SystemPresets);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::PresetInfo:
-            chem->logMessage("CHEM", "Starting task PresetInfo");
-            task->pend();
-            chem->haken_midi_out.sendRequestConfiguration();
-            chem->haken_midi_out.dispatch(DISPATCH_NOW);
-            notifyChange(HakenTask::PresetInfo);
+            if (chem->isHakenConnected()) {
+                chem->logMessage("CHEM", "Starting task PresetInfo");
+                task->pend();
+                chem->haken_midi.request_configuration();
+                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                notifyChange(HakenTask::PresetInfo);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::LastPreset:
-            // TODO
-            //chem->midilog.logMessage("CHEM", "Starting task LastPreset");
-            task->done();
-            notifyChange(HakenTask::LastPreset);
-            current = next_task(current);
+            if (chem->isHakenConnected()) {
+                // TODO
+                //chem->midilog.logMessage("CHEM", "Starting task LastPreset");
+                task->done();
+                notifyChange(HakenTask::LastPreset);
+                current = next_task(current);
+            } else {
+                task->not_applicable();
+                notifyChange(current);
+                current = next_task(current);
+            }
             break;
 
         case HakenTask::SyncDevices: {
@@ -385,10 +426,12 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 MidiDeviceBroker::get()->sync();
                 task->done();
                 notifyChange(HakenTask::SyncDevices);
-                current = next_task(current);
             } else {
+                task->not_applicable();
+                notifyChange(current);
                 current = next_task(current);
             }
+            current = next_task(current);
        } break;
 
         case HakenTask::End:

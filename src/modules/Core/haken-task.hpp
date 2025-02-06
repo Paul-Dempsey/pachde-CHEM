@@ -1,6 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "../services/haken-midi.hpp"
+#include "../../services/haken-midi.hpp"
 
 namespace pachde {
 
@@ -36,6 +36,7 @@ enum class TaskState : uint8_t {
     Complete,
     Done,
     Waiting,
+    NotApplicable,
     Broken
 };
 
@@ -75,6 +76,7 @@ struct HakenTaskInfo
     bool completed() { return TaskState::Complete == state; }
     bool isdone() { return TaskState::Done == state; }
     bool waiting() { return TaskState::Waiting == state; }
+    bool na() { return TaskState::NotApplicable == state; }
     bool broken() { return TaskState::Broken == state; }
 
     void refresh() {
@@ -91,6 +93,7 @@ struct HakenTaskInfo
     void complete() { state = TaskState::Complete; }
     void done() { state = TaskState::Done; }
     void wait() { state = TaskState::Waiting; }
+    void not_applicable() { state = TaskState::NotApplicable;}
     void fail() { state = TaskState::Broken; }
 
     void fromJson(json_t* root);

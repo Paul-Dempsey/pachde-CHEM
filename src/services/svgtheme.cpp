@@ -6,6 +6,19 @@ namespace svg_theme {
 
 constexpr const uint32_t ALPHA_MASK = 0xff000000;
 
+std::string format_string(const char *fmt, ...)
+{
+    const int len = 512;
+    std::string s(len, '\0');
+    va_list args;
+    va_start(args, fmt);
+    auto r = std::vsnprintf(&s[0], len, fmt, args);
+    va_end(args);
+    if (r < 0) return "??";
+    s.resize(std::min(r, len));
+    return s;
+}
+
 bool isVisibleColor(PackedColor co)
 {
     return 0 != (co & ALPHA_MASK);
@@ -55,6 +68,7 @@ inline PackedColor PackRGBA(unsigned int r, unsigned int g, unsigned int b, unsi
 }
 
 bool isValidHexColor(std::string hex) {
+    if (*hex.begin() != '#') return false;
     switch (hex.size()) {
         case 1 + 3: 
         case 1 + 4:
@@ -62,8 +76,19 @@ bool isValidHexColor(std::string hex) {
         case 1 + 8: break;
         default: return false;
     }
-    if (*hex.begin() != '#') return false;
     return std::string::npos == hex.find_first_not_of("0123456789ABCDEFabcdef", 1);
+}
+
+std::string hex_string(PackedColor co)
+{
+    uint8_t r = co & 0xff; co = co >> 8;
+    uint8_t g = co & 0xff; co = co >> 8;
+    uint8_t b = co & 0xff; co = co >> 8;
+    uint8_t a = co & 0xff;
+    auto result = format_string("#%2x%2x%2x%2x", r, g, b, a);
+    if (0xff == a) result.resize(7);
+    assert(isValidHexColor(result));
+    return result;
 }
 
 std::vector<unsigned char> ParseHex(std::string hex) {
@@ -120,15 +145,6 @@ std::vector<unsigned char> ParseHex(std::string hex) {
     return result;
 }
 
-std::string format_string(const char *fmt, ...)
-{
-    const int len = 256;
-    std::string s(len, '\0');
-    va_list args;
-    va_start(args, fmt);
-    auto r = std::vsnprintf(&(*s.begin()), len + 1, fmt, args);
-    return r < 0 ? "??" : s;
-}
 
 const PackedColor OPAQUE_BLACK = 255 << 24;
 

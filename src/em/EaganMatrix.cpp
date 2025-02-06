@@ -13,8 +13,6 @@ EaganMatrix::EaganMatrix()
     in_system(false),
     pendingEditorReply(false),
     data_stream(-1),
-    pedal_fraction(0),
-    pedal_fraction_ex(0),
     editorReply(0),
     led(0)
 {
@@ -32,8 +30,6 @@ void EaganMatrix::reset()
     in_system = false;
     pendingEditorReply = false;
     data_stream = -1;
-    pedal_fraction = 0;
-    pedal_fraction_ex = 0;
     editorReply = 0;
     led = 0;
     notifyHardwareChanged();
@@ -105,47 +101,25 @@ void EaganMatrix::notifyLED(uint8_t led)
 
 void EaganMatrix::begin_preset()
 {
-    clear_preset();
+    clear_preset(false);
     in_preset = true;
 }
 
-void EaganMatrix::clear_preset()
+void EaganMatrix::clear_preset(bool notify)
 {
     in_preset = false;
     preset.clear();
     name_buffer.clear();
     text_buffer.clear();
-    notifyPresetChanged();
+    if (notify) notifyPresetChanged();
 }
 
 void EaganMatrix::onChannelTwoCC(uint8_t cc, uint8_t value)
 {
-    switch (cc) {
-    case Haken::ccFracPed:
-        pedal_fraction = value;
-        break;
-
-    case Haken::ccFracPedEx:
-        pedal_fraction_ex = value;
-        break;
-    }
 }
+
 void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
 {
-    switch (cc) {
-    // case Haken::ccMini_LB:
-    // case Haken::ccLoopDetect:
-    //     notifyLoopDetect(cc, value);
-    //     break;
-
-    case Haken::ccFracPed:
-        pedal_fraction = value;
-        break;
-
-    case Haken::ccFracPedEx:
-        pedal_fraction_ex = value;
-        break;
-    }
 }
 
 void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
@@ -207,14 +181,6 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         notifyLoopDetect(cc, value);
         break;
 
-    case Haken::ccFracPed:
-        pedal_fraction = value;
-        break;
-
-    case Haken::ccFracPedEx:
-        pedal_fraction_ex = value;
-        break;
-
     case Haken::ccVersHi:
         firmware_version = value;
         break;
@@ -268,6 +234,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
     case Haken::ch1: {
         switch (status) {
         case MidiStatus_CC: {
+            ch1.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelOneCC(msg.bytes.data1, msg.bytes.data2);
         } break;
         }
@@ -276,6 +243,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
     case Haken::ch2: {
         switch (status) {
         case MidiStatus_CC: {
+            ch2.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelTwoCC(msg.bytes.data1, msg.bytes.data2);
         } break;
         }
@@ -284,6 +252,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
     case Haken::ch16: {
         switch (status) {
         case MidiStatus_CC:
+            ch16.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannel16CC(msg.bytes.data1, msg.bytes.data2);
             break;
 

@@ -1,7 +1,10 @@
+// Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
-#include "../em/midi-message.h"
 #include <ghc/filesystem.hpp>
+#include "../em/midi-message.h"
+#include "../em/PresetId.hpp"
+#include "../em/wrap-HakenMidi.hpp"
 
 using namespace ::rack;
 namespace pachde {
@@ -20,6 +23,7 @@ constexpr const float DISPATCH_NOW = MIDI_RATE;
 
 struct MidiLog
 {
+    uint32_t id;
     FILE * log;
     std::string logfile();
 
@@ -30,6 +34,7 @@ struct MidiLog
     void close();
     void logMessage(const char *prefix, PackedMidiMessage message);
     void logMessage(const char *prefix, const char *info);
+    void logMessage(const char *prefix, const std::string& str);
 };
 
 
@@ -47,7 +52,7 @@ struct MidiInput : midi::Input
     rack::dsp::Timer midi_timer;
 
     MidiInput(const MidiInput &) = delete; // no copy constructor
-    MidiInput() : message_count(0), log(nullptr) {}
+    MidiInput() : message_count(0), log(nullptr) { this->channel = -1; }
 
     uint64_t count() { return message_count; }
     void clear()

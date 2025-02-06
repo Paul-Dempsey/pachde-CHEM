@@ -20,6 +20,7 @@ typedef unsigned int PackedColor;
 const PackedColor NoColor = 0;
 bool isVisibleColor(PackedColor co);
 PackedColor applyOpacity(PackedColor color, float alpha);
+std::string hex_string(PackedColor co);
 
 enum Severity { Info, Warn, Error, Critical };
 const char * SeverityName(Severity sev);

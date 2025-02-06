@@ -5,64 +5,54 @@
 using namespace ::rack;
 namespace pachde {
 
-ModuleBroker* main(nullptr);
+std::shared_ptr<ModuleBroker> the_module_broker_instance = std::make_shared<ModuleBroker>();
 
-struct ModuleBroker::Internal
+std::shared_ptr<ModuleBroker> ModuleBroker::get()
 {
-    std::vector<IChemHost*> hosts;
-    std::mutex mut;
-};
-
-ModuleBroker* ModuleBroker::get()
-{
-    if (!main) {
-        main = new ModuleBroker();
-    }
-    return main;
+    return the_module_broker_instance;
 }
 
 ModuleBroker::ModuleBroker()
-: my(new Internal)
-{ }
+{ 
+}
 
 ModuleBroker::~ModuleBroker()
-{
-    if (my) { delete my; }
+{ 
 }
 
 void ModuleBroker::register_host(IChemHost* host)
 {
-    std::unique_lock<std::mutex> lock(my->mut);
-    if (my->hosts.cend() == std::find(my->hosts.cbegin(), my->hosts.cend(), host)) {
-        my->hosts.push_back(host);
+    if (hosts.cend() == std::find(hosts.cbegin(), hosts.cend(), host)) {
+        hosts.push_back(host);
+    } else {
+        assert(false);
     }
 }
 
 void ModuleBroker::unregister_host(IChemHost* host)
 {
-    std::unique_lock<std::mutex> lock(my->mut);
-    auto item = std::find(my->hosts.cbegin(), my->hosts.cend(), host);
-    if (item != my->hosts.cend())
-    {
-        my->hosts.erase(item);
+    auto item = std::find(hosts.cbegin(), hosts.cend(), host);
+    if (item != hosts.cend()) {
+        hosts.erase(item);
     }  
 }
 
 bool ModuleBroker::is_primary(IChemHost* host)
 {
-    if (my->hosts.empty()) return false;
-    return (host == *my->hosts.cbegin());
+    if (hosts.empty()) return false;
+    return (host == *hosts.cbegin());
 }
 
 IChemHost* ModuleBroker::get_primary()
 {
-    if (my->hosts.empty()) return nullptr;
-    return *my->hosts.begin();
+    if (hosts.empty()) return nullptr;
+    return *hosts.begin();
 }
 
-bool ModuleBroker::try_bind_client(IChemClient* client) {
-    if (my->hosts.empty()) return false;
-    for (auto host : my->hosts) {
+bool ModuleBroker::try_bind_client(IChemClient* client)
+{
+    if (hosts.empty()) return false;
+    for (auto host : hosts) {
         if (!host->host_has_client_model(client)) {
             if (host->host_claim() == client->client_claim()) {
                 host->register_chem_client(client);
@@ -75,7 +65,7 @@ bool ModuleBroker::try_bind_client(IChemClient* client) {
 
 IChemHost* ModuleBroker::get_host(const std::string& claim)
 {
-    for (auto host : my->hosts) {
+    for (auto host : hosts) {
         if (host->host_claim() == claim) {
             return host;
         }
@@ -85,22 +75,22 @@ IChemHost* ModuleBroker::get_host(const std::string& claim)
 
 void ModuleBroker::addHostPickerMenu(ui::Menu* menu, IChemClient* client)
 {
-    if (my->hosts.empty()) {
+    if (hosts.empty()) {
         menu->addChild(createMenuLabel("[no Core modules available]"));
         return;
     }
 
-    auto it = std::find_if(my->hosts.cbegin(), my->hosts.cend(), [&](IChemHost * host){
+    auto it = std::find_if(hosts.cbegin(), hosts.cend(), [&](IChemHost* host){
         return host->host_has_client(client);
     });
-    IChemHost* current_host = (it == my->hosts.cend()) ? nullptr : *it;
+    IChemHost* current_host = (it == hosts.cend()) ? nullptr : *it;
 
     menu->addChild(createMenuItem("Disconnect", "", [=](){
         current_host->unregister_chem_client(client);
         client->onConnectHost(nullptr);
     }, nullptr == current_host));
 
-    for (auto host : my->hosts) {
+    for (auto host : hosts) {
         auto conn = host->host_connection(ChemDevice::Haken);
         std::string item;
         if (conn) {

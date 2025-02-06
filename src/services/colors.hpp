@@ -57,23 +57,23 @@ inline const NVGcolor& RampGray(Ramp g)
 #define COLOR_GREEN_HI nvgRGB(0xbd,0xfc,0xbd)  // #bdfcbd
 
 // PORT_* colors are HSL 30-degree hue increments
-#define PORT_RED     nvgHSL(0.f, 0.6f, 0.5f)
-#define PORT_ORANGE  nvgHSL(30.f/360.f, 0.80f, 0.5f)
-#define PORT_YELLOW  nvgHSL(60.f/360.f, 0.65f, 0.5f)
-#define PORT_LIME    nvgHSL(90.f/360.f, 0.60f, 0.5f)
-#define PORT_GREEN   nvgHSL(120.f/360.f, 0.5f, 0.5f)
-#define PORT_GRASS   nvgHSL(150.f/360.f, 0.5f, 0.5f)
-#define PORT_CYAN    nvgHSL(180.f/360.f, 0.5f, 0.5f)
-#define PORT_CORN    nvgHSL(210.f/360.f, 0.5f, 0.55f)
-#define PORT_BLUE    nvgHSL(240.f/360.f, 0.5f, 0.55f)
-#define PORT_VIOLET  nvgHSL(270.f/360.f, 0.5f, 0.5f)
-#define PORT_MAGENTA nvgHSL(300.f/360.f, 0.5f, 0.5f)
-#define PORT_PINK    nvgHSL(330.f/360.f, 0.65f, 0.65f)
-#define PORT_DEFAULT nvgHSL(210.f/360.f, 0.5f, 0.65f)
+#define PORT_RED     nvgHSL(0.f, 0.6f, 0.5f)           // #cc3233
+#define PORT_ORANGE  nvgHSL(30.f/360.f, 0.80f, 0.5f)   // #e57f19
+#define PORT_YELLOW  nvgHSL(60.f/360.f, 0.65f, 0.5f)   // #d2d22c
+#define PORT_LIME    nvgHSL(90.f/360.f, 0.60f, 0.5f)   // #7fcc32
+#define PORT_GREEN   nvgHSL(120.f/360.f, 0.5f, 0.5f)   // #3fbf3f
+#define PORT_GRASS   nvgHSL(150.f/360.f, 0.5f, 0.5f)   // #3fbf7f
+#define PORT_CYAN    nvgHSL(180.f/360.f, 0.5f, 0.5f)   // #3fbfbf
+#define PORT_CORN    nvgHSL(210.f/360.f, 0.5f, 0.55f)  // #528cc5
+#define PORT_BLUE    nvgHSL(240.f/360.f, 0.5f, 0.55f)  // #5252c5
+#define PORT_VIOLET  nvgHSL(270.f/360.f, 0.5f, 0.5f)   // #7f3fbf
+#define PORT_MAGENTA nvgHSL(300.f/360.f, 0.5f, 0.5f)   // #bf3fbf
+#define PORT_PINK    nvgHSL(330.f/360.f, 0.65f, 0.65f) // #df6ba5
+#define PORT_DEFAULT nvgHSL(210.f/360.f, 0.5f, 0.65f)  // #79a5d2
 
-#define PORT_LIGHT_ORANGE  nvgHSL(30.f/360.f, 0.80f, 0.75f)
-#define PORT_LIGHT_LIME    nvgHSL(90.f/360.f, 0.75f, 0.75f)
-#define PORT_LIGHT_VIOLET  nvgHSL(270.f/360.f, 0.75f, 0.75f)
+#define PORT_LIGHT_ORANGE  nvgHSL(30.f/360.f, 0.80f, 0.75f)  // #f2bf8c
+#define PORT_LIGHT_LIME    nvgHSL(90.f/360.f, 0.75f, 0.75f)  // #bfef8f
+#define PORT_LIGHT_VIOLET  nvgHSL(270.f/360.f, 0.75f, 0.75f) // #bf8fef
 
 extern const NVGcolor panel_border_color;
 extern const NVGcolor blue_light;
@@ -131,13 +131,12 @@ inline NVGcolor fromPackedOrDefault(PackedColor co, const NVGcolor& fallback)
     return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
 }
 
-
 inline PackedColor toPacked(NVGcolor co) {
     return PackRGBA(
-        static_cast<uint32_t>(co.r * 255), 
-        static_cast<uint32_t>(co.g * 255),
-        static_cast<uint32_t>(co.b * 255),
-        static_cast<uint32_t>(co.a * 255));
+        static_cast<uint32_t>(co.r * 255.f), 
+        static_cast<uint32_t>(co.g * 255.f),
+        static_cast<uint32_t>(co.b * 255.f),
+        static_cast<uint32_t>(co.a * 255.f));
 }
 
 struct NamedColor {

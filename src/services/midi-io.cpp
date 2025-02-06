@@ -2,7 +2,7 @@
 #include "midi-io.hpp"
 #include "../plugin.hpp"
 #include "../services/misc.hpp"
-#include "../em/wrap-haken-midi.hpp"
+#include "../em/wrap-HakenMidi.hpp"
 using namespace ::rack;
 
 namespace pachde {
@@ -124,7 +124,9 @@ const char * StatusName(uint8_t status) {
     }
 }
 
+static std::string unknown{"(unknown)"};
 struct Names {
+
     std::vector<std::string> names;
     Names(const char * source) {
         std::string token;
@@ -144,6 +146,7 @@ struct Names {
         }
     }
     const std::string& Name(uint8_t index) {
+        if (index >= names.size()) return unknown;
         return names[index];
     }
 };
@@ -151,6 +154,7 @@ struct Names {
 auto ch1_2cc_names = Names(SSL_ch1_ch2);
 auto ch16cc_names = Names(SSL_ch16);
 auto task_names = Names(SSL_ccTask);
+auto stream_names = Names(SSL_streams);
 
 const std::string& channelCCName(uint8_t channel, uint8_t cc) {
     static std::string undef = "";
@@ -168,13 +172,15 @@ const std::string& channelCCName(uint8_t channel, uint8_t cc) {
 
 std::string MidiLog::logfile()
 {
-    return asset::user(format_string("%s/midilog.txt", pluginInstance->slug.c_str()));
+    return asset::user(format_string("%s/midilog-%x.txt", pluginInstance->slug.c_str(), id));
 }
 
+static uint32_t midi_log_instance_count(0);
+
 MidiLog::MidiLog() :
-    //logging(false), 
     log(nullptr)
 {
+    id = ++midi_log_instance_count;
 }
 
 void MidiLog::ensure_file()
@@ -184,6 +190,7 @@ void MidiLog::ensure_file()
     auto dir = system::getDirectory(path);
     system::createDirectories(dir);
     log = std::fopen(path.c_str(), "w");
+    logMessage("MidiLog", format_string("id = %x", id));
 }
 
 void MidiLog::close() {
@@ -219,10 +226,16 @@ void MidiLog::logMessage(const char *prefix, PackedMidiMessage m)
                     break;
 
                 case Haken::ch16:
-                    if (Haken::ccTask == cc) {
+                    switch (cc) {
+                    case Haken::ccTask:
                         bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), task_names.Name(m.bytes.data2).c_str());
-                    } else {
+                        break;
+                    case Haken::ccStream:
+                        bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), stream_names.Name(m.bytes.data2).c_str());
+                        break;
+                    default:
                         bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %02d\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), m.bytes.data2);
+                        break;
                     }
                     break;
 
@@ -256,7 +269,6 @@ void MidiLog::logMessage(const char *prefix, PackedMidiMessage m)
         std::fflush(log);
     }
 }
-
 void MidiLog::logMessage(const char *prefix, const char *info)
 {
     ensure_file();
@@ -272,5 +284,12 @@ void MidiLog::logMessage(const char *prefix, const char *info)
         }
     }
 }
+
+void MidiLog::logMessage(const char *prefix, const std::string& str)
+{
+    logMessage(prefix, printable(str));
+}
+
+
 
 }

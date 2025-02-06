@@ -11,7 +11,9 @@ struct PresetDescription
     std::string name;
     std::string text;
 
-    PresetDescription() {}
+    PresetDescription() {
+        id.invalidate();
+    }
 
     PresetDescription(PresetId id, std::string name, std::string text)
     : id(id), name(name), text(text)
@@ -23,9 +25,7 @@ struct PresetDescription
             name = source->name;
             text = source->text;
         } else {
-            id = 0;
-            name = "";
-            text = "";
+            clear();
         }
     }
 

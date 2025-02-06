@@ -27,6 +27,7 @@ std::string PresetModule::client_claim()
 }
 void PresetModule::onConnectHost(IChemHost* host)
 {
+    chem_host = host;
 }
 void PresetModule::onPresetChange()
 {

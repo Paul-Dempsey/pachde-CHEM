@@ -2,11 +2,6 @@
 <svg version="1.0" viewBox="0 0 15 15" 
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:svg="http://www.w3.org/2000/svg">
-   <sodipodi:namedview id="namedview6" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0"
-      inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1"
-      showguides="true" inkscape:zoom="82.260089" inkscape:cx="10.375627" inkscape:cy="7.5431477"
-      inkscape:window-width="3840" inkscape:window-height="2054" inkscape:window-x="3829" inkscape:window-y="-11"
-      inkscape:window-maximized="1" inkscape:current-layer="svg6" />
    <linearGradient id="grim" gradientUnits="userSpaceOnUse"
       x1="6" y1="1" x2="7.5" y2="15">
       <stop offset="0" stop-color="#cacaca"/>
@@ -22,12 +17,11 @@
       <stop offset="0" stop-color="#ebebeb"/>
       <stop offset="1" stop-color="#cccccc"/>
    </linearGradient>
-   <circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.5" r="6.5" />
-   <circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.5" r="5.8" />
-   <circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.36" />
-
+   <circle id="screw-rim" fill="url(#grim)" cx="7.5" cy="7.5" r="6.5" stroke="none" stroke-width=".25" />
+   <circle id="screw-bevel" fill="url(#gbevel)" cx="7.5" cy="7.5" r="5.8" stroke="none" stroke-width=".25" />
+   <circle id="screw-face" fill="url(#gface)" cx="7.5" cy="7.5" r="5.36" stroke="none" stroke-width=".25" />
    <path id="screw-slot"
-      fill="#a0a0a0"
+      fill="#a0a0a0" stroke="none" stroke-width=".25"
       d="M 6.5 3.5 L 6.1582031 4.8613281 C 6.0623511 4.9161834 5.9705882 4.968249 5.875 5.0234375 L 4.5351562 4.6445312 L 3.5351562 6.3769531 L 4.5273438 7.328125 C 4.526856 7.4443046 4.5254118 7.5554477 4.5253906 7.671875 L 3.5351562 8.6347656 L 4.5351562 10.365234 L 5.8203125 9.9921875 C 5.9375011 10.060561 6.0501488 10.125359 6.1679688 10.193359 L 6.5 11.5 L 8.5 11.5 L 8.8125 10.210938 C 8.9355746 10.140598 9.0531082 10.072866 9.1757812 10.001953 L 10.464844 10.376953 L 11.464844 8.6445312 L 10.486328 7.6992188 C 10.486858 7.5643877 10.48838 7.4350811 10.488281 7.3007812 L 11.464844 6.3652344 L 10.464844 4.6347656 L 9.1269531 5.0175781 C 9.0245136 4.9579357 8.9265489 4.9008167 8.8242188 4.8417969 L 8.5 3.5 L 6.5 3.5 z " />
    <path id="slot-overlay"
       transform="scale(0.85,0.85)translate(1.4,1.4)"

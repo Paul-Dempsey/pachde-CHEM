@@ -1,8 +1,9 @@
 #include "Preset.hpp"
+#include "../../services/colors.hpp"
 
-PresetModuleWidget::PresetModuleWidget(PresetModule *module)
+PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
+    my_module(module)
 {
-    my_module = module;
     setModule(module);
 
     initThemeEngine();
@@ -15,12 +16,17 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module)
 
 }
 
-void PresetModuleWidget::step()
+// void PresetModuleWidget::step()
+// {
+//     ChemModuleWidget::step();
+// }
+
+void PresetModuleWidget::draw(const DrawArgs& args)
 {
-    ChemModuleWidget::step();
+    Base::draw(args);
 }
 
 void PresetModuleWidget::appendContextMenu(Menu *menu)
 {
-    ChemModuleWidget::appendContextMenu(menu);
+    Base::appendContextMenu(menu);
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "wrap-haken-midi.hpp"
+#include "wrap-HakenMidi.hpp"
 #include "midi-message.h"
 #include "em-hardware.h"
 #include "preset.hpp"
@@ -19,6 +19,13 @@ struct IHandleEmEvents {
     virtual void onLED(uint8_t led) = 0;
 };
 
+struct ChannelData
+{
+    uint8_t cc[128]{0};
+    uint8_t pedal_fraction() { return cc[Haken::ccFracPed]; }
+    uint8_t pedal_fraction_ex() { return cc[Haken::ccFracPedEx]; }
+};
+
 struct EaganMatrix {
     bool ready;
     uint16_t firmware_version;
@@ -33,10 +40,12 @@ struct EaganMatrix {
     bool in_system;
     bool pendingEditorReply;
     int data_stream;
-    uint8_t pedal_fraction;
-    uint8_t pedal_fraction_ex;
+
     uint8_t editorReply;
     uint8_t led;
+    ChannelData ch1;
+    ChannelData ch2;
+    ChannelData ch16;
 
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
@@ -60,7 +69,7 @@ struct EaganMatrix {
     EaganMatrix();
 
     void begin_preset();
-    void clear_preset();
+    void clear_preset(bool notify);
 
     void onChannelOneCC(uint8_t cc, uint8_t value);
     void onChannelTwoCC(uint8_t cc, uint8_t value);

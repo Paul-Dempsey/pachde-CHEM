@@ -1,7 +1,6 @@
+// Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "midi-io.hpp"
-#include "../em/wrap-haken-midi.hpp"
-#include "../em/EaganMatrix.hpp"
 
 namespace pachde {
 
@@ -11,54 +10,41 @@ enum class HakenMidiRate : uint8_t {
     Twentieth = Haken::midiTxTweenth
 };
 
-
-struct HakenMidiOutput : IDoMidi
+struct HakenMidi
 {
-    midi::Output output;
-    uint64_t message_count;
-    bool tick_tock;
     MidiLog* log;
-    EaganMatrix* em;
+    IDoMidi* doer;
+    bool tick_tock;
 
-    rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
-    void queueMessage(PackedMidiMessage msg);
-    void dispatch(float sampleTime);
-    rack::dsp::Timer midi_timer;
-    
-    HakenMidiOutput(const HakenMidiOutput&) = delete; // no copy constructor
-    HakenMidiOutput() : message_count(0), tick_tock(true), log(nullptr), em(nullptr) {
-        output.channel = -1;
+    HakenMidi(const HakenMidi&) = delete; // no copy constructor
+    HakenMidi() : log(nullptr), doer(nullptr), tick_tock(true) {}
+
+    void init(MidiLog* log, IDoMidi* handler)
+    {
+        this->log = log;
+        doer = handler;
     }
 
-    midi::Output& midi_out() { return output; }
+    void send_message(PackedMidiMessage msg) { doer->doMessage(msg); }
 
-    void clear() {
-        message_count = 0;
-        tick_tock = true;
-        ring.clear();
-        midi_timer.reset();
-    }
-    uint64_t count() { return message_count; }
-
-    void setLogger(MidiLog* logger) {
-        log = logger;
-    }
-    void setEm(EaganMatrix* matrix) {
-        em = matrix;
-    }
-
-    void sendControlChange(uint8_t channel, uint8_t cc, uint8_t value);
-    void sendKeyPressure(uint8_t channel, uint8_t note, uint8_t pressure);
-    void sendEditorPresent();
-    void sendRequestConfiguration();
-    void sendRequestConText();
-    void sendRequestUpdates();
-    void sendRequestUser();
-    void sendRequestSystem();
-    void sendMidiRate(HakenMidiRate rate);
-
-    // IDoMidi
-    void doMessage(PackedMidiMessage message) override;
+    void control_change(uint8_t channel, uint8_t cc, uint8_t value);
+    void key_pressure(uint8_t channel, uint8_t note, uint8_t pressure);
+    void select_preset(PresetId id);
+    void editor_present();
+    void request_configuration();
+    void request_con_text();
+    void request_updates();
+    void request_user();
+    void request_system();
+    void midi_rate(HakenMidiRate rate);
+    void remake_mahling();
+    void previous_system_preset();
+    void next_system_preset();
+    void reset_calibration();
+    void refine_calibration();
+    void factory_calibration();
+    void surface_alignment();
 };
 
+    
 }

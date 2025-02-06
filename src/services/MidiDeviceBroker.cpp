@@ -2,28 +2,22 @@
 
 namespace pachde {
 
-MidiDeviceBroker * brokerInstance = nullptr;
+std::shared_ptr<MidiDeviceBroker> the_broker_instance = std::make_shared<MidiDeviceBroker>();
 
-MidiDeviceBroker* MidiDeviceBroker::get()
+std::shared_ptr<MidiDeviceBroker> MidiDeviceBroker::get()
 {
-    if (!brokerInstance) {
-        brokerInstance = new MidiDeviceBroker();
-    }
-    return brokerInstance;
+    return the_broker_instance; 
 }
 
 bool MidiDeviceBroker::is_primary(MidiDeviceHolder* holder)
 {
-    auto it = std::find(holders.cbegin(), holders.cend(), holder);
-    return it == holders.cbegin();
+    assert(!holders.empty());
+    return *holders.cbegin() == holder;
 }
 
 void MidiDeviceBroker::registerDeviceHolder(MidiDeviceHolder* holder)
 {
     assert(holders.cend() == std::find(holders.cbegin(), holders.cend(), holder));
-    // if (!empty() && !holder->getClaim().empty()) {
-    //     assert(claims.cend() == claims.find(holder->getClaim()));
-    // }
     holders.push_back(holder);
 }
 
@@ -88,14 +82,25 @@ void MidiDeviceBroker::sync()
         auto holder_claim = holder->getClaim();
         auto cit = connections.find(holder_claim);
         if (cit != connections.cend()) {
-            holder->connect(cit->second);
+            if (holder->connection) {
+                auto c1 = holder->connection;
+                auto c2 = cit->second;
+                if ((c1->input_device_id != c2->input_device_id) 
+                    || (c1->driver_id != c2->driver_id)
+                    || (c1->output_device_id != c2->output_device_id))
+                {
+                    holder->connect(c2);
+                }
+            } else {
+                holder->connect(cit->second);
+            }
         }
     }
 }
 
 bool MidiDeviceBroker::bindAvailableEm(MidiDeviceHolder* holder)
 {
-    assert(std::find(holders.cbegin(), holders.cend(), holder) != holders.cend());
+    assert(std::find(holders.cbegin(), holders.cend(), holder) != holders.cend()); // only registered holders should call this
 
     for (auto connection : EnumerateMidiConnections(true)) {
         auto claim = connection->info.claim();

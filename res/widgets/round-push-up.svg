@@ -1,14 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" id="svg4" sodipodi:docname="round-push-up.svg"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg"
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" 
+   xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-   <sodipodi:namedview id="namedview4" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0"
-      inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1"
-      inkscape:zoom="38.559417" inkscape:cx="6.4316326" inkscape:cy="11.657334" inkscape:window-width="3840"
-      inkscape:window-height="2126" inkscape:window-x="-11" inkscape:window-y="-11" inkscape:window-maximized="1"
-      inkscape:current-layer="svg4" />
-   <defs id="defs4">
+   <defs>
       <linearGradient id="gtaper"  x1="5.5" y1="2" x2="8" y2="14" gradientUnits="userSpaceOnUse">
          <stop stop-color="#d9d9d9" offset="0" />
          <stop stop-color="#333333" offset="1" />
@@ -19,7 +13,8 @@
       </linearGradient>
    </defs>
    <circle id="rbtn-punch" fill="#000000" cx="8" cy="8" r="8" />
-   <circle id="rbtn-bezel" fill="#404040" cx="8" cy="8" r="7.5" />
-   <circle id="rbtn-taper" fill="url(#gtaper)" cx="8" cy="8" r="6" />
+   <circle id="rbtn-bezel" fill="#404040" cx="8" cy="8" r="7.5" stroke-width=".25"  />
+   <circle id="rbtn-taper" fill="url(#gtaper)" cx="8" cy="8" r="6" stroke-width=".25"  />
    <circle id="rbtn-face" fill="url(#gface)" cx="8" cy="8" r="5" />
+   <circle id="rbtn-wire" fill="none" stroke="white" stroke-width=".25" opacity="0" cx="8" cy="8" r="5" />
 </svg>

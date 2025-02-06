@@ -5,14 +5,13 @@ namespace pachde {
 
 struct ModuleBroker
 {
-    struct Internal;
-    Internal * my;
+    std::vector<IChemHost*> hosts;
 
     ModuleBroker();
     ~ModuleBroker();
     ModuleBroker & operator=(const ModuleBroker &) = delete;
     ModuleBroker(const ModuleBroker&) = delete;
-    static ModuleBroker* get();
+    static std::shared_ptr<ModuleBroker> get();
 
     void register_host(IChemHost* host);
     void unregister_host(IChemHost* host);

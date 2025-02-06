@@ -44,7 +44,7 @@ void PresetDescription::fromJson(const json_t* root)
 
 std::string PresetDescription::summary()
 {
-    return format_string("[%d.%d.%d] %s", id.bankHi(), id.bankLo(), id.number(), name);
+    return format_string("[%d.%d.%d] %s", id.bankHi(), id.bankLo(), id.number(), name.c_str());
 }
 
 }

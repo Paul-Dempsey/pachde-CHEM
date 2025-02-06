@@ -4,7 +4,7 @@
 #include <mutex>
 #include <thread>
 #include <rack.hpp>
-#include "../services/midi-io.hpp"
+#include "../../services/midi-io.hpp"
 
 using namespace ::rack;
 
