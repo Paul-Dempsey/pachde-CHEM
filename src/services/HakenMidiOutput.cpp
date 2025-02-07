@@ -17,6 +17,7 @@ void HakenMidiOutput::dispatch(float sampleTime)
         }
         ++message_count;
         em->onMessage(message);
+        output.setChannel(-1);
         output.sendMessage(rackFromPacked(message));
     }
 }

@@ -110,7 +110,7 @@ void PresetWidget::onHoverKey(const HoverKeyEvent& e)
         if (drag_started && !dragging) {
             e.consume(this);
             stop_drag();
-            if (agent) agent->onChoosePreset(this);
+            agent->onChoosePreset(this);
         }
         break;
 
@@ -118,7 +118,7 @@ void PresetWidget::onHoverKey(const HoverKeyEvent& e)
         if (e.action == GLFW_RELEASE) {
             e.consume(this);
             set_selected(!selected);
-            if (agent) agent->onSetSelection(this, selected);
+            agent->onSetSelection(this, selected);
         }
         break;
 
@@ -140,16 +140,25 @@ void PresetWidget::onButton(const ButtonEvent&e)
         case GLFW_RELEASE:
             if (button_down)
             {
-                if (e.pos.x < box.size.x - GRIP_HIT) {
-                    if (drag_started && !dragging) {
-                        e.consume(this);
-                        stop_drag();
-                        if (agent) agent->onChoosePreset(this);
-                    }
-                } else {
+                auto mod = e.mods & RACK_MOD_MASK;
+                if (mod) {
                     e.consume(this);
                     set_selected(!selected);
-                    if (agent) agent->onSetSelection(this, selected);
+                    agent->onSetSelection(this, selected);
+                    stop_drag();
+                } else {
+                    if (e.pos.x < box.size.x - GRIP_HIT) {
+                        if (drag_started && !dragging) {
+                            e.consume(this);
+                            agent->onChoosePreset(this);
+                            stop_drag();
+                        }
+                    } else {
+                        e.consume(this);
+                        set_selected(!selected);
+                        agent->onSetSelection(this, selected);
+                        stop_drag();
+                    }
                 }
                 button_down = false;
             }
@@ -191,13 +200,18 @@ void PresetWidget::onDragStart(const DragStartEvent& e)
 
 void PresetWidget::onDragEnd(const DragEndEvent& e)
 {
-    stop_drag();
+    if (dragging) {
+        if (drop_target != this) {
+            agent->onDropPreset(drop_target);
+        }
+        stop_drag();
+    }
 }
 
 void PresetWidget::onDragMove(const DragMoveEvent& e)
 {
     drag_pos = drag_pos.plus(e.mouseDelta.div(getAbsoluteZoom()));
-    if (dragging && agent) {
+    if (dragging) {
         drop_target = agent->getDropTarget(this->box.pos + drag_pos);
     }
 }
@@ -207,6 +221,12 @@ void PresetWidget::onDragHover(const DragHoverEvent& e)
     if (drag_started && !dragging) {
         if (has_elapsed(drag_delay_timer, DRAG_DELAY_INTERVAL)) {
             dragging = true;
+            glfwSetCursor(APP->window->win, glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR));
+            if (!selected) {
+                agent->onClearSelection();
+                set_selected(true);
+                agent->onSetSelection(this, true);
+            }
         }
     }
     e.consume(this); // allow DragEnter and DragLeave
@@ -218,13 +238,12 @@ void PresetWidget::onDragEnter(const DragEnterEvent& e)
 
 void PresetWidget::onDragLeave(const DragLeaveEvent& e)
 {
-    stop_drag();
 }
 
 void PresetWidget::onPathDrop(const PathDropEvent& e)
 {
     e.consume(this);
-    if (agent) agent->onDropFile(e);
+    agent->onDropFile(e);
 }
 
 
@@ -257,6 +276,9 @@ void PresetWidget::draw(const DrawArgs& args)
     if (button_down) {
         FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - 1.f, drag_current_color);
     }
+    // if (drag_started) {
+    //     FillRect(vg, -6.f, 2.f, 4.f, 4.f, GetStockColor(StockColor::Chartreuse));
+    // }
     if (dragging) {
         if (drop_target == this) {
             FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - 1.f, drag_current_color);

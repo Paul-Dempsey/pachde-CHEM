@@ -146,7 +146,7 @@ void CoreModule::onPresetChanged()
     if (task->pending()) {
         task->complete();
     }
-    logMessage("Core", format_string("--- Received Preset Chenged: %s", em.preset.summary().c_str()));
+    logMessage("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     notify_preset_changed();
 }
 void CoreModule::onUserComplete()
@@ -359,7 +359,9 @@ void CoreModule::process(const ProcessArgs &args)
     }
 
     // todo: after a reset, need to have a ~20sec pause before rescanning
-    tasks.process(args);
+    if (!haken_midi_out.pending()) {
+        tasks.process(args);
+    }
 
     if (getOutput(OUT_READY).isConnected()) {
         getOutput(OUT_READY).setVoltage(em.ready ? 10.0f : 0.0f);

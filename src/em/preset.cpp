@@ -42,7 +42,7 @@ void PresetDescription::fromJson(const json_t* root)
     }
 }
 
-std::string PresetDescription::summary()
+std::string PresetDescription::summary() const
 {
     return format_string("[%d.%d.%d] %s", id.bankHi(), id.bankLo(), id.number(), name.c_str());
 }

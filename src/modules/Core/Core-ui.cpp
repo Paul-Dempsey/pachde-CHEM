@@ -15,6 +15,8 @@ constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
 CoreModuleWidget::~CoreModuleWidget()
 {
     if (my_module) {
+        my_module->em.unsubscribeEMEvents(this);
+        my_module->tasks.unsubscribeChange(this);
         my_module->ui = nullptr;
     }
     if (chem_host) {
@@ -47,7 +49,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createIndicatorsCentered((box.size.x * 0.5f) - ((6.f + 7.f * 9.f) * .5f), 354.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
-    addChild(preset_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(preset_label = createStaticTextLabel<TipLabel>(
         Vec(box.size.x *.5f, 145.f), box.size.x, "[preset]", theme_engine, theme, style));
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
@@ -68,11 +70,15 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     // y -= 16.f;
     y = 3.75;
     addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y), box.size.x - 15.f, "", theme_engine, theme, style));
+        Vec(box.size.x*.5f, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
         my_module->register_chem_client(this);
         my_module->em.subscribeEMEvents(this);
+        // sync task updates that occurred before now
+        for (HakenTask id = HakenTask::First; id < HakenTask::End; id = next_task(id)) {
+            onHakenTaskChange(id);
+        }
         my_module->tasks.subscribeChange(this);
     }
 }
@@ -273,7 +279,9 @@ void CoreModuleWidget::onHardwareChanged(uint8_t hardware, uint16_t firmware_ver
 
 void CoreModuleWidget::onPresetChanged()
 {
-    preset_label->text(my_module->host_preset()->name);
+    auto preset = my_module->host_preset();
+    preset_label->text(preset->name);
+    preset_label->describe(preset->summary());
 }
 
 void CoreModuleWidget::onUserComplete() {}
@@ -506,6 +514,9 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Editor Hello", "", [this]() {
                 my_module->haken_midi.editor_present();
+            }));
+            menu->addChild(createMenuItem("ConText", "", [this]() {
+                my_module->haken_midi.request_con_text();
             }));
             menu->addChild(createMenuItem("Updates", "", [this]() {
                 my_module->haken_midi.request_updates();

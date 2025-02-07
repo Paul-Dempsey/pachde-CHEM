@@ -9,8 +9,7 @@
    </linearGradient>
 
    <g>
-      <rect fill="url(#panel-gradient)" id="g-panel" width="210" height="380" x="0" y="0" inkscape:label="panel"
-         sodipodi:insensitive="true" style="fill:url(#panel-gradient)" />
+      <rect id="g-panel" fill="url(#panel-gradient)" width="210" height="380" x="0" y="0" />
       <g id="grid">
          <rect fill="#333333" id="grid-bg" width="150" height="314" x="12" y="20" stroke-width=".5" />
          <path stroke="#1f1f1f" stroke-width="1px" d="M 12,41 H 162 Z" id="gl1--grid-line" />
@@ -29,23 +28,23 @@
          <path stroke="#1f1f1f" stroke-width="1px" d="M 12,314 H 162 Z" id="gl14--grid-line" />
          <rect fill="#464060" id="grid-new" width="150" height="21" x="12" y="336" />
       </g>
-      <g id="g6" inkscape:label="preset-advance" transform="translate(-225.5,-8)">
+      <g id="g6" transform="translate(-225.5,-8)">
          <path
-            style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:center;text-anchor:middle;fill:#d9d9d9"
+            style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';text-align:center;text-anchor:middle;fill:#d9d9d9"
             d="m 396.49399,127.53877 v -8.364 h 1.008 v 1.764 l -0.324,-0.228 q 0.156,-0.516 0.456,-0.876 0.312,-0.372 0.756,-0.564 0.444,-0.192 1.008,-0.192 0.804,0 1.404,0.408 0.612,0.396 0.948,1.092 0.336,0.684 0.336,1.56 0,0.924 -0.36,1.62 -0.36,0.684 -0.972,1.056 -0.612,0.372 -1.356,0.372 -0.564,0 -1.008,-0.204 -0.444,-0.204 -0.744,-0.564 -0.3,-0.36 -0.432,-0.816 l 0.288,-0.276 v 4.212 z m 2.736,-3.276 q 0.54,0 0.948,-0.264 0.42,-0.276 0.648,-0.756 0.24,-0.48 0.24,-1.104 0,-0.624 -0.24,-1.104 -0.228,-0.48 -0.648,-0.744 -0.408,-0.276 -0.948,-0.276 -0.54,0 -0.948,0.276 -0.408,0.264 -0.636,0.744 -0.228,0.48 -0.228,1.104 0,0.624 0.228,1.104 0.228,0.48 0.636,0.756 0.408,0.264 0.948,0.264 z m 4.308,0.828 v -5.916 h 1.02 v 1.584 l -0.264,0.06 q 0.084,-0.528 0.396,-0.912 0.324,-0.396 0.744,-0.612 0.432,-0.216 0.84,-0.216 0.276,0 0.528,0.06 0.252,0.06 0.516,0.204 l -0.504,0.912 q -0.144,-0.072 -0.348,-0.12 -0.192,-0.048 -0.372,-0.048 -0.288,0 -0.576,0.108 -0.276,0.108 -0.504,0.336 -0.228,0.228 -0.348,0.612 -0.048,0.168 -0.084,0.444 -0.024,0.264 -0.024,0.732 v 2.772 z m 7.044,0.096 q -0.696,0 -1.224,-0.228 -0.516,-0.24 -0.864,-0.66 -0.336,-0.42 -0.516,-0.96 -0.168,-0.552 -0.168,-1.164 0,-0.612 0.168,-1.164 0.168,-0.564 0.492,-0.996 0.336,-0.432 0.84,-0.684 0.504,-0.252 1.176,-0.252 0.684,0 1.176,0.24 0.504,0.228 0.816,0.636 0.324,0.408 0.48,0.912 0.156,0.504 0.156,1.044 0,0.048 -0.012,0.228 0,0.168 -0.024,0.3 h -4.26 q 0.036,0.864 0.504,1.344 0.468,0.48 1.272,0.48 0.516,0 0.9,-0.168 0.384,-0.168 0.72,-0.54 l 0.708,0.624 q -0.324,0.348 -0.684,0.576 -0.36,0.216 -0.768,0.324 -0.396,0.108 -0.888,0.108 z m 1.524,-3.264 q 0.024,-0.096 0.024,-0.192 0.012,-0.096 0.012,-0.192 0,-0.288 -0.108,-0.576 -0.096,-0.288 -0.3,-0.516 -0.192,-0.24 -0.504,-0.372 -0.3,-0.144 -0.72,-0.144 -0.516,0 -0.888,0.24 -0.372,0.24 -0.576,0.636 -0.204,0.396 -0.24,0.876 h 3.636 z m 4.41601,3.264 q -0.6,0 -1.08,-0.18 -0.48,-0.18 -0.828,-0.48 -0.336,-0.3 -0.54,-0.636 l 0.708,-0.6 q 0.228,0.456 0.672,0.756 0.456,0.288 1.08,0.288 0.564,0 0.9,-0.24 0.336,-0.24 0.336,-0.648 0,-0.336 -0.204,-0.528 -0.204,-0.192 -0.54,-0.312 -0.336,-0.12 -0.732,-0.216 -0.336,-0.084 -0.684,-0.204 -0.336,-0.12 -0.612,-0.3 -0.276,-0.18 -0.444,-0.468 -0.168,-0.288 -0.168,-0.708 0,-0.732 0.564,-1.176 0.576,-0.456 1.5,-0.456 0.672,0 1.224,0.288 0.564,0.276 0.876,0.84 l -0.648,0.48 q -0.24,-0.42 -0.636,-0.6 -0.384,-0.192 -0.852,-0.192 -0.468,0 -0.78,0.192 -0.312,0.192 -0.312,0.528 0,0.252 0.144,0.408 0.144,0.156 0.42,0.264 0.288,0.108 0.696,0.204 0.372,0.084 0.756,0.204 0.384,0.12 0.708,0.312 0.324,0.192 0.516,0.516 0.204,0.312 0.204,0.816 0,0.552 -0.276,0.972 -0.276,0.42 -0.78,0.648 -0.504,0.228 -1.188,0.228 z m 6.17999,0 q -0.696,0 -1.224,-0.228 -0.516,-0.24 -0.864,-0.66 -0.336,-0.42 -0.516,-0.96 -0.168,-0.552 -0.168,-1.164 0,-0.612 0.168,-1.164 0.168,-0.564 0.492,-0.996 0.336,-0.432 0.84,-0.684 0.504,-0.252 1.176,-0.252 0.684,0 1.176,0.24 0.504,0.228 0.816,0.636 0.324,0.408 0.48,0.912 0.156,0.504 0.156,1.044 0,0.048 -0.012,0.228 0,0.168 -0.024,0.3 h -4.26 q 0.036,0.864 0.504,1.344 0.468,0.48 1.272,0.48 0.516,0 0.9,-0.168 0.384,-0.168 0.72,-0.54 l 0.708,0.624 q -0.324,0.348 -0.684,0.576 -0.36,0.216 -0.768,0.324 -0.396,0.108 -0.888,0.108 z m 1.524,-3.264 q 0.024,-0.096 0.024,-0.192 0.012,-0.096 0.012,-0.192 0,-0.288 -0.108,-0.576 -0.096,-0.288 -0.3,-0.516 -0.192,-0.24 -0.504,-0.372 -0.3,-0.144 -0.72,-0.144 -0.516,0 -0.888,0.24 -0.372,0.24 -0.576,0.636 -0.204,0.396 -0.24,0.876 h 3.636 z m 4.36802,3.264 q -0.42,0 -0.768,-0.156 -0.336,-0.168 -0.528,-0.528 -0.192,-0.36 -0.192,-0.924 v -5.988 l 1.032,-0.576 v 6.3 q 0,0.492 0.156,0.768 0.156,0.264 0.564,0.264 0.12,0 0.288,-0.024 0.168,-0.036 0.36,-0.084 v 0.792 q -0.228,0.084 -0.468,0.12 -0.228,0.036 -0.444,0.036 z m -2.712,-5.22 v -0.792 h 3.624 v 0.792 z"
-            id="preset--ctl-label" aria-label="preset" inkscape:label="preset" />
+            id="preset--ctl-label" />
       </g>
       <g id="up-down-scroll" transform="translate(186,59)">
          <path id="bar--ctl-bar" fill="none" stroke="#0278df" d="M -5.75,0 H 5 Z" />
       </g>
-      <g id="g32" inkscape:label="prev-next-cv">
+      <g id="g32">
          <path id="minus--ctl-label" transform="translate(171,334)" fill="#808080" d="M 10,5.25 H 2 v 1.5 h 8 z" />
          <path id="plus--ctl-label" transform="translate(189,334)" fill="#808080"
             d="M 6.75,2 H 5.25 V 5.25 H 2 v 1.5 H 5.25 V 10 h 1.5 V 6.75 H 10 V 5.25 H 6.75 Z" />
       </g>
       <g id="g8" transform="translate(-17.723568)">
-         <g aria-label="#d (pachde logo)" id="g2" transform="translate(195.44443,366.72992)"
-            style="fill:#d4a011;fill-opacity:1" inkscape:label="#d">
+         <g aria-label="#d (pachde logo)" id="pachde" transform="translate(195.44443,366.72992)"
+            style="fill:#d4a011;fill-opacity:1">
             <path
                d="M 3.023,5.309 3.916,3.543 5.003,3.834 4.104,5.599 5.759,6.042 6.658,4.277 7.74,4.567 6.846,6.334 7.631,6.544 7.34,7.631 6.328,7.36 5.666,8.665 6.969,9.014 6.678,10.1 5.148,9.691 4.255,11.457 3.168,11.166 4.062,9.4 2.407,8.956 1.513,10.723 0.426,10.431 1.32,8.665 0.54,8.456 0.831,7.369 1.843,7.64 2.5,6.334 1.202,5.986 1.493,4.899 Z M 5.242,7.068 3.587,6.625 2.924,7.93 4.58,8.374 Z"
                id="hash--brand" fill="#d4a011" />
@@ -55,120 +54,115 @@
          </g>
          <path id="pdo--brand"
             style="opacity:1;fill:none;fill-opacity:1;stroke:#d4a011;stroke-width:0.525475;stroke-dasharray:none;stroke-opacity:1"
-            sodipodi:type="star" inkscape:flatsided="true" sodipodi:sides="6" sodipodi:cx="191.13033"
-            sodipodi:cy="357.53949" sodipodi:r1="7.0977392" sodipodi:r2="14.57469" sodipodi:arg1="-0.23602366"
-            sodipodi:arg2="0.28757512" inkscape:rounded="-3.1225023e-17" inkscape:randomized="0"
             d="m 198.03128,355.87977 -2.01311,6.80626 -6.90096,1.65973 -4.88784,-5.14655 2.01311,-6.80626 6.90096,-1.65973 z"
             transform="matrix(1.4272798,0,0,1.4272798,-69.621751,-134.87472)" />
       </g>
-      <path fill="#f9a54b" fill-opacity="0.4" stroke-width=".5"
-         d="m 201.19667,192.48898 v 8.64632 q 0,3.48551 -2.04122,5.623 -2.02201,2.13752 -5.33419,2.13752 -2.17602,0 -4.14018,-1.05913 -1.94499,-1.03986 -2.90779,-3.15813 -0.96286,-2.11824 -1.00136,-3.62029 l -0.0769,-3.15812 h -9.78248 v -5.41117 z m -4.54462,5.33414 h -6.47031 v 2.11827 q 0,1.36722 0.98211,2.33007 0.98211,0.98211 2.33007,0.98211 1.54055,0 2.38785,-1.09766 0.84731,-1.09764 0.84731,-3.1196 z m 4.96828,15.48252 v 4.92978 h -25.70791 v -4.92978 z m -25.70791,21.00924 h 2.83076 v -0.0769 q -1.6561,-1.15541 -2.40715,-2.33007 -0.73175,-1.17466 -0.73175,-2.90779 0,-2.90777 2.50338,-4.94901 2.50341,-2.04122 6.08517,-2.04122 3.54326,0 6.06592,2.17602 2.5419,2.17602 2.5419,5.16084 0,1.425 -0.63547,2.56116 -0.63547,1.13616 -2.02196,2.4071 h 2.29155 v 4.92976 h -16.52238 z m 11.9585,-3.62029 q 0,-1.46352 -1.17466,-2.44561 -1.15541,-0.98208 -2.92704,-0.98208 -1.65611,0 -2.67671,0.92433 -1.00136,0.94358 -1.00136,2.46488 0,1.46352 1.15541,2.50338 1.17466,1.03988 2.83076,1.03988 1.54055,0 2.65744,-1.03988 1.13616,-1.03986 1.13616,-2.4649 z m 4.56387,12.0933 v 5.25715 l -9.62843,4.75642 9.62843,4.23651 v 5.04531 l -23.82073,-10.30243 v -5.12231 l 8.47302,3.69732 z"
-         id="title" aria-label="Play" />
+      <path id="title" fill="#f9a54b" fill-opacity="0.4" stroke-width=".5" d="m 201.19667,192.48898 v 8.64632 q 0,3.48551 -2.04122,5.623 -2.02201,2.13752 -5.33419,2.13752 -2.17602,0 -4.14018,-1.05913 -1.94499,-1.03986 -2.90779,-3.15813 -0.96286,-2.11824 -1.00136,-3.62029 l -0.0769,-3.15812 h -9.78248 v -5.41117 z m -4.54462,5.33414 h -6.47031 v 2.11827 q 0,1.36722 0.98211,2.33007 0.98211,0.98211 2.33007,0.98211 1.54055,0 2.38785,-1.09766 0.84731,-1.09764 0.84731,-3.1196 z m 4.96828,15.48252 v 4.92978 h -25.70791 v -4.92978 z m -25.70791,21.00924 h 2.83076 v -0.0769 q -1.6561,-1.15541 -2.40715,-2.33007 -0.73175,-1.17466 -0.73175,-2.90779 0,-2.90777 2.50338,-4.94901 2.50341,-2.04122 6.08517,-2.04122 3.54326,0 6.06592,2.17602 2.5419,2.17602 2.5419,5.16084 0,1.425 -0.63547,2.56116 -0.63547,1.13616 -2.02196,2.4071 h 2.29155 v 4.92976 h -16.52238 z m 11.9585,-3.62029 q 0,-1.46352 -1.17466,-2.44561 -1.15541,-0.98208 -2.92704,-0.98208 -1.65611,0 -2.67671,0.92433 -1.00136,0.94358 -1.00136,2.46488 0,1.46352 1.15541,2.50338 1.17466,1.03988 2.83076,1.03988 1.54055,0 2.65744,-1.03988 1.13616,-1.03986 1.13616,-2.4649 z m 4.56387,12.0933 v 5.25715 l -9.62843,4.75642 9.62843,4.23651 v 5.04531 l -23.82073,-10.30243 v -5.12231 l 8.47302,3.69732 z" />
    </g>
    <g style="display:none" id="Number-text">
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6550293" y="32.729774" id="text3">
-         <tspan sodipodi:role="line" id="tspan3" x="5.6550293" y="32.729774"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan3" x="5.6550293" y="32.729774"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             1</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.8417969" y="53.83849" id="text4">
-         <tspan sodipodi:role="line" id="tspan4" x="5.8417969" y="53.83849"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan4" x="5.8417969" y="53.83849"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             2</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.7033691" y="74.828552" id="text5">
-         <tspan sodipodi:role="line" id="tspan5" x="5.7033691" y="74.828552"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan5" x="5.7033691" y="74.828552"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             3</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.7011719" y="95.884529" id="text6">
-         <tspan sodipodi:role="line" id="tspan6" x="5.7011719" y="95.884529"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan  id="tspan6" x="5.7011719" y="95.884529"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             4</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6967773" y="116.93172" id="text7">
-         <tspan sodipodi:role="line" id="tspan7" x="5.6967773" y="116.93172"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan7" x="5.6967773" y="116.93172"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             5</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6945801" y="137.98331" id="text8">
-         <tspan sodipodi:role="line" id="tspan8" x="5.6945801" y="137.98331"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan8" x="5.6945801" y="137.98331"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             6</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6308594" y="159.0327" id="text9">
-         <tspan sodipodi:role="line" id="tspan9" x="5.6308594" y="159.0327"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan9" x="5.6308594" y="159.0327"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             7</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6682129" y="180.08647" id="text10">
-         <tspan sodipodi:role="line" id="tspan10" x="5.6682129" y="180.08647"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan10" x="5.6682129" y="180.08647"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             8</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.7143555" y="201.13806" id="text11">
-         <tspan sodipodi:role="line" id="tspan11" x="5.7143555" y="201.13806"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan11" x="5.7143555" y="201.13806"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             9</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.4836426" y="222.18965" id="text12">
-         <tspan sodipodi:role="line" id="tspan12" x="5.4836426" y="222.18965"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan12" x="5.4836426" y="222.18965"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             10</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.6550293" y="243.24562" id="text13">
-         <tspan sodipodi:role="line" id="tspan13" x="5.6550293" y="243.24562"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan13" x="5.6550293" y="243.24562"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             11</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.5583496" y="264.35434" id="text14">
-         <tspan sodipodi:role="line" id="tspan14" x="5.5583496" y="264.35434"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan14" x="5.5583496" y="264.35434"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             12</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.512207" y="285.34439" id="text15">
-         <tspan sodipodi:role="line" id="tspan15" x="5.512207" y="285.34439"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan15" x="5.512207" y="285.34439"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             13</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.4462891" y="306.40039" id="text16">
-         <tspan sodipodi:role="line" id="tspan16" x="5.4462891" y="306.40039"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan16" x="5.4462891" y="306.40039"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             14</tspan>
       </text>
       <text xml:space="preserve"
-         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';-inkscape-font-specification:'Century Gothic';text-align:center;text-anchor:middle"
+         style="font-size:9px;line-height:1.25;font-family:'Century Gothic';text-align:center;text-anchor:middle"
          x="5.5166016" y="327.44757" id="text17">
-         <tspan sodipodi:role="line" id="tspan17" x="5.5166016" y="327.44757"
-            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';-inkscape-font-specification:'Century Schoolbook';fill:#666666;fill-opacity:1">
+         <tspan id="tspan17" x="5.5166016" y="327.44757"
+            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9px;font-family:'Century Schoolbook';fill:#666666;fill-opacity:1">
             15</tspan>
       </text>
    </g>

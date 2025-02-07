@@ -14,12 +14,13 @@ constexpr const float GRIP_HIT   = 15.f;
 struct PresetWidget;
 
 struct IPresetAction {
+    virtual void onClearSelection() = 0;
     virtual void onSetSelection(PresetWidget* source, bool on) = 0;
     virtual void onDelete(PresetWidget* source) = 0;
     virtual void onDropFile(const widget::Widget::PathDropEvent& e) = 0;
     virtual void onChoosePreset(PresetWidget* source) = 0;
     virtual PresetWidget* getDropTarget(Vec pos) = 0;
-
+    virtual void onDropPreset(PresetWidget* target) = 0;
 };
 
 class PresetWidget : public OpaqueWidget, public IApplyTheme
@@ -94,6 +95,7 @@ public:
     }
     void stop_drag() {
         drag_started = dragging = false;
+        glfwSetCursor(APP->window->win, NULL);
     }
     void onDragStart(const DragStartEvent& e) override;
     void onDragEnd(const DragEndEvent& e) override;
@@ -105,9 +107,10 @@ public:
     void draw(const DrawArgs& args) override;
 };
 
-inline PresetWidget* createPresetWidget(std::deque<std::shared_ptr<PresetDescription>>* presets, float x, float y, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetDescription>>* presets, float x, float y, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {
     auto o = createThemedWidget<PresetWidget>(Vec(x,y), engine, theme);
+    o->set_agent(agent);
     o->set_preset_list(presets);
     return o;
 }

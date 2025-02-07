@@ -2,7 +2,7 @@
 #include <ghc/filesystem.hpp>
 #include "../../services/colors.hpp"
 #include "../../services/open-file.hpp"
-
+#include "../../em/em-hardware.h"
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
@@ -88,6 +88,14 @@ constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float PRESETS_TOP = 20.f;
 constexpr const float PRESETS_LEFT = 12.f;
 
+const char * const NotConnected = "[not connected]";
+
+bool PlayUi::connected() {
+    if (!my_module) return false;
+    if (!chem_host) return false;
+    return true;
+}
+
 PlayUi::PlayUi(PlayModule *module) :
     my_module(module)
 {
@@ -101,20 +109,20 @@ PlayUi::PlayUi(PlayModule *module) :
 
     float y = PRESETS_TOP;
     for (int i = 0; i < 15; ++i) {
-        auto pw = createPresetWidget(&presets, PRESETS_LEFT, y, theme_engine, theme);
-        pw->set_agent(this);
+        auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme_engine, theme);
         pw->get_label().text(format_string("[preset %d]", i));
         preset_widgets.push_back(pw);
         addChild(pw);
         y += 21;
     }
     LabelStyle style{"dytext", TextAlignment::Left, 10.f};
-    addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, "[em device]", theme_engine, theme, style));
+    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
+        Vec(28.f, box.size.y - 13.f), 200.f, NotConnected, theme_engine, theme, style));
 
-    LabelStyle debug{"debug", TextAlignment::Center, 9.f};
-    addChild(debug_info = createStaticTextLabel<StaticTextLabel>(
-        Vec(box.size.x*.5f, box.size.y - 24.f), box.size.x, "", theme_engine, theme, debug));
+    LabelStyle warn{"warning", TextAlignment::Left, 9.f};
+    addChild(warning_label = createStaticTextLabel<TipLabel>(
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, warn));
+    warning_label->describe("[warning/status]");
 
     style.height = 16.f;
     addChild(playlist_label = createStaticTextLabel<TipLabel>(
@@ -198,6 +206,8 @@ PlayUi::PlayUi(PlayModule *module) :
 
 void PlayUi::presets_to_json(json_t * root)
 {
+    json_object_set_new(root, "haken-device", json_string(playlist_device.c_str()));
+
     auto jaru = json_array();
     for (auto preset: presets) {
         json_array_append_new(jaru, preset->toJson());
@@ -207,6 +217,10 @@ void PlayUi::presets_to_json(json_t * root)
 
 void PlayUi::presets_from_json(json_t * root)
 {
+    auto j = json_object_get(root, "haken-device");
+    if (j) {
+        playlist_device = json_string_value(j);
+    }
     auto jar = json_object_get(root, "playlist");
     if (jar) {
         json_t* jp;
@@ -288,8 +302,23 @@ bool PlayUi::load_playlist(std::string path, bool set_folder)
 
     playlist_name = system::getStem(path);
     playlist_label->text(playlist_name);
-    playlist_label->describe(my_module->playlist_file);
+    std::string tip = my_module->playlist_file;
+    if (!playlist_device.empty()) {
+        tip.append("\n- for ");
+        tip.append(playlist_device);
+        playlist_label->describe(tip);
 
+        if (chem_host) {
+            auto em = chem_host->host_matrix();
+            if (em) {
+                const char * current_device = HardwarePresetClass(em->hardware);
+                if (0 != strcmp(current_device, playlist_device.c_str())) {
+                    warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
+                }
+            }
+        }
+    
+    }
     return true;
 }
 
@@ -302,6 +331,7 @@ void PlayUi::open_playlist()
         load_playlist(path, true);
     } else {
         playlist_name = "";
+        playlist_device = "";
         my_module->playlist_file = "";
     }
 }
@@ -324,6 +354,15 @@ void PlayUi::save_playlist()
     auto root = json_object();
     if (!root) return;
     DEFER({json_decref(root);});
+
+    if (playlist_device.empty()) {
+        if (chem_host) {
+            auto em = chem_host->host_matrix();
+            if (em) {
+                playlist_device = HardwarePresetClass(em->hardware);
+            }
+        }
+    }
     presets_to_json(root);
 
     std::string tmpPath = system::join(dir, TempName(".tmp.json"));
@@ -352,10 +391,23 @@ void PlayUi::save_as_playlist()
             path.append(".json");
         }
         my_module->playlist_file = path;
-
+        if (playlist_device.empty()) {
+            if (chem_host) {
+                auto em = chem_host->host_matrix();
+                if (em) {
+                    playlist_device = HardwarePresetClass(em->hardware);
+                }
+            }
+        }
         playlist_name = system::getStem(path);
         playlist_label->text(playlist_name);
-        playlist_label->describe(my_module->playlist_file);
+
+        auto tip = my_module->playlist_file;
+        if (!playlist_device.empty()) {
+            tip.append("\n- for ");
+            tip.append(playlist_device);
+        }
+        playlist_label->describe(tip);
 
         save_playlist();
         my_module->update_mru(path);
@@ -364,6 +416,7 @@ void PlayUi::save_as_playlist()
 
 void PlayUi::clear_playlist(bool forget_file)
 {
+    warning_label->text("");
     if (!my_module) return;
     for (auto pw : preset_widgets) {
         pw->set_preset(-1, nullptr);
@@ -373,6 +426,7 @@ void PlayUi::clear_playlist(bool forget_file)
         playlist_name = "";
         playlist_label->text("");
         playlist_label->describe("");
+        playlist_device = "";
     }
     presets.clear();
     clear_selected();
@@ -381,18 +435,19 @@ void PlayUi::clear_playlist(bool forget_file)
 
 void PlayUi::select_none()
 {
+    if (selected.empty()) return;
     clear_selected();
     scroll_to(scroll_top, true);
 }
 
 void PlayUi::onConnectHost(IChemHost* host)
 {
-    this->host = host;
-    if (this->host) {
-        onConnectionChange(ChemDevice::Haken, this->host->host_connection(ChemDevice::Haken));
+    chem_host = host;
+    if (chem_host) {
+        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
     } else {
-        haken_device_label->text("");
+        haken_device_label->text(NotConnected);
         live_preset_label->text("");
     }
 }
@@ -523,19 +578,18 @@ void PlayUi::scroll_to_live()
 int PlayUi::first_selected()
 {
     if (selected.empty()) return -1;
-    get_selected_indices();
     return *selected.cbegin();
 }
 int PlayUi::last_selected()
 {
     if (selected.empty()) return -1;
-    get_selected_indices();
     return *(selected.cend()-1);
 }
 void PlayUi::select_item(int index)
 {
     if (selected.cend() == std::find(selected.cbegin(), selected.cend(), index)) {
         selected.push_back(index);
+        std::sort(selected.begin(), selected.end());
     }
 }
 void PlayUi::unselect_item(int index)
@@ -545,7 +599,6 @@ void PlayUi::unselect_item(int index)
 }
 const std::vector<int>& PlayUi::get_selected_indices()
 {
-    std::sort(selected.begin(), selected.end());
     return selected;
 }
 
@@ -571,6 +624,7 @@ void PlayUi::clone()
     for (size_t i = 0; i < count; ++i) {
         selected.push_back(index--);
     }
+    std::sort(selected.begin(), selected.end());
     page_down(true, false, true);
 }
 
@@ -608,6 +662,7 @@ void PlayUi::to_first()
     for (size_t i = 0; i < count; ++i) {
         selected.push_back(static_cast<int>(i));
     }
+    std::sort(selected.begin(), selected.end());
     page_up(true, false, true);
 }
 
@@ -627,13 +682,13 @@ void PlayUi::to_last()
     for (size_t i = 0; i < count; ++i) {
         selected.push_back(index--);
     }
+    std::sort(selected.begin(), selected.end());
     page_down(true, false, true);
 }
 
 void PlayUi::to_n(int dx)
 {
     if (selected.empty() || 0 == dx) return;
-    get_selected_indices();
     if ((first_selected() + dx) < 0) return;
     if ((last_selected() + dx) > static_cast<int>(presets.size())-1) return;
 
@@ -685,8 +740,8 @@ void PlayUi::to_down()
 
 void PlayUi::onPresetChange()
 {
-    if (host) {
-        auto preset = host->host_preset();
+    if (chem_host) {
+        auto preset = chem_host->host_preset();
         if (preset) {
             live_preset = std::make_shared<PresetDescription>();
             live_preset->init(preset);
@@ -708,11 +763,30 @@ void PlayUi::onPresetChange()
 void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : "");
+    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
+    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
+    if (!playlist_device.empty()) {
+        if (chem_host) {
+            auto em = chem_host->host_matrix();
+            if (em) {
+                const char * current_device = HardwarePresetClass(em->hardware);
+                if (0 != strcmp(current_device, playlist_device.c_str())) {
+                    warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
+                } else {
+                    warning_label->text("");
+                }
+            }
+        }
+    }
+
 }
 
 
 // IPresetAction
+void PlayUi::onClearSelection()
+{
+    select_none();
+}
 
 void PlayUi::onSetSelection(PresetWidget* source, bool on)
 {
@@ -730,6 +804,8 @@ void PlayUi::onDelete(PresetWidget* source)
     clear_selected();
     auto index = source->get_index();
     selected.push_back(index);
+    std::sort(selected.begin(), selected.end());
+
     remove_selected();
     make_visible(--index);
 }
@@ -748,14 +824,13 @@ void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e)
 
 void PlayUi::onChoosePreset(PresetWidget* source)
 {
-    if (!my_module) return;
-   
-    auto haken = my_module->chem_host->host_haken();
+    if (!connected()) return;
+
+    auto haken = chem_host->host_haken();
     if (haken) {
         auto id = source->get_preset_id();
         if (id.valid()) {
-            auto k = my_module->chem_host->host_haken();
-            k->log->logMessage("play", format_string("Selecting %s", presets[source->get_index()]->summary().c_str()));
+            haken->log->logMessage("play", format_string("Selecting %s", presets[source->get_index()]->summary().c_str()));
             haken->select_preset(id);
         }
     }
@@ -765,7 +840,6 @@ PresetWidget* PlayUi::getDropTarget(Vec pos)
 {
     if ((pos.y < PRESETS_TOP) || (pos.y > PRESETS_TOP + 314.f)) return nullptr;
     if ((pos.x < PRESETS_LEFT) || (pos.x > PRESETS_LEFT + 150.f)) return nullptr;
-    select_none();
     for (auto pw : preset_widgets) {
         if (pw->box.contains(pos)) {
             return pw;
@@ -775,8 +849,70 @@ PresetWidget* PlayUi::getDropTarget(Vec pos)
     return nullptr;
 }
 
+void PlayUi::onDropPreset(PresetWidget* target)
+{
+    if (!target || selected.empty()) return;
+    int target_index = target->get_index();
+    if (-1 == target_index) {
+        to_last();
+    } else if (0 == target_index) {
+        to_first();
+    } else {
+        if (target->get_selected()) {
+            bool next_free = false;
+            for (auto pw : preset_widgets) {
+                if (next_free) {
+                    if (pw->get_preset_id().valid()) {
+                        if (!pw->get_selected()) {
+                            target_index = pw->get_index();
+                            break;
+                        }
+                    } else {
+                        to_last();
+                        return;
+                    }
+                } else if (pw == target) {
+                    next_free = true;
+                }
+            }
+        }
+        for (auto it = selected.crbegin(); it != selected.crend(); it++) {
+            if (*it < target_index) {
+                --target_index;
+            }
+        }
+
+        // extract the ones we're going to reorder
+        auto extracted = extract(selected);
+        remove_items(selected, presets);
+        selected.clear();
+
+        std::vector<std::shared_ptr<PresetDescription>> new_presets;
+        new_presets.reserve(presets.size());
+        for (auto p : presets) {
+            new_presets.push_back(p);
+        }
+        presets.clear();
+
+        int index = 0;
+        for (auto p : new_presets) {
+            if (index == target_index) {
+                for (auto p : extracted) {
+                    selected.push_back(index);
+                    presets.push_back(p);
+                    index++;
+                }
+            }
+            presets.push_back(p);
+            index++;
+        }
+        make_visible(target_index);
+    }
+}
+
 void PlayUi::onHoverKey(const HoverKeyEvent& e)
 {
+    auto mods = e.mods & RACK_MOD_MASK;
     switch (e.key) {
     case GLFW_KEY_ESCAPE: {
         if (e.action == GLFW_RELEASE) {
@@ -785,23 +921,19 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
         }
     } break;
 
-    // Rack isn't friendly to modules that want keyboard controls
-    //
-    // case GLFW_KEY_PAGE_UP: 
-    //     if (e.action == GLFW_RELEASE) {
-    //         e.consume(this);
-    //         page_up((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL, (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT, true);
-    //         return;
-    //     }
-    //     break;
+    case GLFW_KEY_PAGE_UP: 
+        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
+            e.consume(this);
+            page_up(false, false, true);
+        }
+        break;
 
-    // case GLFW_KEY_PAGE_DOWN: 
-    //     if (e.action == GLFW_RELEASE) {
-    //         e.consume(this);
-    //         page_down((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL, (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT, true);
-    //         return;
-    //     }
-    //     break;
+    case GLFW_KEY_PAGE_DOWN: 
+        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
+            e.consume(this);
+            page_down(false, false, true);
+        }
+        break;
 
     case GLFW_KEY_MENU:
         if (e.action == GLFW_RELEASE) {

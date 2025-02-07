@@ -71,17 +71,18 @@ constexpr const int PLAYLIST_LENGTH = 15;
 struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 {
     using Base = ChemModuleWidget;
-    IChemHost* host = nullptr;
+
+    IChemHost* chem_host = nullptr;
     PlayModule* my_module = nullptr;
     LinkButton* link_button = nullptr;
     UpButton * up_button = nullptr;
     DownButton* down_button = nullptr;
     PlayMenu* play_menu = nullptr;
-    StaticTextLabel* haken_device_label = nullptr;
+    TipLabel* haken_device_label = nullptr;
     TipLabel* playlist_label = nullptr;
     StaticTextLabel* page_label = nullptr;
     StaticTextLabel* live_preset_label = nullptr;
-    StaticTextLabel* debug_info = nullptr;
+    TipLabel* warning_label = nullptr;
 
     std::shared_ptr<PresetDescription> live_preset;
 
@@ -90,10 +91,12 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     ssize_t scroll_top = 0;  // index of top preset
 
     std::string playlist_name;
+    std::string playlist_device;
 
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-play.svg"); }
 
     PlayUi(PlayModule *module);
+    bool connected();
 
     std::vector<int> selected;
     int first_selected();
@@ -141,11 +144,13 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // IPresetAction
+    void onClearSelection() override;
     void onSetSelection(PresetWidget* source, bool on) override;
     void onDelete(PresetWidget* source) override;
     void onDropFile(const widget::Widget::PathDropEvent& e) override;
     void onChoosePreset(PresetWidget* source) override;
     PresetWidget* getDropTarget(Vec pos) override;
+    void onDropPreset(PresetWidget* target) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;
     //void step() override;

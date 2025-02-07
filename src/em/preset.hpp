@@ -37,7 +37,7 @@ struct PresetDescription
 
     json_t* toJson();
     void fromJson(const json_t* root);
-    std::string summary();
+    std::string summary() const;
 
 };
 

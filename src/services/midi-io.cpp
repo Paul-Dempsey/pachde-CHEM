@@ -65,13 +65,16 @@ midi::Message rackFromPacked(PackedMidiMessage message)
     default:
     case 0:
         msg.setSize(1);
+        msg.bytes[0] = message.bytes.status_byte;
         break;
     case 1:
         msg.setSize(2);
+        msg.bytes[0] = message.bytes.status_byte;
         msg.bytes[1] = message.bytes.data1;
         break;
     case 2:
         msg.setSize(3);
+        msg.bytes[0] = message.bytes.status_byte;
         msg.bytes[1] = message.bytes.data1;
         msg.bytes[2] = message.bytes.data2;
         break;
@@ -231,7 +234,11 @@ void MidiLog::logMessage(const char *prefix, PackedMidiMessage m)
                         bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), task_names.Name(m.bytes.data2).c_str());
                         break;
                     case Haken::ccStream:
-                        bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), stream_names.Name(m.bytes.data2).c_str());
+                        if (127 == m.bytes.data2) {
+                            bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s [END]\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str());
+                        } else {
+                            bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), stream_names.Name(m.bytes.data2).c_str());
+                        }
                         break;
                     default:
                         bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %02d\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), m.bytes.data2);

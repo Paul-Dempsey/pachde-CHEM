@@ -119,6 +119,8 @@
             "m2": { "fill": "g50" },
 
             "debug" : { "fill": "#fc59a5"},
+            "warning": { "fill": "#e7e745" },
+
             "x": { "fill": "#000000" }
         }
     }

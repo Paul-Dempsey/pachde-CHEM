@@ -40,10 +40,10 @@ public:
     void setNumber(uint8_t n) { id.bytes.number = n; make_valid(); }
     void clear() { invalidate(); }
     //RawPresetId& raw() { return id; }
-    uint32_t key() { return id.data; }
-    uint8_t bankHi() { return id.bytes.bank_hi; }
-    uint8_t bankLo() { return id.bytes.bank_lo; }
-    uint8_t number() { return id.bytes.number; }
+    uint32_t key() const { return id.data; }
+    uint8_t bankHi() const { return id.bytes.bank_hi; }
+    uint8_t bankLo() const { return id.bytes.bank_lo; }
+    uint8_t number() const { return id.bytes.number; }
 };
 
 }

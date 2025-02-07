@@ -1,6 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "em/preset.hpp"
+#include "em/eaganmatrix.hpp"
 #include "services/midi-devices.hpp"
 #include "services/haken-midi.hpp"
 
@@ -19,6 +20,7 @@ struct IChemHost
     virtual std::string host_claim() = 0;
     virtual const PresetDescription* host_preset() = 0;
     virtual HakenMidi* host_haken() = 0;
+    virtual EaganMatrix* host_matrix() = 0;
 };
 
 struct IChemClient

@@ -13,6 +13,9 @@ void HakenMidi::key_pressure(uint8_t channel, uint8_t note, uint8_t pressure) {
 
 void HakenMidi::select_preset(PresetId id)
 {
+    if (log) {
+        log->logMessage(">>H", "---- Select Preset");
+    }
     assert(id.valid());
     //send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42)); tick_tock = !tick_tock;
     //send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
@@ -46,7 +49,6 @@ void HakenMidi::request_con_text() {
     if (log) {
         log->logMessage(">>H", "---- RequestConText");
     }
-    //doMessage(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
     send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi));
 }
 
@@ -55,8 +57,8 @@ void HakenMidi::request_updates()
     if (log) {
         log->logMessage(">>H", "---- RequestUpdates");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42));
-    tick_tock = !tick_tock;
+    // send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42));
+    // tick_tock = !tick_tock;
 
     // firmware 1009
 //    control_change(Haken::ch16, 55, 1); // bit 1 means request config

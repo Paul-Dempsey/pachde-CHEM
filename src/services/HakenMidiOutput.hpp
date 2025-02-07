@@ -19,7 +19,7 @@ struct HakenMidiOutput : IDoMidi
     
     HakenMidiOutput(const HakenMidiOutput&) = delete; // no copy constructor
     HakenMidiOutput() : message_count(0), log(nullptr), em(nullptr) {
-        output.channel = -1;
+        output.setChannel(-1);
     }
 
     midi::Output& midi_out() { return output; }
@@ -30,6 +30,7 @@ struct HakenMidiOutput : IDoMidi
         midi_timer.reset();
     }
     uint64_t count() { return message_count; }
+    bool pending() { return ring.size() > 0; }
 
     void setLogger(MidiLog* logger) {
         log = logger;

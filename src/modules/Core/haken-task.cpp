@@ -349,7 +349,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             if (chem->isHakenConnected()) {
                 chem->logMessage("CHEM", "Starting task Updates");
                 chem->haken_midi.request_updates();
-                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                // chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 task->done();
                 notifyChange(HakenTask::Updates);
                 current = next_task(current);
@@ -366,7 +366,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 assert(task->scheduled()); // should have been handled in process_task_timing
                 task->pend();
                 chem->haken_midi.request_user();
-                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                //chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 notifyChange(HakenTask::UserPresets);
             } else {
                 task->not_applicable();
@@ -382,7 +382,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 assert(chem->isHakenConnected());
                 task->pend();
                 chem->haken_midi.request_system();
-                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                //chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 notifyChange(HakenTask::SystemPresets);
             } else {
                 task->not_applicable();
@@ -396,7 +396,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 chem->logMessage("CHEM", "Starting task PresetInfo");
                 task->pend();
                 chem->haken_midi.request_configuration();
-                chem->haken_midi_out.dispatch(DISPATCH_NOW);
+                //chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 notifyChange(HakenTask::PresetInfo);
             } else {
                 task->not_applicable();

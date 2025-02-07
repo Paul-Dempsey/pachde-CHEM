@@ -4,10 +4,11 @@
 #include "../../services/HakenMidiOutput.hpp"
 #include "../../services/midi-devices.hpp"
 #include "../../services/midi-io.hpp"
-#include "../../widgets/MidiPicker.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/blip-widget.hpp"
+#include "../../widgets/indicator-widget.hpp"
+#include "../../widgets/label-widget.hpp"
+#include "../../widgets/MidiPicker.hpp"
+#include "../../widgets/tip-label-widget.hpp"
 #include "haken-task.hpp"
 //#include "midi-input-worker.hpp"
 
@@ -87,7 +88,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void unregister_chem_client(IChemClient* client) override;
     bool host_has_client_model(IChemClient* client) override;
     bool host_has_client(IChemClient* client) override;
-    //bool host_ready() override { return this->em.ready; }
     std::shared_ptr<MidiDeviceConnection> host_connection(ChemDevice device) override;
     std::string host_claim() override {
         return haken_device.getClaim();
@@ -97,6 +97,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     }
     HakenMidi* host_haken() override {
         return &haken_midi;
+    }
+    EaganMatrix* host_matrix() override {
+        return &em;
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
@@ -170,7 +173,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     StaticTextLabel* haken_device_label = nullptr;
     StaticTextLabel* controller1_device_label = nullptr;
     StaticTextLabel* controller2_device_label = nullptr;
-    StaticTextLabel* preset_label = nullptr;
+    TipLabel* preset_label = nullptr;
     StaticTextLabel* firmware_label = nullptr;
     //StaticTextLabel* task_status_label = nullptr;
     StaticTextLabel* em_status_label = nullptr;

@@ -126,15 +126,14 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
 {
     switch (cc) {
     case Haken::ccBankH:
-        if (in_preset) {
-            preset.id.setBankHi(value);
+        if (in_system) {
+            value = 127;
         }
+        preset.id.setBankHi(value);
         break;
 
     case Haken::ccBankL: // category
-        if (in_preset) {
-            preset.id.setBankLo(value);
-        }
+        preset.id.setBankLo(value);
         break;
 
     case Haken::ccStream: {
@@ -197,11 +196,17 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     case Haken::ccTask:
         notifyTaskMessage(value);
         switch (value) {
+        case Haken::beginUserNames:
+            in_user = true;
+            break;
         case Haken::endUserNames:
             notifyUserComplete();
             break;
         case Haken::endSysNames:
             notifySystemComplete();
+            break;
+        case Haken::beginSysNames:
+            in_system = true;
             break;
         }
         break;
@@ -246,6 +251,9 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
             ch2.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelTwoCC(msg.bytes.data1, msg.bytes.data2);
         } break;
+
+        case MidiStatus_ProgramChange:
+            break;        
         }
     } break;
 
@@ -259,6 +267,18 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
         case MidiStatus_ProgramChange:
             if (in_preset) {
                 preset.id.setNumber(msg.bytes.data1);
+                if (Haken::catEdBuf == preset.id.bankHi()) {
+                    uint16_t pn = (static_cast<uint16_t>(preset.id.bankLo()) << 7) + preset.id.number();
+                    if (pn < 129) {
+                        preset.id.setBankHi(Haken::catUser);
+                        --pn;
+                    } else {
+                        pn -= 129;
+                        preset.id.setBankHi(Haken::catSSlot);
+                    }
+                    preset.id.setBankLo((pn & 0xff00) >> 7);
+                    preset.id.setNumber(pn & 0xff);
+                }
                 in_preset = false;
                 ready = true;
                 notifyPresetChanged();
