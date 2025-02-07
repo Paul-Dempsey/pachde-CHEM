@@ -6,14 +6,20 @@ void ChemModule::dataFromJson(json_t* root)
     if (j) {
         theme_name = json_string_value(j);
     }
+    j = json_object_get(root, "follow-rack-theme");
+    if (j) {
+        follow_rack = json_boolean_value(j);
+    }
+    if (follow_rack) {
 
+    }
 }
 
 json_t* ChemModule::dataToJson()
 {
     json_t* root = json_object();
-    json_object_set_new(root, "theme", json_stringn(theme_name.c_str(), theme_name.size()));
-
+    json_object_set_new(root, "theme", json_string(theme_name.c_str()));
+    json_object_set_new(root, "follow-rack-theme", json_boolean(follow_rack));
     return root;
 }
 
@@ -43,6 +49,15 @@ void ChemModuleWidget::step()
 {
     ModuleWidget::step();
     setPartnerPanelBorder<ChemModuleWidget>(this);
+    if (module) {
+        auto chem = getChemModule();
+        if (chem->follow_rack) {
+            auto needed = ::rack::settings::preferDarkPanels ? "Dark" : "Light";
+            if (needed != chem->theme_name) {
+                setThemeName(needed);
+            }
+        }
+    }
 }
 
 // Debug layout
@@ -82,10 +97,17 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     if (!module) return;
     if (!initThemeEngine()) return;
     if (!theme_engine.isLoaded()) return;
-
+    bool follow = module ? getChemModule()->follow_rack : true;
     menu->addChild(new MenuSeparator); 
-    AppendThemeMenu(menu, this, theme_engine);
-    menu->addChild(new MenuSeparator); 
+    menu->addChild(createCheckMenuItem("Follow Rack Dark/Light preference", "",
+        [=](){ return follow; },
+        [=](){
+            auto chem = getChemModule();
+            chem->follow_rack = !follow;
+            this->setThemeName(getThemeName());
+        }));
+    AppendThemeMenu(menu, this, theme_engine, follow);
+    menu->addChild(new MenuSeparator);
     menu->addChild(createMenuItem("Reload themes", "", [this]() {
         reloadThemes();
         this->setThemeName(getThemeName());
@@ -99,7 +121,6 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
         "Layout help", "",
         [this]() { return hints; },
         [this]() { hints = !hints; }));
-
 }
 
 // ---------------------------------------------------------------------------

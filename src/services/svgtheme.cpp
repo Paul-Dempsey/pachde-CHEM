@@ -726,21 +726,18 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
     return modified;
 }
 
-void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes)
+void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable)
 {
     auto theme_names = themes.getThemeNames();
     if (theme_names.empty()) return; // no themes
 
-    std::vector<rack::ui::MenuItem*> menus;
     for (auto theme : theme_names) {
-        menus.push_back(createCheckMenuItem(
+        menu->addChild(createCheckMenuItem(
             theme, "", [=]() { return 0 == theme.compare(holder->getThemeName()); },
-            [=]() { holder->setThemeName(theme); }
+            [=]() { holder->setThemeName(theme); },
+            disable
         ));
     }
-    for (auto child: menus) {
-        menu->addChild(child);
-    }    
 }
 
 }
