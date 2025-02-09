@@ -11,12 +11,14 @@ struct Hamburger : TipWidget, IApplyTheme
 {
     using base = TipWidget;
     uint8_t patties;
+    float patty_width;
     NVGcolor patty_color;
     NVGcolor hover_color;
     bool hovered;
 
     Hamburger()
     :   patties(3),
+        patty_width(1.5f),
         patty_color(RampGray(G_90)),
         hover_color(RampGray(G_65)),
         hovered(false)
@@ -59,8 +61,15 @@ struct Hamburger : TipWidget, IApplyTheme
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        patty_color = fromPackedOrDefault(theme->getFillColor("patty", true), RampGray(G_50));
-        hover_color = fromPackedOrDefault(theme->getFillColor("patty-hover", true), RampGray(G_40));
+        auto style = theme->getStyle("patty");
+        if (style) {
+            patty_width = style->isApplyStrokeWidth() ? style->stroke_width : 1.5f;
+            patty_color = fromPackedOrDefault(style->strokeWithOpacity(), RampGray(G_50));
+        } else {
+            patty_width = 1.5f;
+            patty_color = RampGray(G_50);
+        }
+        hover_color = fromPackedOrDefault(theme->getStrokeColor("patty-hover", true), RampGray(G_40));
         return true;
     }
 
@@ -76,10 +85,9 @@ struct Hamburger : TipWidget, IApplyTheme
             OpenCircle(vg, half_x, half_y, half_x-1.f, hover_color, .75f);
         }
         float y = 3.5f;
-        const float step = 2.5f;
-        const float line_width = 1.5f;
+        float step = std::max(2.5f, patty_width + 1);
         for (auto n = 0; n < patties; ++n) {
-            Line(vg, 2.f, y, box.size.x - 2.f, y, patty_color, line_width); y += step;
+            Line(vg, 2.f, y, box.size.x - 2.f, y, patty_color, patty_width); y += step;
         }
     }
 };

@@ -19,8 +19,8 @@ void HakenMidi::select_preset(PresetId id)
     assert(id.valid());
     //send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42)); tick_tock = !tick_tock;
     //send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
-    send_message(MakeCC(Haken::ch16, Haken::ccBankH, id.bankHi()));
-    send_message(MakeCC(Haken::ch16, Haken::ccBankL, id.bankLo()));
+    send_message(MakeCC(Haken::ch16, Haken::ccBankH, id.bank_hi()));
+    send_message(MakeCC(Haken::ch16, Haken::ccBankL, id.bank_lo()));
     send_message(MakeProgramChange(Haken::ch16, id.number()));
 }
 

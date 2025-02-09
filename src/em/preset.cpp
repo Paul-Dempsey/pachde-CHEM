@@ -6,8 +6,8 @@ namespace pachde {
 json_t* PresetDescription::toJson()
 {
     json_t* root = json_object();
-    json_object_set_new(root, "hi", json_integer(id.bankHi()));
-    json_object_set_new(root, "lo", json_integer(id.bankLo()));
+    json_object_set_new(root, "hi", json_integer(id.bank_hi()));
+    json_object_set_new(root, "lo", json_integer(id.bank_lo()));
     json_object_set_new(root, "num", json_integer(id.number()));
     json_object_set_new(root, "name", json_stringn(name.c_str(), name.size()));
     if (text.size()) {
@@ -44,7 +44,7 @@ void PresetDescription::fromJson(const json_t* root)
 
 std::string PresetDescription::summary() const
 {
-    return format_string("[%d.%d.%d] %s", id.bankHi(), id.bankLo(), id.number(), name.c_str());
+    return format_string("[%d.%d.%d] %s", id.bank_hi(), id.bank_lo(), id.number(), name.c_str());
 }
 
 }

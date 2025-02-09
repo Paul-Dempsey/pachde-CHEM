@@ -51,6 +51,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createStaticTextLabel<TipLabel>(
         Vec(box.size.x *.5f, 145.f), box.size.x, "[preset]", theme_engine, theme, style));
+    preset_label->glowing(true);
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(box.size.x - RACK_GRID_WIDTH * 1.5f, 30, "LED"));
@@ -339,17 +340,17 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
 
 void CoreModuleWidget::onLED(uint8_t led)
 {
-    blip->setBrightness(1.f); 
+    blip->set_brightness(1.f); 
     switch (led) {
-    case Haken::ledOff:         blip->setLight(no_light); blip->setBrightness(0.f); break;
-    case Haken::ledBlue:        blip->setLight(blue_light); break;
-    case Haken::ledRed:         blip->setLight(red_light); break;
-    case Haken::ledBrightGreen: blip->setLight(bright_green_light); break;
-    case Haken::ledGreen:       blip->setLight(green_light); break;
-    case Haken::ledWhite:       blip->setLight(white_light); break;
-    case Haken::ledYellow:      blip->setLight(yellow_light); break;
-    case Haken::ledPurple:      blip->setLight(purple_light); break;
-    case Haken::ledBlueGreen:   blip->setLight(blue_green_light); break;
+    case Haken::ledOff:         blip->set_light_color(no_light); blip->set_brightness(0.f); break;
+    case Haken::ledBlue:        blip->set_light_color(blue_light); break;
+    case Haken::ledRed:         blip->set_light_color(red_light); break;
+    case Haken::ledBrightGreen: blip->set_light_color(bright_green_light); break;
+    case Haken::ledGreen:       blip->set_light_color(green_light); break;
+    case Haken::ledWhite:       blip->set_light_color(white_light); break;
+    case Haken::ledYellow:      blip->set_light_color(yellow_light); break;
+    case Haken::ledPurple:      blip->set_light_color(purple_light); break;
+    case Haken::ledBlueGreen:   blip->set_light_color(blue_green_light); break;
     }
 }
 

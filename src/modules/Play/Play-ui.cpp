@@ -7,6 +7,8 @@ using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
 
+// -- Play Menu ---------------------------------
+
 struct PlayMenu : Hamburger
 {
     using Base = Hamburger;
@@ -80,7 +82,8 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(createMenuItem("Select none", "Esc",  [this](){ ui->select_none(); }, no_selection));
 }
 
-// ----------------------------------------------
+// -- Play UI -----------------------------------
+
 constexpr const float ONEU = 15.f;
 constexpr const float HALFU = 7.5f;
 constexpr const float RIGHT_MARGIN_CENTER = 186.f;
@@ -94,6 +97,13 @@ bool PlayUi::connected() {
     if (!my_module) return false;
     if (!chem_host) return false;
     return true;
+}
+
+PlayUi::~PlayUi()
+{
+    if (modified && module && !my_module->playlist_file.empty()) {
+        save_playlist();
+    }
 }
 
 PlayUi::PlayUi(PlayModule *module) :
@@ -110,7 +120,9 @@ PlayUi::PlayUi(PlayModule *module) :
     float y = PRESETS_TOP;
     for (int i = 0; i < 15; ++i) {
         auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme_engine, theme);
-        pw->get_label().text(format_string("[preset %d]", i));
+        if (!module) {
+            pw->set_text(format_string("[preset #%d]", 1 + i));
+        }
         preset_widgets.push_back(pw);
         addChild(pw);
         y += 21;
@@ -123,10 +135,18 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(warning_label = createStaticTextLabel<TipLabel>(
         Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, warn));
     warning_label->describe("[warning/status]");
+    warning_label->glowing(true);
 
     style.height = 16.f;
     addChild(playlist_label = createStaticTextLabel<TipLabel>(
-        Vec(ONEU, 3.5), 148.f, "[playlist file]", theme_engine, theme, style));
+        Vec(ONEU, 3.5), 148.f, "My Favorites", theme_engine, theme, style));
+    playlist_label->glowing(true);
+
+    addChild(blip = createBlipCentered(7.5f, 13.f, "Playlist unsaved when lit"));
+    blip->set_radius(2.5f);
+    blip->set_rim_color(nvgTransRGBAf(RampGray(G_65), .4f));
+    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    blip->set_brightness(0.f);
 
     style.height = 9.f;
     style.align = TextAlignment::Center;
@@ -135,7 +155,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), theme_engine, theme, "Add to playlist");
     heart->setHandler([this](bool c, bool s){ 
-        add_current();
+        add_live();
     });
     addChild(heart);
 
@@ -143,7 +163,8 @@ PlayUi::PlayUi(PlayModule *module) :
     style.height = 14.f;
     style.bold = true;
     addChild(live_preset_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(87, 340.f), 150.f, "[preset]", theme_engine, theme, style));
+        Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
+    live_preset_label->glowing(true);
 
     play_menu = createThemedWidget<PlayMenu>(Vec(150.f, HALFU), theme_engine, theme);
     play_menu->setUi(this);
@@ -168,13 +189,13 @@ PlayUi::PlayUi(PlayModule *module) :
 
     auto prev = createWidgetCentered<PrevButton>(Vec(RIGHT_MARGIN_CENTER - 9.5f, 98.f));
     prev->describe("Select previous preset");
-    prev->setHandler([this](bool c, bool s){});
+    prev->setHandler([this](bool c, bool s){ prev_preset(); });
     prev->applyTheme(theme_engine, theme);
     addChild(prev);
 
     auto next = createWidgetCentered<NextButton>(Vec(RIGHT_MARGIN_CENTER + 9.f, 98.f));
     next->describe("Select next preset");
-    next->setHandler([this](bool c, bool s){});
+    next->setHandler([this](bool c, bool s){ next_preset(); });
     next->applyTheme(theme_engine, theme);
     addChild(next);
 
@@ -201,6 +222,32 @@ PlayUi::PlayUi(PlayModule *module) :
         }
     } else {
         update_up_down();
+    }
+    set_modified(false);
+}
+
+void PlayUi::setThemeName(const std::string& name)
+{
+    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    Base::setThemeName(name);
+}
+
+void PlayUi::set_track_live(bool track)
+{
+    if (!module) return;
+    if (track == my_module->track_live) return;
+    my_module->track_live = track;
+    if (live_preset) {
+        scroll_to_live();
+        auto wit = std::find_if(preset_widgets.begin(), preset_widgets.end(), [](PresetWidget* pw) {
+            return pw->is_live();            
+        });
+        if (wit != preset_widgets.end()) {
+            widgets_clear_current();
+            current_index = (*wit)->get_index();
+            current_preset = presets[current_index];
+            (*wit)->set_current(true);
+        }
     }
 }
 
@@ -233,7 +280,7 @@ void PlayUi::presets_from_json(json_t * root)
     }
 }
 
-void PlayUi::add_current()
+void PlayUi::add_live()
 {
     if (!live_preset) return;
     auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<pachde::PresetDescription> p){
@@ -241,6 +288,7 @@ void PlayUi::add_current()
     });
     if (it == presets.cend()) {
         presets.push_back(live_preset);
+        set_modified(true);
         page_down(true, false, true);
     } else {
         auto cit = std::find_if(preset_widgets.cbegin(), preset_widgets.cend(), [this](PresetWidget* pw) {
@@ -252,23 +300,68 @@ void PlayUi::add_current()
     }
 }
 
+void PlayUi::select_preset(PresetId id)
+{
+    if (!id.valid()) return;
+
+    auto haken = chem_host->host_haken();
+    if (haken) {
+        haken->log->logMessage("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
+        haken->select_preset(id);
+    }
+}
+
+void PlayUi::sync_to_current_index()
+{
+    current_preset = presets[current_index];
+    auto wit = std::find_if(preset_widgets.begin(), preset_widgets.end(), [this](PresetWidget* pw){
+        return pw->get_index() == current_index;
+    });
+    if (wit != preset_widgets.end()) {
+        onChoosePreset(*wit); 
+        return;
+    }
+    make_visible(current_index);
+    select_preset(current_preset->id);
+
+}
+
+void PlayUi::widgets_clear_current()
+{
+    for(auto wit = preset_widgets.begin(); wit != preset_widgets.end(); wit++) {
+        (*wit)->set_current(false);
+    }
+}
+
+void PlayUi::prev_preset()
+{
+    if (--current_index < 0) {
+        current_index = preset_count() - 1;
+    }
+    sync_to_current_index();
+}
+
+void PlayUi::next_preset()
+{
+    if (++current_index >= preset_count()) current_index = 0;
+    sync_to_current_index();
+}
+
 void PlayUi::sync_to_presets()
 {
     scroll_top = 0;
     clear_selected();
+    auto live_id = get_live_id();
     auto pit = presets.cbegin();
-    uint32_t live_key = live_preset ? live_preset->id.key() : PresetId::InvalidKey;
     size_t index = 0;
     for (auto pw : preset_widgets) {
         pw->clear_states();
         if (pit != presets.cend()) {
             auto preset = *pit++;
-            pw->set_preset(index++, preset);
-            if (live_key != PresetId::InvalidKey) {
-                pw->set_live(live_key == preset->id.key());
-            }
+            pw->set_preset(index, preset == current_preset, preset->id == live_id, preset);
+            ++index;
         } else {
-            pw->set_preset(-1, nullptr);
+            pw->clear_preset();
         }
     }
     update_up_down();
@@ -294,6 +387,7 @@ bool PlayUi::load_playlist(std::string path, bool set_folder)
 	DEFER({json_decref(root);});
     presets_from_json(root);
 
+    set_modified(false);
     if (set_folder) {
         my_module->playlist_folder = system::getDirectory(path);
     }
@@ -307,18 +401,8 @@ bool PlayUi::load_playlist(std::string path, bool set_folder)
         tip.append("\n- for ");
         tip.append(playlist_device);
         playlist_label->describe(tip);
-
-        if (chem_host) {
-            auto em = chem_host->host_matrix();
-            if (em) {
-                const char * current_device = HardwarePresetClass(em->hardware);
-                if (0 != strcmp(current_device, playlist_device.c_str())) {
-                    warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
-                }
-            }
-        }
-    
     }
+    check_playlist_device();
     return true;
 }
 
@@ -326,6 +410,9 @@ void PlayUi::open_playlist()
 {
     if (!my_module) return;
     std::string path;
+    if (modified && module && !my_module->playlist_file.empty()) {
+        save_playlist();
+    }
     bool ok = openFileDialog(my_module->playlist_folder, "Playlists (.json):json;Any (*):*", playlist_name, path);
     if (ok) {
         load_playlist(path, true);
@@ -333,12 +420,14 @@ void PlayUi::open_playlist()
         playlist_name = "";
         playlist_device = "";
         my_module->playlist_file = "";
+        set_modified(false);
     }
 }
 
 void PlayUi::close_playlist()
 {
     clear_playlist(true);
+    set_modified(false);
 }
 
 void PlayUi::save_playlist()
@@ -377,6 +466,7 @@ void PlayUi::save_playlist()
 	system::remove(my_module->playlist_file);
     system::sleep(0.0005);
 	system::rename(tmpPath, my_module->playlist_file);
+    set_modified(false);
 }
 
 void PlayUi::save_as_playlist()
@@ -411,6 +501,7 @@ void PlayUi::save_as_playlist()
 
         save_playlist();
         my_module->update_mru(path);
+        set_modified(false);
     }    
 }
 
@@ -419,7 +510,7 @@ void PlayUi::clear_playlist(bool forget_file)
     warning_label->text("");
     if (!my_module) return;
     for (auto pw : preset_widgets) {
-        pw->set_preset(-1, nullptr);
+        pw->clear_preset();
     }
     if (forget_file) {
         my_module->playlist_file = "";
@@ -427,10 +518,12 @@ void PlayUi::clear_playlist(bool forget_file)
         playlist_label->text("");
         playlist_label->describe("");
         playlist_device = "";
+        set_modified(false);
     }
     presets.clear();
     clear_selected();
     sync_to_presets();
+    set_modified(true);
 }
 
 void PlayUi::select_none()
@@ -463,14 +556,12 @@ bool PlayUi::is_visible(ssize_t index)
 void PlayUi::update_live()
 {
     if (live_preset) {
-        auto live_key = live_preset->id.key();
         for (auto pw : preset_widgets) {
-            if (!pw->get_preset_id().valid()) break;
-            pw->set_live(pw->get_preset_id() == live_key);
+            if (pw->empty()) break;
+            pw->set_live(pw->get_preset_id() == live_preset->id);
         }
     } else {
         for (auto pw : preset_widgets) {
-            if (!pw->get_preset_id().valid()) break;
             pw->set_live(false);
         }
     }
@@ -481,13 +572,13 @@ void PlayUi::update_up_down()
     bool up{false}, down{false};
     if (presets.size() > PLAYLIST_LENGTH) {
         up = scroll_top > 0;
-        down = scroll_top < static_cast<ssize_t>(presets.size()) - PLAYLIST_LENGTH;
+        down = scroll_top < preset_count() - PLAYLIST_LENGTH;
     }
     up_button->enable(up);
     down_button->enable(down);
 
     int page  = 1 + (scroll_top / PLAYLIST_LENGTH);
-    int total = 1 + (presets.size() / PLAYLIST_LENGTH);
+    int total = 1 + (preset_count() / PLAYLIST_LENGTH);
     page_label->text(format_string("%d of %d", page, total));
 }
 
@@ -502,7 +593,7 @@ void PlayUi::page_up(bool ctrl, bool shift, bool refresh)
 
 void PlayUi::page_down(bool ctrl, bool shift, bool refresh)
 {
-    ssize_t last_page = presets.size() / PLAYLIST_LENGTH;
+    ssize_t last_page = preset_count() / PLAYLIST_LENGTH;
 
     if (ctrl) {
         scroll_to(last_page, refresh);
@@ -517,22 +608,22 @@ void PlayUi::scroll_to(ssize_t pos, bool refresh)
     // if (pos < 0) {
     //     pos = 0;
     //     refresh = true;
-    // } else if (pos > static_cast<ssize_t>(presets.size()) - PLAYLIST_LENGTH) {
-    //     pos = presets.size() - PLAYLIST_LENGTH;
+    // } else if (pos > preset_count() - PLAYLIST_LENGTH) {
+    //     pos = preset_count() - PLAYLIST_LENGTH;
     //     refresh = true;
     // }
     assert(pos >= SSIZE_0);
 
     if (scroll_top != pos || refresh) {
         scroll_top = pos;
-        auto live_key = live_preset ? live_preset->id.key() : PresetId::InvalidKey;
+        auto live_id = get_live_id();
         auto sit = get_selected_indices().cbegin();
 
         auto pit = presets.cbegin() + pos;
         for (auto pw : preset_widgets) {
             pw->clear_states();
             if (pit != presets.cend()) {
-                pw->set_preset(pos, *pit);
+                pw->set_preset(pos, current_preset == *pit, live_id == (*pit)->id, *pit);
 
                 if (sit != selected.cend()) {
                     bool is_selected = (pos == *sit);
@@ -542,14 +633,10 @@ void PlayUi::scroll_to(ssize_t pos, bool refresh)
                     pw->set_selected(false);
                 }
 
-                if (live_key != PresetId::InvalidKey) {
-                    pw->set_live(live_key == pit->get()->id.key());
-                }
-
                 ++pos;
                 pit++;
             } else {
-                pw->set_preset(-1, nullptr);
+                pw->clear_preset();
             }
         }
     }
@@ -564,10 +651,9 @@ void PlayUi::make_visible(ssize_t index)
 void PlayUi::scroll_to_live()
 {
     if (!live_preset) return;
-    auto live_key = live_preset->id.key();
     int index = 0;
     for (auto p : presets) {
-        if (live_key == p->id.key()) {
+        if (live_preset->id == p->id) {
             make_visible(index);
             break;
         }
@@ -620,12 +706,13 @@ void PlayUi::clone()
     for (auto item : extracted) {
         presets.push_back(item);
     }
-    auto index = static_cast<int>(presets.size()-1);
+    auto index = preset_count()-1;
     for (size_t i = 0; i < count; ++i) {
         selected.push_back(index--);
     }
     std::sort(selected.begin(), selected.end());
     page_down(true, false, true);
+    set_modified(true);
 }
 
 void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetDescription>>& items)
@@ -645,6 +732,7 @@ void PlayUi::remove_selected()
     remove_items(list, presets);
     clear_selected();
     make_visible(new_top);
+    set_modified(true);
 }
 
 void PlayUi::to_first()
@@ -664,6 +752,7 @@ void PlayUi::to_first()
     }
     std::sort(selected.begin(), selected.end());
     page_up(true, false, true);
+    set_modified(true);
 }
 
 void PlayUi::to_last()
@@ -678,19 +767,20 @@ void PlayUi::to_last()
     {
         presets.push_back(*it);
     }
-    auto index = static_cast<int>(presets.size()-1);
+    auto index = preset_count() - 1;
     for (size_t i = 0; i < count; ++i) {
         selected.push_back(index--);
     }
     std::sort(selected.begin(), selected.end());
     page_down(true, false, true);
+    set_modified(true);
 }
 
 void PlayUi::to_n(int dx)
 {
     if (selected.empty() || 0 == dx) return;
     if ((first_selected() + dx) < 0) return;
-    if ((last_selected() + dx) > static_cast<int>(presets.size())-1) return;
+    if ((last_selected() + dx) > (preset_count()-1)) return;
 
     // extract the ones we're going to reorder
     auto extracted = extract(selected);
@@ -726,6 +816,7 @@ void PlayUi::to_n(int dx)
     assert(xit == extracted.cend());
     int first = dx < 0 ? first_selected() : last_selected();
     scroll_to((first / PLAYLIST_LENGTH) * PLAYLIST_LENGTH, true);
+    set_modified(true);
 }
 
 void PlayUi::to_up()
@@ -752,12 +843,36 @@ void PlayUi::onPresetChange()
     } else {
         live_preset_label->text("");
     }
-    auto live_key = live_preset ? live_preset->id.key() : PresetId::InvalidKey;
+
+    auto live_id = get_live_id();
     for (auto pw : preset_widgets) {
-        pw->set_live((live_key != PresetId::InvalidKey) 
-            && (live_key == pw->get_preset_id().key()));
+        if (pw->empty()) break;
+        pw->set_live(live_id.valid() && (live_id == pw->get_preset_id()));
+        if (pw->is_live() && my_module->track_live) {
+            current_index = pw->get_index();
+            current_preset = presets[current_index];
+        }
     }
     scroll_to_live();
+}
+
+void PlayUi::check_playlist_device()
+{
+    if (!connected() || playlist_device.empty()) {
+        warning_label->text("");
+        return;
+    }
+    if (chem_host) {
+        auto em = chem_host->host_matrix();
+        if (em && em->hardware != 0) {
+            const char * current_device = HardwarePresetClass(em->hardware);
+            if (0 != strcmp(current_device, playlist_device.c_str())) {
+                warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
+            } else {
+                warning_label->text("");
+            }
+        }
+    }
 }
 
 void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -765,20 +880,7 @@ void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
     if (device != ChemDevice::Haken) return;
     haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
     haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
-    if (!playlist_device.empty()) {
-        if (chem_host) {
-            auto em = chem_host->host_matrix();
-            if (em) {
-                const char * current_device = HardwarePresetClass(em->hardware);
-                if (0 != strcmp(current_device, playlist_device.c_str())) {
-                    warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
-                } else {
-                    warning_label->text("");
-                }
-            }
-        }
-    }
-
+    check_playlist_device();
 }
 
 
@@ -808,6 +910,22 @@ void PlayUi::onDelete(PresetWidget* source)
 
     remove_selected();
     make_visible(--index);
+    set_modified(true);
+}
+
+void PlayUi::onSetCurrrent(int index)
+{
+    current_index = index;
+    if (-1 == index) {
+        current_preset = nullptr;
+        widgets_clear_current();
+    } else {
+        current_preset = presets[index];
+        for (auto pw : preset_widgets) {
+            if (pw->empty()) break;
+            pw->set_current(pw->get_index() == index);
+        }
+    }
 }
 
 void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e)
@@ -825,14 +943,15 @@ void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e)
 void PlayUi::onChoosePreset(PresetWidget* source)
 {
     if (!connected()) return;
+    auto id = source->get_preset_id();
+    assert(id.valid());
+    current_index = source->get_index();
+    current_preset = presets[current_index];
 
     auto haken = chem_host->host_haken();
     if (haken) {
-        auto id = source->get_preset_id();
-        if (id.valid()) {
-            haken->log->logMessage("play", format_string("Selecting %s", presets[source->get_index()]->summary().c_str()));
-            haken->select_preset(id);
-        }
+        haken->log->logMessage("play", format_string("Selecting %s", current_preset->summary().c_str()));
+        haken->select_preset(id);
     }
 }
 
@@ -858,12 +977,12 @@ void PlayUi::onDropPreset(PresetWidget* target)
     } else if (0 == target_index) {
         to_first();
     } else {
-        if (target->get_selected()) {
+        if (target->is_selected()) {
             bool next_free = false;
             for (auto pw : preset_widgets) {
                 if (next_free) {
-                    if (pw->get_preset_id().valid()) {
-                        if (!pw->get_selected()) {
+                    if (!pw->empty()) {
+                        if (!pw->is_selected()) {
                             target_index = pw->get_index();
                             break;
                         }
@@ -885,7 +1004,7 @@ void PlayUi::onDropPreset(PresetWidget* target)
         // extract the ones we're going to reorder
         auto extracted = extract(selected);
         remove_items(selected, presets);
-        selected.clear();
+        //selected.clear();
 
         std::vector<std::shared_ptr<PresetDescription>> new_presets;
         new_presets.reserve(presets.size());
@@ -898,7 +1017,7 @@ void PlayUi::onDropPreset(PresetWidget* target)
         for (auto p : new_presets) {
             if (index == target_index) {
                 for (auto p : extracted) {
-                    selected.push_back(index);
+                    //selected.push_back(index);
                     presets.push_back(p);
                     index++;
                 }
@@ -908,6 +1027,8 @@ void PlayUi::onDropPreset(PresetWidget* target)
         }
         make_visible(target_index);
     }
+    selected.clear();
+    set_modified(true);
 }
 
 void PlayUi::onHoverKey(const HoverKeyEvent& e)
@@ -948,6 +1069,7 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
 // void PlayUi::step()
 // {
 //     Base::step();
+    
 // }
 
 void PlayUi::draw(const DrawArgs& args)
@@ -958,7 +1080,13 @@ void PlayUi::draw(const DrawArgs& args)
     }
 }
 
-// void PlayUi::appendContextMenu(Menu *menu)
-// {
-//     Base::appendContextMenu(menu);
-// }
+void PlayUi::appendContextMenu(Menu *menu)
+{
+    if (!module) return;
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createCheckMenuItem("Track live preset", "", 
+        [this](){ return my_module->track_live; },
+        [this](){ set_track_live(!my_module->track_live); }
+    ));
+    Base::appendContextMenu(menu);
+}

@@ -51,16 +51,20 @@
 
             "tab-label":       { "fill": "#edc774" },
             "tab-label-hi":    { "fill": "#feeabe" },
-            "preset":          { "fill": "#deb55c" },
-            "preset-selected": { "fill": "#b39556" },
-            "preset-seltext":  { "fill": "#3c2b07" },
-            "preset-grip":     { "fill": "#dfcf51" },
-            "preset-drag" :    { "fill": "#dfcf51" },
-            "preset-dragcur" : { "fill": "#dfcf51", "opacity": 0.4 },
-            "grid-bg":         { "fill": "#62512c" },
-            "grid-line":       { "stroke": "#8a7342" },
-            "grid-new":        { "fill": "#464060" },
-            "cur-dot":         { "fill": "#464060" },
+
+            "preset":          { "fill": " #deb55c" },
+            "preset-live":     { "fill": " #464060" },
+            "preset-current":  { "fill": " #250b91" },
+            "preset-livetext": { "fill": " #8c72f5" },
+            "preset-selected": { "fill": " #8b733b" },
+            "preset-seltext":  { "fill": " #251a01" },
+            "preset-grip":     { "fill": " #dfcf51" },
+            "preset-drag" :    { "fill": " #dfcf51" },
+            "preset-dragcur" : { "fill": " #dfcf51", "opacity": 0.4 },
+
+            "grid-bg":         { "fill": " #62512c" },
+            "grid-line":       { "stroke": " #8a7342" },
+            "grid-new":        { "fill": " #464060" },
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
@@ -97,8 +101,8 @@
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#a39066" }, { "index":1, "offset":1, "color": "#78643a" } ] } },
             "screw-slot":  { "fill": "#675633" },
 
-            "patty": { "fill": "#edc774" },
-            "patty-hover": { "fill": "#63c663" },
+            "patty": { "stroke": "#edc774" },
+            "patty-hover": { "stroke": "#63c663" },
 
             "tsk-0":     { "fill":"#3e3e3e" },
             "tsk-nsch":  { "fill":"#b4b2b2" },

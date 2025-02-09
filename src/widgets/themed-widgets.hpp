@@ -259,15 +259,95 @@ using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
 
-struct ThemeKnob : rack::RoundKnob, IApplyTheme
+struct GlowKnob : rack::RoundKnob {
+    bool bright{false};
+    GlowKnob() {
+        box.size.x = 32.f;
+        box.size.y = 32.f;
+        this->shadow->hide();
+    }
+    void glowing(bool glow) { bright = glow; }
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1) return;
+        if (rack::settings::rackBrightness > .95f) return;
+        if (bright) fb->draw(args);
+    }
+};
+
+template<typename TSvg>
+struct TKnob : GlowKnob, IApplyTheme
 {
+    using Base = GlowKnob;
+    bool wire{false};
+
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        this->bg->setSvg(engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/Knob-bg.svg"), theme));
-        setSvg(engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/Knob.svg"), theme));
+        wire = (theme->name == "Wire");
+        bg->setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::bg()), theme));
+        setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::knob()), theme));
         return true;
     }
+
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1) return;
+        if (rack::settings::rackBrightness > .95f) return;
+        bool base_bright = bright;
+        if (wire) {
+            bright = true;
+        }
+        Base::drawLayer(args, layer);
+        if (wire) {
+            bright = base_bright;
+        }
+    }
 };
+
+struct GrayKnobSvg {
+    static std::string bg() { return "res/widgets/knob-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob.svg"; }
+};
+struct RedKnobSvg {
+    static std::string bg() { return "res/widgets/knob-red-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob-red.svg"; }
+};
+struct GreenKnobSvg {
+    static std::string bg() { return "res/widgets/knob-green-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob-green.svg"; }
+};
+struct BlueKnobSvg {
+    static std::string bg() { return "res/widgets/knob-blue-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob-blue.svg"; }
+};
+struct YellowKnobSvg {
+    static std::string bg() { return "res/widgets/knob-yellow-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob-yellow.svg"; }
+};
+struct VioletKnobSvg {
+    static std::string bg() { return "res/widgets/knob-violet-bg.svg"; }
+    static std::string knob() { return "res/widgets/knob-violet.svg"; }
+};
+
+using BasicKnob = TKnob<GrayKnobSvg>;
+
+using GrayKnob = TKnob<GrayKnobSvg>;
+using BlueKnob = TKnob<BlueKnobSvg>;
+using RedKnob = TKnob<RedKnobSvg>;
+using GreenKnob = TKnob<GreenKnobSvg>;
+using YellowKnob = TKnob<YellowKnobSvg>;
+using VioletKnob = TKnob<VioletKnobSvg>;
+
+template <typename TKnob>
+TKnob* createChemKnob(Vec pos, Module * module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+{
+	auto o = createParam<TKnob>(pos, module, paramId);
+    o->applyTheme(engine, theme);
+	o->box.pos = o->box.pos.minus(o->box.size.div(2));
+    return o;
+}
+
+
 
 }

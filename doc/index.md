@@ -1,6 +1,8 @@
+![](./image/repo-banner.svg)
+
 # pachde CHEM
 
-**CHEM** (Controller for Haken Eagan Matrix) is the successor to pachde HC One.
+**CHEM** is the successor to pachde HC One.
 
 ---
 

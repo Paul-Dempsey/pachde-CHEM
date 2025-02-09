@@ -57,7 +57,6 @@ struct MidiPicker : TipWidget, IApplyTheme
         auto broker = MidiDeviceBroker::get();
         broker->sync();
 
-
         menu->addChild(createMenuLabel( is_em ? "Eagan Matrix device" : "MIDI controller"));
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Reset (none)", "", [=](){

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="32" height="32" viewBox="0 0 32 32" version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-face" 
+      x1="13" y1="1.5" x2="17" y2="33" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#bfbfbf" stop-opacity="1" offset="0" />
+      <stop stop-color="#202020" stop-opacity="1" offset="1" />
+    </linearGradient>
+  </defs>
+  <circle id="kg-rim"       opacity="1" cx="16" cy="16" r="15" fill="none" stroke="#737373" stroke-width="2" />
+  <circle id="kg-wire"      opacity="0" cx="16" cy="16" r="15.6" fill="none" stroke="#41bf73" stroke-width=".5" />
+  <path   id="kg-gnomeno"   opacity="0" fill="none" stroke="#ebebe0" stroke-width=".25" d="m 15.142877,2 v 13.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 2 Z" />
+  <path   id="kg-taper"     opacity="1" fill="#ebebe0" d="m 14.855469,.0524375 c 0,0 0.286732,-0.05229 1.14455,-0.052437 0.857819,-1.4744e-4 1.164043,0.052437 1.164043,0.052437 l -0.344751,2.1706802 -0.811499,-0.015305 -0.825568,0.022273 z" />
+  <path   id="kg-gnomen"    opacity="1" fill="#f5f5ef" d="m 15.142877,2 v 13.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 2 Z" />
+  <circle id="kg-pin"       opacity="1" fill="none" stroke="#202020" stroke-width=".3" cx="16" cy="16" r="1" />
+</svg>

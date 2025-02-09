@@ -4,10 +4,10 @@
   <defs>
     <linearGradient id="g-face" 
       x1="13" y1="1.5" x2="17" y2="33" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#bfbfbf" stop-opacity="1" offset="0" />
-      <stop stop-color="#202020" stop-opacity="1" offset="1" />
+      <stop stop-color="#bf4160" offset="0" />
+      <stop stop-color="#39131d" offset="1" />
     </linearGradient>
   </defs>
-  <circle id="k-flat-face" opacity="0" cx="16" cy="16" r="16" fill="#999999" />
-  <circle id="k-face"      opacity="1" cx="16" cy="16" r="16" fill="url(#g-face)" />
+  <circle id="kr-flat-face" opacity="0" cx="16" cy="16" r="16" fill="#bf4160" />
+  <circle id="kr-face"      opacity="1" cx="16" cy="16" r="16" fill="url(#g-face)" />
 </svg>

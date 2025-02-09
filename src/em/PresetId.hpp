@@ -35,14 +35,14 @@ public:
         id.bytes.number = number;
         id.bytes.pad = 0;
     }
-    void setBankHi(uint8_t hi) { id.bytes.bank_hi = hi; make_valid(); }
-    void setBankLo(uint8_t low) { id.bytes.bank_lo = low; make_valid(); }
-    void setNumber(uint8_t n) { id.bytes.number = n; make_valid(); }
+    void set_bank_hi(uint8_t hi) { id.bytes.bank_hi = hi; make_valid(); }
+    void set_bank_lo(uint8_t low) { id.bytes.bank_lo = low; make_valid(); }
+    void set_number(uint8_t n) { id.bytes.number = n; make_valid(); }
     void clear() { invalidate(); }
     //RawPresetId& raw() { return id; }
     uint32_t key() const { return id.data; }
-    uint8_t bankHi() const { return id.bytes.bank_hi; }
-    uint8_t bankLo() const { return id.bytes.bank_lo; }
+    uint8_t bank_hi() const { return id.bytes.bank_hi; }
+    uint8_t bank_lo() const { return id.bytes.bank_lo; }
     uint8_t number() const { return id.bytes.number; }
 };
 

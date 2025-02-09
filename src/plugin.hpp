@@ -12,8 +12,9 @@ extern Plugin* pluginInstance;
 
 extern Model* modelBlank;
 extern Model* modelCore;
-extern Model* modelPreset;
 extern Model* modelPlay;
+extern Model* modelMacro;
+extern Model* modelPreset;
 
 // Theming
 

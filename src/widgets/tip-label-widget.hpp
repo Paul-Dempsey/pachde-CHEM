@@ -6,7 +6,7 @@ namespace pachde {
 
 struct TipLabel : StaticTextLabel
 {
-    using BaseClass = StaticTextLabel;
+    using Base = StaticTextLabel;
 
     TipHolder* tip_holder;
 
@@ -46,34 +46,34 @@ struct TipLabel : StaticTextLabel
 
     void onHover(const HoverEvent& e) override
     {
-        BaseClass::onHover(e);
+        Base::onHover(e);
         e.consume(this);
     }
 
     void onEnter(const EnterEvent& e) override {
-        BaseClass:: onEnter(e);
+        Base:: onEnter(e);
         createTip();
     }
 
     void onLeave(const LeaveEvent& e) override {
-        BaseClass:: onLeave(e);
+        Base:: onLeave(e);
         destroyTip();
     }
 
     void onDragLeave(const DragLeaveEvent& e) override {
-        BaseClass::onDragLeave(e);
+        Base::onDragLeave(e);
         destroyTip();
     }
 
     void onDragEnd(const DragEndEvent& e) override
     {
-        BaseClass::onDragEnd(e);
+        Base::onDragEnd(e);
         destroyTip();
     }
 
     void onButton(const ButtonEvent& e) override
     {
-        BaseClass::onButton(e);
+        Base::onButton(e);
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
             destroyTip();
             createContextMenu();

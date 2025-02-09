@@ -17,6 +17,7 @@ struct IPresetAction {
     virtual void onClearSelection() = 0;
     virtual void onSetSelection(PresetWidget* source, bool on) = 0;
     virtual void onDelete(PresetWidget* source) = 0;
+    virtual void onSetCurrrent(int index) = 0;
     virtual void onDropFile(const widget::Widget::PathDropEvent& e) = 0;
     virtual void onChoosePreset(PresetWidget* source) = 0;
     virtual PresetWidget* getDropTarget(Vec pos) = 0;
@@ -27,9 +28,12 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
 {
     using Base = OpaqueWidget;
 
-    TipLabel* preset_name;
+    std::string preset_name;
+
     NVGcolor grip_color;
-    NVGcolor dot_color;
+    NVGcolor live_color;
+    NVGcolor current_color;
+    NVGcolor live_text_color;
     NVGcolor selected_color;
     NVGcolor selected_text_color;
     NVGcolor text_color;
@@ -45,6 +49,7 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
     bool button_down;
     bool live;
     bool selected;
+    bool current;
 
     bool wire_style;
 
@@ -56,18 +61,25 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
 
 public:
     PresetWidget();
-    TipLabel& get_label() { return *preset_name; }
-
+    void set_text(const std::string & name) {
+        preset_name = name;
+    }
+    bool empty() {
+        assert(((preset_index >= 0 && preset_id.valid())) || ((-1 == preset_index) && !preset_id.valid()));
+        return !preset_id.valid();
+    }
     void clear_states();
-    bool get_selected() { return selected; }
+    bool is_current() { return current; }
+    void set_current(bool enable) { current = enable; }
+    bool is_selected() { return selected; }
     void set_selected(bool select);
     int get_index() { return preset_index; }
-    bool get_live();
+    bool is_live() { return live; }
     void set_live(bool state) { live = state; }
     PresetId get_preset_id() { return preset_id; }
-
     std::shared_ptr<PresetDescription> get_preset();
-    void set_preset(int index, std::shared_ptr<PresetDescription> preset);
+    void set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetDescription> preset);
+    void clear_preset();
     void set_preset_list(std::deque<std::shared_ptr<PresetDescription>>* presets) {
         preset_list = presets;
     }
@@ -104,6 +116,8 @@ public:
     void onDragEnter(const DragEnterEvent& e) override;
     void onDragLeave(const DragLeaveEvent& e) override;
 
+    void render(const DrawArgs& args, bool pre_base);
+    void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
 };
 

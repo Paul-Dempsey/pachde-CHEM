@@ -51,6 +51,41 @@ std::string GetTag(NSVGshape* shape)
     return id;
 }
 
+inline const char * skip_space(const char * s) {
+    while (' ' == *s) ++s;
+    return s;
+}
+
+std::string strip_space(const std::string &s) {
+    if (std::string::npos == s.find(' ')) return s;
+    std::string r;
+    r.reserve(s.size());
+    for (auto it = s.cbegin(); it != s.cend(); it++) {
+        unsigned char c = *it;
+        if (' ' != c) r.push_back(c);
+    }
+    return r;
+}
+
+std::string& trim_left(std::string& s) {
+    if (' ' != *s.begin()) return s;
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return ' ' != ch;
+    }));
+    return s;
+}
+std::string& trim_right(std::string& s) {
+    if (' ' != *s.rbegin()) return s;
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return ' ' != ch;
+    }).base(), s.end());
+    return s;
+}
+
+inline std::string& trim_space(std::string& s) {
+    return trim_right(trim_left(s));
+}
+
 inline int hex_value(unsigned char ch) {
     if (ch > 'f' || ch < '0') { return -1; }
     if (ch <= '9') { return ch & 0xF; }
@@ -68,7 +103,7 @@ inline PackedColor PackRGBA(unsigned int r, unsigned int g, unsigned int b, unsi
 }
 
 bool isValidHexColor(std::string hex) {
-    if (*hex.begin() != '#') return false;
+    if (*hex.cbegin() != '#') return false;
     switch (hex.size()) {
         case 1 + 3: 
         case 1 + 4:
@@ -289,8 +324,8 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             auto ocolor = json_object_get(item, "color");
             if (ocolor) {
                 if (requireString(ocolor, "color")) {
-                    auto hex = json_string_value(ocolor);
-                    if (!parseColor(hex, "color", &color)) {
+                    auto hex = strip_space(json_string_value(ocolor));
+                    if (!parseColor(hex.c_str(), "color", &color)) {
                         ok = false;
                     }
                 } else {
@@ -331,19 +366,19 @@ bool SvgThemeEngine::parseFill(json_t* root, std::shared_ptr<Style> style)
     if (!ofill) return true;
     if (!requireObjectOrString(ofill, "fill")) return false;
     if (json_is_string(ofill)) {
-        auto value = json_string_value(ofill);
-        if (0 == strcmp(value, "none")) {
+        auto value = strip_space(json_string_value(ofill));
+        if (value == "none") {
             style->fill.setNone();
         } else {
-            if (!parseColor(value, "fill", &color)) return false;
+            if (!parseColor(value.c_str(), "fill", &color)) return false;
             style->fill.setColor(color);
         }
     } else {
         auto ocolor = json_object_get(ofill, "color");
         if (ocolor) {
             if (!requireString(ocolor, "color")) return false;
-            auto hex = json_string_value(ocolor);
-            if (!parseColor(hex, "color", &color)) return false;
+            auto hex = strip_space(json_string_value(ocolor));
+            if (!parseColor(hex.c_str(), "color", &color)) return false;
             style->fill.setColor(color);
         }
         auto ogradient = json_object_get(ofill, "gradient");
@@ -370,11 +405,11 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
         if (!requireObjectOrString(ostroke, "stroke")) return false;
 
         if (json_is_string(ostroke)) {
-            auto value = json_string_value(ostroke);
-            if (0 == strcmp(value, "none")) {
+            auto value = strip_space(json_string_value(ostroke));
+            if (value == "none") {
                 style->stroke.setNone();
             } else {
-            if (!parseColor(value, "stroke", &color)) return false;
+            if (!parseColor(value.c_str(), "stroke", &color)) return false;
                 style->stroke.setColor(color);
             }
         } else {
@@ -387,8 +422,8 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
             auto ocolor = json_object_get(ostroke, "color");
             if (ocolor) {
                 if (!requireString(ocolor, "color")) return false;
-                auto hex = json_string_value(ocolor);
-                if (!parseColor(hex, "color", &color)) return false;
+                auto hex = strip_space(json_string_value(ocolor));
+                if (!parseColor(hex.c_str(), "color", &color)) return false;
                 style->stroke.setColor(color);
             }
 
@@ -443,9 +478,9 @@ bool SvgThemeEngine::parseColors(json_t* root) {
 
     json_object_foreach_safe(root, n, key, j) {
         if (json_is_string(j)) {
-            auto value = json_string_value(j);
+            auto value = strip_space(json_string_value(j));
             if (!requireValidHexColor(value, key)) return false;
-            this->colors.insert(std::make_pair(std::string(key), parseHexColor(value)));
+            this->colors.insert(std::make_pair(std::string(key), parseHexColor(value.c_str())));
         } else {
             logError(ErrorCode::StringExpected, "Expected a named color, e.g. \"Aqua\" : \"#00ffff\",");
         }
@@ -488,14 +523,15 @@ bool SvgThemeEngine::load(const std::string& filename)
                 }
 
                 j = json_object_get(item, "name");
-                const char * name = nullptr;
+                std::string name;
                 if (j && json_is_string(j)) {
                     name = json_string_value(j);
+                    trim_space(name);
                 }
-                if (name && *name) {
+                if (!name.empty()) {
                     j = json_object_get(item, "theme");
                     if (j && json_is_object(j)) {
-                        logInfo(format_string("Parsing theme '%s'", name));
+                        logInfo(format_string("Parsing theme '%s'", name.c_str()));
                         auto theme = std::make_shared<SvgTheme>();
                         theme->name = name;
                         theme->file = filename;

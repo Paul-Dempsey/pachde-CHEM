@@ -7,8 +7,9 @@ void init(Plugin *p)
 	pluginInstance = p;
 	p->addModel(modelBlank);
 	p->addModel(modelCore);
-	p->addModel(modelPreset);
 	p->addModel(modelPlay);
+	p->addModel(modelMacro);
+	p->addModel(modelPreset);
 }
 
 bool isPeerModule(Module* me, Module* candidate)
@@ -19,8 +20,9 @@ bool isPeerModule(Module* me, Module* candidate)
     auto model =  candidate->model;
     return (me->model != model) && (
             (model == modelCore)
-            || (model == modelPreset)
             || (model == modelPlay)
+            || (model == modelMacro)
+            || (model == modelPreset)
             // add new models here
         );
 }

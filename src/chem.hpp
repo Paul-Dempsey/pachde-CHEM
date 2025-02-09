@@ -20,6 +20,7 @@ struct ChemModule : Module, IThemeHolder
         if (follow_rack) {
             return ::rack::settings::preferDarkPanels ? "Dark": "Light";
         }
+        if (theme_name.empty()) return DEFAULT_THEME;
         return theme_name;
     }
 

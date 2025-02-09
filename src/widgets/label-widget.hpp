@@ -6,7 +6,6 @@ using namespace svg_theme;
 
 // $TODO: labels need to be cleaned up:
 // - reduce the number of label types
-// - use a text style struct for alignment, height, bold, color, theme key?
 
 namespace pachde {
 
@@ -51,14 +50,14 @@ struct LabelStyle
 
 struct BasicTextLabel: Widget, IApplyTheme
 {
+    using Base = Widget;
+
     std::string _text;
     NVGcolor _color;
     LabelStyle _style;
+    bool bright;
 
-    BasicTextLabel()
-    :   _color(RampGray(G_90))
-    {
-    }
+    BasicTextLabel();
     std::string getText() { return _text; }
     bool left() { return _style.left(); }
     bool right() { return _style.right(); }
@@ -74,52 +73,22 @@ struct BasicTextLabel: Widget, IApplyTheme
         box.size.y = _style.height;
     }
     void color(const NVGcolor &new_color) { _color = new_color; }
-    void render(const DrawArgs& args)
-    {
-        if (_text.empty()) return;
-
-        auto vg = args.vg;
-        auto font = _style.bold ? GetPluginFontSemiBold() : GetPluginFontRegular();
-        if (!FontOk(font)) return;
-
-        nvgSave(vg);
-        SetTextStyle(vg, font, _color, _style.height);
-        switch (_style.align) {
-        case TextAlignment::Left:
-            nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_LEFT);
-            nvgText(vg, 0.f, 0.f, _text.c_str(), nullptr);
-            break;
-        case TextAlignment::Center:
-            nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_CENTER);
-            nvgText(vg, box.size.x * .5, 0.f, _text.c_str(), nullptr);
-            break;
-        case TextAlignment::Right:
-            nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_RIGHT);
-            nvgText(vg, box.size.x, 0.f, _text.c_str(), nullptr);
-            break;
-        }
-        nvgRestore(vg);
+    void glowing(bool glow) {
+        bright = glow;
     }
 
     // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        _color = fromPacked(theme_engine.getFillColor(theme->name, this->_style.key, true));
-        if (!isColorVisible(_color)) {
-            _color = RampGray(G_85);
-        }
-        return true;
-    }
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
 
-    void draw(const DrawArgs& args) override
-    {
-        Widget::draw(args);
-        render(args);
-    }
+    void render(const DrawArgs& args);
+    void drawLayer(const DrawArgs& args, int layer) override;
+    void draw(const DrawArgs& args) override;
 };
 
 struct StaticTextLabel: Widget, IApplyTheme
 {
+    using Base = Widget;
+
     FramebufferWidget* _fb = nullptr;
     BasicTextLabel* _label = nullptr;
 
@@ -163,13 +132,17 @@ struct StaticTextLabel: Widget, IApplyTheme
         box.size.y = other.height;
         dirty();
     }
+    void glowing(bool glow) {
+        _label->glowing(glow);
+        dirty();
+    }
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
         return _label->applyTheme(theme_engine, theme);
     }
     void draw(const DrawArgs& args) override
     {
-        Widget::draw(args);
+        Base::draw(args);
 #if defined VISIBLE_STATICTEXTLABEL_BOUNDS
         FillRect(args.vg, _fb->box.pos.x, _fb->box.pos.y, _fb->box.size.x, _fb->box.size.y, Overlay(GetStockColor(StockColor::Yellow), .20f));
 #endif

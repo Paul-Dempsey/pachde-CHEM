@@ -98,20 +98,22 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     if (!initThemeEngine()) return;
     if (!theme_engine.isLoaded()) return;
     bool follow = module ? getChemModule()->follow_rack : true;
-    menu->addChild(new MenuSeparator); 
-    menu->addChild(createCheckMenuItem("Follow Rack Dark/Light preference", "",
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createMenuLabel("— themes —"));
+    AppendThemeMenu(menu, this, theme_engine, follow);
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createCheckMenuItem("Follow Rack theme", "",
         [=](){ return follow; },
         [=](){
             auto chem = getChemModule();
             chem->follow_rack = !follow;
             this->setThemeName(getThemeName());
         }));
-    AppendThemeMenu(menu, this, theme_engine, follow);
-    menu->addChild(new MenuSeparator);
     menu->addChild(createMenuItem("Reload themes", "", [this]() {
         reloadThemes();
         this->setThemeName(getThemeName());
     }));
+    menu->addChild(new MenuSeparator);
 
     menu->addChild(createCheckMenuItem(
         "Grid", "",

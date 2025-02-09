@@ -129,11 +129,11 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         if (in_system) {
             value = 127;
         }
-        preset.id.setBankHi(value);
+        preset.id.set_bank_hi(value);
         break;
 
     case Haken::ccBankL: // category
-        preset.id.setBankLo(value);
+        preset.id.set_bank_lo(value);
         break;
 
     case Haken::ccStream: {
@@ -266,18 +266,18 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
 
         case MidiStatus_ProgramChange:
             if (in_preset) {
-                preset.id.setNumber(msg.bytes.data1);
-                if (Haken::catEdBuf == preset.id.bankHi()) {
-                    uint16_t pn = (static_cast<uint16_t>(preset.id.bankLo()) << 7) + preset.id.number();
+                preset.id.set_number(msg.bytes.data1);
+                if (Haken::catEdBuf == preset.id.bank_hi()) {
+                    uint16_t pn = (static_cast<uint16_t>(preset.id.bank_lo()) << 7) + preset.id.number();
                     if (pn < 129) {
-                        preset.id.setBankHi(Haken::catUser);
+                        preset.id.set_bank_hi(Haken::catUser);
                         --pn;
                     } else {
                         pn -= 129;
-                        preset.id.setBankHi(Haken::catSSlot);
+                        preset.id.set_bank_hi(Haken::catSSlot);
                     }
-                    preset.id.setBankLo((pn & 0xff00) >> 7);
-                    preset.id.setNumber(pn & 0xff);
+                    preset.id.set_bank_lo((pn & 0xff00) >> 7);
+                    preset.id.set_number(pn & 0xff);
                 }
                 in_preset = false;
                 ready = true;

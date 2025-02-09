@@ -5,7 +5,8 @@ namespace fs = ghc::filesystem;
 
 PlayModule::PlayModule()
 :   chem_host(nullptr),
-    ui(nullptr)
+    ui(nullptr),
+    track_live(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configInput(IN_PRESET_PREV, "Previous preset trigger");
@@ -29,6 +30,11 @@ void PlayModule::dataFromJson(json_t* root)
         device_claim = json_string_value(j);
     }
 
+    j = json_object_get(root,"track-live");
+    if (j) {
+        track_live = json_boolean_value(j);
+    }
+    
     j = json_object_get(root, "playlist-folder");
     if (j) {
         playlist_folder = json_string_value(j);
@@ -59,6 +65,7 @@ json_t* PlayModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    json_object_set_new(root, "track-live", json_boolean(track_live));
     json_object_set_new(root, "playlist-folder", json_string(playlist_folder.c_str()));
     json_object_set_new(root, "playlist-file", json_string(playlist_file.c_str()));
     
