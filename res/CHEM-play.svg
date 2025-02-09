@@ -4,8 +4,8 @@
    xmlns:svg="http://www.w3.org/2000/svg">
 
    <linearGradient id="panel-gradient" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#1f1f1f" id="stop1" />
-      <stop offset="1" stop-color="#080808" id="stop2" />
+      <stop offset="0" stop-color="#282828" id="stop1" />
+      <stop offset="1" stop-color="#181818" id="stop2" />
    </linearGradient>
 
    <g>

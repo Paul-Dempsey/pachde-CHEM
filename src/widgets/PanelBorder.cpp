@@ -34,8 +34,9 @@ void PartnerPanelBorder::setPartners(bool isLeft, bool isRight)
 
 void PartnerPanelBorder::draw(const DrawArgs& args)
 {
-    // NVGcolor coLink = GetStockColor(StockColor::Coral);
-    // NVGcolor coLink2 = nvgTransRGBAf(coLink, 0.f);
+    // auto coLink = GetStockColor(StockColor::Coral);
+    // auto coLink2 = nvgTransRGBAf(coLink, 0.f);
+    // auto coLink = RampGray(G_50);
     auto vg = args.vg; 
     if (left || right) {
         Line(vg, 0.5f, 0.5f, box.size.x - 1.0f, 0.5f, panel_border_color);
@@ -64,6 +65,13 @@ void PartnerPanelBorder::draw(const DrawArgs& args)
             // y += 1.5f;
             // Line(vg, 0.5f, y, 3.5, y, coLink, 1.f);
 
+            // dotted
+            // float y = 10.f;
+            // while (y < 380.f) {
+            //     Line(vg, 0.5f, y, 0.5f, y + 1.f, coLink, 1.f);
+            //     y += 10.f;
+            // }
+
         } else {
             Line(args.vg, 0.5f, 0.5f, 0.5f, box.size.y - 1.0f, panel_border_color);
         }
@@ -90,6 +98,7 @@ void PartnerPanelBorder::draw(const DrawArgs& args)
             // Line(vg, box.size.x - 3.5f, y, box.size.x - 1.f, y, coLink, 1.f);
             // y += 1.5f;
             // Line(vg, box.size.x - 3.5f, y, box.size.x - 1.f, y, coLink, 1.f);
+
 
         } else {
             Line(args.vg, box.size.x - 1.f, 0.5f, box.size.x - 1.f, box.size.y - 1.0f, panel_border_color);
