@@ -3,6 +3,8 @@
 #include "../../services/colors.hpp"
 #include "../../services/open-file.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/logo-widget.hpp"
+
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
@@ -116,6 +118,10 @@ PlayUi::PlayUi(PlayModule *module) :
     this->panelBorder = new PartnerPanelBorder();
     replacePanelBorder(panel, this->panelBorder);
     setPanel(panel);
+
+    if (!module) {
+        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+    }
 
     float y = PRESETS_TOP;
     for (int i = 0; i < 15; ++i) {

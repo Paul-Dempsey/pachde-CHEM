@@ -3,6 +3,8 @@
 #include "../../services/colors.hpp"
 #include "../../services/open-file.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/logo-widget.hpp"
+
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
@@ -36,6 +38,8 @@ constexpr const float INPUT_TOP  = 305.5f;
 constexpr const float INPUT_DX = 28.5;
 constexpr const float INPUT_DY = 37.5;
 
+enum M { M1, M2, M3, M4, M5, M6 };
+
 MacroUi::MacroUi(MacroModule *module) :
     my_module(module)
 {
@@ -47,17 +51,21 @@ MacroUi::MacroUi(MacroModule *module) :
     replacePanelBorder(panel, this->panelBorder);
     setPanel(panel);
     float x, y;
-    bool br = !module; // br = in browser
+    bool browsing = !module;
+
+    if (browsing) {
+        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+    }
 
     // knobs
     x = KNOB_CX;
     y = KNOB_CY;
-    addChild(knobs[0] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M1, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[1] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M2, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[2] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M3, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[3] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M4, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[4] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme));
+    addChild(knobs[M1] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M1, theme_engine, theme)); y += MACRO_DY;
+    addChild(knobs[M2] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M2, theme_engine, theme)); y += MACRO_DY;
+    addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M3, theme_engine, theme)); y += MACRO_DY;
+    addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M4, theme_engine, theme)); y += MACRO_DY;
+    addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
+    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme));
     
     if (!my_module || my_module->glow_knobs) {
         glowing_knobs(true);
@@ -67,20 +75,20 @@ MacroUi::MacroUi(MacroModule *module) :
     x = LABEL_LEFT;
     y = LABEL_TOP;
     LabelStyle style{"ctl-label", TextAlignment::Left, 14.f, true};
-    addChild(m1_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"Size":"i", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m2_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"OctBelow":"ii", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m3_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"DelayAmt":"iii", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m4_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"DblLevel":"iv", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m5_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"DelayTime":"v", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m6_label = createStaticTextLabel(Vec(x,y), 75.f, br ?"Motion":"vi", theme_engine, theme, style));
+    addChild(m1_label = createStaticTextLabel(Vec(x,y), 75.f, "i", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m2_label = createStaticTextLabel(Vec(x,y), 75.f, "ii", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m3_label = createStaticTextLabel(Vec(x,y), 75.f, "iii", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m4_label = createStaticTextLabel(Vec(x,y), 75.f, "iv", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m5_label = createStaticTextLabel(Vec(x,y), 75.f, "v", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m6_label = createStaticTextLabel(Vec(x,y), 75.f, "vi", theme_engine, theme, style));
 
     // knob pedal annotations
     style.key = "macro-ped";
     style.height = 9.f;
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y),40.f, br ?"p1":"p1", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
     addChild(m2_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y),40.f, br ?"p2":"", theme_engine, theme, style)); y += MACRO_DY;
+    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
     addChild(m4_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
     addChild(m5_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
     addChild(m6_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style));
@@ -102,7 +110,7 @@ MacroUi::MacroUi(MacroModule *module) :
 
     LabelStyle warn{"warning", TextAlignment::Left, 9.f};
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, br ?"[warning/status]":"", theme_engine, theme, warn));
+        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, warn));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
@@ -121,6 +129,22 @@ MacroUi::MacroUi(MacroModule *module) :
         });
     }
     addChild(link_button);
+
+    // Browsing UI
+
+    if (browsing) {
+        m1_label->text("Size");
+        m2_label->text("OctBelow");
+        m3_label->text("DelayAmt");
+        m4_label->text("DblLevel");
+        m5_label->text("DelayTime");
+        m6_label->text("Motion");
+
+        m1_ped_label->text("p1");
+        m3_ped_label->text("p2");
+    }
+
+    // init
 
     if (my_module) {
         my_module->ui = this;

@@ -30,8 +30,8 @@ struct ChemModule : Module, IThemeHolder
 
 struct ChemModuleWidget : ModuleWidget, IThemeHolder
 {
-    bool showGrid = false;
-    bool hints = false;
+    bool showGrid{false};
+    bool hints{false};
 
     virtual std::string panelFilename() = 0;
 

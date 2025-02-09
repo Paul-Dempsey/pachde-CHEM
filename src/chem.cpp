@@ -1,4 +1,5 @@
 #include "chem.hpp"
+#include "widgets/logo-widget.hpp"
 
 void ChemModule::dataFromJson(json_t* root)
 {
@@ -26,6 +27,7 @@ json_t* ChemModule::dataToJson()
 // ---------------------------------------------------------------------------
 // UI
 //
+
 
 void ChemModuleWidget::setThemeName(const std::string& name)
 {

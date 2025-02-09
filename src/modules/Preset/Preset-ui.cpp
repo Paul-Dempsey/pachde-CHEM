@@ -1,5 +1,6 @@
 #include "Preset.hpp"
 #include "../../services/colors.hpp"
+#include "../../widgets/logo-widget.hpp"
 
 PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     my_module(module)
@@ -13,6 +14,10 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     this->panelBorder = new PartnerPanelBorder();
     replacePanelBorder(panel, this->panelBorder);
     setPanel(panel);
+
+    if (!module) {
+        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+    }
 
 }
 
