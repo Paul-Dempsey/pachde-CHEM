@@ -14,6 +14,8 @@ extern Model* modelBlank;
 extern Model* modelCore;
 extern Model* modelPlay;
 extern Model* modelMacro;
+extern Model* modelPre;
+extern Model* modelFx;
 extern Model* modelPreset;
 
 // Theming

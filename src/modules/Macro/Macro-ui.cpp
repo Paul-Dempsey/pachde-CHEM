@@ -1,7 +1,5 @@
 #include "Macro.hpp"
-#include <ghc/filesystem.hpp>
 #include "../../services/colors.hpp"
-#include "../../services/open-file.hpp"
 #include "../../em/em-hardware.h"
 #include "../../widgets/logo-widget.hpp"
 
@@ -153,7 +151,7 @@ MacroUi::MacroUi(MacroModule *module) :
 }
 
 void MacroUi::glowing_knobs(bool glow) {
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < MacroModule::NUM_PARAMS; ++i) {
         knobs[i]->glowing(glow);
     }
 }

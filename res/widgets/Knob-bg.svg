@@ -3,7 +3,7 @@
   xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g-face" 
-      x1="13" y1="1.5" x2="17" y2="33" gradientUnits="userSpaceOnUse">
+      x1="13" y1="1.5" x2="17" y2="30" gradientUnits="userSpaceOnUse">
       <stop stop-color="#bfbfbf" stop-opacity="1" offset="0" />
       <stop stop-color="#202020" stop-opacity="1" offset="1" />
     </linearGradient>

@@ -49,6 +49,24 @@
       ]
     },
     {
+      "slug": "chem-pre",
+      "name": "CHEM Pre",
+      "description": "CHEM Pre for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
+      "slug": "chem-fx",
+      "name": "CHEM Fx",
+      "description": "CHEM Fx (aka Recirculator) for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
       "slug": "chem-preset",
       "name": "CHEM Preset",
       "description": "CHEM Presets for Haken Eagan Matrix",

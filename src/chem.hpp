@@ -30,6 +30,8 @@ struct ChemModule : Module, IThemeHolder
 
 struct ChemModuleWidget : ModuleWidget, IThemeHolder
 {
+    using Base = ModuleWidget;
+
     bool showGrid{false};
     bool hints{false};
 
@@ -47,6 +49,7 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 
     void setThemeName(const std::string& name) override;
 
+    void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;
     void drawCrossLine(NVGcontext *vg, float x, float y);
     void draw(const DrawArgs& args) override;

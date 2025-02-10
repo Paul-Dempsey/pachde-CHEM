@@ -120,7 +120,7 @@ PlayUi::PlayUi(PlayModule *module) :
     setPanel(panel);
 
     if (!module) {
-        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+        addChild(createWidgetCentered<Logo>(Vec(90.f, box.size.y*.5)));
     }
 
     float y = PRESETS_TOP;
@@ -1042,7 +1042,7 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
     auto mods = e.mods & RACK_MOD_MASK;
     switch (e.key) {
     case GLFW_KEY_ESCAPE: {
-        if (e.action == GLFW_RELEASE) {
+        if ((e.action == GLFW_RELEASE) && (0 == mods)) {
             e.consume(this);
             select_none();
         }
@@ -1063,7 +1063,7 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
         break;
 
     case GLFW_KEY_MENU:
-        if (e.action == GLFW_RELEASE) {
+        if ((e.action == GLFW_RELEASE) && (0 == mods)) {
             e.consume(this);
             createContextMenu();
         }

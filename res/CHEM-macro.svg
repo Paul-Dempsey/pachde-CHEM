@@ -14,10 +14,10 @@
    <g>
       <rect id="g-top--sctn" fill="url(#top-gradient)" x="0" y="0" width="120.5" height="272" />
       <g transform="translate(0,272)">
-         <path id="1--d0" stroke="#202020" stroke-width="1" d="m 0,0.5 h 165" />
-         <path id="1--d1" stroke="#161616" stroke-width="1" d="m 0,1.5 h 165" />
-         <path id="1--d2" stroke="#101010" stroke-width="1" d="m 0,2.5 h 165" />
-         <path id="1--d3" stroke="#404040" stroke-width="1" d="m 0,3.5 h 165" />
+         <path id="1--d0" stroke="#202020" stroke-width="1" d="m 0,0.5 h 120" />
+         <path id="1--d1" stroke="#161616" stroke-width="1" d="m 0,1.5 h 120" />
+         <path id="1--d2" stroke="#101010" stroke-width="1" d="m 0,2.5 h 120" />
+         <path id="1--d3" stroke="#404040" stroke-width="1" d="m 0,3.5 h 120" />
       </g>
       <rect id="g-in--sctn" fill="url(#in-gradient)" x="0" y="276" width="120.5" height="104.5" />
       

@@ -62,6 +62,29 @@ void ChemModuleWidget::step()
     }
 }
 
+void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
+{
+    auto mods = e.mods & RACK_MOD_MASK;
+    switch (e.key) {
+    case GLFW_KEY_F4: {
+        if (e.action == GLFW_RELEASE && (0 == mods)) {
+            e.consume(this);
+            reloadThemes();
+            setThemeName(getThemeName());
+        }
+    } break;
+
+    case GLFW_KEY_MENU:
+        if ((e.action == GLFW_RELEASE) && (0 == mods)){
+            e.consume(this);
+            createContextMenu();
+        }
+        break;
+    }
+    Base::onHoverKey(e);
+
+}
+
 // Debug layout
 void ChemModuleWidget::drawCrossLine(NVGcontext *vg, float x, float y)
 {

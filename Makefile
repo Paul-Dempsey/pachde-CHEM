@@ -52,6 +52,12 @@ SOURCES += src/modules/Play/Play-ui.cpp
 SOURCES += src/modules/Macro/Macro.cpp
 SOURCES += src/modules/Macro/Macro-ui.cpp
 
+SOURCES += src/modules/Pre/Pre.cpp
+SOURCES += src/modules/Pre/Pre-ui.cpp
+
+SOURCES += src/modules/Fx/Fx.cpp
+SOURCES += src/modules/Fx/Fx-ui.cpp
+
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
 

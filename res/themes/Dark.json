@@ -10,21 +10,21 @@
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
             "title": {"fill": "brand", "opacity": 0.4},
-            "detent0": { "stroke": "#000000" },
-            "detent1": { "stroke": "#808080" },
+
+            "d0": { "stroke": "#202020" },
+            "d1": { "stroke": "#161616" },
+            "d2": { "stroke": "#101010" },
+            "d3": { "stroke": "#404040" },
+
+            "k-face": { "fill": { "gradient": [{ "index":0, "color":" #bfbfbf"}, { "index":1, "color":" #202020"}]}},
+            "k-rim": { "stroke": " #737373" },
+            "k-gnomen": { "fill": " #f5f5ef" },
+            "k-taper": {  "fill": " #ebebe0" },
+            "k-pin": { "fill": "none", "stroke":"#202020" },
 
             "macro-ped": { "fill": "brand" },
 
-            "rbtn-punch": {"fill": "#080808"},
-            "rbtn-bezel": {"fill": "#404040" },
-            "rbtn-taper": { "fill": { "gradient": [{ "index":0, "color":"#d9d9d9"}, { "index":1, "color":"#333333"}]}},
-            "rbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#bfbfbf"}, { "index":1, "color":"#333333"}]}},
-            "rbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"#666666"}, { "index":1, "color":"#333333"}]}},
-            "rbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#8c8c8c"}, { "index":1, "color":"#595959"}]}},
-            "rbtn-wire": { "opacity":0 },
-            
             "qbtn-punch" :   { "fill": "#080808" },
-
             "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#999999"}, { "index":1, "color":"#595959"}]}},
             "qbtn-hi-l":  { "fill": "#8c8c8c" },
             "qbtn-hi-r":  { "fill": "#666666" },
