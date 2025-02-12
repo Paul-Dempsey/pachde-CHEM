@@ -16,7 +16,7 @@ If you own more than one Eagan Matrix device, add an instance of **Core** for ea
 | **Pre** | The pre-master section controls, with general pre-level, and controls for the Compressor/Tanh. Pre-convolution controls are in the Convolution module. |
 | **Fx** | The "effects", a.k.a. Recirculator section. |
 | **Post** | Th post-master section controls, including a global Mute, post level (Volume), and EQ. Post-convolution controls are in the Convolution module.|
-| **Convolution** | Controls for pre- and post- convolutions. |
+| **Convo** | Controls for pre- and post- convolutions. |
 
 More modules are planned to cover other important controls, such as rounding and polyphony,
 and a means to address macros 7-90 (which has interesting challenges in the context of VCV Rack).

@@ -228,7 +228,8 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     // IHakenTaskEvents
     void onHakenTaskChange(HakenTask task) override;
 
-    void setThemeName(const std::string& name) override;
+    void setThemeName(const std::string& name, void *context) override;
+
     void drawMidiAnimation(const DrawArgs& args, bool halo);
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;

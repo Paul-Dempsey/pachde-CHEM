@@ -10,13 +10,14 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
 
     if (!module) {
         addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+    }
+    if (module) {
+        my_module->set_chem_ui(this);
     }
 
 }

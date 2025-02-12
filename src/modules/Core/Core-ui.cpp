@@ -37,8 +37,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
 
     set_theme_colors();
@@ -74,6 +73,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
         Vec(box.size.x*.5f, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
+        my_module->set_chem_ui(this);
         my_module->register_chem_client(this);
         my_module->em.subscribeEMEvents(this);
         // sync task updates that occurred before now
@@ -223,10 +223,10 @@ void CoreModuleWidget::set_theme_colors(const std::string& theme)
     theme_colors[ThemeColor::coWeird] = GetStockColor(StockColor::Chartreuse);
 }
 
-void CoreModuleWidget::setThemeName(const std::string& name)
+void CoreModuleWidget::setThemeName(const std::string& name, void * context)
 {
     set_theme_colors(name);
-    ChemModuleWidget::setThemeName(name);
+    ChemModuleWidget::setThemeName(name, context);
 }
 
 // IChemClient

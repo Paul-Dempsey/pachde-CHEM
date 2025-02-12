@@ -31,15 +31,6 @@
       ]
     },
     {
-      "slug": "chem-play",
-      "name": "CHEM Play",
-      "description": "CHEM Playlist for Haken Eagan Matrix",
-      "tags": [
-        "Controller",
-        "Expander"
-      ]
-    },
-    {
       "slug": "chem-macro",
       "name": "CHEM Macro",
       "description": "CHEM Macro for Haken Eagan Matrix",
@@ -67,6 +58,15 @@
       ]
     },
     {
+      "slug": "chem-play",
+      "name": "CHEM Play",
+      "description": "CHEM Playlist for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+   {
       "slug": "chem-preset",
       "name": "CHEM Preset",
       "description": "CHEM Presets for Haken Eagan Matrix",

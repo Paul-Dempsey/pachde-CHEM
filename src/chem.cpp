@@ -11,9 +11,7 @@ void ChemModule::dataFromJson(json_t* root)
     if (j) {
         follow_rack = json_boolean_value(j);
     }
-    if (follow_rack) {
 
-    }
 }
 
 json_t* ChemModule::dataToJson()
@@ -28,12 +26,26 @@ json_t* ChemModule::dataToJson()
 // UI
 //
 
+void ChemModuleWidget::set_extender_theme(bool left, const std::string& name)
+{
+    auto expander = left ? module->getLeftExpander().module : module->getRightExpander().module;
+    if (isPeerModule(module, expander)) {
+        auto chem = static_cast<ChemModule*>(expander);
+        if (chem->chem_ui) {
+            chem->chem_ui->setThemeName(name, nullptr);
+            chem->chem_ui->set_extender_theme(left, name);
+        }
+    }
+}
 
-void ChemModuleWidget::setThemeName(const std::string& name)
+void ChemModuleWidget::setThemeName(const std::string& name, void *context)
 {
     if (!module) return;
+
     auto panel = dynamic_cast<rack::app::SvgPanel*>(getPanel());
     if (!panel) return;
+
+    getChemModule()->setThemeName(name, context);
 
     auto svg_theme = theme_engine.getTheme(name);
 
@@ -43,8 +55,12 @@ void ChemModuleWidget::setThemeName(const std::string& name)
     }
 
     svg_theme::ApplyChildrenTheme(this, theme_engine, svg_theme);
-    getChemModule()->setThemeName(name);
     sendDirty(this);
+
+    if (context == this) {
+        set_extender_theme(true, name);
+        set_extender_theme(false, name);
+    }
 }
 
 void ChemModuleWidget::step()
@@ -56,7 +72,7 @@ void ChemModuleWidget::step()
         if (chem->follow_rack) {
             auto needed = ::rack::settings::preferDarkPanels ? "Dark" : "Light";
             if (needed != chem->theme_name) {
-                setThemeName(needed);
+                setThemeName(needed, nullptr);
             }
         }
     }
@@ -70,7 +86,7 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
         if (e.action == GLFW_RELEASE && (0 == mods)) {
             e.consume(this);
             reloadThemes();
-            setThemeName(getThemeName());
+            setThemeName(getThemeName(), nullptr);
         }
     } break;
 
@@ -123,23 +139,36 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     if (!initThemeEngine()) return;
     if (!theme_engine.isLoaded()) return;
     bool follow = module ? getChemModule()->follow_rack : true;
+//    bool sync = module ? getChemModule()->sync_theme : true;
+
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel("— themes —"));
-    AppendThemeMenu(menu, this, theme_engine, follow);
+    AppendThemeMenu(menu, this, theme_engine, follow, this);
+
     menu->addChild(new MenuSeparator);
+    // menu->addChild(createCheckMenuItem("Sync theme with expanders", "",
+    //     [=](){ return sync; },
+    //     [=](){
+    //         auto chem = getChemModule();
+    //         chem->sync_theme = !sync;
+    //         if (chem->sync_theme) {
+    //             this->setThemeName(getThemeName());
+    //         }
+    //     }));
     menu->addChild(createCheckMenuItem("Follow Rack theme", "",
         [=](){ return follow; },
         [=](){
             auto chem = getChemModule();
             chem->follow_rack = !follow;
-            this->setThemeName(getThemeName());
+            this->setThemeName(getThemeName(), nullptr);
         }));
-    menu->addChild(createMenuItem("Reload themes", "", [this]() {
-        reloadThemes();
-        this->setThemeName(getThemeName());
-    }));
-    menu->addChild(new MenuSeparator);
 
+    menu->addChild(createMenuItem("Hot-reload themes", "F4", [this]() {
+        reloadThemes();
+        this->setThemeName(getThemeName(), this);
+    }));
+
+    menu->addChild(new MenuSeparator);
     menu->addChild(createCheckMenuItem(
         "Grid", "",
         [this]() { return showGrid; },

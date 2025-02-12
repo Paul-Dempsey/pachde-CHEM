@@ -9,13 +9,18 @@ using namespace svg_theme;
 using namespace pachde;
 
 #define DEFAULT_THEME "Dark"
+struct ChemModuleWidget;
 
 struct ChemModule : Module, IThemeHolder
 {
     std::string theme_name;
     bool follow_rack{false};
+    ChemModuleWidget* chem_ui{nullptr};
 
-    void setThemeName(const std::string& name) override { this->theme_name = name; }
+    void set_chem_ui(ChemModuleWidget* ui) { chem_ui = ui; };
+
+    void setThemeName(const std::string& name, void *) override { this->theme_name = name; }
+
     std::string getThemeName() override {
         if (follow_rack) {
             return ::rack::settings::preferDarkPanels ? "Dark": "Light";
@@ -47,7 +52,9 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
         return module ? getChemModule()->getThemeName() : ::rack::settings::preferDarkPanels ? "Dark": "Light";
     }
 
-    void setThemeName(const std::string& name) override;
+    void set_extender_theme(bool left, const std::string& name);
+
+    void setThemeName(const std::string& name, void *context) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;

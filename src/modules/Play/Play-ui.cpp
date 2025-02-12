@@ -90,7 +90,7 @@ constexpr const float ONEU = 15.f;
 constexpr const float HALFU = 7.5f;
 constexpr const float RIGHT_MARGIN_CENTER = 186.f;
 constexpr const ssize_t SSIZE_0 = 0;
-constexpr const float PRESETS_TOP = 20.f;
+constexpr const float PRESETS_TOP = 32.f;
 constexpr const float PRESETS_LEFT = 12.f;
 
 const char * const NotConnected = "[not connected]";
@@ -115,23 +115,18 @@ PlayUi::PlayUi(PlayModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-
-    if (!module) {
-        addChild(createWidgetCentered<Logo>(Vec(90.f, box.size.y*.5)));
-    }
 
     float y = PRESETS_TOP;
     for (int i = 0; i < 15; ++i) {
         auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme_engine, theme);
         if (!module) {
-            pw->set_text(format_string("[preset #%d]", 1 + i));
+            pw->set_text(in_range(i, 4, 14) ? "..." : format_string("[preset #%d]", 1 + i));
         }
         preset_widgets.push_back(pw);
         addChild(pw);
-        y += 21;
+        y += 20;
     }
     LabelStyle style{"dytext", TextAlignment::Left, 10.f};
     addChild(haken_device_label = createStaticTextLabel<TipLabel>(
@@ -145,10 +140,10 @@ PlayUi::PlayUi(PlayModule *module) :
 
     style.height = 16.f;
     addChild(playlist_label = createStaticTextLabel<TipLabel>(
-        Vec(ONEU, 3.5), 148.f, "My Favorites", theme_engine, theme, style));
+        Vec(ONEU, 16), 148.f, "My Favorites", theme_engine, theme, style));
     playlist_label->glowing(true);
 
-    addChild(blip = createBlipCentered(7.5f, 13.f, "Playlist unsaved when lit"));
+    addChild(blip = createBlipCentered(7.5f, 24.f, "Playlist unsaved when lit"));
     blip->set_radius(2.5f);
     blip->set_rim_color(nvgTransRGBAf(RampGray(G_65), .4f));
     blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
@@ -172,7 +167,7 @@ PlayUi::PlayUi(PlayModule *module) :
         Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
     live_preset_label->glowing(true);
 
-    play_menu = createThemedWidget<PlayMenu>(Vec(150.f, HALFU), theme_engine, theme);
+    play_menu = createThemedWidget<PlayMenu>(Vec(150.f, PRESETS_TOP - 12.f), theme_engine, theme);
     play_menu->setUi(this);
     play_menu->describe("Play actions menu");
     addChild(play_menu);
@@ -208,8 +203,13 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_PREV, PORT_CORN, theme_engine, theme)));
     addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_NEXT, PORT_CORN, theme_engine, theme)));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    if (!module) {
+        addChild(createWidgetCentered<Logo>(Vec(90.f, box.size.y*.5)));
+    }
 
+    // Footer
+
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ui::Menu* menu = createMenu();
@@ -222,6 +222,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     if (my_module) {
         my_module->ui = this;
+        my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
         if (!my_module->playlist_file.empty()) {
             load_playlist(my_module->playlist_file, false);
@@ -232,10 +233,10 @@ PlayUi::PlayUi(PlayModule *module) :
     set_modified(false);
 }
 
-void PlayUi::setThemeName(const std::string& name)
+void PlayUi::setThemeName(const std::string& name, void * context)
 {
     blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
-    Base::setThemeName(name);
+    Base::setThemeName(name, context);
 }
 
 void PlayUi::set_track_live(bool track)

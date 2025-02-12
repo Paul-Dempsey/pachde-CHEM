@@ -15,6 +15,7 @@ PresetWidget::PresetWidget()
     text_color(RampGray(G_65)),
     drag_color(nvgRGB(0x9d, 0x91, 0x31)),
     drag_current_color(nvgRGBAf(0x9d, 0x91, 0x31, 0.2f)),
+
     preset_list(nullptr),
     preset_index(-1),
     agent(nullptr),
@@ -30,7 +31,7 @@ PresetWidget::PresetWidget()
     drop_target(nullptr)
 {
     box.size.x = 150.f;
-    box.size.y = 21.f;
+    box.size.y = 20.f;
 }
 
 bool PresetWidget::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)

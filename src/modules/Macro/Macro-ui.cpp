@@ -12,6 +12,7 @@ namespace fs = ghc::filesystem;
 constexpr const float ONEU = 15.f;
 constexpr const float HALFU = 7.5f;
 constexpr const ssize_t SSIZE_0 = 0;
+constexpr const float CENTER = 60.f;
 
 const char * const NotConnected = "[not connected]";
 
@@ -45,15 +46,12 @@ MacroUi::MacroUi(MacroModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
     float x, y;
     bool browsing = !module;
 
-    if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
-    }
+    if (browsing) { addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f))); }
 
     // knobs
     x = KNOB_CX;
@@ -137,7 +135,7 @@ MacroUi::MacroUi(MacroModule *module) :
         m4_label->text("DblLevel");
         m5_label->text("DelayTime");
         m6_label->text("Motion");
-
+        
         m1_ped_label->text("p1");
         m3_ped_label->text("p2");
     }
@@ -146,6 +144,7 @@ MacroUi::MacroUi(MacroModule *module) :
 
     if (my_module) {
         my_module->ui = this;
+        my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
 }
@@ -156,10 +155,10 @@ void MacroUi::glowing_knobs(bool glow) {
     }
 }
 
-void MacroUi::setThemeName(const std::string& name)
+void MacroUi::setThemeName(const std::string& name, void * context)
 {
 //    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
-    Base::setThemeName(name);
+    Base::setThemeName(name, context);
 }
 
 void MacroUi::onConnectHost(IChemHost* host)

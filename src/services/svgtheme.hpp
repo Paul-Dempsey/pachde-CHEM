@@ -16,7 +16,7 @@
 namespace svg_theme {
 
 // nanosvg colors are 8-bit (0-255) abgr packed into an unsigned int.
-typedef unsigned int PackedColor;
+typedef uint32_t PackedColor;
 const PackedColor NoColor = 0;
 bool isVisibleColor(PackedColor co);
 PackedColor applyOpacity(PackedColor color, float alpha);
@@ -305,7 +305,7 @@ struct IApplyTheme
 struct IThemeHolder
 {
     virtual std::string getThemeName() = 0;
-    virtual void setThemeName(const std::string& theme_name) = 0;
+    virtual void setThemeName(const std::string& theme_name, void *context) = 0;
 };
 
 } // namespace svg_theme

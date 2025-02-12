@@ -41,14 +41,13 @@ PreUi::PreUi(PreModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
     float x, y;
     bool browsing = !module;
 
     if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(CENTER, 380.f)));
+        addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f)));
     }
 
     addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 65.f), 100.f, "Compressor", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 18.f, true}));
@@ -115,13 +114,13 @@ PreUi::PreUi(PreModule *module) :
     // Browsing UI
 
     if (browsing) {
-
     }
 
     // init
 
     if (my_module) {
         my_module->ui = this;
+        my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
 }
@@ -132,10 +131,10 @@ void PreUi::glowing_knobs(bool glow) {
     }
 }
 
-void PreUi::setThemeName(const std::string& name)
+void PreUi::setThemeName(const std::string& name, void * context)
 {
 //    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
-    Base::setThemeName(name);
+    Base::setThemeName(name, context);
 }
 
 void PreUi::onConnectHost(IChemHost* host)

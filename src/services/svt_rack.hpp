@@ -20,7 +20,7 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
 // Your IThemeHolder::applyTheme(std::string theme) override should update 
 // the themes of visible widgets, and remember the theme.
 //
-void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable = false);
+void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable = false, void* context = nullptr);
 
 // send Dirty event to widget
 void sendDirty(Widget* widget);

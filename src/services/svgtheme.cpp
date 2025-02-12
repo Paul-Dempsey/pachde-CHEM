@@ -26,7 +26,7 @@ bool isVisibleColor(PackedColor co)
 
 PackedColor applyOpacity(PackedColor color, float alpha)
 {
-    return (color & ~ALPHA_MASK) | (static_cast<uint32_t>(alpha * 255) << 24);
+    return (color & ~ALPHA_MASK) | (static_cast<uint32_t>(alpha * 255.f) << 24);
 }
 
 const char * SeverityName(Severity sev) {
@@ -762,7 +762,7 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
     return modified;
 }
 
-void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable)
+void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable, void* context)
 {
     auto theme_names = themes.getThemeNames();
     if (theme_names.empty()) return; // no themes
@@ -770,7 +770,7 @@ void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, b
     for (auto theme : theme_names) {
         menu->addChild(createCheckMenuItem(
             theme, "", [=]() { return 0 == theme.compare(holder->getThemeName()); },
-            [=]() { holder->setThemeName(theme); },
+            [=]() { holder->setThemeName(theme, context); },
             disable
         ));
     }

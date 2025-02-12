@@ -4,12 +4,13 @@
         "theme": {
             "panel": { "fill": "rack-white" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
-            "numbers": { "opacity":0 },
+            "panel-border": { "stroke": {"color":"#505bf4", "width": 0.5 }},
 
             "hexoid": { "fill": "#c78d11" },
             "CHEM": { "fill": "#c78d11" },
             "pachde": { "fill": "#c78d11" },
-            "title": {"fill": "brand", "opacity": 0.4},
+            "new-title": {"fill": "#1f1f1f" },
+            "th": {"stroke": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
             "d0": { "stroke": "#d9d9d9" },

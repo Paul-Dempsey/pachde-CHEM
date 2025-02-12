@@ -4,7 +4,9 @@
         "theme": {
             "panel" :  { "fill": "#df62a6" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#df62a6"}, { "index":1, "color":"#c84a90"}]}},
-            "numbers": { "opacity":0 },
+            "panel-border": { "stroke": {"color":"#decc2f", "width": 0.5 }},
+            "th": {"stroke": { "color":"#decc2f", "width": 0.5 }},
+
             "grid-bg":   { "fill": "#decc2f" },
             "grid-line": { "stroke": "#df62a6" },
             "grid-new": { "fill": "#3b6ab0" },
@@ -13,7 +15,7 @@
             "hexoid": { "fill": "brand" },
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
-            "title": {"fill": "brand", "opacity": 0.6},
+            "new-title": {"fill": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#df62a6"}, { "index":1, "color":"#c84a90"}]}},
             "d0": { "stroke": "#a9427b" },
@@ -103,8 +105,8 @@
 
             "alpha-knob-bg": { "fill" : { "gradient" : [ { "index": 0, "offset":0, "color":"#4095bf" }, { "index": 1, "offset":1, "color":"#204a5f" }]}},
 
-            "patty": { "fill": "g90"},
-            "patty-hover": { "fill": "brand"},
+            "patty": { "stroke": "#decc2f"},
+            "patty-hover": { "stroke": "brand"},
 
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e38dbc" }, { "index":1, "offset":1, "color": "#a14b7a" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e389ba" }, { "index":1, "offset":1, "color": "#8a3b67" }]}},

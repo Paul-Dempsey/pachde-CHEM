@@ -28,15 +28,13 @@ FxUi::FxUi(FxModule *module) :
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    this->panelBorder = new PartnerPanelBorder();
-    replacePanelBorder(panel, this->panelBorder);
+    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
+    
     float x, y;
     bool browsing = !module;
 
-    if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
-    }
+    if (browsing) { addChild(createWidgetCentered<Logo>(Vec(82.5, 70.f))); }
 
     addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(34.f, 28.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Left, 18.f, true}));
 
@@ -119,13 +117,13 @@ FxUi::FxUi(FxModule *module) :
     // Browsing UI
 
     if (browsing) {
-
     }
 
     // init
 
     if (my_module) {
         my_module->ui = this;
+        my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
 }
@@ -136,10 +134,10 @@ void FxUi::glowing_knobs(bool glow) {
     }
 }
 
-void FxUi::setThemeName(const std::string& name)
+void FxUi::setThemeName(const std::string& name, void * context)
 {
 //    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
-    Base::setThemeName(name);
+    Base::setThemeName(name, context);
 }
 
 void FxUi::onConnectHost(IChemHost* host)
