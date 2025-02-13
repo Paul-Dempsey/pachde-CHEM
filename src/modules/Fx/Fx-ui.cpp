@@ -2,18 +2,14 @@
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
 #include "../../widgets/logo-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
 
+namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
 
 // -- Fx UI -----------------------------------
-
-constexpr const float ONEU = 15.f;
-constexpr const float HALFU = 7.5f;
-constexpr const ssize_t SSIZE_0 = 0;
-
-const char * const NotConnected = "[not connected]";
 
 FxUi::~FxUi()
 {
@@ -36,34 +32,34 @@ FxUi::FxUi(FxModule *module) :
 
     if (browsing) { addChild(createWidgetCentered<Logo>(Vec(82.5, 70.f))); }
 
-    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(34.f, 28.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Left, 18.f, true}));
-
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(12.f, 38.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(34.f, 28.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Left, 16.f, true}));
+    
     // knobs with labels
-    const float center = 82.5f;
-    const float dy_knob = 60.f;
-    const float knob_x_offset = 32.f;
-    const float knob_top = 114.f;
-    const float label_offset = 18.f;
-    y = knob_top;
-    x = center - knob_x_offset;
-    LabelStyle r_label_style {"ctl-label", TextAlignment::Center, 14.f, false};
+    const float CENTER = 82.5f;
+    const float DY_KNOB = 60.f;
+    const float KNOB_DX = 32.f;
+    const float KNOB_TOP = 114.f;
+    const float LABEL_DY = 18.f;
+    y = KNOB_TOP;
+    x = CENTER - KNOB_DX;
 
     for (int i = 0; i < K_MIX; ++i) {
         knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme);
         addChild(knobs[i]);
 
-        r_labels[i] = createStaticTextLabel<TipLabel>(Vec(x, y + label_offset), 80.f, format_string("R%d", i), theme_engine, theme, r_label_style);
+        r_labels[i] = createStaticTextLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme_engine, theme, S::control_label);
         addChild(r_labels[i]);
 
         if (i == 2) {
-            x = center + knob_x_offset;
-            y = knob_top;
+            x = CENTER + KNOB_DX;
+            y = KNOB_TOP;
         } else {
-            y += dy_knob;
+            y += DY_KNOB;
         }
     }
 
-    knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(center, 70.f), my_module, FxModule::P_MIX, theme_engine, theme);
+    knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(CENTER, 70.f), my_module, FxModule::P_MIX, theme_engine, theme);
     addChild(knobs[K_MIX]);
 
     if (!my_module || my_module->glow_knobs) {
@@ -72,37 +68,35 @@ FxUi::FxUi(FxModule *module) :
 
     // inputs
     // x = 14.f;
-//    addChild(Center(createThemedColorInput(Vec(34.f, 314.f), my_module, PreModule::IN_PRE_LEVEL, PORT_CORN, theme_engine, theme)));
     const float PORT_LEFT = 62.75f;
     const float PORT_DX   = 38.75f;
     const float PORT_TOP  = 305.f;
     const float PORT_DY   = 36.f;
-
     x = PORT_LEFT;
     y = PORT_TOP;
     for (int i = 0; i <= K_R6; ++i) {
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, PORT_CORN, theme_engine, theme)));
+        addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
         x += PORT_DX;
         if (i == 2) {
             y += PORT_DY;
             x = PORT_LEFT;
         }
     }
-    addChild(Center(createThemedColorInput(Vec(23.f, 322.f), my_module, FxModule::IN_MIX, PORT_CORN, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(23.f, y), my_module, FxModule::IN_MIX, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(23.f, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
 
     // footer
 
-    LabelStyle warn{"warning", TextAlignment::Left, 9.f};
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, warn));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
+    addChild(warn = createStaticTextLabel<TipLabel>(
+        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
+    warn->describe("[warning/status]");
+    warn->glowing(true);
 
-    LabelStyle haken{"dytext", TextAlignment::Left, 10.f};
-    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, NotConnected, theme_engine, theme, haken));
+    addChild(haken = createStaticTextLabel<TipLabel>(
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -147,15 +141,15 @@ void FxUi::onConnectHost(IChemHost* host)
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         //onPresetChange();
     } else {
-        haken_device_label->text(NotConnected);
+        haken->text(S::NotConnected);
     }
 }
 
 void FxUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
+    haken->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
+    haken->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
 }
 
 void FxUi::onPresetChange()

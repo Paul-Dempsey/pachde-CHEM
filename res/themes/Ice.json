@@ -23,6 +23,8 @@
             "k-taper": {  "fill": " #9cbecf" },
             "k-pin": { "fill": " #226f98", "stroke":"none" },            
 
+            "ped-assign": { "fill": "brand" },
+
             "qbtn-punch" :   { "fill": "#43371d" },
             "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#66aacc"}, { "index":1, "color":"#193543"}]}},
             "qbtn-hi-l":  { "fill": "#8c8c8c" },
@@ -70,6 +72,7 @@
             "ctl-label":   { "fill": "g60" },
             "ctl-label-hi":{ "fill": "g85" },
             "ctl-bar":     { "stroke": "#5b8093"},
+            "in-label":    { "fill": "g45" },
 
             "menu":        { "fill" : "#63c663" },
 

@@ -58,6 +58,15 @@
       ]
     },
     {
+      "slug": "chem-post",
+      "name": "CHEM Post",
+      "description": "CHEM Post for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
       "slug": "chem-play",
       "name": "CHEM Play",
       "description": "CHEM Playlist for Haken Eagan Matrix",

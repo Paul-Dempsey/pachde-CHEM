@@ -37,7 +37,9 @@ SOURCES += src/widgets/blip-widget.cpp
 SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/preset-widget.cpp
+SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/themed-widgets.cpp
+SOURCES += src/widgets/uniform-style.cpp
 
 # modules
 SOURCES += src/modules/Blank/Blank.cpp
@@ -57,6 +59,9 @@ SOURCES += src/modules/Pre/Pre-ui.cpp
 
 SOURCES += src/modules/Fx/Fx.cpp
 SOURCES += src/modules/Fx/Fx-ui.cpp
+
+SOURCES += src/modules/Post/Post.cpp
+SOURCES += src/modules/Post/Post-ui.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp

@@ -1,5 +1,5 @@
+#pragma once
 #include <rack.hpp>
-#include "../services/svt_Rack.hpp"
 #include "../services/colors.hpp"
 #include "../services/svt_rack.hpp"
 #include "TipWidget.hpp"

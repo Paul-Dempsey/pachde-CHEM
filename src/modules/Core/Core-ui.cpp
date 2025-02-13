@@ -1,9 +1,8 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/uniform-style.hpp"
 
 // Layout
-constexpr const float U1 = 15.f;
-constexpr const float UHALF = 7.5f;
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float PICKER_TOP = 200.f;
 constexpr const float PICKER_INTERVAL = 42.f;
@@ -95,7 +94,7 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 {
     float y = PICKER_TOP;
-    haken_picker = createMidiPicker(UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
+    haken_picker = createMidiPicker(style::UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
     std::string text = "[Eagan Matrix Device]";
     if (my_module) {
         if (my_module->haken_device.connection) {
@@ -113,17 +112,17 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     style.height = 14.f;
 
     addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, style));
+        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, style));
 
     y += PICKER_INTERVAL;
-    controller1_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
+    controller1_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
     addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
+        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
     y += PICKER_INTERVAL;
-    controller2_picker = createMidiPicker(UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
+    controller2_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
     addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
+        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
 
     float x = 18.f;
     y = PICKER_TOP - 16.f;

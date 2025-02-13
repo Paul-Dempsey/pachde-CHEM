@@ -2,19 +2,15 @@
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
 #include "../../widgets/logo-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
 
-using namespace svg_theme;
+namespace S = pachde::style;
 using namespace pachde;
 namespace fs = ghc::filesystem;
 
 // -- Pre UI -----------------------------------
 
-constexpr const float ONEU = 15.f;
-constexpr const float HALFU = 7.5f;
-constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float CENTER = 52.5f;
-
-const char * const NotConnected = "[not connected]";
 
 bool PreUi::connected() {
     if (!my_module) return false;
@@ -50,36 +46,40 @@ PreUi::PreUi(PreModule *module) :
         addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f)));
     }
 
-    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 65.f), 100.f, "Compressor", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 18.f, true}));
+    bool tanh = module ? my_module->getParam(PreModule::P_COMP_TANH).getValue() >= .5f : false;
+
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 72.f), my_module, PreModule::P_COMP_TANH, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, tanh ? "Tanh" : "Compressor", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
     x = CENTER;
-    addChild(knobs[K_MIX]       = createChemKnob<BlueKnob>(Vec(x, 108.f), module, PreModule::P_MIX, theme_engine, theme));
-    addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(34.f, 42.f), module, PreModule::P_PRE_LEVEL, theme_engine, theme));
-    const float PARAM_TOP = 148.f;
-    const float PARAM_DY = 57.f;
+    addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), my_module, PreModule::P_PRE_LEVEL, theme_engine, theme));
+    addChild(knobs[K_MIX]       = createChemKnob<BlueKnob>(Vec(x, 96.f), my_module, PreModule::P_MIX, theme_engine, theme));
+
+    const float PARAM_TOP = 136.f;
+    const float PARAM_DY = 54.5f;
     const float label_offset = 18.f;
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
     y = PARAM_TOP;
-    addChild(knobs[K_THRESHOLD] = createChemKnob<BasicKnob>(Vec(x, y), module, PreModule::P_THRESHOLD, theme_engine, theme));
-    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Threshhold", theme_engine, theme, knob_label_style));
+    addChild(knobs[K_THRESHOLD] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
+    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Drive" : "Threshhold", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
-    addChild(knobs[K_ATTACK] = createChemKnob<BasicKnob>(Vec(x, y), module, PreModule::P_ATTACK, theme_engine, theme));
-    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Attack", theme_engine, theme, knob_label_style));
+    addChild(knobs[K_ATTACK] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK_, theme_engine, theme));
+    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "—" : "Attack", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
-    addChild(knobs[K_RATIO] = createChemKnob<BasicKnob>(Vec(x, y), module, PreModule::P_RATIO, theme_engine, theme));
-    addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Ratio", theme_engine, theme, knob_label_style));
+    addChild(knobs[K_RATIO] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
+    addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Makeup" : "Ratio", theme_engine, theme, knob_label_style));
     
     if (!my_module || my_module->glow_knobs) {
         glowing_knobs(true);
     }
 
     // inputs
-    addChild(Center(createThemedColorInput(Vec(34.f, 314.f), my_module, PreModule::IN_PRE_LEVEL, PORT_CORN, theme_engine, theme)));
-    const float PORT_Y = 347.f;
+    addChild(Center(createThemedColorInput(Vec(34.f, 305.f), my_module, PreModule::IN_PRE_LEVEL, PORT_CORN, theme_engine, theme)));
+    const float PORT_Y = 341.f;
     const float PORT_DX = 26.f;
     x = 14.f;
     addChild(Center(createThemedColorInput(Vec(x, PORT_Y), my_module, PreModule::IN_MIX, PORT_CORN, theme_engine, theme))); x += PORT_DX;
@@ -89,17 +89,15 @@ PreUi::PreUi(PreModule *module) :
 
     // footer
 
-    LabelStyle warn{"warning", TextAlignment::Left, 9.f};
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, warn));
+        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    LabelStyle haken{"dytext", TextAlignment::Left, 10.f};
     addChild(haken_device_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, NotConnected, theme_engine, theme, haken));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -126,9 +124,10 @@ PreUi::PreUi(PreModule *module) :
 }
 
 void PreUi::glowing_knobs(bool glow) {
-    for (int i = 0; i < PreModule::NUM_PARAMS; ++i) {
+    for (int i = 0; i < PreModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);
     }
+    selector->bright = glow;
 }
 
 void PreUi::setThemeName(const std::string& name, void * context)
@@ -144,15 +143,15 @@ void PreUi::onConnectHost(IChemHost* host)
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         //onPresetChange();
     } else {
-        haken_device_label->text(NotConnected);
+        haken_device_label->text(S::NotConnected);
     }
 }
 
 void PreUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
+    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
+    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
 }
 
 void PreUi::onPresetChange()

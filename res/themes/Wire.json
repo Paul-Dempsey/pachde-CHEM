@@ -3,7 +3,7 @@
         "name": "Wire",
         "theme": {
             "panel" : { "fill": "dark-panel" },
-            "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#1f1f1f"}, { "index":1, "color":"#080808"}]}},
+            "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#181818"}, { "index":1, "color":"#181818"}]}},
             "panel-border": { "stroke": {"color":"brand", "width": 0.25 }},
             "th": { "stroke": {"color":"brand", "width": 0.25 }},
 
@@ -12,7 +12,6 @@
             "pachde": {"fill": "brand"},
             "new-title": { "fill": "brand" },
 
-            "sctn": { "fill": { "gradient": [{ "index":0, "color":"#282828"}, { "index":1, "color":"#181818"}]}},
             "d0": { "stroke": "#202020" },
             "d1": { "stroke": "#161616" },
             "d2": { "stroke": "#101010" },
@@ -60,6 +59,7 @@
             "ctl-hovered": { "fill": "#f4e88e" },
             "ctl-label":   { "fill": "g65" },
             "ctl-label-hi":{ "fill": "g85" },
+            "in-label":    { "fill": "g45" },
 
             "menu":        { "fill" : "g50" },
 
@@ -120,6 +120,7 @@
             "kv-pin": { "opacity":1, "stroke":{"color":"#c982c4", "width":1.5} },
             "ky-pin": { "opacity":1, "stroke":{"color":"#bfa041", "width":1.5} },
 
+            "ped-assign": { "fill": "brand" },
 
             "patty": { "stroke": { "color":"g80", "width": 0.5}},
             "patty-hover": { "stroke": "brand" },

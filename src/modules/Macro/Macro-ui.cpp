@@ -2,6 +2,9 @@
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
 #include "../../widgets/logo-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
+
+namespace S = pachde::style;
 
 using namespace svg_theme;
 using namespace pachde;
@@ -9,12 +12,7 @@ namespace fs = ghc::filesystem;
 
 // -- Macro UI -----------------------------------
 
-constexpr const float ONEU = 15.f;
-constexpr const float HALFU = 7.5f;
-constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float CENTER = 60.f;
-
-const char * const NotConnected = "[not connected]";
 
 bool MacroUi::connected() {
     if (!my_module) return false;
@@ -70,51 +68,62 @@ MacroUi::MacroUi(MacroModule *module) :
     // knob labels
     x = LABEL_LEFT;
     y = LABEL_TOP;
-    LabelStyle style{"ctl-label", TextAlignment::Left, 14.f, true};
-    addChild(m1_label = createStaticTextLabel(Vec(x,y), 75.f, "i", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m2_label = createStaticTextLabel(Vec(x,y), 75.f, "ii", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m3_label = createStaticTextLabel(Vec(x,y), 75.f, "iii", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m4_label = createStaticTextLabel(Vec(x,y), 75.f, "iv", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m5_label = createStaticTextLabel(Vec(x,y), 75.f, "v", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m6_label = createStaticTextLabel(Vec(x,y), 75.f, "vi", theme_engine, theme, style));
+    LabelStyle control_style{S::control_label};
+    control_style.align = TextAlignment::Left;
+
+    addChild(m1_label = createStaticTextLabel(Vec(x,y), 75.f, "i",   theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m2_label = createStaticTextLabel(Vec(x,y), 75.f, "ii",  theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m3_label = createStaticTextLabel(Vec(x,y), 75.f, "iii", theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m4_label = createStaticTextLabel(Vec(x,y), 75.f, "iv",  theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m5_label = createStaticTextLabel(Vec(x,y), 75.f, "v",   theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m6_label = createStaticTextLabel(Vec(x,y), 75.f, "vi",  theme_engine, theme, control_style));
 
     // knob pedal annotations
-    style.key = "macro-ped";
-    style.height = 9.f;
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m2_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m4_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m5_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style)); y += MACRO_DY;
-    addChild(m6_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, style));
+    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m2_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m4_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m5_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m6_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label));
 
     // inputs
-
+    const float PORT_LABEL_DY = -18.f;
     x = INPUT_LEFT;
     y = INPUT_TOP;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M1, PORT_CORN, theme_engine, theme))); x += INPUT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M2, PORT_CORN, theme_engine, theme))); x += INPUT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M1, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
+    x += INPUT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M2, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
+    x += INPUT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M3, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M3", theme_engine, theme, S::in_port_label));
+    
     y += INPUT_DY;
     x = INPUT_LEFT;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M4, PORT_CORN, theme_engine, theme))); x += INPUT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M5, PORT_CORN, theme_engine, theme))); x += INPUT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M4, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M4", theme_engine, theme, S::in_port_label));
+    x += INPUT_DX;
+    
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M5, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M5", theme_engine, theme, S::in_port_label));
+    x += INPUT_DX;
+    
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M6, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M6", theme_engine, theme, S::in_port_label));
 
     // footer
 
-    LabelStyle warn{"warning", TextAlignment::Left, 9.f};
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, warn));
+        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    LabelStyle haken{"dytext", TextAlignment::Left, 10.f};
     addChild(haken_device_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, NotConnected, theme_engine, theme, haken));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, style::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -168,15 +177,15 @@ void MacroUi::onConnectHost(IChemHost* host)
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         //onPresetChange();
     } else {
-        haken_device_label->text(NotConnected);
+        haken_device_label->text(S::NotConnected);
     }
 }
 
 void MacroUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
+    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
+    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
 }
 
 void MacroUi::onPresetChange()

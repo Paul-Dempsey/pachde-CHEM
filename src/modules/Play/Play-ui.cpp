@@ -4,7 +4,9 @@
 #include "../../services/open-file.hpp"
 #include "../../em/em-hardware.h"
 #include "../../widgets/logo-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
 
+namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
 namespace fs = ghc::filesystem;
@@ -93,8 +95,6 @@ constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float PRESETS_TOP = 32.f;
 constexpr const float PRESETS_LEFT = 12.f;
 
-const char * const NotConnected = "[not connected]";
-
 bool PlayUi::connected() {
     if (!my_module) return false;
     if (!chem_host) return false;
@@ -128,17 +128,15 @@ PlayUi::PlayUi(PlayModule *module) :
         addChild(pw);
         y += 20;
     }
-    LabelStyle style{"dytext", TextAlignment::Left, 10.f};
     addChild(haken_device_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, NotConnected, theme_engine, theme, style));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    LabelStyle warn{"warning", TextAlignment::Left, 9.f};
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, warn));
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    style.height = 16.f;
+    LabelStyle style{"dytext", TextAlignment::Left, 16.f};
     addChild(playlist_label = createStaticTextLabel<TipLabel>(
         Vec(ONEU, 16), 148.f, "My Favorites", theme_engine, theme, style));
     playlist_label->glowing(true);
@@ -547,7 +545,7 @@ void PlayUi::onConnectHost(IChemHost* host)
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
     } else {
-        haken_device_label->text(NotConnected);
+        haken_device_label->text(S::NotConnected);
         live_preset_label->text("");
     }
 }
@@ -885,8 +883,8 @@ void PlayUi::check_playlist_device()
 void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : NotConnected);
+    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
+    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
     check_playlist_device();
 }
 

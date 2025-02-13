@@ -16,7 +16,7 @@ FxModule::FxModule()
     configParam(P_R6, 0.f, 127.f, 0.f, "R6");
     configParam(P_MIX, 0.f, Haken::max14, 0.f, "Mix");
     configSwitch(P_ENABLE, 0.f, 1.f, 1.f, "Enable Fx", {"on", "off"});
-    configSwitch(P_EFFECT, 0.f, 6.f, 0.f, "Effect", {"Long reverb", "Short reverb", "Mod delay", "Swept delay", "Analog echo", "Delay with LPF", "Delay with HPF"});
+    configSwitch(P_EFFECT, 0.f, 6.f, 0.f, "Effect", {"Short reverb", "Mod delay", "Swept delay", "Analog echo", "Delay with LPF", "Delay with HPF", "Long reverb"});
 
     configInput(IN_R1, "R1");
     configInput(IN_R2, "R2");

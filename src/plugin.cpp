@@ -11,6 +11,7 @@ void init(Plugin *p)
 	p->addModel(modelMacro);
 	p->addModel(modelPre);
 	p->addModel(modelFx);
+	p->addModel(modelPost);
 	p->addModel(modelPreset);
 }
 
@@ -26,6 +27,7 @@ bool isPeerModule(Module* me, Module* candidate)
             || (model == modelMacro)
             || (model == modelPre)
             || (model == modelFx)
+			|| (model == modelPost)
             || (model == modelPreset)
             // add new models here
         );

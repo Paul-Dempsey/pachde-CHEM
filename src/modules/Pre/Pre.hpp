@@ -3,8 +3,9 @@
 #include "../../chem.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/themed-widgets.hpp"
 #include "../../widgets/label-widget.hpp"
+#include "../../widgets/selector-widget.hpp"
+#include "../../widgets/themed-widgets.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 
 using namespace pachde;
@@ -39,9 +40,11 @@ struct PreModule : ChemModule, IChemClient
     enum Params {
         P_PRE_LEVEL,
         P_MIX,
-        P_THRESHOLD,
-        P_ATTACK,
-        P_RATIO,
+        P_THRESHOLD_DRIVE,
+        P_ATTACK_,
+        P_RATIO_MAKEUP,
+        P_COMP_TANH,
+        NUM_KNOBS = P_COMP_TANH,
         NUM_PARAMS
     };
     enum Inputs {
@@ -67,9 +70,6 @@ struct PreModule : ChemModule, IChemClient
 
 // -- Pre UI -----------------------------------
 
-struct PreMenu;
-constexpr const int PLAYLIST_LENGTH = 15;
-
 struct PreUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
@@ -83,6 +83,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
+    SelectorWidget* selector{nullptr};
     StaticTextLabel* comptanh_label;
     StaticTextLabel* top_knob_label;
     StaticTextLabel* mid_knob_label;

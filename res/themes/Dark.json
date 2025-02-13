@@ -23,7 +23,7 @@
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke":"#202020" },
 
-            "macro-ped": { "fill": "brand" },
+            "ped-assign": { "fill": "brand" },
 
             "qbtn-punch" :   { "fill": "#080808" },
             "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#999999"}, { "index":1, "color":"#595959"}]}},
@@ -78,6 +78,7 @@
             "ctl-hovered": { "fill": "#f4e88e" },
             "ctl-label":   { "fill": "g65" },
             "ctl-label-hi":{ "fill": "g85" },
+            "in-label":    { "fill": "g45" },
 
             "menu":        { "fill" : "g50" },
 

@@ -29,6 +29,8 @@
             "k-taper": {  "fill": "#3b138b" },
             "k-pin": { "fill": "none", "stroke": {"color":" #4a1aaa", "width":1.5 }},
 
+            "ped-assign": { "fill": "brand" },
+
             "qbtn-punch" :   { "fill": "#080808" },
 
             "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#999999"}, { "index":1, "color":"#595959"}]}},

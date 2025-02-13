@@ -1,6 +1,9 @@
 #include "Preset.hpp"
 #include "../../services/colors.hpp"
 #include "../../widgets/logo-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
+
+namespace S = pachde::style;
 
 PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     my_module(module)
