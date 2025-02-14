@@ -9,6 +9,11 @@ std::shared_ptr<MidiDeviceBroker> MidiDeviceBroker::get()
     return the_broker_instance; 
 }
 
+MidiDeviceBroker::MidiDeviceBroker()
+{
+    holders.reserve(16);
+}
+
 bool MidiDeviceBroker::is_primary(MidiDeviceHolder* holder)
 {
     assert(!holders.empty());

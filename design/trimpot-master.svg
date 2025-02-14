@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-face" 
+      x1="5.5" y1=".5" x2="9" y2="16" gradientUnits="userSpaceOnUse">
+         <stop stop-color="#c982c4" offset="0" />
+         <stop stop-color="#391339" offset="1" />
+    </linearGradient>
+  </defs>
+  <rect height="16" width="16" />
+  <circle id="t-flat-face" opacity="0" cx="8" cy="8" r="7" fill="#c982c4" />
+  <circle id="t-face"      opacity="1" cx="8" cy="8" r="7" fill="url(#g-face)" />
+
+  <circle id="t-rim"     opacity="1" cx="8" cy="8" r="7" fill="none" stroke="#753c75" stroke-width="1" />
+  <circle id="t-wire"    opacity="0" cx="8" cy="8" r="7.3" fill="none" stroke="#da4dda" stroke-width=".5" />
+  <g transform="scale(.5,.5)">
+    <path id="t-gnomeno" opacity="0" fill="none" stroke="#ebebe0" stroke-width=".25" d="m 15.142877,3 v 12.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 3 Z" />
+    <path id="t-taper"   opacity="1" fill="#ebebe0" stroke="none" stroke-width=".25" d="m 14.855469,1.0524375 c 0,0 0.286732,-0.05229 1.14455,-0.052437 0.857819,-1.4744e-4 1.164043,0.052437 1.164043,0.052437 l -0.344751,2.1706802 -0.811499,-0.015305 -0.825568,0.022273 z" />
+    <path id="t-gnomen"  opacity="1" fill="#f5f5ef" d="m 15.142877,3 v 12.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 3 Z" />
+  </g>
+  <circle id="t-pin"     opacity="1" cx="8" cy="8" r=".5" fill="none" stroke="#da4dda" stroke-width=".3" />
+</svg>

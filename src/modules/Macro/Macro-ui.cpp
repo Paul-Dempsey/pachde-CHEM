@@ -12,7 +12,6 @@ namespace fs = ghc::filesystem;
 
 // -- Macro UI -----------------------------------
 
-constexpr const float CENTER = 60.f;
 
 bool MacroUi::connected() {
     if (!my_module) return false;
@@ -23,19 +22,19 @@ bool MacroUi::connected() {
 MacroUi::~MacroUi()
 {
 }
-
+constexpr const float PANEL_WIDTH = 120.f;
+constexpr const float CENTER = PANEL_WIDTH * .5f;
 constexpr const float KNOB_CX = 25.f;
 constexpr const float KNOB_CY = 48.f;
 constexpr const float KNOB_TOP = KNOB_CY - 16.f;
 constexpr const float MACRO_DY = 40.f;
 constexpr const float LABEL_LEFT = 45.f;
 constexpr const float LABEL_TOP = KNOB_CY;
-constexpr const float INPUT_LEFT = 31.5f;
-constexpr const float INPUT_TOP  = 305.5f;
-constexpr const float INPUT_DX = 28.5;
-constexpr const float INPUT_DY = 37.5;
 
-enum M { M1, M2, M3, M4, M5, M6 };
+constexpr const float INPUT_DX = PANEL_WIDTH*.25f;
+constexpr const float INPUT_LEFT = CENTER - (1.5f*INPUT_DX);
+
+enum M { M1, M2, M3, M4, M5, M6, K_ATTENUVERTER };
 
 MacroUi::MacroUi(MacroModule *module) :
     my_module(module)
@@ -61,10 +60,6 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
     addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme));
     
-    if (!my_module || my_module->glow_knobs) {
-        glowing_knobs(true);
-    }
-
     // knob labels
     x = LABEL_LEFT;
     y = LABEL_TOP;
@@ -88,30 +83,22 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(m6_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label));
 
     // inputs
-    const float PORT_LABEL_DY = -18.f;
+    const NVGcolor co_port = PORT_CORN;
     x = INPUT_LEFT;
-    y = INPUT_TOP;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M1, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
+    y = S::PORT_TOP + S::PORT_DY*.5f;
+    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, MacroModule::P_ATTENUVERT, theme_engine, theme));
     x += INPUT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M2, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
-    x += INPUT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M3, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M3", theme_engine, theme, S::in_port_label));
-    
-    y += INPUT_DY;
-    x = INPUT_LEFT;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M4, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M4", theme_engine, theme, S::in_port_label));
-    x += INPUT_DX;
-    
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M5, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M5", theme_engine, theme, S::in_port_label));
-    x += INPUT_DX;
-    
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, MacroModule::IN_M6, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + PORT_LABEL_DY), 35.f, "M6", theme_engine, theme, S::in_port_label));
+    y = S::PORT_TOP;
+    for (int i = 0; i <= M6; ++i) {
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, co_port, theme_engine, theme)));
+        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, i));
+        addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
+        x += INPUT_DX;
+        if (i == 2) {
+            y += S::PORT_DY;
+            x = INPUT_LEFT + INPUT_DX;
+        }
+    }
 
     // footer
 
@@ -150,6 +137,10 @@ MacroUi::MacroUi(MacroModule *module) :
     }
 
     // init
+
+    if (!my_module || my_module->glow_knobs) {
+        glowing_knobs(true);
+    }
 
     if (my_module) {
         my_module->ui = this;

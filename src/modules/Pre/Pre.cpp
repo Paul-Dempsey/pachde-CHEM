@@ -13,12 +13,13 @@ PreModule::PreModule()
     configInput(IN_THRESHOLD, "Threshold");
     configInput(IN_ATTACK,    "Attack");
     configInput(IN_RATIO,     "Ratio");
-
+    
     configParam(P_PRE_LEVEL,        0.f, 127.f, 0.f, "Prelevel");
     configParam(P_MIX,              0.f, 127.f, 0.f, "Mix");
     configParam(P_THRESHOLD_DRIVE,  0.f, 127.f, 0.f, "Threshold");
     configParam(P_ATTACK_,          0.f, 127.f, 0.f, "Attack");
     configParam(P_RATIO_MAKEUP,     0.f, 127.f, 0.f, "Ratio");
+    configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
     configSwitch(P_COMP_TANH,       0.f,   1.f, 0.f, "Select comp/tanh", { "Compressor", "Tanh"});
 }

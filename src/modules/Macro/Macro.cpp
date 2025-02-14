@@ -4,6 +4,8 @@ using namespace pachde;
 MacroModule::MacroModule()
 :   chem_host(nullptr),
     ui(nullptr),
+    attenuator_target(IN_INVALID),
+    last_attenuator_target(IN_INVALID),
     glow_knobs(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
@@ -20,6 +22,14 @@ MacroModule::MacroModule()
     configParam(P_M4, 0.f, Haken::max14, 0.f, "Macro 4 (iv)");
     configParam(P_M5, 0.f, Haken::max14, 0.f, "Macro 5 (v)");
     configParam(P_M6, 0.f, Haken::max14, 0.f, "Macro 6 (vi)");
+    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
+
+    configLight(L_M1a, "Attenuverter on M1");
+    configLight(L_M2a, "Attenuverter on M2");
+    configLight(L_M3a, "Attenuverter on M3");
+    configLight(L_M4a, "Attenuverter on M4");
+    configLight(L_M5a, "Attenuverter on M5");
+    configLight(L_M6a, "Attenuverter on M6");
 }
 
 void MacroModule::dataFromJson(json_t* root)
@@ -73,6 +83,22 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
     if (ui) ui->onConnectionChange(device, connection);
 }
 
+void MacroModule::onPortChange(const PortChangeEvent& e)
+{
+    if (e.type == Port::OUTPUT) return;
+    if (e.connecting) {
+        attenuator_target = e.portId;
+    } else {
+        for (int i = IN_M1; i <= IN_M6; ++i) {
+            if (getInput(i).isConnected()) {
+                attenuator_target = i;
+                return;
+            }
+        }
+        attenuator_target = Inputs::IN_INVALID;
+    }
+}
+
 void MacroModule::process(const ProcessArgs& args)
 {
     if (!chem_host && !device_claim.empty()) {
@@ -80,6 +106,14 @@ void MacroModule::process(const ProcessArgs& args)
             auto broker = ModuleBroker::get();
             broker->try_bind_client(this);
         }
+    }
+    if (((args.frame + id) % 45) == 0) {
+        if (last_attenuator_target != attenuator_target) {
+            for (int i = L_M1a; i <= L_M6a; ++i) {
+                getLight(i).setSmoothBrightness(i == attenuator_target ? .6f : 0.f, 45);
+            }
+        }
+        last_attenuator_target = attenuator_target;
     }
 }
 

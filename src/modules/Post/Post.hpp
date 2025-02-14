@@ -19,7 +19,7 @@ struct PostModule : ChemModule, IChemClient
         P_MIX,
         P_TILT,
         P_FREQUENCY,
-        P_ATTENUATION,
+        P_ATTENUVERT,
         NUM_PARAMS,
         NUM_KNOBS = NUM_PARAMS, 
     };

@@ -31,7 +31,7 @@ enum K {
     K_MIX, 
     K_TILT, 
     K_FREQUENCY, 
-    K_ATTENUATOR
+    K_ATTENUVERTER
 };
 
 PostUi::PostUi(PostModule *module) :
@@ -69,25 +69,30 @@ PostUi::PostUi(PostModule *module) :
     addChild(knobs[K_FREQUENCY] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_FREQUENCY, theme_engine, theme));
     addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Frequency", theme_engine, theme, knob_label_style));
 
-    // TODO: TRIMPOT
-    addChild(knobs[K_ATTENUATOR] = createChemKnob<GreenKnob>(Vec(x, 298), module, PostModule::P_ATTENUATION, theme_engine, theme));
-    
-    if (!my_module || my_module->glow_knobs) {
-        glowing_knobs(true);
-    }
-
     // inputs
-    const float PORT_TOP  = 305.f;
-    const float PORT_DY   = 36.f;
-    const float PORT_DX   = 34.f;
-    y = PORT_TOP;
-    x = 16.f;
+    const NVGcolor co_port = PORT_CORN;
+    y = S::PORT_TOP;
+    x = CENTER - S::PORT_DX;
+    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, PostModule::P_ATTENUVERT, theme_engine, theme));
+    
+    x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MUTE, PORT_RED, theme_engine, theme)));
-    addChild(Center(createThemedColorInput(Vec(x + PORT_DX + PORT_DX, y), my_module, PostModule::IN_POST_LEVEL, PORT_CORN, theme_engine, theme)));
-    y += PORT_DY;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MIX, PORT_CORN, theme_engine, theme))); x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_TILT, PORT_CORN, theme_engine, theme))); x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_FREQUENCY, PORT_CORN, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MUTE", theme_engine, theme, S::in_port_label));
+    
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_POST_LEVEL, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "LVL", theme_engine, theme, S::in_port_label));
+
+    y += S::PORT_DY;
+    x = CENTER - S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MIX, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MIX", theme_engine, theme, S::in_port_label));
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_TILT, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "TLT", theme_engine, theme, S::in_port_label));
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_FREQUENCY, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "FRQ", theme_engine, theme, S::in_port_label));
 
     // footer
 
@@ -117,6 +122,10 @@ PostUi::PostUi(PostModule *module) :
     }
 
     // init
+
+    if (!my_module || my_module->glow_knobs) {
+        glowing_knobs(true);
+    }
 
     if (my_module) {
         my_module->ui = this;

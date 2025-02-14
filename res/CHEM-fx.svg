@@ -11,26 +11,26 @@
       <sodipodi:guide position="82.515715,331.1296" orientation="1,0" id="guide2" inkscape:locked="false" />
    </sodipodi:namedview>
    <defs id="defs2">
-      <linearGradient id="section-stops">
+      <linearGradient id="panel-stops">
          <stop offset="0" stop-color="#282828" />
          <stop offset="1" stop-color="#181818" />
       </linearGradient>
-      <linearGradient id="all-gradient" x1="0" y1="0" x2="0" y2="380" xlink:href="#section-stops" gradientUnits="userSpaceOnUse" />
-      <linearGradient id="top-gradient" x1="0" y1="0" x2="0" y2="276" xlink:href="#section-stops" gradientUnits="userSpaceOnUse" />
-      <linearGradient id="inp-gradient" x1="0" y1="0" x2="0" y2="100" xlink:href="#section-stops" gradientUnits="userSpaceOnUse" />
+      <linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" xlink:href="#panel-stops" gradientUnits="userSpaceOnUse" />
    </defs>
    <g id="g1">
-      <rect opacity="1" id="all--sctn" fill="url(#all-gradient)" x="0" y="0" width="165.5" height="380" />
-      <rect opacity="0" id="top--sctn" fill="url(#top-gradient)" x="0" y="0" width="165.5" height="276" />
-      <rect opacity="0" id="inp--sctn" fill="url(#inp-gradient)" x="0" y="280" width="165.5" height="100" />
+      <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="165.5" height="380" />
       <g transform="translate(0,276)" id="separator2">
          <path id="2--d0" stroke="#202020" stroke-width="1" d="M 0,0.5 H 165" />
          <path id="2--d1" stroke="#161616" stroke-width="1" d="M 0,1.5 H 165" />
          <path id="2--d2" stroke="#101010" stroke-width="1" d="M 0,2.5 H 165" />
          <path id="2--d3" stroke="#404040" stroke-width="1" d="M 0,3.5 H 165" />
       </g>
-      <circle id="light" cx="116" cy="58" r="5" fill="#20415f" stroke="#333333" stroke-width="1" />
+      <path id="rv--d0" stroke="#202020" stroke-width="1" d="M 162.5,280.5 v 112" />
+      <path id="rv--d1" stroke="#161616" stroke-width="1" d="M 163.5,279.5 v 112" />
+      <path id="rv--d2" stroke="#101010" stroke-width="1" d="M 164.5,278.5 v 112" />
+      <path id="lv--d3" stroke="#404040" stroke-width="1" d="M 0.5,280 v 112" />
    </g>
+   <circle id="light" cx="116" cy="58" r="5" fill="#20415f" stroke="#333333" stroke-width="1" />
 
    <g id="FX" transform="translate(76, 3.5)">
       <path id="FX--new-title" fill="#f9a54b"

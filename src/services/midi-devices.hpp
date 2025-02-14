@@ -117,7 +117,7 @@ struct MidiDeviceBroker
     std::vector<MidiDeviceHolder*> holders;
     std::map<std::string, MidiDeviceHolder*> claims;
 
-    MidiDeviceBroker() {}
+    MidiDeviceBroker();
     static std::shared_ptr<MidiDeviceBroker> get();
 
     bool is_primary(MidiDeviceHolder* holder);

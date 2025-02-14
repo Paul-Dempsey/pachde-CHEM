@@ -13,6 +13,10 @@
             "th": {"stroke": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
+            "t0": { "stroke": "#d9d9d9" },
+            "t1": { "stroke": "#cfcfcf" },
+            "t2": { "stroke": "#bfbfbf" },
+            "t3": { "stroke": "#ededed" },
             "d0": { "stroke": "#d9d9d9" },
             "d1": { "stroke": "#cfcfcf" },
             "d2": { "stroke": "#bfbfbf" },
@@ -88,12 +92,6 @@
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
             "cop-bezel": { "fill": "#5d8ed7", "opacity": 0.2 },
            
-            "knob-bg":    { "fill" : { "gradient" : [{ "index":0, "offset":0, "color":"#e5e5e5" }, { "index": 1, "offset":1, "color":"#909090" }]}},
-            "knob-ring":  { "stroke": "#595959" },
-            "knob-index": { "fill": "#404040" },
-
-            "alpha-knob-bg": { "fill" : { "gradient" : [{ "index": 0, "offset":0, "color":"#4095bf" }, { "index": 1, "offset":1, "color":"#204a5f" }]}},
-
             "screw-rim":   { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#cacaca" }, { "index": 1, "offset": 1, "color": "#9d9d9d" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#b8b8b8" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#ebebeb" }, { "index": 1, "offset": 1, "color": "#cccccc" }]}},

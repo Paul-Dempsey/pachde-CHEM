@@ -13,7 +13,8 @@ std::shared_ptr<ModuleBroker> ModuleBroker::get()
 }
 
 ModuleBroker::ModuleBroker()
-{ 
+{
+    hosts.reserve(4);
 }
 
 ModuleBroker::~ModuleBroker()

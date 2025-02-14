@@ -12,10 +12,15 @@
             "new-title": {"fill": "brand" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
-            "d0": { "stroke": "#202020" },
-            "d1": { "stroke": "#161616" },
-            "d2": { "stroke": "#101010" },
-            "d3": { "stroke": "#325668" },
+            "t0": { "stroke": " #202020" },
+            "t1": { "stroke": " #161616" },
+            "t2": { "stroke": " #101010" },
+            "t3": { "stroke": " #325668" },
+
+            "d0": { "stroke": " #202020" },
+            "d1": { "stroke": " #161616" },
+            "d2": { "stroke": " #101010" },
+            "d3": { "stroke": " #325668" },
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":"#80afc7"}, { "index":1, "color":" #091921"}]}},
             "k-rim": { "stroke": " #325261" },
@@ -87,12 +92,6 @@
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
             "cop-bezel": { "opacity": 0.5 },
             
-            "knob-bg":    { "fill" : { "gradient" : [ { "index":0, "offset":0, "color":"#808080" }, { "index":1, "offset":1, "color":"#202020" } ] } },
-            "knob-ring":  { "stroke": "#595959" },
-            "knob-index": { "fill": "#404040" },
-
-            "alpha-knob-bg": { "fill" : { "gradient" : [ { "index": 0, "offset":0, "color":"#4095bf" }, { "index": 1, "offset":1, "color":"#204a5f" } ] } },
-
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#4f798f" }, { "index":1, "offset":1, "color": "#233d4a" } ] } },
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#658fa4" }, { "index":1, "offset":1, "color": "#2c4b5a" } ] } },
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#528097" }, { "index":1, "offset":1, "color": "#33596b" } ] } },

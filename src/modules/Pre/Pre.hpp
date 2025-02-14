@@ -43,6 +43,7 @@ struct PreModule : ChemModule, IChemClient
         P_THRESHOLD_DRIVE,
         P_ATTACK_,
         P_RATIO_MAKEUP,
+        P_ATTENUVERT,
         P_COMP_TANH,
         NUM_KNOBS = P_COMP_TANH,
         NUM_PARAMS
@@ -88,8 +89,11 @@ struct PreUi : ChemModuleWidget, IChemClient
     StaticTextLabel* top_knob_label;
     StaticTextLabel* mid_knob_label;
     StaticTextLabel* bot_knob_label;
+    StaticTextLabel* in_thresh_drive;
+    StaticTextLabel* in_attack_x;
+    StaticTextLabel* in_ratio_makeup;
 
-    GlowKnob* knobs[PreModule::NUM_PARAMS];
+    GlowKnob* knobs[PreModule::NUM_KNOBS];
 
     PreUi(PreModule *module);
     ~PreUi();

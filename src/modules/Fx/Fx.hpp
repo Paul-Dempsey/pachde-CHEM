@@ -46,6 +46,7 @@ struct FxModule : ChemModule, IChemClient
         P_R5,
         P_R6,
         P_MIX,
+        P_ATTENUVERT,
         NUM_KNOBS,
 
         // Switches

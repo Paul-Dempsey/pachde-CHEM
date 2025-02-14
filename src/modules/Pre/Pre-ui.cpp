@@ -25,9 +25,10 @@ PreUi::~PreUi()
 enum K { 
     K_PRE_LEVEL, 
     K_MIX, 
-    K_THRESHOLD, 
-    K_ATTACK, 
-    K_RATIO
+    K_THRESH_DRIVE, 
+    K_ATTACK_X, 
+    K_RATIO_MAKEUP,
+    K_ATTENUVERTER
 };
 
 PreUi::PreUi(PreModule *module) :
@@ -62,33 +63,45 @@ PreUi::PreUi(PreModule *module) :
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
     y = PARAM_TOP;
-    addChild(knobs[K_THRESHOLD] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
+    addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
     addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Drive" : "Threshhold", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
-    addChild(knobs[K_ATTACK] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK_, theme_engine, theme));
+    addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK_, theme_engine, theme));
     addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "—" : "Attack", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
-    addChild(knobs[K_RATIO] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
+    addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
     addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Makeup" : "Ratio", theme_engine, theme, knob_label_style));
     
-    if (!my_module || my_module->glow_knobs) {
-        glowing_knobs(true);
-    }
-
     // inputs
-    addChild(Center(createThemedColorInput(Vec(34.f, 305.f), my_module, PreModule::IN_PRE_LEVEL, PORT_CORN, theme_engine, theme)));
-    const float PORT_Y = 341.f;
-    const float PORT_DX = 26.f;
-    x = 14.f;
-    addChild(Center(createThemedColorInput(Vec(x, PORT_Y), my_module, PreModule::IN_MIX, PORT_CORN, theme_engine, theme))); x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, PORT_Y), my_module, PreModule::IN_THRESHOLD, PORT_CORN, theme_engine, theme))); x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, PORT_Y), my_module, PreModule::IN_ATTACK, PORT_CORN, theme_engine, theme))); x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, PORT_Y), my_module, PreModule::IN_RATIO, PORT_CORN, theme_engine, theme)));
+    auto co_port = PORT_CORN;
+    y = S::PORT_TOP;
+    x = CENTER - S::PORT_DX;
+    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, PreModule::P_ATTENUVERT, theme_engine, theme));
 
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35, "LVL", theme_engine, theme, S::in_port_label));
+
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, co_port, theme_engine, theme)));
+    addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "—":"A", theme_engine, theme, S::in_port_label));
+
+    y += S::PORT_DY;
+    x = CENTER - S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "MIX", theme_engine, theme, S::in_port_label));
+
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD, co_port, theme_engine, theme)));
+    addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "D":"TH", theme_engine, theme, S::in_port_label));
+
+    x += S::PORT_DX;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO, co_port, theme_engine, theme)));
+    addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "MU":"R", theme_engine, theme, S::in_port_label));
+    
     // footer
-
     addChild(warning_label = createStaticTextLabel<TipLabel>(
         Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
@@ -115,6 +128,10 @@ PreUi::PreUi(PreModule *module) :
     }
 
     // init
+
+    if (!my_module || my_module->glow_knobs) {
+        glowing_knobs(true);
+    }
 
     if (my_module) {
         my_module->ui = this;

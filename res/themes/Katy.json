@@ -18,16 +18,30 @@
             "new-title": {"fill": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#df62a6"}, { "index":1, "color":"#c84a90"}]}},
+            "t0": { "stroke": "#b74885" },
+            "t1": { "stroke": "#bd518d" },
+            "t2": { "stroke": "#c25c94" },
+            "t3": { "stroke": "#e36eae" },
+
             "d0": { "stroke": "#a9427b" },
             "d1": { "stroke": "#a03d73" },
             "d2": { "stroke": "#95386b" },
             "d3": { "stroke": "#e269ac" },
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #c2a6fa"}, { "index":1, "color":" #7f52d7"}]}},
-            "k-rim": { "stroke": "#956de5" },
+            "k-rim": { "stroke": "#7a59be" },
             "k-gnomen": { "fill": "#2d0974" },
             "k-taper": {  "fill": "#3b138b" },
             "k-pin": { "fill": "none", "stroke": {"color":" #4a1aaa", "width":1.5 }},
+
+            "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
+            "ky-rim":  { "stroke" : "#cb8433" },
+
+            "kb-face": { "fill" : { "gradient" : [
+                { "index":0, "color": "#8d96fc" }, 
+                { "index":1, "color": "#051194" }]}},
+            "kb-rim":  { "stroke" : "#4b529b" },
+            "kb-pin": { "fill": "none", "stroke": {"color":" #4a1aaa", "width":1.5 }},
 
             "ped-assign": { "fill": "brand" },
 
@@ -99,13 +113,7 @@
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
             "cop-bezel": { "fill": "g75", "opacity": 0.2 },
             "cop-ring": { "fill": "g40" },
-            "cop-hole": { "fill": "g5"},
-
-            "knob-bg":    { "fill" : { "gradient" : [ { "index":0, "offset":0, "color":"#808080" }, { "index":1, "offset":1, "color":"#202020" }]}},
-            "knob-ring":  { "stroke": "#595959" },
-            "knob-index": { "fill": "#404040" },
-
-            "alpha-knob-bg": { "fill" : { "gradient" : [ { "index": 0, "offset":0, "color":"#4095bf" }, { "index": 1, "offset":1, "color":"#204a5f" }]}},
+            "cop-hole": { "fill": "g5" },
 
             "patty": { "stroke": "#decc2f"},
             "patty-hover": { "stroke": "brand"},

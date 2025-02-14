@@ -16,11 +16,40 @@ struct MacroUi;
 
 struct MacroModule : ChemModule, IChemClient
 {
+    enum Params {
+        P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
+        P_ATTENUVERT,
+        NUM_KNOBS,
+        NUM_PARAMS = NUM_KNOBS
+    };
+    enum Inputs {
+        IN_INVALID = -1,
+        IN_M1,
+        IN_M2,
+        IN_M3,
+        IN_M4,
+        IN_M5,
+        IN_M6,
+        NUM_INPUTS
+    };
+    enum Outputs {
+        NUM_OUTPUTS
+    };
+    enum Lights {
+        L_M1a, L_M2a, L_M3a, L_M4a, L_M5a, L_M6a,
+        NUM_LIGHTS
+    };
+
     std::string device_claim;
     IChemHost* chem_host;
     MacroUi* ui;
     rack::dsp::Timer poll_host;
 
+    int attenuator_target;
+    int last_attenuator_target;
+    float attenuation[NUM_INPUTS]{0.f};
+
+    // options
     bool glow_knobs;
 
     MacroModule();
@@ -39,29 +68,10 @@ struct MacroModule : ChemModule, IChemClient
 
     // ----  Rack  ------------------------------------------
 
-    enum Params {
-        P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
-        NUM_PARAMS
-    };
-    enum Inputs {
-        IN_M1,
-        IN_M2,
-        IN_M3,
-        IN_M4,
-        IN_M5,
-        IN_M6,
-        NUM_INPUTS
-    };
-    enum Outputs {
-        NUM_OUTPUTS
-    };
-    enum Lights {
-        NUM_LIGHTS
-    };
-
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void onPortChange(const PortChangeEvent& e) override;
     void process(const ProcessArgs& args) override;
 };
 
@@ -94,7 +104,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     StaticTextLabel* m5_ped_label;
     StaticTextLabel* m6_ped_label;
 
-    GlowKnob* knobs[6];
+    GlowKnob* knobs[MacroModule::NUM_KNOBS];
 
     MacroUi(MacroModule *module);
     ~MacroUi();

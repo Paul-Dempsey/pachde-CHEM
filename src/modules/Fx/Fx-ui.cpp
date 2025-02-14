@@ -15,7 +15,7 @@ FxUi::~FxUi()
 {
 }
 
-enum K { K_R1, K_R2, K_R3, K_R4, K_R5, K_R6, K_MIX, K_EFFECT };
+enum K { K_R1, K_R2, K_R3, K_R4, K_R5, K_R6, K_MIX, K_ATTENUVERTER };
 
 FxUi::FxUi(FxModule *module) :
     my_module(module)
@@ -36,7 +36,8 @@ FxUi::FxUi(FxModule *module) :
     addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(34.f, 28.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Left, 16.f, true}));
     
     // knobs with labels
-    const float CENTER = 82.5f;
+    const float PANEL_WIDTH = 165.f;
+    const float CENTER = PANEL_WIDTH*.5f;
     const float DY_KNOB = 60.f;
     const float KNOB_DX = 32.f;
     const float KNOB_TOP = 114.f;
@@ -62,29 +63,27 @@ FxUi::FxUi(FxModule *module) :
     knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(CENTER, 70.f), my_module, FxModule::P_MIX, theme_engine, theme);
     addChild(knobs[K_MIX]);
 
-    if (!my_module || my_module->glow_knobs) {
-        glowing_knobs(true);
-    }
-
     // inputs
-    // x = 14.f;
-    const float PORT_LEFT = 62.75f;
-    const float PORT_DX   = 38.75f;
-    const float PORT_TOP  = 305.f;
-    const float PORT_DY   = 36.f;
-    x = PORT_LEFT;
-    y = PORT_TOP;
+    const NVGcolor co_port = PORT_CORN;
+    const float PORT_LEFT = CENTER - (1.5f*S::PORT_DX);
+
+    x = PORT_LEFT + S::PORT_DX;
+    y = S::PORT_TOP;
     for (int i = 0; i <= K_R6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, PORT_CORN, theme_engine, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, co_port, theme_engine, theme)));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
-        x += PORT_DX;
+        x += S::PORT_DX;
         if (i == 2) {
-            y += PORT_DY;
-            x = PORT_LEFT;
+            y += S::PORT_DY;
+            x = PORT_LEFT + S::PORT_DX;
         }
     }
-    addChild(Center(createThemedColorInput(Vec(23.f, y), my_module, FxModule::IN_MIX, PORT_CORN, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(23.f, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
+    y = S::PORT_TOP;
+    x = PORT_LEFT;
+    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_ATTENUVERT, theme_engine, theme));
+    y += S::PORT_DY;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
 
     // footer
 
@@ -114,6 +113,9 @@ FxUi::FxUi(FxModule *module) :
     }
 
     // init
+    if (!my_module || my_module->glow_knobs) {
+        glowing_knobs(true);
+    }
 
     if (my_module) {
         my_module->ui = this;
