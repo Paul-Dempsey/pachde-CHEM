@@ -22,6 +22,8 @@ bool MacroUi::connected() {
 MacroUi::~MacroUi()
 {
 }
+
+using MM = MacroModule;
 constexpr const float PANEL_WIDTH = 120.f;
 constexpr const float CENTER = PANEL_WIDTH * .5f;
 constexpr const float KNOB_CX = 25.f;
@@ -33,6 +35,9 @@ constexpr const float LABEL_TOP = KNOB_CY;
 
 constexpr const float INPUT_DX = PANEL_WIDTH*.25f;
 constexpr const float INPUT_LEFT = CENTER - (1.5f*INPUT_DX);
+
+constexpr const float ATT_CONNECTOR_X = INPUT_LEFT + 10.f;
+constexpr const float ATT_CONNECTOR_Y = S::PORT_TOP + S::PORT_DY*.5f + 10.f;
 
 enum M { M1, M2, M3, M4, M5, M6, K_ATTENUVERTER };
 
@@ -183,11 +188,14 @@ void MacroUi::onPresetChange()
 {
 }
 
-// void MacroUi::step()
-// {
-//     Base::step();
-    
-// }
+void MacroUi::step()
+{
+    Base::step();
+    if (!my_module) return;
+
+    knobs[K_ATTENUVERTER]->enable(my_module->attenuator_target >= 0);
+
+}
 
 void MacroUi::draw(const DrawArgs& args)
 {

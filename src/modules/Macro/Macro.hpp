@@ -19,8 +19,8 @@ struct MacroModule : ChemModule, IChemClient
     enum Params {
         P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
         P_ATTENUVERT,
-        NUM_KNOBS,
-        NUM_PARAMS = NUM_KNOBS
+        NUM_KNOBS = P_ATTENUVERT,
+        NUM_PARAMS
     };
     enum Inputs {
         IN_INVALID = -1,
@@ -53,7 +53,7 @@ struct MacroModule : ChemModule, IChemClient
     bool glow_knobs;
 
     MacroModule();
-    ~MacroModule() {
+    virtual ~MacroModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
@@ -72,6 +72,8 @@ struct MacroModule : ChemModule, IChemClient
     json_t* dataToJson() override;
 
     void onPortChange(const PortChangeEvent& e) override;
+
+    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -107,7 +109,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
 
     MacroUi(MacroModule *module);
-    ~MacroUi();
+    virtual ~MacroUi();
 
     bool connected();
     void glowing_knobs(bool glow);
@@ -123,7 +125,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-macro.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    //void step() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

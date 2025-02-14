@@ -21,7 +21,7 @@ PreModule::PreModule()
     configParam(P_RATIO_MAKEUP,     0.f, 127.f, 0.f, "Ratio");
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
-    configSwitch(P_COMP_TANH,       0.f,   1.f, 0.f, "Select comp/tanh", { "Compressor", "Tanh"});
+    configSwitch(P_SELECT,       0.f,   1.f, 0.f, "Select comp/tanh", { "Compressor", "Tanh"});
 }
 
 void PreModule::dataFromJson(json_t* root)

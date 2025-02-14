@@ -44,8 +44,7 @@ struct PreModule : ChemModule, IChemClient
         P_ATTACK_,
         P_RATIO_MAKEUP,
         P_ATTENUVERT,
-        P_COMP_TANH,
-        NUM_KNOBS = P_COMP_TANH,
+        P_SELECT, NUM_KNOBS = P_SELECT,
         NUM_PARAMS
     };
     enum Inputs {
@@ -84,8 +83,10 @@ struct PreUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
+    int comp_type;
+
     SelectorWidget* selector{nullptr};
-    StaticTextLabel* comptanh_label;
+    StaticTextLabel* selector_label;
     StaticTextLabel* top_knob_label;
     StaticTextLabel* mid_knob_label;
     StaticTextLabel* bot_knob_label;
@@ -112,7 +113,8 @@ struct PreUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-pre.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    //void step() override;
+    void sync_labels();
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

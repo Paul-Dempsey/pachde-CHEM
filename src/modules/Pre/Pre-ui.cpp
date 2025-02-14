@@ -32,7 +32,8 @@ enum K {
 };
 
 PreUi::PreUi(PreModule *module) :
-    my_module(module)
+    my_module(module),
+    comp_type(-1)
 {
     setModule(module);
     initThemeEngine();
@@ -47,10 +48,10 @@ PreUi::PreUi(PreModule *module) :
         addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f)));
     }
 
-    bool tanh = module ? my_module->getParam(PreModule::P_COMP_TANH).getValue() >= .5f : false;
+    comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 72.f), my_module, PreModule::P_COMP_TANH, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, tanh ? "Tanh" : "Compressor", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 72.f), my_module, PreModule::P_SELECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
     x = CENTER;
@@ -64,16 +65,16 @@ PreUi::PreUi(PreModule *module) :
 
     y = PARAM_TOP;
     addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
-    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Drive" : "Threshhold", theme_engine, theme, knob_label_style));
+    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
     addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK_, theme_engine, theme));
-    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "—" : "Attack", theme_engine, theme, knob_label_style));
+    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
     addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
-    addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, tanh ? "Makeup" : "Ratio", theme_engine, theme, knob_label_style));
-    
+    addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
+
     // inputs
     auto co_port = PORT_CORN;
     y = S::PORT_TOP;
@@ -86,7 +87,7 @@ PreUi::PreUi(PreModule *module) :
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, co_port, theme_engine, theme)));
-    addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "—":"A", theme_engine, theme, S::in_port_label));
+    addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
@@ -95,11 +96,11 @@ PreUi::PreUi(PreModule *module) :
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD, co_port, theme_engine, theme)));
-    addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "D":"TH", theme_engine, theme, S::in_port_label));
+    addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO, co_port, theme_engine, theme)));
-    addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, tanh ? "MU":"R", theme_engine, theme, S::in_port_label));
+    addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
     
     // footer
     addChild(warning_label = createStaticTextLabel<TipLabel>(
@@ -132,6 +133,9 @@ PreUi::PreUi(PreModule *module) :
     if (!my_module || my_module->glow_knobs) {
         glowing_knobs(true);
     }
+
+    comp_type = -1; // force refresh
+    sync_labels();
 
     if (my_module) {
         my_module->ui = this;
@@ -175,11 +179,45 @@ void PreUi::onPresetChange()
 {
 }
 
-// void PreUi::step()
-// {
-//     Base::step();
-    
-// }
+void PreUi::sync_labels()
+{
+    if (my_module) {
+        auto pq = my_module->getParamQuantity(PreModule::P_SELECT);
+        if (pq) {
+            auto current = getParamIndex(pq);
+            if (current == comp_type) return;
+            comp_type = current;
+        }
+    }
+    if (comp_type == -1) comp_type = 0;
+    if (comp_type > 0){
+        effect_label   ->text("Tanh");
+        top_knob_label ->text("Drive");
+        mid_knob_label ->text("—");
+        knobs[K_ATTACK_X]->enable(false);
+        bot_knob_label ->text("Makeup");
+        in_attack_x    ->text("—");
+        in_thresh_drive->text("D");
+        in_ratio_makeup->text("MU");
+    } else {
+        effect_label   ->text("Compressor");
+        top_knob_label ->text("Threshhold");
+        mid_knob_label ->text("Attack");
+        knobs[K_ATTACK_X]->enable(true);
+        bot_knob_label ->text("Ratio");
+        in_attack_x    ->text("A");
+        in_thresh_drive->text("TH");
+        in_ratio_makeup->text("R");
+    }
+
+}
+
+void PreUi::step()
+{
+    Base::step();
+    if (!my_module) return;
+    sync_labels();
+}
 
 void PreUi::draw(const DrawArgs& args)
 {

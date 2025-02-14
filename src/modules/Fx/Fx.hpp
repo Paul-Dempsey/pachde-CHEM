@@ -47,10 +47,9 @@ struct FxModule : ChemModule, IChemClient
         P_R6,
         P_MIX,
         P_ATTENUVERT,
-        NUM_KNOBS,
 
         // Switches
-        P_ENABLE = NUM_KNOBS,
+        P_ENABLE, NUM_KNOBS = P_ENABLE,
         P_EFFECT,
 
         NUM_PARAMS
@@ -102,8 +101,10 @@ struct FxUi : ChemModuleWidget, IChemClient
     StaticTextLabel* r_labels[6];
     GlowKnob* knobs[FxModule::NUM_KNOBS];
 
+    int effect{-1};
+
     FxUi(FxModule *module);
-    ~FxUi();
+    virtual ~FxUi();
 
     bool connected();
     void glowing_knobs(bool glow);
@@ -119,7 +120,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-fx.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    //void step() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

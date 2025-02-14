@@ -2,6 +2,7 @@
 #pragma once
 #include "../plugin.hpp"
 #include "../services/svgtheme.hpp"
+#include "../services/colors.hpp"
 #include "TipWidget.hpp"
 using namespace svg_theme;
 
@@ -260,18 +261,64 @@ using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
 
 struct GlowKnob : rack::RoundKnob {
+    using Base = rack::RoundKnob;
+    bool enabled{true};
     bool bright{false};
+    bool wire{false};
+
     GlowKnob() {
         box.size.x = 32.f;
         box.size.y = 32.f;
         this->shadow->hide();
     }
+
+    // enabling
+    void enable(bool on) { enabled = on; }
+    void onButton(const ButtonEvent& e) override{
+        if (!enabled) {
+            e.stopPropagating();
+            return;
+        }
+        Base::onButton(e);
+    }
+    void onHoverScroll(const HoverScrollEvent& e) override {
+        if (enabled) Base::onHoverScroll(e);
+        e.consume(this);
+    }
+    void onChange(const ChangeEvent& e) override {
+        if (enabled) Base::onChange(e);
+        e.consume(this);
+    }
+
+    // "glowing"
     void glowing(bool glow) { bright = glow; }
+
     void drawLayer(const DrawArgs& args, int layer) override
     {
         if (layer != 1) return;
+        if (!enabled) return;
         if (rack::settings::rackBrightness > .95f) return;
         if (bright) fb->draw(args);
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        if (enabled && bright && rack::settings::rackBrightness < .95f) return;
+        if (enabled) {
+            Base::draw(args);
+        } else {
+            if (wire) {
+                float cx = box.size.x*.5f;
+                float cy = box.size.y*.5f;
+                float r = box.size.x*.5f - 1.25f;
+                auto co = RampGray(G_40);
+                OpenCircle(args.vg, cx, cy, r, co, .75f);
+                Line(args.vg, cx, cy - 1.f, cx, cy - r, co, .75f);
+            } else {
+                Base::draw(args);
+                Circle(args.vg, box.size.x*.5f, box.size.y*.5f, box.size.x*.5f - 1.f, nvgTransRGBAf(RampGray(G_55), .6f));
+            }
+        }
     }
 };
 
@@ -279,7 +326,6 @@ template<typename TSvg>
 struct TKnob : GlowKnob, IApplyTheme
 {
     using Base = GlowKnob;
-    bool wire{false};
 
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
@@ -294,11 +340,14 @@ struct TKnob : GlowKnob, IApplyTheme
     {
         if (layer != 1) return;
         if (rack::settings::rackBrightness > .95f) return;
+
         bool base_bright = bright;
         if (wire) {
             bright = true;
         }
+
         Base::drawLayer(args, layer);
+
         if (wire) {
             bright = base_bright;
         }

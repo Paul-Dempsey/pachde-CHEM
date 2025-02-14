@@ -164,11 +164,62 @@ bool FxUi::connected() {
     return true;
 }
 
-// void FxUi::step()
-// {
-//     Base::step();
-    
-// }
+void FxUi::step()
+{
+    Base::step();
+
+    auto pq = my_module ? my_module->getParamQuantity(FxModule::P_EFFECT) : nullptr;
+    auto index = pq ? getParamIndex(pq) : 0;
+    if (index != effect) {
+        effect = index;
+        effect_label->text(pq ? pq->getDisplayValueString() : "Short reverb");
+
+        bool six_param = (Haken::R_shortRev == effect || Haken::R_longRev == effect);
+        knobs[K_R5]->enable(six_param);
+        knobs[K_R6]->enable(six_param);
+        if (!six_param) {
+            r_labels[K_R5]->text("—");
+            r_labels[K_R6]->text("—");
+        }
+
+        switch (effect) {
+        case Haken::R_shortRev:
+        case Haken::R_longRev:
+            r_labels[K_R1]->text("Diffuse");
+            r_labels[K_R2]->text("LPF");
+            r_labels[K_R3]->text("Damping");
+            r_labels[K_R4]->text("Decay");
+            r_labels[K_R5]->text("PreDelay");
+            r_labels[K_R6]->text("HPF");
+            break;
+        case Haken::R_modDel:
+        case Haken::R_swepEcho:
+            r_labels[K_R1]->text("ModDepth");
+            r_labels[K_R2]->text("ModRate");
+            r_labels[K_R3]->text("Feedback");
+            r_labels[K_R4]->text("Time");
+            break;
+        default:
+            switch (effect) {
+            case Haken::R_anaEcho:
+                r_labels[K_R1]->text("Noise");
+                break;
+            case Haken::R_digEchoLPF:
+                r_labels[K_R1]->text("LPF");
+                break;
+            case Haken::R_digEchoHPF:
+                r_labels[K_R1]->text("HPF");
+                break;
+            default: r_labels[K_R1]->text("R1");
+                break;
+            }
+            r_labels[K_R2]->text("Offset");
+            r_labels[K_R3]->text("Feedback");
+            r_labels[K_R4]->text("Time");
+            break;
+        }
+    }
+}
 
 void FxUi::draw(const DrawArgs& args)
 {

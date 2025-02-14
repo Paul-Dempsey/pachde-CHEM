@@ -88,14 +88,36 @@ void MacroModule::onPortChange(const PortChangeEvent& e)
     if (e.type == Port::OUTPUT) return;
     if (e.connecting) {
         attenuator_target = e.portId;
+        auto pq = getParamQuantity(P_ATTENUVERT);
+        if (pq) {
+            pq->setImmediateValue(attenuation[attenuator_target]);
+        }
     } else {
         for (int i = IN_M1; i <= IN_M6; ++i) {
             if (getInput(i).isConnected()) {
                 attenuator_target = i;
+                auto pq = getParamQuantity(P_ATTENUVERT);
+                if (pq) {
+                    pq->setImmediateValue(attenuation[i]);
+                }
                 return;
             }
         }
         attenuator_target = Inputs::IN_INVALID;
+        auto pq = getParamQuantity(P_ATTENUVERT);
+        if (pq) {
+            pq->setImmediateValue(0.f);
+        }
+    }
+}
+
+void MacroModule::process_params(const ProcessArgs& args)
+{
+    if (attenuator_target >= 0) {
+        auto pq = getParamQuantity(P_ATTENUVERT);
+        if (pq) {
+            attenuation[attenuator_target] = pq->getValue();
+        }
     }
 }
 
@@ -107,10 +129,16 @@ void MacroModule::process(const ProcessArgs& args)
             broker->try_bind_client(this);
         }
     }
-    if (((args.frame + id) % 45) == 0) {
+
+    if (((args.frame + id) % 40) == 0) {
+        process_params(args);
+    }
+
+    if (((args.frame + id) % 63) == 0) {
+        // attenuator lights
         if (last_attenuator_target != attenuator_target) {
             for (int i = L_M1a; i <= L_M6a; ++i) {
-                getLight(i).setSmoothBrightness(i == attenuator_target ? .6f : 0.f, 45);
+                getLight(i).setSmoothBrightness(i == attenuator_target ? .6f : 0.f, 90);
             }
         }
         last_attenuator_target = attenuator_target;
