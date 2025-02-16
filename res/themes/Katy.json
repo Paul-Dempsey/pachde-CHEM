@@ -18,15 +18,8 @@
             "new-title": {"fill": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#df62a6"}, { "index":1, "color":"#c84a90"}]}},
-            "t0": { "stroke": "#b74885" },
-            "t1": { "stroke": "#bd518d" },
-            "t2": { "stroke": "#c25c94" },
-            "t3": { "stroke": "#e36eae" },
 
-            "d0": { "stroke": "#a9427b" },
-            "d1": { "stroke": "#a03d73" },
-            "d2": { "stroke": "#95386b" },
-            "d3": { "stroke": "#e269ac" },
+            "div": { "stroke": "#f78ec8" },
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #c2a6fa"}, { "index":1, "color":" #7f52d7"}]}},
             "k-rim": { "stroke": "#7a59be" },

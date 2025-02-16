@@ -19,8 +19,7 @@ struct MacroModule : ChemModule, IChemClient
     enum Params {
         P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
         P_ATTENUVERT,
-        NUM_KNOBS = P_ATTENUVERT,
-        NUM_PARAMS
+        NUM_PARAMS, NUM_KNOBS = NUM_PARAMS
     };
     enum Inputs {
         IN_INVALID = -1,
@@ -53,7 +52,7 @@ struct MacroModule : ChemModule, IChemClient
     bool glow_knobs;
 
     MacroModule();
-    virtual ~MacroModule() {
+    ~MacroModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
@@ -109,8 +108,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
 
     MacroUi(MacroModule *module);
-    virtual ~MacroUi();
-
+    ~MacroUi();
     bool connected();
     void glowing_knobs(bool glow);
 

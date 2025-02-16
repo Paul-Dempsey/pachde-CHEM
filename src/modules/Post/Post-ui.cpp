@@ -22,10 +22,6 @@ bool PostUi::connected() {
     return true;
 }
 
-PostUi::~PostUi()
-{
-}
-
 enum K { 
     K_POST_LEVEL, 
     K_MIX, 
@@ -46,10 +42,6 @@ PostUi::PostUi(PostModule *module) :
     float x, y;
     bool browsing = !module;
 
-    if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f)));
-    }
-
     addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
@@ -68,6 +60,13 @@ PostUi::PostUi(PostModule *module) :
     y += PARAM_DY;
     addChild(knobs[K_FREQUENCY] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_FREQUENCY, theme_engine, theme));
     addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Frequency", theme_engine, theme, knob_label_style));
+    y += PARAM_DY;
+
+    if (browsing) {
+        auto logo = new Logo(0.35f);
+        logo->box.pos = Vec(CENTER - logo->box.size.x*.5, y - 16.f);
+        addChild(logo);
+    }
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -97,7 +96,7 @@ PostUi::PostUi(PostModule *module) :
     // footer
 
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(S::CORE_LINK_TEXT, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
+        Vec(S::CORE_LINK_TEXT, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
@@ -115,11 +114,6 @@ PostUi::PostUi(PostModule *module) :
         });
     }
     addChild(link_button);
-
-    // Browsing UI
-
-    if (browsing) {
-    }
 
     // init
 

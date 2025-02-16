@@ -19,16 +19,7 @@
    </defs>
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="165.5" height="380" />
-      <g transform="translate(0,276)" id="separator2">
-         <path id="2--d0" stroke="#202020" stroke-width="1" d="M 0,0.5 H 165" />
-         <path id="2--d1" stroke="#161616" stroke-width="1" d="M 0,1.5 H 165" />
-         <path id="2--d2" stroke="#101010" stroke-width="1" d="M 0,2.5 H 165" />
-         <path id="2--d3" stroke="#404040" stroke-width="1" d="M 0,3.5 H 165" />
-      </g>
-      <path id="rv--d0" stroke="#202020" stroke-width="1" d="M 162.5,280.5 v 112" />
-      <path id="rv--d1" stroke="#161616" stroke-width="1" d="M 163.5,279.5 v 112" />
-      <path id="rv--d2" stroke="#101010" stroke-width="1" d="M 164.5,278.5 v 112" />
-      <path id="lv--d3" stroke="#404040" stroke-width="1" d="M 0.5,280 v 112" />
+      <path id="b--div" fill="none" stroke="#737373" stroke-width="0.5"  d="M 2,278 h 160" />
    </g>
    <circle id="light" cx="116" cy="58" r="5" fill="#20415f" stroke="#333333" stroke-width="1" />
 

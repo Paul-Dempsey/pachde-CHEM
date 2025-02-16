@@ -104,7 +104,6 @@ struct FxUi : ChemModuleWidget, IChemClient
     int effect{-1};
 
     FxUi(FxModule *module);
-    virtual ~FxUi();
 
     bool connected();
     void glowing_knobs(bool glow);

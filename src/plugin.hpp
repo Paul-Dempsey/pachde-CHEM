@@ -17,6 +17,7 @@ extern Model* modelMacro;
 extern Model* modelPre;
 extern Model* modelFx;
 extern Model* modelPost;
+extern Model* modelConvo;
 extern Model* modelPreset;
 
 // Theming

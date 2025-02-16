@@ -8,20 +8,20 @@ PreModule::PreModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configInput(IN_PRE_LEVEL, "Pre level");
+    configInput(IN_PRE_LEVEL, "Pre-level");
     configInput(IN_MIX,       "Mix");
     configInput(IN_THRESHOLD, "Threshold");
     configInput(IN_ATTACK,    "Attack");
     configInput(IN_RATIO,     "Ratio");
     
-    configParam(P_PRE_LEVEL,        0.f, 127.f, 0.f, "Prelevel");
-    configParam(P_MIX,              0.f, 127.f, 0.f, "Mix");
-    configParam(P_THRESHOLD_DRIVE,  0.f, 127.f, 0.f, "Threshold");
-    configParam(P_ATTACK_,          0.f, 127.f, 0.f, "Attack");
-    configParam(P_RATIO_MAKEUP,     0.f, 127.f, 0.f, "Ratio");
+    configParam(P_PRE_LEVEL,       0.f, 127.f, 0.f, "Pre-level");
+    configParam(P_MIX,             0.f, 127.f, 0.f, "Mix");
+    configParam(P_THRESHOLD_DRIVE, 0.f, 127.f, 0.f, "Threshold");
+    configParam(P_ATTACK_,         0.f, 127.f, 0.f, "Attack");
+    configParam(P_RATIO_MAKEUP,    0.f, 127.f, 0.f, "Ratio");
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
-    configSwitch(P_SELECT,       0.f,   1.f, 0.f, "Select comp/tanh", { "Compressor", "Tanh"});
+    configSwitch(P_SELECT, 0.f, 1.f, 0.f, "Select comp/tanh", { "Compressor", "Tanh"});
 }
 
 void PreModule::dataFromJson(json_t* root)

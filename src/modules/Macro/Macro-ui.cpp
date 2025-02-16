@@ -8,12 +8,11 @@ namespace S = pachde::style;
 
 using namespace svg_theme;
 using namespace pachde;
-namespace fs = ghc::filesystem;
 
 // -- Macro UI -----------------------------------
 
-
-bool MacroUi::connected() {
+bool MacroUi::connected()
+{
     if (!my_module) return false;
     if (!chem_host) return false;
     return true;
@@ -21,15 +20,18 @@ bool MacroUi::connected() {
 
 MacroUi::~MacroUi()
 {
+    if (my_module) {
+        my_module->ui = nullptr;
+    }
 }
 
 using MM = MacroModule;
 constexpr const float PANEL_WIDTH = 120.f;
 constexpr const float CENTER = PANEL_WIDTH * .5f;
 constexpr const float KNOB_CX = 25.f;
-constexpr const float KNOB_CY = 48.f;
+constexpr const float KNOB_CY = 35.f;
 constexpr const float KNOB_TOP = KNOB_CY - 16.f;
-constexpr const float MACRO_DY = 40.f;
+constexpr const float MACRO_DY = 41.5f;
 constexpr const float LABEL_LEFT = 45.f;
 constexpr const float LABEL_TOP = KNOB_CY;
 
@@ -52,8 +54,6 @@ MacroUi::MacroUi(MacroModule *module) :
     setPanel(panel);
     float x, y;
     bool browsing = !module;
-
-    if (browsing) { addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f))); }
 
     // knobs
     x = KNOB_CX;
@@ -108,7 +108,7 @@ MacroUi::MacroUi(MacroModule *module) :
     // footer
 
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
@@ -155,7 +155,7 @@ MacroUi::MacroUi(MacroModule *module) :
 }
 
 void MacroUi::glowing_knobs(bool glow) {
-    for (int i = 0; i < MacroModule::NUM_PARAMS; ++i) {
+    for (int i = 0; i < MacroModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);
     }
 }

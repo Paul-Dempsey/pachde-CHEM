@@ -97,7 +97,6 @@ struct PreUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[PreModule::NUM_KNOBS];
 
     PreUi(PreModule *module);
-    ~PreUi();
 
     bool connected();
     void glowing_knobs(bool glow);

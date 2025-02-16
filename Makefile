@@ -63,6 +63,9 @@ SOURCES += src/modules/Fx/Fx-ui.cpp
 SOURCES += src/modules/Post/Post.cpp
 SOURCES += src/modules/Post/Post-ui.cpp
 
+SOURCES += src/modules/Convo/Convo.cpp
+SOURCES += src/modules/Convo/Convo-ui.cpp
+
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
 

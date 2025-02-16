@@ -17,7 +17,9 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     setPanel(panel);
 
     if (!module) {
-        addChild(createWidgetCentered<Logo>(Vec(box.size.x*.5f, box.size.y*.5)));
+        auto logo = new WatermarkLogo(1.8f);
+        logo->box.pos = Vec(84.f, 180.f - logo->box.size.y*.6);
+        addChild(logo);
     }
     if (module) {
         my_module->set_chem_ui(this);

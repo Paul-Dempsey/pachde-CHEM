@@ -9,13 +9,13 @@ PostModule::PostModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(P_POST_LEVEL,   0.f, 127.f, 64.f, "Post level");
+    configParam(P_POST_LEVEL,   0.f, 127.f, 64.f, "Post-level");
     configParam(P_MIX,          0.f, 127.f, 0.f, "EQ Mix");
     configParam(P_TILT,         0.f, 127.f, 64.f, "EQ Tilt");
     configParam(P_FREQUENCY,    0.f, 127.f, 0.f, "EQ Frequency");
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
-    configInput(IN_POST_LEVEL, "Post level");
+    configInput(IN_POST_LEVEL, "Post-level");
     configInput(IN_MIX,        "EQ Mix");
     configInput(IN_TILT,       "EQ Tilt");
     configInput(IN_FREQUENCY,  "EQ Frequency");

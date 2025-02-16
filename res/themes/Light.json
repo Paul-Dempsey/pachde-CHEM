@@ -13,20 +13,17 @@
             "th": {"stroke": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
-            "t0": { "stroke": "#d9d9d9" },
-            "t1": { "stroke": "#cfcfcf" },
-            "t2": { "stroke": "#bfbfbf" },
-            "t3": { "stroke": "#ededed" },
-            "d0": { "stroke": "#d9d9d9" },
-            "d1": { "stroke": "#cfcfcf" },
-            "d2": { "stroke": "#bfbfbf" },
-            "d3": { "stroke": "#ededed" },
+            "div": { "stroke": "#808080" },
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #efefe0"}, { "index":1, "color":" #686868"}]}},
             "k-rim": { "stroke": "#9b9b9b" },
             "k-gnomen": { "fill": " #f5f5ef" },
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke": { "color": " #202020", "width":1 }},
+
+            "selector": { "fill": "#202020", "stroke": { "color": "#40ab6b", "width":1 }},
+            "selector-sel": { "fill": " #0b873c" },
+            "selector-item": { "fill": " #a0a0a0" },
 
             "ped-assign": { "fill": "brand" },
 

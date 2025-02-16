@@ -36,23 +36,8 @@
 
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="105.5" height="380" />
-      <g transform="translate(0,56)" id="sep1">
-         <path id="a--t0" stroke="#202020" stroke-width="1" d="M 0,0.5 H 105" />
-         <path id="a--t1" stroke="#161616" stroke-width="1" d="M 0,1.5 H 105" />
-         <path id="a--t2" stroke="#101010" stroke-width="1" d="M 0,2.5 H 105" />
-         <path id="a--t3" stroke="#404040" stroke-width="1" d="M 0,3.5 H 105" />
-      </g>
-      <g transform="translate(0,276)" id="separator2" >
-         <path id="2--d0" stroke="#202020" stroke-width="1" d="M 0,0.5 h 105" />
-         <path id="2--d1" stroke="#161616" stroke-width="1" d="M 0,1.5 h 105" />
-         <path id="2--d2" stroke="#101010" stroke-width="1" d="M 0,2.5 h 104" />
-         <path id="2--d3" stroke="#404040" stroke-width="1" d="M 0,3.5 h 103" />
-      </g>
-      <path id="rv--d0" stroke="#202020" stroke-width="1" d="M 101.5,280.5 v 112" />
-      <path id="rv--d1" stroke="#161616" stroke-width="1" d="M 102.5,280.5 v 112" />
-      <path id="rv--d2" stroke="#101010" stroke-width="1" d="M 103.5,280 v 112" />
-      <path id="lv--d3" stroke="#404040" stroke-width="1" d="M 0.5,280 v 112" />
-
+      <path id="t--div" fill="none" stroke="#737373" stroke-width="0.5"  d="M 2,58  h 102" />
+      <path id="b--div" fill="none" stroke="#737373" stroke-width="0.5"  d="M 2,278 h 102" />
    </g>
 
    <circle id="EQ-active" fill="#20415f" stroke="#333333" cx="74" cy="85" r="5" />

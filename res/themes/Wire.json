@@ -12,10 +12,7 @@
             "pachde": {"fill": "brand"},
             "new-title": { "fill": "brand" },
 
-            "d0": { "stroke": "#202020" },
-            "d1": { "stroke": "#161616" },
-            "d2": { "stroke": "#101010" },
-            "d3": { "stroke": "#404040" },
+            "div": { "stroke": "#606060" },
 
             "midi-frame" : { "fill": "none", "stroke": "g65" },
             "midi-face"  : { "fill": "none", "stroke": "g50" },

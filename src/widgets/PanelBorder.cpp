@@ -8,9 +8,10 @@ void removePanelBorder(SvgPanel* panel)
 {
     if (panel->panelBorder) {
         auto child = panel->panelBorder;
-        panel->panelBorder = nullptr;
         panel->fb->removeChild(child);
         panel->fb->setDirty();
+        panel->panelBorder = nullptr;
+        delete child;
     }
 }
 

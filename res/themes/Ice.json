@@ -12,15 +12,7 @@
             "new-title": {"fill": "brand" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
-            "t0": { "stroke": " #202020" },
-            "t1": { "stroke": " #161616" },
-            "t2": { "stroke": " #101010" },
-            "t3": { "stroke": " #325668" },
-
-            "d0": { "stroke": " #202020" },
-            "d1": { "stroke": " #161616" },
-            "d2": { "stroke": " #101010" },
-            "d3": { "stroke": " #325668" },
+            "div": { "stroke": " #325668" },
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":"#80afc7"}, { "index":1, "color":" #091921"}]}},
             "k-rim": { "stroke": " #325261" },

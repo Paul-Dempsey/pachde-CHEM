@@ -67,6 +67,15 @@
       ]
     },
     {
+      "slug": "chem-convo",
+      "name": "CHEM Convo",
+      "description": "CHEM Convo(lutions) for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
       "slug": "chem-play",
       "name": "CHEM Play",
       "description": "CHEM Playlist for Haken Eagan Matrix",

@@ -92,7 +92,6 @@ struct PostUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[PostModule::NUM_PARAMS];
 
     PostUi(PostModule *module);
-    ~PostUi();
 
     bool connected();
     void glowing_knobs(bool glow);

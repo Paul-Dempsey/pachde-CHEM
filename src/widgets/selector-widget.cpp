@@ -55,6 +55,12 @@ bool SelectorWidget::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::sh
         } else {
             active_color = stem_color;
         }
+        pco = theme->getFillColor("selector-item", true);
+        if (isVisibleColor(pco)) {
+            inactive_color = fromPacked(pco);
+        } else {
+            inactive_color = RampGray(G_50);
+        }
     } else {
         head_color = RampGray(G_75);
         stem_color = nvgRGB(0x41, 0xbf, 0x73);
@@ -212,7 +218,7 @@ void SelectorWidget::draw(const DrawArgs& args)
 {
     auto vg = args.vg;
     auto pq = getParamQuantity();
-    auto value = pq ? static_cast<int>(std::floor(pq->getValue())) : minimum;
+    auto value = pq ? static_cast<int>(std::floor(pq->getValue())) : 0;
     assert(in_range(value, minimum, maximum));
 
     if (bright && rack::settings::rackBrightness < .95f) return;

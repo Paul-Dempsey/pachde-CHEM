@@ -174,6 +174,10 @@ struct TButton : SvgButton, IApplyTheme
         return refresh;
     }
     
+    void onHover(const HoverEvent& e) override {
+        e.consume(this);
+    }
+
     void destroyTip() {
         if (tip_holder) { tip_holder->destroyTip(); }
     }
@@ -222,9 +226,10 @@ struct TButton : SvgButton, IApplyTheme
         ui::Menu* menu = createMenu();
     	appendContextMenu(menu);
     }
+
 };
 
-template <class TButton>
+template <typename TButton>
 TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
     TButton * o  = new(TButton);
     o->applyTheme(engine, theme);
@@ -234,6 +239,21 @@ TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_
     }
     return o;
 }
+
+template <typename TButton, typename TLight>
+TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lightId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+    TButton * o  = new(TButton);
+    o->applyTheme(engine, theme);
+	o->box.pos = pos;
+    if (tip) {
+        o->describe(tip);
+    }
+    auto light = createLight<TLight>(Vec(0,0), module, lightId);
+    light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
+    o->addChildBottom(light);
+    return o;
+}
+
 
 struct SmallRoundButtonSvg {
     static std::string up() { return "res/widgets/round-push-up.svg"; }
@@ -259,6 +279,7 @@ using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
+
 
 struct GlowKnob : rack::RoundKnob {
     using Base = rack::RoundKnob;

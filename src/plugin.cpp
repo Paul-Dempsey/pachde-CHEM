@@ -12,6 +12,7 @@ void init(Plugin *p)
 	p->addModel(modelPre);
 	p->addModel(modelFx);
 	p->addModel(modelPost);
+	p->addModel(modelConvo);
 	p->addModel(modelPreset);
 }
 
@@ -28,6 +29,7 @@ bool isPeerModule(Module* me, Module* candidate)
             || (model == modelPre)
             || (model == modelFx)
 			|| (model == modelPost)
+			|| (model == modelConvo)
             || (model == modelPreset)
             // add new models here
         );

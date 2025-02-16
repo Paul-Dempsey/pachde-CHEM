@@ -26,6 +26,7 @@ extern pachde::LabelStyle warning_label; // "warning" 9px left
 extern pachde::LabelStyle haken_label;   // "dytext" 10px left
 extern pachde::LabelStyle in_port_label; // "in-label" 12px Center
 extern pachde::LabelStyle control_label; // "ctl-label" 14px Center
+extern pachde::LabelStyle control_label_left; // "ctl-label" 14px left
 extern pachde::LabelStyle heading_label; // "ctl-label" 16px Center bold
 extern pachde::LabelStyle pedal_label;   // "ped-assign" 9px Lext
 

@@ -18,10 +18,6 @@ bool PreUi::connected() {
     return true;
 }
 
-PreUi::~PreUi()
-{
-}
-
 enum K { 
     K_PRE_LEVEL, 
     K_MIX, 
@@ -44,21 +40,20 @@ PreUi::PreUi(PreModule *module) :
     float x, y;
     bool browsing = !module;
 
-    if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(CENTER, 70.f)));
-    }
-
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 72.f), my_module, PreModule::P_SELECT, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 68.f), my_module, PreModule::P_SELECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 60.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+#ifndef NDEBUG
+    selector->host = "Pre";
+#endif
 
     // knobs
     x = CENTER;
     addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), my_module, PreModule::P_PRE_LEVEL, theme_engine, theme));
     addChild(knobs[K_MIX]       = createChemKnob<BlueKnob>(Vec(x, 96.f), my_module, PreModule::P_MIX, theme_engine, theme));
 
-    const float PARAM_TOP = 136.f;
+    const float PARAM_TOP = 135.f;
     const float PARAM_DY = 54.5f;
     const float label_offset = 18.f;
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
@@ -104,7 +99,7 @@ PreUi::PreUi(PreModule *module) :
     
     // footer
     addChild(warning_label = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
@@ -192,19 +187,23 @@ void PreUi::sync_labels()
     if (comp_type == -1) comp_type = 0;
     if (comp_type > 0){
         effect_label   ->text("Tanh");
+
         top_knob_label ->text("Drive");
         mid_knob_label ->text("—");
         knobs[K_ATTACK_X]->enable(false);
         bot_knob_label ->text("Makeup");
+
         in_attack_x    ->text("—");
         in_thresh_drive->text("D");
-        in_ratio_makeup->text("MU");
+        in_ratio_makeup->text("M");
     } else {
         effect_label   ->text("Compressor");
+
         top_knob_label ->text("Threshhold");
         mid_knob_label ->text("Attack");
         knobs[K_ATTACK_X]->enable(true);
         bot_knob_label ->text("Ratio");
+
         in_attack_x    ->text("A");
         in_thresh_drive->text("TH");
         in_ratio_makeup->text("R");

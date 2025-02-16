@@ -11,10 +11,6 @@ namespace fs = ghc::filesystem;
 
 // -- Fx UI -----------------------------------
 
-FxUi::~FxUi()
-{
-}
-
 enum K { K_R1, K_R2, K_R3, K_R4, K_R5, K_R6, K_MIX, K_ATTENUVERTER };
 
 FxUi::FxUi(FxModule *module) :
@@ -30,21 +26,23 @@ FxUi::FxUi(FxModule *module) :
     float x, y;
     bool browsing = !module;
 
-    if (browsing) { addChild(createWidgetCentered<Logo>(Vec(82.5, 70.f))); }
-
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(12.f, 38.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(34.f, 28.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Left, 16.f, true}));
-    
-    // knobs with labels
     const float PANEL_WIDTH = 165.f;
     const float CENTER = PANEL_WIDTH*.5f;
+
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(9.f, 30.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 22.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+#ifndef NDEBUG
+    selector->host = "Fx";
+#endif
+
+    // knobs with labels
     const float DY_KNOB = 60.f;
-    const float KNOB_DX = 32.f;
+    const float KNOB_DX = 30.f;
     const float KNOB_TOP = 114.f;
     const float LABEL_DY = 18.f;
+
     y = KNOB_TOP;
     x = CENTER - KNOB_DX;
-
     for (int i = 0; i < K_MIX; ++i) {
         knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme);
         addChild(knobs[i]);
@@ -52,11 +50,11 @@ FxUi::FxUi(FxModule *module) :
         r_labels[i] = createStaticTextLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme_engine, theme, S::control_label);
         addChild(r_labels[i]);
 
-        if (i == 2) {
-            x = CENTER + KNOB_DX;
-            y = KNOB_TOP;
-        } else {
+        if (i & 1) {
             y += DY_KNOB;
+            x = CENTER - KNOB_DX;
+        } else {
+            x = CENTER + KNOB_DX;
         }
     }
 
@@ -88,7 +86,7 @@ FxUi::FxUi(FxModule *module) :
     // footer
 
     addChild(warn = createStaticTextLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, browsing ?"[warning/status]":"", theme_engine, theme, S::warning_label));
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warn->describe("[warning/status]");
     warn->glowing(true);
 
