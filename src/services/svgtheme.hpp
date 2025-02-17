@@ -38,7 +38,7 @@ enum ErrorCode {
     IntegerExpected              = 9,
     NameExpected                 = 10,
     ThemeExpected                = 11,
-    InvalidHexColor              = 12,
+    InvalidColor                 = 12,
     OneOfColorOrGradient         = 13,
     TwoGradientStopsMax          = 14,
     GradientStopIndexZeroOrOne   = 15,
@@ -244,7 +244,7 @@ private:
     void logWarning(ErrorCode code, std::string info) {
         log(Severity::Warn, code, info);
     }
-    bool requireValidHexColor(std::string hex, const char * name);
+    bool requireValidColor(const std::string& spec, const char * name);
     bool requireArray(json_t* j, const char * name);
     bool requireObject(json_t* j, const char * name);
     bool requireObjectOrString(json_t* j, const char * name);
@@ -259,7 +259,7 @@ private:
     bool parseTheme(json_t* root, std::shared_ptr<SvgTheme> theme);
     bool parseGradient(json_t* root, Gradient& gradient);
     bool parseColors(json_t* root);
-    bool parseColor(const char * spec, const char *name, PackedColor* result);
+    bool parseColor(const std::string& spec, const char *name, PackedColor* result);
 
     bool applyPaint(std::string tag, NSVGpaint & target, Paint& source);
     bool applyStroke(std::string tag, NSVGshape* shape, std::shared_ptr<Style> style);

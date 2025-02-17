@@ -86,6 +86,31 @@ inline std::string& trim_space(std::string& s) {
     return trim_right(trim_left(s));
 }
 
+bool is_rgb(const std::string& text) {
+    assert(std::string::npos == text.find(' '));
+    auto scan = text.cbegin();
+    if ('r' == *scan++) {
+        if ('g' == *scan++) {
+            if ('b' == *scan++) {
+                return '(' == *scan;
+            }
+        }
+    }
+    return false;
+}
+bool is_hsl(const std::string& text) {
+    assert(std::string::npos == text.find(' '));
+    auto scan = text.cbegin();
+    if ('h' == *scan++) {
+        if ('s' == *scan++) {
+            if ('l' == *scan++) {
+                return '(' == *scan;
+            }
+        }
+    }
+    return false;
+}
+
 inline int hex_value(unsigned char ch) {
     if (ch > 'f' || ch < '0') { return -1; }
     if (ch <= '9') { return ch & 0xF; }
@@ -180,8 +205,126 @@ std::vector<unsigned char> ParseHex(std::string hex) {
     return result;
 }
 
-
 const PackedColor OPAQUE_BLACK = 255 << 24;
+
+inline bool is_number_sep(char ch) { return ' ' == ch || ',' == ch; }
+
+uint64_t parse_uint64(std::string::const_iterator& pos, std::string::const_iterator end)
+{
+    uint64_t r = 0;
+    while (pos != end && std::isdigit(*pos)) {
+        r *= 10;
+        r += *pos - '0';
+        pos++;
+    }
+    return r;
+}
+
+float parse_float(std::string::const_iterator& pos, std::string::const_iterator end)
+{
+    std::string n(pos, end);
+    char * stop;
+    const char *s = n.c_str();
+    float r = std::strtof(s, &stop);
+    if (stop == s) return -1.0f;
+    pos = pos + (stop - s);
+    return r;
+}
+
+float clamp(float a, float min, float max) { return a < min ? min : (a > max ? max : a); }
+float intermediate_hue(float h, float m1, float m2)
+{
+	if (h < 0) h += 1;
+	if (h > 1) h -= 1;
+	if (h < 1.0f/6.0f)
+		return m1 + (m2 - m1) * h * 6.0f;
+	else if (h < 3.0f/6.0f)
+		return m2;
+	else if (h < 4.0f/6.0f)
+		return m1 + (m2 - m1) * (2.0f/3.0f - h) * 6.0f;
+	return m1;
+}
+
+PackedColor PackedFromHSL(float h, float s, float l)
+{
+	float m1, m2;
+	h = fmodf(h, 1.0f);
+	if (h < 0.0f) h += 1.0f;
+	s = clamp(s, 0.0f, 1.0f);
+	l = clamp(l, 0.0f, 1.0f);
+	m2 = l <= 0.5f ? (l * (1 + s)) : (l + s - l * s);
+	m1 = 2 * l - m2;
+	auto r = static_cast<uint8_t>(255 * clamp(intermediate_hue(h + 1.0f/3.0f, m1, m2), 0.0f, 1.0f));
+	auto g = static_cast<uint8_t>(255 * clamp(intermediate_hue(h, m1, m2), 0.0f, 1.0f));
+	auto b = static_cast<uint8_t>(255 * clamp(intermediate_hue(h - 1.0f/3.0f, m1, m2), 0.0f, 1.0f));
+
+    return PackRGB(r,g,b);
+}
+
+PackedColor parseRgbColor(const std::string& text)
+{
+    if (!is_rgb(text)) return OPAQUE_BLACK;
+    auto it = text.cbegin() + 4;
+
+    auto val = parse_uint64(it, text.cend());
+    if (val > 255) return OPAQUE_BLACK;
+    uint8_t r = val;
+    while (it != text.cend() && is_number_sep(*it)) it++;
+
+    val = parse_uint64(it, text.cend());
+    if (val > 255) return OPAQUE_BLACK;
+    uint8_t g = val;
+    while (it != text.cend() && is_number_sep(*it)) it++;
+
+    val = parse_uint64(it, text.cend());
+    if (val > 255) return OPAQUE_BLACK;
+    uint8_t b = val;
+    while (it != text.cend() && ')' != *it) it++;
+    return (it == text.cend()) ? OPAQUE_BLACK: PackRGB(r, g, b);
+}
+
+PackedColor parseHslColor(const std::string& text)
+{
+    if (!is_hsl(text)) return OPAQUE_BLACK;
+    auto it = text.cbegin() + 4;
+
+    auto val = parse_uint64(it, text.cend());
+    float h = static_cast<float>(val % 360)/360.f;
+    if ((it < text.cend() - 3) && ('d' == *it) && ('e' == *(it + 1)) && ('g' == *(it + 2))) {
+        it = it + 3;
+    }
+    while (it != text.cend() && is_number_sep(*it)) it++;
+
+    auto s = parse_float(it, text.cend());
+    if ((s < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    while (it != text.cend() && is_number_sep(*it)) it++;
+
+    auto l = parse_float(it, text.cend());
+    if ((l < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    while (it != text.cend() && ')' != *it) it++;
+    return (it == text.cend()) ? OPAQUE_BLACK: PackedFromHSL(h,s,l);
+}
+
+PackedColor parseHexColor(const std::string& text)
+{
+    auto parts = ParseHex(text);
+    if (parts.size() == 3) {
+        return PackRGB(parts[0], parts[1], parts[2]);
+    }
+    if (parts.size() == 4) {
+        return PackRGBA(parts[0], parts[1], parts[2], parts[3]);
+    }
+    // user error coding the color
+    return OPAQUE_BLACK;
+}
+
+float getNumber(json_t * j)
+{
+    if (json_is_real(j)) return json_real_value(j);
+    if (json_is_number(j)) return json_number_value(j);
+    if (json_is_integer(j)) return static_cast<float>(json_integer_value(j));
+    return 1.f;
+}
 
 void SvgThemeEngine::clear()
 {
@@ -198,10 +341,12 @@ std::shared_ptr<SvgTheme> SvgThemeEngine::getTheme(const std::string& name)
     return r == themes.end() ? nullptr : *r;
 }
 
-bool SvgThemeEngine::requireValidHexColor(std::string hex, const char * name)
+bool SvgThemeEngine::requireValidColor(const std::string& spec, const char * name)
 {
-    if (isValidHexColor(hex)) return true;
-    logError(ErrorCode::InvalidHexColor, format_string("'%s': invalid hex color: '%s'", name, hex.c_str()));
+    if (isValidHexColor(spec)) return true;
+    if (is_rgb(spec)) return true; 
+    if (is_hsl(spec)) return true; 
+    logError(ErrorCode::InvalidColor, format_string("'%s': invalid hex/rgb color: '%s'", name, spec.c_str()));
     return false;
 }
 bool SvgThemeEngine::requireArray(json_t* j, const char * name)
@@ -241,32 +386,21 @@ bool SvgThemeEngine::requireInteger(json_t* j, const char * name)
     return false;
 }
 
-PackedColor parseHexColor(const char * text)
-{
-    auto parts = ParseHex(text);
-    if (parts.size() == 3) {
-        return PackRGB(parts[0], parts[1], parts[2]);
-    }
-    if (parts.size() == 4) {
-        return PackRGBA(parts[0], parts[1], parts[2], parts[3]);
-    }
-    // user error coding the color
-    return OPAQUE_BLACK;
-}
-
-float getNumber(json_t * j)
-{
-    if (json_is_real(j)) return json_real_value(j);
-    if (json_is_number(j)) return json_number_value(j);
-    if (json_is_integer(j)) return static_cast<float>(json_integer_value(j));
-    return 1.f;
-}
-
-bool SvgThemeEngine::parseColor(const char * spec, const char *name, PackedColor* result)
+bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, PackedColor* result)
 {
     if (isValidHexColor(spec)) {
         *result = parseHexColor(spec);
         return true;
+    }
+    if (is_rgb(spec)) {
+        PackedColor r = parseRgbColor(spec);
+        *result = r;
+        return OPAQUE_BLACK != r;
+    }
+    if (is_hsl(spec)) {
+        PackedColor r = parseHslColor(spec);
+        *result = r;
+        return OPAQUE_BLACK != r;
     }
 
     auto item = colors.find(spec);
@@ -276,7 +410,7 @@ bool SvgThemeEngine::parseColor(const char * spec, const char *name, PackedColor
     }
 
     *result = OPAQUE_BLACK;
-    return requireValidHexColor(spec, name);
+    return requireValidColor(spec, name);
 }
 
 bool SvgThemeEngine::parseOpacity(json_t * root, std::shared_ptr<Style> style)
@@ -324,8 +458,8 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             auto ocolor = json_object_get(item, "color");
             if (ocolor) {
                 if (requireString(ocolor, "color")) {
-                    auto hex = strip_space(json_string_value(ocolor));
-                    if (!parseColor(hex.c_str(), "color", &color)) {
+                    auto text = strip_space(json_string_value(ocolor));
+                    if (!parseColor(text.c_str(), "color", &color)) {
                         ok = false;
                     }
                 } else {
@@ -370,15 +504,15 @@ bool SvgThemeEngine::parseFill(json_t* root, std::shared_ptr<Style> style)
         if (value == "none") {
             style->fill.setNone();
         } else {
-            if (!parseColor(value.c_str(), "fill", &color)) return false;
+            if (!parseColor(value, "fill", &color)) return false;
             style->fill.setColor(color);
         }
     } else {
         auto ocolor = json_object_get(ofill, "color");
         if (ocolor) {
             if (!requireString(ocolor, "color")) return false;
-            auto hex = strip_space(json_string_value(ocolor));
-            if (!parseColor(hex.c_str(), "color", &color)) return false;
+            auto text = strip_space(json_string_value(ocolor));
+            if (!parseColor(text, "color", &color)) return false;
             style->fill.setColor(color);
         }
         auto ogradient = json_object_get(ofill, "gradient");
@@ -409,7 +543,7 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
             if (value == "none") {
                 style->stroke.setNone();
             } else {
-            if (!parseColor(value.c_str(), "stroke", &color)) return false;
+            if (!parseColor(value, "stroke", &color)) return false;
                 style->stroke.setColor(color);
             }
         } else {
@@ -422,8 +556,8 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
             auto ocolor = json_object_get(ostroke, "color");
             if (ocolor) {
                 if (!requireString(ocolor, "color")) return false;
-                auto hex = strip_space(json_string_value(ocolor));
-                if (!parseColor(hex.c_str(), "color", &color)) return false;
+                auto text = strip_space(json_string_value(ocolor));
+                if (!parseColor(text, "color", &color)) return false;
                 style->stroke.setColor(color);
             }
 
@@ -479,8 +613,10 @@ bool SvgThemeEngine::parseColors(json_t* root) {
     json_object_foreach_safe(root, n, key, j) {
         if (json_is_string(j)) {
             auto value = strip_space(json_string_value(j));
-            if (!requireValidHexColor(value, key)) return false;
-            this->colors.insert(std::make_pair(std::string(key), parseHexColor(value.c_str())));
+            if (!requireValidColor(value, key)) return false;
+            PackedColor color;
+            if (!parseColor(value, key, &color)) return false;
+            this->colors.insert(std::make_pair(std::string(key), color));
         } else {
             logError(ErrorCode::StringExpected, "Expected a named color, e.g. \"Aqua\" : \"#00ffff\",");
         }
