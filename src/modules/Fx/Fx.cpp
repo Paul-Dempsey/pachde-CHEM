@@ -8,14 +8,14 @@ FxModule::FxModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(P_R1, 0.f, 10.f,  5.8f,   "R1");
-    configParam(P_R2, 0.f, 10.f, 12.573f, "R2");
-    configParam(P_R3, 0.f, 10.f,  6.731f, "R3");
-    configParam(P_R4, 0.f, 10.f, 12.573f, "R4");
-    configParam(P_R5, 0.f, 10.f,  2.159f, "R5");
-    configParam(P_R6, 0.f, 10.f, 12.573f, "R6");
-    configParam(P_MIX, 0.f, 10.f, 46.99f, "Mix");
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
+    configParam(P_R1,  0.f, 10.f,  5.8f,   "R1")->displayPrecision = 4;
+    configParam(P_R2,  0.f, 10.f, 12.573f, "R2")->displayPrecision = 4;
+    configParam(P_R3,  0.f, 10.f,  6.731f, "R3")->displayPrecision = 4;
+    configParam(P_R4,  0.f, 10.f, 12.573f, "R4")->displayPrecision = 4;
+    configParam(P_R5,  0.f, 10.f,  2.159f, "R5")->displayPrecision = 4;
+    configParam(P_R6,  0.f, 10.f, 12.573f, "R6")->displayPrecision = 4;
+    configParam(P_MIX, 0.f, 10.f, 46.99f, "Mix")->displayPrecision = 4;
+    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
     configSwitch(P_ENABLE, 0.f, 1.f, 1.f, "Enable Fx", {"on", "off"});
     configSwitch(P_EFFECT, 0.f, 6.f, 0.f, "Effect", {"Short reverb", "Mod delay", "Swept delay", "Analog echo", "Delay with LPF", "Delay with HPF", "Long reverb"});

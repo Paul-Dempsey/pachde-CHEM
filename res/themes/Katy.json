@@ -34,7 +34,7 @@
             "k-disabled": {"fill": "hsl(327, 40%, 50%)", "opacity": 0.6 },
 
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
-            "ky-rim":  { "stroke" : "#cb8433" },
+            "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
 
             "kb-face": { "fill" : { "gradient" : [
                 { "index":0, "color": "#8d96fc" }, 

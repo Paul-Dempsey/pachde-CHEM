@@ -15,11 +15,14 @@
             "div": {"stroke": " #606060"},
 
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #bfbfbf"}, { "index":1, "color":" #202020"}]}},
-            "k-rim": { "stroke": " #737373" },
+            "k-rim": { "stroke": "hsl(0, 0.00%, 30%)" },
             "k-gnomen": { "fill": " #f5f5ef" },
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke":"#202020" },
             "k-disabled": {"fill": "g30", "opacity": 0.8 },
+
+            "kb-rim":  { "stroke" : " #4b529b" },
+            "ky-rim":  { "stroke" : "hsl(45, 35%, 35%)" },
 
             "ped-assign": { "fill": "brand" },
 

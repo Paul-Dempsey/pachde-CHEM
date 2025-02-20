@@ -23,6 +23,10 @@
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke": { "color": " #202020", "width":1 }},
 
+            "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
+            "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
+            "kb-rim":  { "stroke" : " #4b529b" },
+
             "selector": { "fill": "#202020", "stroke": { "color": "#40ab6b", "width":1 }},
             "selector-sel": { "fill": " #0b873c" },
             "selector-item": { "fill": " #a0a0a0" },

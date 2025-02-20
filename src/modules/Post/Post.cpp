@@ -9,11 +9,11 @@ PostModule::PostModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level");
-    configParam(P_MIX,          0.f, 10.f, 0.f, "EQ Mix");
-    configParam(P_TILT,         0.f, 10.f, 5.f, "EQ Tilt");
-    configParam(P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency");
-    configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
+    configParam(P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level")->displayPrecision = 4;
+    configParam(P_MIX,          0.f, 10.f, 0.f, "EQ Mix")->displayPrecision = 4;
+    configParam(P_TILT,         0.f, 10.f, 5.f, "EQ Tilt")->displayPrecision = 4;
+    configParam(P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency")->displayPrecision = 4;
+    configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
     configSwitch(P_MUTE,        0.f, 1.f, 0.f, "Mute", { "Voice", "Mute" });
 

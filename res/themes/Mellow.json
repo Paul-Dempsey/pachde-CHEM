@@ -23,7 +23,8 @@
             "k-disabled": {"fill": "hsl(41, 40%, 35%)", "opacity": 0.6 },
 
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
-            "ky-rim":  { "stroke" : "#cb8433" },
+            "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
+            "kb-rim":  { "stroke" : "#204a60" },
 
             "rbtn-punch" : { "fill": "hsl(41, 35%, 28%)" },
             "rbtn-bezel" : { "fill": "hsl(41, 35.30%, 38.00%)" },
