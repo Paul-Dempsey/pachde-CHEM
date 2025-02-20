@@ -44,9 +44,6 @@ PreUi::PreUi(PreModule *module) :
 
     addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 68.f), my_module, PreModule::P_SELECT, theme_engine, theme));
     addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 60.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
-#ifndef NDEBUG
-    selector->host = "Pre";
-#endif
 
     // knobs
     x = CENTER;

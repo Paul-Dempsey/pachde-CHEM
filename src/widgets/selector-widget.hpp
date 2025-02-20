@@ -26,10 +26,6 @@ struct SelectorWidget: rack::app::ParamWidget, IApplyTheme
     int hovered_item;
     TipHolder* tip_holder;
 
-    #ifndef NDEBUG
-    std::string host;
-    #endif
-
     SelectorWidget();
     virtual ~SelectorWidget();
 

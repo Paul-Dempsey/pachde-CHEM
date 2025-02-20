@@ -160,18 +160,19 @@ struct TButton : SvgButton, IApplyTheme
         bool refresh = frames.size() > 0; 
         if (refresh) {
             frames.clear();
+            sw->setSvg(nullptr);
         }
 
         addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
         addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
 
         if (refresh) {
-    		sw->setSvg(frames[0]);
+            sw->setSvg(frames[0]);
             if (fb) {
                 fb->setDirty();
             }
         }
-        return refresh;
+        return true;
     }
     
     void onHover(const HoverEvent& e) override {
@@ -189,14 +190,23 @@ struct TButton : SvgButton, IApplyTheme
         Base::onEnter(e);
         createTip();
     }
+
     void onLeave(const LeaveEvent& e) override {
+        destroyTip();
         Base::onLeave(e);
-        destroyTip();
     }
+
+    void onDragStart(const DragStartEvent& e) override
+    {
+        destroyTip();
+        Base::onDragStart(e);
+    }
+
     void onDragLeave(const DragLeaveEvent& e) override {
-        Base::onDragLeave(e);
         destroyTip();
+        Base::onDragLeave(e);
     }
+
     void onDragEnd(const DragEndEvent& e) override
     {
         Base::onDragEnd(e);
@@ -245,19 +255,25 @@ TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lig
     TButton * o  = new(TButton);
     o->applyTheme(engine, theme);
 	o->box.pos = pos;
+
     if (tip) {
         o->describe(tip);
     }
+
     auto light = createLight<TLight>(Vec(0,0), module, lightId);
     light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
     o->addChildBottom(light);
     return o;
 }
 
-
 struct SmallRoundButtonSvg {
     static std::string up() { return "res/widgets/round-push-up.svg"; }
     static std::string down() { return "res/widgets/round-push-down.svg"; }
+};
+
+struct LargeRoundButtonSvg {
+    static std::string up() { return "res/widgets/round-push-lg-up.svg"; }
+    static std::string down() { return "res/widgets/round-push-lg-down.svg"; }
 };
 
 struct SquareButtonSvg {
@@ -276,16 +292,17 @@ struct HeartButtonSvg {
 };
 
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
+using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
-
 
 struct GlowKnob : rack::RoundKnob {
     using Base = rack::RoundKnob;
     bool enabled{true};
     bool bright{false};
     bool wire{false};
+    NVGcolor disabled_screen{nvgRGBAf(0x80, 0x80, 0x80, .6f)};
 
     GlowKnob() {
         box.size.x = 32.f;
@@ -337,7 +354,7 @@ struct GlowKnob : rack::RoundKnob {
                 Line(args.vg, cx, cy - 1.f, cx, cy - r, co, .75f);
             } else {
                 Base::draw(args);
-                Circle(args.vg, box.size.x*.5f, box.size.y*.5f, box.size.x*.5f - 1.f, nvgTransRGBAf(RampGray(G_55), .6f));
+                Circle(args.vg, box.size.x*.5f, box.size.y*.5f, box.size.x*.5f - 1.f, disabled_screen);
             }
         }
     }
@@ -354,6 +371,12 @@ struct TKnob : GlowKnob, IApplyTheme
         wire = (theme->name == "Wire");
         bg->setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::bg()), theme));
         setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::knob()), theme));
+        auto screen = theme->getFillColor("k-disabled", true);
+        if (isVisibleColor(screen)) {
+            disabled_screen = fromPacked(screen);
+        } else {
+            disabled_screen = nvgRGBAf(0x80, 0x80, 0x80, .6f);
+        }
         return true;
     }
 

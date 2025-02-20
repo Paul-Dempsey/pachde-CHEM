@@ -17,6 +17,7 @@ SOURCES += src/em/EaganMatrix.cpp
 SOURCES += src/em/em-hardware.cpp
 SOURCES += src/em/midi-message.cpp
 SOURCES += src/em/preset.cpp
+SOURCES += src/em/preset-macro.cpp
 
 # services
 SOURCES += src/services/colors.cpp
@@ -34,7 +35,9 @@ SOURCES += src/services/text.cpp
 
 # widgets
 SOURCES += src/widgets/blip-widget.cpp
+SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
+#SOURCES += src/widgets/mini-fader.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/selector-widget.cpp
@@ -65,6 +68,9 @@ SOURCES += src/modules/Post/Post-ui.cpp
 
 SOURCES += src/modules/Convo/Convo.cpp
 SOURCES += src/modules/Convo/Convo-ui.cpp
+
+SOURCES += src/modules/Jack/Jack.cpp
+SOURCES += src/modules/Jack/Jack-ui.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp

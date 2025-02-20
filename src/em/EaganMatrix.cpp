@@ -1,4 +1,5 @@
 #include "EaganMatrix.hpp"
+#include "../services/misc.hpp"
 
 namespace pachde {
 
@@ -11,16 +12,16 @@ EaganMatrix::EaganMatrix()
     in_preset(false),
     in_user(false),
     in_system(false),
-    pendingEditorReply(false),
-    data_stream(-1),
-    editorReply(0),
-    led(0)
+    pending_EditorReply(false),
+    pending_config(false),
+    frac_hi(false),
+    frac_lsb(0),
+    data_stream(-1)
 {
 }
 
 void EaganMatrix::reset()
 {
-    preset.clear();
     firmware_version = 0;
     hardware = 0;
     reverse_surface = false;
@@ -28,12 +29,34 @@ void EaganMatrix::reset()
     in_preset = false;
     in_user = false;
     in_system = false;
-    pendingEditorReply = false;
+    pending_EditorReply = false;
+    pending_config = false;
+    frac_hi = false;
+    frac_lsb = 0,
     data_stream = -1;
-    editorReply = 0;
-    led = 0;
+    preset.clear();
+    ch1.clear();
+    ch2.clear();
+    ch16.clear();
+    std::memset(macro, 0, 180);
+
     notifyHardwareChanged();
     notifyPresetChanged();
+}
+
+float EaganMatrix::get_macro_voltage(int id)
+{
+    assert(in_range(id, 0, 90));
+    uint16_t raw = macro[id];
+    assert(in_range(raw, static_cast<uint16_t>(0), static_cast<uint16_t>(Haken::max14)));
+    if (id < 7) {
+        // unipolar 0 to 10
+        auto r = raw * inv_max14;
+        return 10.0 * r;
+    } else {
+        auto r = ((double)raw - (double)Haken::zero14) * inv_zero14;
+        return 5.0 * r;
+    }
 }
 
 void EaganMatrix::subscribeEMEvents(IHandleEmEvents* client)
@@ -56,10 +79,10 @@ void EaganMatrix::notifyLoopDetect(uint8_t cc, uint8_t value)
         client->onLoopDetect(cc, value);
     }
 }
-void EaganMatrix::notifyEditorReply()
+void EaganMatrix::notifyEditorReply(uint8_t editor_reply)
 {
     for (auto client : clients) {
-        client->onEditorReply(editorReply);
+        client->onEditorReply(editor_reply);
     }
 }
 void EaganMatrix::notifyPresetChanged()
@@ -118,8 +141,49 @@ void EaganMatrix::onChannelTwoCC(uint8_t cc, uint8_t value)
 {
 }
 
+bool EaganMatrix::handle_macro_cc(uint8_t cc, uint8_t value)
+{
+    // 12-17
+    // 40-63
+    // 102-119
+    if (cc < Haken::ccI || cc > Haken::ccM90) return false;
+
+    uint16_t macro_value = (value << 7) + frac_lsb;
+
+    if (cc <= Haken::ccVI) {
+        macro[cc - Haken::ccI] = macro_value;
+    } else if (cc < Haken::ccM7) {
+        return false;
+    } else {
+        int offset = frac_hi*48;
+
+        if (cc <= Haken::ccM30) {
+            macro[Haken::idM7 + (cc - Haken::ccM7) + offset] = macro_value;
+        } else if (cc >= Haken::ccM31) {
+            macro[Haken::idM31 + (cc - Haken::ccM31) + offset] = macro_value;
+        } else {
+            return false;
+        }
+    }
+    frac_lsb = 0;
+    return true;
+}
+
 void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
 {
+    if (Haken::ccFracPedEx == cc) {
+        frac_hi = true;
+        frac_lsb = value;
+        return;
+    }
+    if (Haken::ccFracPed == cc) {
+        frac_hi = false;
+        frac_lsb = value;
+        return;
+    }
+    if (handle_macro_cc(cc, value)) {
+        return;
+    }
 }
 
 void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
@@ -144,9 +208,9 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
                 broken_midi = true;
             } else {
                 data_stream = value;
-                //if (in_sys_names || in_user_names) {
+                if (!in_preset) {
                     begin_preset();
-                //}
+                }
             }
         } break;
 
@@ -191,11 +255,15 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
 
     case Haken::ccCVCHigh:
         hardware = (value & 0x7c) >> 2;
+        begin_preset();
         break;
 
     case Haken::ccTask:
         notifyTaskMessage(value);
         switch (value) {
+        case Haken::configToMidi:
+            pending_config = true;
+            break;
         case Haken::beginUserNames:
             in_user = true;
             break;
@@ -212,20 +280,18 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         break;
 
     case Haken::ccEdState:
-        led = value & Haken::sLedBits;
-        notifyLED(led);
+        notifyLED(value & Haken::sLedBits);
         break;
 
     case Haken::ccEditorReply:
-        editorReply = value;
-        if (pendingEditorReply) {
-            notifyEditorReply();
-            pendingEditorReply = false;
+        if (pending_EditorReply) {
+            notifyEditorReply(value);
+            pending_EditorReply = false;
         }
         break;
 
     case Haken::ccEditor:
-        pendingEditorReply = true;
+        pending_EditorReply = true;
         break;
     }
 }
@@ -280,6 +346,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                     preset.id.set_number(pn & 0xff);
                 }
                 in_preset = false;
+                pending_config = false;
                 ready = true;
                 notifyPresetChanged();
             }

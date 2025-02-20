@@ -26,25 +26,24 @@ enum Severity { Info, Warn, Error, Critical };
 const char * SeverityName(Severity sev);
 
 enum ErrorCode {
-    Unspecified                  = 0,
-    NoError                      = 1,
-    CannotOpenJsonFile           = 2,
-    JsonParseFailed              = 3,
-    ArrayExpected                = 4,
-    ObjectExpected               = 5,
-    ObjectOrStringExpected       = 6,
-    StringExpected               = 7,
-    NumberExpected               = 8,
-    IntegerExpected              = 9,
-    NameExpected                 = 10,
-    ThemeExpected                = 11,
-    InvalidColor                 = 12,
-    OneOfColorOrGradient         = 13,
-    TwoGradientStopsMax          = 14,
-    GradientStopIndexZeroOrOne   = 15,
-    GradientStopNotPresent       = 16,
-    RemovingGradientNotSupported = 17,
-    GradientNotPresent           = 18,
+    Unspecified,
+    NoError,
+    CannotOpenJsonFile,
+    JsonParseFailed,
+    ArrayExpected,
+    ObjectExpected,
+    ObjectOrStringExpected,
+    StringExpected,
+    NumberExpected,
+    IntegerExpected,
+    NameExpected,
+    ThemeExpected,
+    InvalidColor,
+    OneOfColorOrGradient,
+    TwoGradientStopsMax,
+    GradientStopIndexZeroOrOne,
+    GradientStopNotPresent,
+    GradientNotPresent
 };
 
 // optional logging callback function you provide.

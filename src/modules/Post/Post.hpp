@@ -20,8 +20,9 @@ struct PostModule : ChemModule, IChemClient
         P_TILT,
         P_FREQUENCY,
         P_ATTENUVERT,
+        P_MUTE,
         NUM_PARAMS,
-        NUM_KNOBS = NUM_PARAMS, 
+        NUM_KNOBS = 1 + P_ATTENUVERT
     };
     enum Inputs {
         IN_INVALID = -1,
@@ -38,13 +39,13 @@ struct PostModule : ChemModule, IChemClient
     };
     enum Lights {
         L_EQ,
+        L_MUTE,
         NUM_LIGHTS
     };
 
     std::string device_claim;
     IChemHost* chem_host;
     PostUi* ui;
-    rack::dsp::Timer poll_host;
 
     bool glow_knobs;
     int attenuator_target;
@@ -69,6 +70,7 @@ struct PostModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -89,7 +91,10 @@ struct PostUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
+    LargeRoundButton* mute_button;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
+
+    float last_mute;
 
     PostUi(PostModule *module);
 
@@ -107,7 +112,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-post.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    //void step() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

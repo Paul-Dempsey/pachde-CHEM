@@ -16,13 +16,13 @@ MacroModule::MacroModule()
     configInput(IN_M5, "Macro 5 (v)");
     configInput(IN_M6, "Macro 6 (vi)");
 
-    configParam(P_M1, 0.f, Haken::max14, 0.f, "Macro 1 (i)");
-    configParam(P_M2, 0.f, Haken::max14, 0.f, "Macro 2 (ii)");
-    configParam(P_M3, 0.f, Haken::max14, 0.f, "Macro 3 (iii)");
-    configParam(P_M4, 0.f, Haken::max14, 0.f, "Macro 4 (iv)");
-    configParam(P_M5, 0.f, Haken::max14, 0.f, "Macro 5 (v)");
-    configParam(P_M6, 0.f, Haken::max14, 0.f, "Macro 6 (vi)");
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
+    configParam(P_M1, 0.f, 10.f, 0.f, "Macro 1 (i)", "v")->displayPrecision = 4;
+    configParam(P_M2, 0.f, 10.f, 0.f, "Macro 2 (ii)", "v")->displayPrecision = 4;
+    configParam(P_M3, 0.f, 10.f, 0.f, "Macro 3 (iii)", "v")->displayPrecision = 4;
+    configParam(P_M4, 0.f, 10.f, 0.f, "Macro 4 (iv)", "v")->displayPrecision = 4;
+    configParam(P_M5, 0.f, 10.f, 0.f, "Macro 5 (v)", "v")->displayPrecision = 4;
+    configParam(P_M6, 0.f, 10.f, 0.f, "Macro 6 (vi)", "v")->displayPrecision = 4;
+    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
     configLight(L_M1a, "Attenuverter on M1");
     configLight(L_M2a, "Attenuverter on M2");
@@ -75,6 +75,14 @@ void MacroModule::onConnectHost(IChemHost* host)
 
 void MacroModule::onPresetChange()
 {
+    if (chem_host) {
+        auto preset = chem_host->host_preset();
+        if (preset) {
+            macro_names.fill_macro_names();
+            macro_names.parse_text(preset->text);
+            update_from_em();
+        }
+    }
     if (ui) ui->onPresetChange();
 }
 
@@ -111,6 +119,19 @@ void MacroModule::onPortChange(const PortChangeEvent& e)
     }
 }
 
+void MacroModule::update_from_em()
+{
+    if (chem_host && chem_host->host_preset()) {
+        auto em = chem_host->host_matrix();
+        if (em) {
+            for (int param = Params::P_M1; param <= P_M6; ++param) {
+                float m = em->get_macro_voltage(param);
+                getParam(param).setValue(m);
+            }
+        }
+    }
+}
+
 void MacroModule::process_params(const ProcessArgs& args)
 {
     if (attenuator_target >= 0) {
@@ -123,13 +144,7 @@ void MacroModule::process_params(const ProcessArgs& args)
 
 void MacroModule::process(const ProcessArgs& args)
 {
-    if (!chem_host && !device_claim.empty()) {
-        if (poll_host.process(args.sampleTime) > 2.f) {
-            auto broker = ModuleBroker::get();
-            broker->try_bind_client(this);
-        }
-    }
-
+    
     if (((args.frame + id) % 40) == 0) {
         process_params(args);
     }

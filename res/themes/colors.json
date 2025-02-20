@@ -29,6 +29,9 @@
             "rack-LIGHT_GRAY": "#e6e6e6",
             "rack-DARK_GRAY": "#171717",
 
+            "test-rgb": "rgb(21, 250, 121)",
+            "test-hsl": "hsl(235, 34.40%, 50.40%)",
+
             "fingerboard-red": "#c32222",
             "white": "#ffffff",
             "black": "#000",

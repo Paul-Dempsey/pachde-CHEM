@@ -9,8 +9,10 @@
             "hexoid": { "fill": "#c78d11" },
             "CHEM": { "fill": "#c78d11" },
             "pachde": { "fill": "#c78d11" },
-            "new-title": {"fill": "#1f1f1f" },
+            "title": {"fill": "#1f1f1f" },
             "th": {"stroke": "#1f1f1f" },
+            "jack-glyph": {"fill": " #052d68" },
+
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
             "div": { "stroke": "#808080" },
@@ -26,21 +28,6 @@
             "selector-item": { "fill": " #a0a0a0" },
 
             "ped-assign": { "fill": "brand" },
-
-            "qbtn-punch" :   { "fill": "#080808" },
-            "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#d1d1d1"}, { "index":1, "color":"#3e3e3e"}]}},
-            "qbtn-hi-l":  { "fill": "#8c8c8c" },
-            "qbtn-hi-r":  { "fill": "#666666" },
-            "qbtn-hi-t":  { "fill": "#d9d9d9" },
-            "qbtn-hi-b":  { "fill": "#343434" },
-            "qbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#494a4a"}]}},
-
-            "qbtn-dn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#3d3d3d"}, { "index":1, "color":"#575757"}]}},
-            "qbtn-dn-hi-l":  { "fill": "#666666" },
-            "qbtn-dn-hi-r":  { "fill": "#8c8c8c" },
-            "qbtn-dn-hi-t":  { "fill": "#3d3d3d" },
-            "qbtn-dn-hi-b":  { "fill": "#c8c6c6" },
-            "qbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#a6a6a6"}, { "index":1, "color":"#5b5b5b"}]}},
 
             "dytext": { "fill": "#457aa6"},
             
@@ -78,17 +65,26 @@
 
             "menu":        { "fill" : "g20" },
 
-            "button-bezel": { "fill": "#808080"},
-            "button-ring":  { "fill": "brand"},
-            "button-inset": { "fill": { "gradient": [{"index":0, "offset":0, "color": "#c0c0c0"}, {"index":1, "offset":1, "color": "#404040"}]}},
-            "button-face":  { "fill": { "gradient": [{"index":0, "offset":0, "color": "#e6e6e6"}, {"index":1, "offset":1, "color": "#b0b0b0"}]}},
-
             "port-bezel":     { "fill": "debug" },
             "port-ring":      { "fill": "#808080" },
             "port-jack":      { "fill": "#c0c0c0" },
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
             "cop-bezel": { "fill": "#5d8ed7", "opacity": 0.2 },
-           
+
+            "rbtn-punch": { "fill": "#666666"},
+            "rbtn-bezel": { "fill":  "hsl(0, 0.00%, 65%)"},
+            "rbtn-taper": { "fill": { "gradient": [{"index":0, "color": " #eaeaea"}, {"index":1, "color": "hsl(0, 0.00%, 40.00%)"}]}},
+            "rbtn-face":  { "fill": { "gradient": [{"index":0, "color": " #e6e6e6"}, {"index":1, "color": " hsl(0, 0.00%, 45%)"}]}},
+            "rbtn-dn-taper": { "fill": { "gradient": [{"index":0, "color": "#666666"}, {"index":1, "color": "#333333"}]}},
+            "rbtn-dn-face":  { "fill": { "gradient": [{"index":0, "color": "#8c8c8c"}, {"index":1, "color": "#595959"}]}},
+
+            "lrbtn-punch": { "fill": " #666666"},
+            "lrbtn-bezel": { "fill":  "hsl(0, 0.00%, 65%)"},
+            "lrbtn-taper": { "fill": { "gradient": [{"index":0, "color": " #eaeaea"}, {"index":1, "color": "hsl(0, 0.00%, 40.00%)"}]}},
+            "lrbtn-face":  { "fill": { "gradient": [{"index":0, "color": " #e6e6e6"}, {"index":1, "color": " hsl(0, 0.00% 50%)"}]}},
+            "lrbtn-dn-taper": { "fill": { "gradient": [{"index":0, "color": " #666666"}, {"index":1, "color": " #333333"}]}},
+            "lrbtn-dn-face":  { "fill": { "gradient": [{"index":0, "color": "hsl(0, 0.00%, 60%)"}, {"index":1, "color": "hsl(0, 0.00%, 40%)"}]}},
+
             "screw-rim":   { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#cacaca" }, { "index": 1, "offset": 1, "color": "#9d9d9d" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#f5f5f5" }, { "index": 1, "offset": 1, "color": "#b8b8b8" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index": 0, "offset": 0, "color": "#ebebeb" }, { "index": 1, "offset": 1, "color": "#cccccc" }]}},

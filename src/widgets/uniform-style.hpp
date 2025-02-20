@@ -9,6 +9,7 @@ constexpr const float UHALF = 7.5f;
    
 constexpr const ssize_t SSIZE_0 = 0;
 
+constexpr const float PORT_SECTION = 278.f;
 constexpr const float PORT_TOP = 305.f;
 constexpr const float PORT_DX = 34.f;
 constexpr const float PORT_DY = 36.f;

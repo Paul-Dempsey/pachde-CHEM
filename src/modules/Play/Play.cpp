@@ -113,12 +113,6 @@ void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
 
 void PlayModule::process(const ProcessArgs& args)
 {
-    if (!chem_host && !device_claim.empty()) {
-        if (poll_host.process(args.sampleTime) > 2.f) {
-            auto broker = ModuleBroker::get();
-            broker->try_bind_client(this);
-        }
-    }
 }
 
 Model *modelPlay = createModel<PlayModule, PlayUi>("chem-play");

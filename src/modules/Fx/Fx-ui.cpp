@@ -31,9 +31,6 @@ FxUi::FxUi(FxModule *module) :
 
     addChild(selector = createThemedParam<SelectorWidget>(Vec(9.f, 30.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
     addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 22.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
-#ifndef NDEBUG
-    selector->host = "Fx";
-#endif
 
     // knobs with labels
     const float DY_KNOB = 60.f;

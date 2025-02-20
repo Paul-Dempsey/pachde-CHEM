@@ -10,7 +10,7 @@
             "hexoid": { "fill": "none", "stroke":"brand" },
             "CHEM": {"fill": "brand" },
             "pachde": {"fill": "brand"},
-            "new-title": { "fill": "brand" },
+            "title": { "fill": "brand" },
 
             "div": { "stroke": "#606060" },
 
@@ -60,13 +60,8 @@
 
             "menu":        { "fill" : "g50" },
 
-            "button-bezel": { "fill": "g50"},
-            "button-ring":  { "fill": "#3a68ac"},
-            "button-inset": { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#c0c0c0"}, {"index":1, "offset":1, "color": "#404040"}]}},
-            "button-face":  { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#a0a0a0"}, {"index":1, "offset":1, "color": "#505050"}]}},
-
-            "link-gface":  { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#767575"}, {"index":1, "offset":1, "color": "#353434"}]}},
-            "link-gframe": { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#7b7a7a"}, {"index":1, "offset":1, "color": "#0b0b0b"}]}},
+            "link-gface":  { "fill": { "gradient": [{"index":0, "offset":0, "color": "#767575"}, {"index":1, "offset":1, "color": "#353434"}]}},
+            "link-gframe": { "fill": { "gradient": [{"index":0, "offset":0, "color": "#7b7a7a"}, {"index":1, "offset":1, "color": "#0b0b0b"}]}},
 
             "port-bezel":     { "fill": "#595959" },
             "port-ring":      { "fill": "#808080" },
@@ -128,10 +123,26 @@
             "patty": { "stroke": { "color":"g80", "width": 0.5}},
             "patty-hover": { "stroke": "brand" },
 
-            "screw-rim":   { "stroke":"none", "fill": { "gradient": [ { "index":0, "offset":0, "color": "#30303000" }, { "index":1, "offset":1, "color": "#22222200" }]}},
-            "screw-bevel": { "stroke":"g65", "fill": { "gradient": [ { "index":0, "offset":0, "color": "#63636300" }, { "index":1, "offset":1, "color": "#2B2B2B00" }]}},
-            "screw-face":  { "stroke":"none", "fill": { "gradient": [ { "index":0, "offset":0, "color": "#4C4C4C00" }, { "index":1, "offset":1, "color": "#3B3B3B00" }]}},
+            "screw-rim":   { "stroke":"none", "fill": "none"},
+            "screw-bevel": { "stroke":"g65",  "fill": "none"},
+            "screw-face":  { "stroke":"none", "fill": "none"},
             "screw-slot":  { "stroke":"g65", "fill":"none" },
+
+            "rbtn-punch": { "fill": "none"},
+            "rbtn-bezel": { "fill": "none", "stroke":"g65"},
+            "rbtn-taper": { "fill": "none"},
+            "rbtn-face":  { "fill": "none"},
+            "rbtn-dn-taper": { "fill": "none"},
+            "rbtn-dn-face":  { "fill": "none"},
+            "rbtn-wire": { "opacity":1 },
+
+            "lrbtn-punch": { "fill": "none"},
+            "lrbtn-bezel": { "fill": "none", "stroke":"g65"},
+            "lrbtn-taper": { "fill": "none"},
+            "lrbtn-face":  { "fill": "none"},
+            "lrbtn-dn-taper": { "fill": "none"},
+            "lrbtn-dn-face":  { "fill": "none"},
+            "lrbtn-wire": { "opacity":1 },
 
             "tsk-0":     { "fill":"#737373" },
             "tsk-nsch":  { "fill":"#808080" },

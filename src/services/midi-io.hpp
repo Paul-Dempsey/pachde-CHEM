@@ -59,6 +59,7 @@ struct MidiInput : midi::Input
     {
         targets.clear(); 
         reset();
+        this->channel = -1;
     }
     void addTarget(struct IDoMidi* out) { targets.push_back(out); }
     void setLogger(const std::string& source, MidiLog* logger);

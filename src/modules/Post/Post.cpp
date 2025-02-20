@@ -15,6 +15,8 @@ PostModule::PostModule()
     configParam(P_FREQUENCY,    0.f, 127.f, 0.f, "EQ Frequency");
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
+    configSwitch(P_MUTE,        0.f, 1.f, 0.f, "Mute", { "Voice", "Mute" });
+
     configInput(IN_POST_LEVEL, "Post-level");
     configInput(IN_MIX,        "EQ Mix");
     configInput(IN_TILT,       "EQ Tilt");
@@ -22,6 +24,7 @@ PostModule::PostModule()
     configInput(IN_MUTE,       "Mute trigger");
 
     configLight(L_EQ, "EQ active");
+    configLight(L_MUTE, "Mute");
 }
 
 void PostModule::onPortChange(const PortChangeEvent& e)
@@ -85,14 +88,19 @@ void PostModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
     if (ui) ui->onConnectionChange(device, connection);
 }
 
+void PostModule::process_params(const ProcessArgs& args)
+{
+    auto v = getParam(Params::P_MUTE).getValue();
+    v = (v > 0.5f) ? 1.f : 0.f;
+    getLight(Lights::L_MUTE).setBrightnessSmooth(v, 45.f);
+}
+
 void PostModule::process(const ProcessArgs& args)
 {
-    if (!chem_host && !device_claim.empty()) {
-        if (poll_host.process(args.sampleTime) > 2.f) {
-            auto broker = ModuleBroker::get();
-            broker->try_bind_client(this);
-        }
+    if (0 == ((args.frame + id) % 45)) {
+        process_params(args);
     }
+
 
     if (attenuator_target != Inputs::IN_INVALID) {
         // 

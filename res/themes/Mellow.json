@@ -9,37 +9,37 @@
             "hexoid": { "fill": "brand" },
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
-            "new-title": {"fill": "brand" },
+            "title": {"fill": "brand" },
             "th": {"stroke": " #e9e862" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":" #8a7342"}, { "index":1, "color":" #69572f"}]}},
             "div": {"stroke": "#312307"},
 
-            "k-face": { "fill": { "gradient": [{ "index":0, "color":"#ceaa5c"}, { "index":1, "color":"#564624"}]}},
+            "k-face": { "fill": { "gradient": [{ "index":0, "color":" #ceaa5c"}, { "index":1, "color":" #564624"}]}},
             "k-rim": { "stroke": "#584623" },
             "k-gnomen": { "fill": " #bcc26d" },
-            "k-taper": {  "fill": "#cacf83" },
+            "k-taper": {  "fill": " #cacf83" },
             "k-pin": { "fill": "#69572f", "stroke":"none" },
-   
+            "k-disabled": {"fill": "hsl(41, 40%, 35%)", "opacity": 0.6 },
+
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
             "ky-rim":  { "stroke" : "#cb8433" },
 
+            "rbtn-punch" : { "fill": "hsl(41, 35%, 28%)" },
+            "rbtn-bezel" : { "fill": "hsl(41, 35.30%, 38.00%)" },
+            "rbtn-taper":    { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 60.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 20%)"}]}},
+            "rbtn-face":     { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 50.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 28%)"}]}},
+            "rbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 50.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 28%)"}]}},
+            "rbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 60.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 20%)"}]}},
+
+            "lrbtn-punch" : { "fill": "hsl(41, 35%, 28%)" },
+            "lrbtn-bezel" : { "fill": "hsl(41, 35.30%, 38.00%)" },
+            "lrbtn-taper":    { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 70.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 25%)"}]}},
+            "lrbtn-face":     { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 65.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 30%)"}]}},
+            "lrbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 50.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 28%)"}]}},
+            "lrbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 60.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 20%)"}]}},
+
             "ped-assign": { "fill": "brand" },
-
-            "qbtn-punch" :   { "fill": "#43371d" },
-            "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#c19c4c"}, { "index":1, "color":"#503c10"}]}},
-            "qbtn-hi-l":  { "fill": "#8c8c8c" },
-            "qbtn-hi-r":  { "fill": "#666666" },
-            "qbtn-hi-t":  { "fill": "#d9d9d9" },
-            "qbtn-hi-b":  { "fill": "#343434" },
-            "qbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#b59b63"}, { "index":1, "color":"#503c10"}]}},
-
-            "qbtn-dn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#89713d"}, { "index":1, "color":"#503c10"}]}},
-            "qbtn-dn-hi-l":  { "fill": "#666666" },
-            "qbtn-dn-hi-r":  { "fill": "#8c8c8c" },
-            "qbtn-dn-hi-t":  { "fill": "#404040" },
-            "qbtn-dn-hi-b":  { "fill": "#d9d9d9" },
-            "qbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#b59b63"}, { "index":1, "color":"#544525"}]}},
 
             "midi-frame" : { "fill": "#d4b268" },
             "midi-face"  : { "fill": "#60502d" },
@@ -83,11 +83,6 @@
 
             "ctl-bar": { "stroke": "#725619"},
             "menu": { "fill" : "#3a68ac" },
-
-            "button-bezel": { "fill": "g50"},
-            "button-ring":  { "fill": "#3a68ac"},
-            "button-inset": { "fill": { "gradient": [{"index":0, "offset":0, "color": "#c0c0c0"}, {"index":1, "offset":1, "color": "#404040"}]}},
-            "button-face":  { "fill": { "gradient": [{"index":0, "offset":0, "color": "#a0a0a0"}, {"index":1, "offset":1, "color": "#505050"}]}},
 
             "port-bezel":     { "fill": "#595959" },
             "port-ring":      { "fill": "#808080" },

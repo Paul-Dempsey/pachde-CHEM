@@ -104,6 +104,7 @@ bool is_hsl(const std::string& text) {
     if ('h' == *scan++) {
         if ('s' == *scan++) {
             if ('l' == *scan++) {
+                if ('a' == *scan) { scan++; } 
                 return '(' == *scan;
             }
         }
@@ -245,7 +246,7 @@ float intermediate_hue(float h, float m1, float m2)
 	return m1;
 }
 
-PackedColor PackedFromHSL(float h, float s, float l)
+PackedColor PackedFromHSLA(float h, float s, float l, float a)
 {
 	float m1, m2;
 	h = fmodf(h, 1.0f);
@@ -257,8 +258,8 @@ PackedColor PackedFromHSL(float h, float s, float l)
 	auto r = static_cast<uint8_t>(255 * clamp(intermediate_hue(h + 1.0f/3.0f, m1, m2), 0.0f, 1.0f));
 	auto g = static_cast<uint8_t>(255 * clamp(intermediate_hue(h, m1, m2), 0.0f, 1.0f));
 	auto b = static_cast<uint8_t>(255 * clamp(intermediate_hue(h - 1.0f/3.0f, m1, m2), 0.0f, 1.0f));
-
-    return PackRGB(r,g,b);
+    auto A = static_cast<uint8_t>(255 * clamp(a, 0.0f, 1.0f));
+    return PackRGBA(r,g,b,A);
 }
 
 PackedColor parseRgbColor(const std::string& text)
@@ -286,7 +287,9 @@ PackedColor parseRgbColor(const std::string& text)
 PackedColor parseHslColor(const std::string& text)
 {
     if (!is_hsl(text)) return OPAQUE_BLACK;
-    auto it = text.cbegin() + 4;
+    auto it = text.cbegin() + 3;
+    bool is_alpha = ('a' == *it++);
+    if (is_alpha) it++;
 
     auto val = parse_uint64(it, text.cend());
     float h = static_cast<float>(val % 360)/360.f;
@@ -301,8 +304,14 @@ PackedColor parseHslColor(const std::string& text)
 
     auto l = parse_float(it, text.cend());
     if ((l < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+
+    float alpha = 100.f;
+    if (is_alpha) {
+        alpha = parse_float(it, text.cend());
+        if ((alpha < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    }
     while (it != text.cend() && ')' != *it) it++;
-    return (it == text.cend()) ? OPAQUE_BLACK: PackedFromHSL(h,s,l);
+    return (it == text.cend()) ? OPAQUE_BLACK: PackedFromHSLA(h, s/100.f, l/100.f, alpha/100.f);
 }
 
 PackedColor parseHexColor(const std::string& text)
@@ -459,7 +468,7 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             if (ocolor) {
                 if (requireString(ocolor, "color")) {
                     auto text = strip_space(json_string_value(ocolor));
-                    if (!parseColor(text.c_str(), "color", &color)) {
+                    if (!parseColor(text, "color", &color)) {
                         ok = false;
                     }
                 } else {
@@ -715,9 +724,11 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
             if (target.type != NSVG_PAINT_NONE) {
                 if ((target.type == NSVG_PAINT_RADIAL_GRADIENT)
                     || (target.type == NSVG_PAINT_LINEAR_GRADIENT)) {
-                    logWarning(ErrorCode::RemovingGradientNotSupported, 
-                        format_string("'%s': Removing gradient not supported (leaks memory)", tag.c_str()));
-                    return false;
+                    // make gradient transparent
+                    for (int i = 0; i < target.gradient->nstops; ++i) {
+                        target.gradient->stops[i].color = NoColor;
+                    }
+                    return true;
                 }
                 target.type = NSVG_PAINT_NONE;
                 return true;
@@ -729,9 +740,11 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
                 if ((target.type != NSVG_PAINT_COLOR) || (target.color != source_color)) {
                     if ((target.type == NSVG_PAINT_RADIAL_GRADIENT)
                         || (target.type == NSVG_PAINT_LINEAR_GRADIENT)) {
-                        logWarning(ErrorCode::RemovingGradientNotSupported, 
-                             format_string("'%s': Removing gradient not supported (leaks memory)", tag.c_str()));
-                        return false;
+                        // make gradient flat
+                        for (int i = 0; i < target.gradient->nstops; ++i) {
+                            target.gradient->stops[i].color = source_color;
+                        }
+                        return true;
                     }
                     target.type = NSVG_PAINT_COLOR;
                     target.color = source_color;
@@ -822,10 +835,11 @@ std::shared_ptr<::rack::window::Svg> SvgThemeEngine::loadSvg(const std::string& 
     auto key = filename;
     key.append( ":" + theme->name); 
 	const auto& pair = svgs.find(key);
-	if (pair != svgs.end())
+	if (pair != svgs.end()) {
 		return pair->second;
+    }
 
-	// Load svg
+    // Load svg
 	std::shared_ptr<::rack::window::Svg> svg;
 	try {
 		svg = std::make_shared<::rack::window::Svg>();
@@ -834,13 +848,14 @@ std::shared_ptr<::rack::window::Svg> SvgThemeEngine::loadSvg(const std::string& 
 	}
 	catch (rack::Exception& e) {
 		WARN("%s", e.what());
-		svg = NULL;
+		return nullptr;
 	}
-	svgs[key] = svg;
+	svgs.insert(std::make_pair(key, svg));
 	return svg;
 }
 
-bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, std::string filename, std::shared_ptr<rack::window::Svg>& svg) {
+bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, std::string filename, std::shared_ptr<rack::window::Svg>& svg)
+{
 	auto newSvg = this->loadSvg(filename, theme);
  
 	if (newSvg && (newSvg != svg)) {

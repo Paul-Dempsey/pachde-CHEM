@@ -9,7 +9,7 @@
             "hexoid": { "fill": "brand" },
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
-            "new-title": {"fill": "brand" },
+            "title": {"fill": "brand" },
             "th": {"stroke": "brand" },
 
             "div": {"stroke": " #606060"},
@@ -19,23 +19,12 @@
             "k-gnomen": { "fill": " #f5f5ef" },
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke":"#202020" },
+            "k-disabled": {"fill": "g30", "opacity": 0.8 },
 
             "ped-assign": { "fill": "brand" },
 
-            "qbtn-punch" :   { "fill": "#080808" },
-            "qbtn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#999999"}, { "index":1, "color":"#595959"}]}},
-            "qbtn-hi-l":  { "fill": "#8c8c8c" },
-            "qbtn-hi-r":  { "fill": "#666666" },
-            "qbtn-hi-t":  { "fill": "#d9d9d9" },
-            "qbtn-hi-b":  { "fill": "#343434" },
-            "qbtn-face":  { "fill": { "gradient": [{ "index":0, "color":"#d9d9d9"}, { "index":1, "color":"#404040"}]}},
-
-            "qbtn-dn-bezel": { "fill": { "gradient": [{ "index":0, "color":"#2e2e2e"}, { "index":1, "color":"#595959"}]}},
-            "qbtn-dn-hi-l":  { "fill": "#666666" },
-            "qbtn-dn-hi-r":  { "fill": "#8c8c8c" },
-            "qbtn-dn-hi-t":  { "fill": "#404040" },
-            "qbtn-dn-hi-b":  { "fill": "#c6c6c6" },
-            "qbtn-dn-face":  { "fill": { "gradient": [{ "index":0, "color":"#8c8c8c"}, { "index":1, "color":"#333333"}]}},
+            "fswhi": { "stroke": { "color":"g75", "width":1.5 }},
+            "fswlo": { "stroke": { "color":"g55", "width":1.25 }},
 
             "midi-frame" : { "fill": "#a6a6a6" },
             "midi-face"  : { "fill": "#1f1f1f" },
@@ -79,13 +68,8 @@
 
             "menu":        { "fill" : "g50" },
 
-            "button-bezel": { "fill": "g50"},
-            "button-ring":  { "fill": "#3a68ac"},
-            "button-inset": { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#c0c0c0"}, {"index":1, "offset":1, "color": "#404040"}]}},
-            "button-face":  { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#a0a0a0"}, {"index":1, "offset":1, "color": "#505050"}]}},
-
-            "link-gface":  { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#767575"}, {"index":1, "offset":1, "color": "#353434"}]}},
-            "link-gframe": { "Fill": { "gradient": [{"index":0, "offset":0, "color": "#7b7a7a"}, {"index":1, "offset":1, "color": "#0b0b0b"}]}},
+            "link-gface":  { "fill": { "gradient": [{"index":0, "offset":0, "color": "#767575"}, {"index":1, "offset":1, "color": "#353434"}]}},
+            "link-gframe": { "fill": { "gradient": [{"index":0, "offset":0, "color": "#7b7a7a"}, {"index":1, "offset":1, "color": "#0b0b0b"}]}},
 
             "port-bezel":     { "fill": "#595959" },
             "port-ring":      { "fill": "#808080" },
@@ -96,6 +80,22 @@
             
             "patty": { "stroke": "g90"},
             "patty-hover": { "stroke": "brand"},
+
+            "rbtn-punch": { "fill": "#000000" },
+            "rbtn-bezel": { "fill": "#404040" },
+            "rbtn-taper": { "fill": { "gradient": [{ "index":0, "color":"#d9d9d9"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-face": { "fill": { "gradient": [{ "index":0, "color":"#bfbfbf"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"#666666"}, { "index":1, "color":"#333333"}]}},
+            "rbtn-dn-face": { "fill": { "gradient": [{ "index":0, "color":"#8c8c8c"}, { "index":1, "color":"#595959"}]}},
+            "rbtn-wire": { "stroke": {"color": "white", "width": 0.5}},
+
+            "lrbtn-punch": { "fill": "#000000" },
+            "lrbtn-bezel": { "fill": "#404040" },
+            "lrbtn-taper": { "fill": { "gradient": [{ "index":0, "color":"#ededed"}, { "index":1, "color":"#333333"}]}},
+            "lrbtn-face": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#333333"}]}},
+            "lrbtn-dn-taper": { "fill": { "gradient": [{ "index":0, "color":"#666666"}, { "index":1, "color":"#333333"}]}},
+            "lrbtn-dn-face": { "fill": { "gradient": [{ "index":0, "color":"#a7a7a7"}, { "index":1, "color":"#595959"}]}},
+            "lrbtn-wire": { "stroke": {"color": "white", "width": 0.5}},
 
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#303030" }, { "index":1, "offset":1, "color": "#222222" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#636363" }, { "index":1, "offset":1, "color": "#2B2B2B" }]}},

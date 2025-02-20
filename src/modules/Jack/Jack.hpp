@@ -10,18 +10,18 @@
 
 using namespace pachde;
 
-struct FxUi;
+struct JackUi;
 
-struct FxModule : ChemModule, IChemClient
+struct JackModule : ChemModule, IChemClient
 {
     std::string device_claim;
     IChemHost* chem_host;
-    FxUi* ui;
+    JackUi* ui;
 
     bool glow_knobs;
 
-    FxModule();
-    ~FxModule() {
+    JackModule();
+    ~JackModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
@@ -37,39 +37,25 @@ struct FxModule : ChemModule, IChemClient
     // ----  Rack  ------------------------------------------
 
     enum Params {
-        // Knobs
-        P_R1,
-        P_R2,
-        P_R3,
-        P_R4,
-        P_R5,
-        P_R6,
-        P_MIX,
-        P_ATTENUVERT,
+        P_ASSIGN_JACK_1,
+        P_ASSIGN_JACK_2,
 
-        // Switches
-        P_ENABLE, NUM_KNOBS = P_ENABLE,
-        P_EFFECT,
+        P_MIN_JACK_1,
+        P_MAX_JACK_1, 
+        P_MIN_JACK_2,
+        P_MAX_JACK_2, 
 
         NUM_PARAMS
     };
     enum Inputs {
-        IN_R1,
-        IN_R2,
-        IN_R3,
-        IN_R4,
-        IN_R5,
-        IN_R6,
-        IN_MIX,
-        // gate/trigger
-        IN_ENABLE,
         NUM_INPUTS
     };
     enum Outputs {
+        OUT_JACK_1,
+        OUT_JACK_2,
         NUM_OUTPUTS
     };
     enum Lights {
-        L_ENABLE,
         NUM_LIGHTS
     };
 
@@ -79,33 +65,29 @@ struct FxModule : ChemModule, IChemClient
     void process(const ProcessArgs& args) override;
 };
 
-// -- Fx UI -----------------------------------
+// -- Jack UI -----------------------------------
 
-struct FxMenu;
-constexpr const int PLAYLIST_LENGTH = 15;
+// TODO: adapt HC 1 PedalParam for better menu
 
-struct FxUi : ChemModuleWidget, IChemClient
+struct JackUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
-    IChemHost*    chem_host{nullptr};
-    FxModule*  my_module{nullptr};
+    IChemHost* chem_host{nullptr};
+    JackModule* my_module{nullptr};
 
     LinkButton*   link_button{nullptr};
-    TipLabel*     haken{nullptr};
-    TipLabel*     warn{nullptr};
+    TipLabel*     haken_device_label{nullptr};
+    TipLabel*     warning_label{nullptr};
 
-    SelectorWidget* selector{nullptr};
-    StaticTextLabel* effect_label;
-    StaticTextLabel* r_labels[6];
-    GlowKnob* knobs[FxModule::NUM_KNOBS];
+    StaticTextLabel* assign_1_label;
+    StaticTextLabel* assign_2_label;
 
-    int effect{-1};
+    float last_1, last_2;
 
-    FxUi(FxModule *module);
+    JackUi(JackModule *module);
 
     bool connected();
-    void glowing_knobs(bool glow);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -115,9 +97,10 @@ struct FxUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-fx.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-jack.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
+    void sync_labels();
     void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;

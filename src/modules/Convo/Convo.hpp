@@ -31,7 +31,6 @@ struct ConvoModule : ChemModule, IChemClient
     std::string device_claim;
     IChemHost* chem_host;
     ConvoUi* ui;
-    rack::dsp::Timer poll_host;
 
     bool glow_knobs;
 

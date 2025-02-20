@@ -88,8 +88,8 @@ HakenTasks::HakenTasks()
 {
     tasks = {
         //             id,                       state,                     post  budget periodic
-        HakenTaskInfo( HakenTask::MidiDevice,    TaskState::Uninitialized,  2.f,   0.0f, false ),
-        HakenTaskInfo( HakenTask::HeartBeat,     TaskState::Uninitialized,  0.5f,  2.0f, true ),
+        HakenTaskInfo( HakenTask::MidiDevice,    TaskState::Uninitialized,  2.0f,  0.0f, false ),
+        HakenTaskInfo( HakenTask::HeartBeat,     TaskState::Uninitialized, 15.0f,  2.0f, true ),
         HakenTaskInfo( HakenTask::Updates,       TaskState::Uninitialized,  1.0f,  0.0f, false ),
         HakenTaskInfo( HakenTask::UserPresets,   TaskState::Unscheduled,    0.0f, 12.0f, false ),
         HakenTaskInfo( HakenTask::SystemPresets, TaskState::Unscheduled,    1.0f, 25.0f, false ),
@@ -101,7 +101,10 @@ HakenTasks::HakenTasks()
 
 void HakenTasks::subscribeChange(IHakenTaskEvents* client)
 {
-    clients.push_back(client);
+    auto cit = std::find(clients.cbegin(), clients.cend(), client);
+    if (cit != clients.cend()) {
+        clients.push_back(client);
+    }
 }
 void HakenTasks::unsubscribeChange(IHakenTaskEvents* client)
 {

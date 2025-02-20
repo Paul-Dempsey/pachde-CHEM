@@ -31,7 +31,8 @@ enum K {
 };
 
 PostUi::PostUi(PostModule *module) :
-    my_module(module)
+    my_module(module),
+    last_mute(-1.f)
 {
     setModule(module);
     initThemeEngine();
@@ -40,33 +41,47 @@ PostUi::PostUi(PostModule *module) :
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
     float x, y;
-    bool browsing = !module;
+    //bool browsing = !module;
+    LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 62.f), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
-
+    
     // knobs
     x = CENTER;
     addChild(knobs[K_POST_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), module, PostModule::P_POST_LEVEL, theme_engine, theme));
-    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, 96.f), module, PostModule::P_MIX, theme_engine, theme));
+    
+    // MUTE
+    y = 68.f;
+    addChild(mute_button = Center(createThemedLightButton<LargeRoundButton, TinyLight<RedLight>>(
+        Vec(x, y), my_module, PostModule::L_MUTE, theme_engine, theme, "Mute")));
+    if (my_module) {
+        mute_button->setHandler([=](bool, bool) {
+            auto v = my_module->getParam(PostModule::P_MUTE).getValue();
+            my_module->getParam(PostModule::P_MUTE).setValue(v > .5f ? 0.f : 1.f);
+        });
+    }
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x,y + 14.f), 50.f, "Mute", theme_engine, theme, knob_label_style));
+    
+    y = 104.f;
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    y += 34;
+    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), module, PostModule::P_MIX, theme_engine, theme));
 
-    const float PARAM_TOP = 136.f;
+    y += 40;
     const float PARAM_DY = 54.5f;
     const float label_offset = 18.f;
-    LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
-    y = PARAM_TOP;
     addChild(knobs[K_TILT] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_TILT, theme_engine, theme));
-    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Tilt", theme_engine, theme, knob_label_style));
+    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 50.f, "Tilt", theme_engine, theme, knob_label_style));
     y += PARAM_DY;
     addChild(knobs[K_FREQUENCY] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_FREQUENCY, theme_engine, theme));
-    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "Frequency", theme_engine, theme, knob_label_style));
+    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 80.f, "Frequency", theme_engine, theme, knob_label_style));
     y += PARAM_DY;
 
-    if (browsing) {
-        auto logo = new Logo(0.35f);
-        logo->box.pos = Vec(CENTER - logo->box.size.x*.5, y - 16.f);
-        addChild(logo);
-    }
+    // if (browsing) {
+    //     auto logo = new Logo(0.35f);
+    //     logo->box.pos = Vec(CENTER - logo->box.size.x*.5, y - 16.f);
+    //     addChild(logo);
+    // }
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -162,11 +177,18 @@ void PostUi::onPresetChange()
 {
 }
 
-// void PostUi::step()
-// {
-//     Base::step();
+void PostUi::step()
+{
+    Base::step();
+    if (!my_module) return;
+
+    auto current = my_module->getParam(PostModule::P_MUTE).getValue();
+    if (last_mute != current) {
+        last_mute = current;
+        mute_button->describe(format_string("Mute: %s", current > .5f ? "on": "off"));
+    }
     
-// }
+}
 
 void PostUi::draw(const DrawArgs& args)
 {

@@ -76,6 +76,15 @@
       ]
     },
     {
+      "slug": "chem-jack",
+      "name": "CHEM jack",
+      "description": "CHEM Jack (pedals) for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
       "slug": "chem-play",
       "name": "CHEM Play",
       "description": "CHEM Playlist for Haken Eagan Matrix",

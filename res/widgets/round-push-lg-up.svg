@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28" height="28" viewBox="0 0 28 28" version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+   <defs>
+      <linearGradient id="gtaper"  x1="5.5" y1="0" x2="12" y2="19" gradientUnits="userSpaceOnUse">
+         <stop stop-color="#ededed" offset="0" />
+         <stop stop-color="#333333" offset="1" />
+      </linearGradient>
+      <linearGradient id="gface" x1="12" y1="0" x2="16" y2="17" gradientUnits="userSpaceOnUse">
+         <stop stop-color="#e6e6e6" offset="0" />
+         <stop stop-color="#505050" offset="1" />
+      </linearGradient>
+   </defs>
+   <circle id="lrbtn-punch" fill="#000000"    cx="14" cy="14" r="12" />
+   <circle id="lrbtn-bezel" fill="#404040"    cx="14" cy="14" r="11.5" stroke-width=".25" />
+   <circle id="lrbtn-taper" fill="url(#gtaper)" cx="14" cy="14" r="10" stroke-width=".25" />
+   <circle id="lrbtn-face"  fill="url(#gface)"  cx="14" cy="14" r="9.25" />
+   <circle id="lrbtn-wire"  fill="none" stroke="white" stroke-width=".25" opacity="0" cx="14" cy="14" r="8.5" />
+</svg>

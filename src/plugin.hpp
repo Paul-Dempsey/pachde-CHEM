@@ -18,6 +18,7 @@ extern Model* modelPre;
 extern Model* modelFx;
 extern Model* modelPost;
 extern Model* modelConvo;
+extern Model* modelJack;
 extern Model* modelPreset;
 
 // Theming

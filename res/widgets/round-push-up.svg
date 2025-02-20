@@ -16,5 +16,5 @@
    <circle id="rbtn-bezel" fill="#404040" cx="8" cy="8" r="7.5" stroke-width=".25"  />
    <circle id="rbtn-taper" fill="url(#gtaper)" cx="8" cy="8" r="6" stroke-width=".25"  />
    <circle id="rbtn-face" fill="url(#gface)" cx="8" cy="8" r="5" />
-   <circle id="rbtn-wire" fill="none" stroke="white" stroke-width=".25" opacity="0" cx="8" cy="8" r="5" />
+   <circle id="rbtn-wire" fill="none" stroke="white" stroke-width=".25" opacity="0" cx="8" cy="8" r="8.5" />
 </svg>

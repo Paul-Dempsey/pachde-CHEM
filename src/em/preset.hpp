@@ -13,6 +13,8 @@ struct PresetDescription
 
     PresetDescription() {
         id.invalidate();
+        name.reserve(32);
+        text.reserve(256);
     }
 
     PresetDescription(PresetId id, std::string name, std::string text)

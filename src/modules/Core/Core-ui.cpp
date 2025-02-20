@@ -64,10 +64,8 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     style.align = TextAlignment::Center;
     style.height = 10.f;
     style.bold = false;
-    // addChild(task_status_label = createStaticTextLabel<StaticTextLabel>(
-    //     Vec(UHALF, y), box.size.x - 15.f, "", theme_engine, theme, style));
-    // y -= 16.f;
-    y = 3.75;
+
+    y = 174.f;
     addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
         Vec(box.size.x*.5f, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
@@ -252,7 +250,7 @@ void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<Mid
     em_status_label->text(nothing);
     //task_status_label->text(nothing);
     preset_label->text(nothing);
-
+    preset_label->describe(nothing);
     std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
     switch (device) {
     case ChemDevice::Haken: haken_device_label->text(name); break;
@@ -280,8 +278,13 @@ void CoreModuleWidget::onHardwareChanged(uint8_t hardware, uint16_t firmware_ver
 void CoreModuleWidget::onPresetChanged()
 {
     auto preset = my_module->host_preset();
-    preset_label->text(preset->name);
-    preset_label->describe(preset->summary());
+    if (preset) {
+        preset_label->text(preset->name);
+        preset_label->describe(preset->text.empty() ? preset->summary() : preset->text);
+    } else {
+        preset_label->text("");
+        preset_label->describe("");
+    }
 }
 
 void CoreModuleWidget::onUserComplete() {}

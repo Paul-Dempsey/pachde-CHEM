@@ -1,12 +1,10 @@
 #pragma once
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
+#include "../../em/preset-macro.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
-// #include "../../widgets/blip-widget.hpp"
 #include "../../widgets/themed-widgets.hpp"
-// #include "../../widgets/draw-button.hpp"
-// #include "../../widgets/hamburger.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 
@@ -42,11 +40,12 @@ struct MacroModule : ChemModule, IChemClient
     std::string device_claim;
     IChemHost* chem_host;
     MacroUi* ui;
-    rack::dsp::Timer poll_host;
 
     int attenuator_target;
     int last_attenuator_target;
     float attenuation[NUM_INPUTS]{0.f};
+
+    PresetMacro macro_names;
 
     // options
     bool glow_knobs;
@@ -57,6 +56,8 @@ struct MacroModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
+
+    void update_from_em();
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -92,6 +93,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
+    TipLabel* preset_label;
     StaticTextLabel* m1_label;
     StaticTextLabel* m2_label;
     StaticTextLabel* m3_label;

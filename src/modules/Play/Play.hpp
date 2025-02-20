@@ -20,7 +20,6 @@ struct PlayModule : ChemModule, IChemClient
     std::string device_claim;
     IChemHost* chem_host;
     PlayUi* ui;
-    rack::dsp::Timer poll_host;
 
     std::string playlist_folder;
     std::string playlist_file;

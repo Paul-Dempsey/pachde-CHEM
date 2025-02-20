@@ -93,7 +93,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return haken_device.getClaim();
     }
     const PresetDescription* host_preset() override {
-        return &em.preset;
+        return em.preset.id.valid() ? &em.preset : nullptr;
     }
     HakenMidi* host_haken() override {
         return &haken_midi;

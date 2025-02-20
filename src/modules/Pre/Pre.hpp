@@ -17,7 +17,6 @@ struct PreModule : ChemModule, IChemClient
     std::string device_claim;
     IChemHost* chem_host;
     PreUi* ui;
-    rack::dsp::Timer poll_host;
 
     bool glow_knobs;
 

@@ -31,7 +31,7 @@ constexpr const float CENTER = PANEL_WIDTH * .5f;
 constexpr const float KNOB_CX = 25.f;
 constexpr const float KNOB_CY = 35.f;
 constexpr const float KNOB_TOP = KNOB_CY - 16.f;
-constexpr const float MACRO_DY = 41.5f;
+constexpr const float MACRO_DY = 40.f;
 constexpr const float LABEL_LEFT = 45.f;
 constexpr const float LABEL_TOP = KNOB_CY;
 
@@ -63,8 +63,12 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M3, theme_engine, theme)); y += MACRO_DY;
     addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M4, theme_engine, theme)); y += MACRO_DY;
     addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
-    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme));
+    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme)); 
     
+    addChild(preset_label = createStaticTextLabel<TipLabel>(
+        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "", theme_engine, theme,
+        LabelStyle{"curpreset", TextAlignment::Center, 12.f, false}));
+
     // knob labels
     x = LABEL_LEFT;
     y = LABEL_TOP;
@@ -186,6 +190,19 @@ void MacroUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCo
 
 void MacroUi::onPresetChange()
 {
+    if (my_module) {
+        m1_label->text(my_module->macro_names.macro[M1]);
+        m2_label->text(my_module->macro_names.macro[M2]);
+        m3_label->text(my_module->macro_names.macro[M3]);
+        m4_label->text(my_module->macro_names.macro[M4]);
+        m5_label->text(my_module->macro_names.macro[M5]);
+        m6_label->text(my_module->macro_names.macro[M6]);
+        auto preset = chem_host ? chem_host->host_preset() : nullptr;
+        if (preset) {
+            preset_label->text(preset->name);
+            preset_label->describe(preset->text);
+        }
+    }
 }
 
 void MacroUi::step()

@@ -54,10 +54,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     x = 16.f;
     y = 140.f;
     addChild(selector = createThemedParam<SelectorWidget>(Vec(x, y), my_module, CM::P_SELECT, theme_engine, theme));
-    addChild(selector_label = createStaticTextLabel<StaticTextLabel>(Vec(x + 5.f, y - 19.f), 20.f, "", theme_engine, theme, heading_style));
-#ifndef NDEBUG
-    selector->host = "Convo";
-#endif
+    addChild(selector_label = createStaticTextLabel<StaticTextLabel>(Vec(x + 5.f, y - 20.5f), 20.f, "", theme_engine, theme, heading_style));
 
     heading_style.height = 14.f;
     x = CENTER - PANEL_WIDTH *.25;
@@ -74,7 +71,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     addChild(knobs[K_POST_MIX]   = createChemKnob<BlueKnob>(Vec(CENTER+center_dx, y), my_module, CM::P_POST_MIX, theme_engine, theme));
     addChild(knobs[K_POST_INDEX] = createChemKnob<BasicKnob>(Vec(CENTER+center_dx+knob_dx, y), my_module, CM::P_POST_INDEX, theme_engine, theme));
 
-    x = 55.f;
+    x = 56.5f;
     y = 95.f;
     const float knob_dy = 40.f;
     addChild(knobs[K_TYPE] = createChemKnob<BasicKnob>(Vec(x, y), my_module, CM::P_TYPE, theme_engine, theme));
@@ -82,7 +79,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
         theme_engine, theme, LabelStyle {"dytext", TextAlignment::Left, 14.f}));
 
     extend_button = Center(createThemedLightButton<SmallRoundButton, TinySimpleLight<BlueLight>>(
-        Vec(22.f, y+KNOB_LABEL_DY), my_module, CM::L_EXTEND, theme_engine, theme, "Toggle extended processing"));
+        Vec(22.f, y + 6.f), my_module, CM::L_EXTEND, theme_engine, theme, "Toggle extended processing"));
     addChild(extend_button);
     if (my_module) {
         extend_button->setHandler([=](bool, bool) {
@@ -104,10 +101,11 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     addChild( createStaticTextLabel<StaticTextLabel>(Vec(x + KNOB_LABEL_DX, y+KNOB_LABEL_DY), 80.f, "Width", theme_engine, theme, S::control_label_left));
 
     y += knob_dy;
-    addChild(knobs[K_L] = createChemKnob<BasicKnob>(Vec(CENTER - 28, y), my_module, CM::P_LEFT, theme_engine, theme));
-    addChild( createStaticTextLabel<StaticTextLabel>(Vec(CENTER - 28 - 24, y), 80.f, "L", theme_engine, theme, S::control_label_left));
-    addChild(knobs[K_R] = createChemKnob<BasicKnob>(Vec(CENTER + 28, y), my_module, CM::P_RIGHT, theme_engine, theme));
-    addChild( createStaticTextLabel<StaticTextLabel>(Vec(CENTER + 28 + 20, y), 80.f, "R", theme_engine, theme, S::control_label_left));
+    const float lr_knob_dx = 24.f;
+    addChild(knobs[K_L] = createChemKnob<BasicKnob>(Vec(CENTER - lr_knob_dx, y), my_module, CM::P_LEFT, theme_engine, theme));
+    addChild( createStaticTextLabel<StaticTextLabel>(Vec(CENTER - lr_knob_dx - 24, y), 80.f, "L", theme_engine, theme, S::control_label_left));
+    addChild(knobs[K_R] = createChemKnob<BasicKnob>(Vec(CENTER + lr_knob_dx, y), my_module, CM::P_RIGHT, theme_engine, theme));
+    addChild( createStaticTextLabel<StaticTextLabel>(Vec(CENTER + lr_knob_dx + 20, y), 80.f, "R", theme_engine, theme, S::control_label_left));
 
     addChild(knobs[K_ATTENUVERT] = createChemKnob<TrimPot>(Vec(CENTER,S::PORT_TOP), my_module, CM::P_ATTENUVERT, theme_engine, theme));
 
