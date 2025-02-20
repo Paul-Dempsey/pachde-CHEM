@@ -32,16 +32,16 @@ ConvoModule::ConvoModule()
         "White",
         "Grey"
     });
-    configParam(P_LENGTH, 0.f, 127.f, 127.f, "Length");
-    configParam(P_TUNING, 0.f, 127.f, 64.f, "Tuning");
-    configParam(P_WIDTH,  0.f, 127.f, 64.f, "Width");
-    configParam(P_LEFT,      0.f, 127.f, 127.f, "Left attenuation");
-    configParam(P_RIGHT,      0.f, 127.f, 127.f, "Right attenuation");
+    configParam(P_LENGTH, 0.f, 10.f, 10.f, "Length");
+    configParam(P_TUNING, 0.f, 10.f,  5.f, "Tuning");
+    configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width");
+    configParam(P_LEFT,   0.f, 10.f, 10.f, "Left attenuation");
+    configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right attenuation");
 
-    configParam(P_PRE_MIX,    0.f, 127.f, 0.f, "Pre Mix");
-    configParam(P_PRE_INDEX,  0.f, 127.f, 0.f, "Pre Index");
-    configParam(P_POST_MIX,   0.f, 127.f, 0.f, "Post Mix");
-    configParam(P_POST_INDEX, 0.f, 127.f, 0.f, "Post Index");
+    configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix");
+    configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index");
+    configParam(P_POST_MIX,   0.f, 10.f, 0.f, "Post Mix");
+    configParam(P_POST_INDEX, 0.f, 10.f, 0.f, "Post Index");
 
     configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
