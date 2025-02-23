@@ -14,6 +14,7 @@
 
             "div": { "stroke": "#606060" },
 
+            "k#": { "fill": "hsl(90, 40%, 45%)" },
             "midi-frame" : { "fill": "none", "stroke": "g65" },
             "midi-face"  : { "fill": "none", "stroke": "g50" },
             "midi-label" : { "fill": "#d9d9d9" },

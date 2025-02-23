@@ -17,6 +17,7 @@
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
             "div": { "stroke": "#808080" },
 
+            "k#": { "fill": "#4095bf" },
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #efefe0"}, { "index":1, "color":" #686868"}]}},
             "k-rim": { "stroke": "#9b9b9b" },
             "k-gnomen": { "fill": " #f5f5ef" },
