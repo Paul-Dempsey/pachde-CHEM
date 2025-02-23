@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="18" height="18" viewBox="0 0 18 18" version="1.1"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:svg="http://www.w3.org/2000/svg">
+   <g>
+      <path id="base--noped-fill"  fill-opacity=".33" fill="#505050" d="m 0.65783536,8.9461565 -0.004455,2.7113835 7.88437224,4.967477 8.3436584,-5.312695 0.0803,-0.973892 -7.9350474,5.027504 z" />
+      <path id="left--noped-fill"  fill-opacity=".33" fill="#6a6a6a" d="m 9.0266636,15.365934 v -3.45759 L 0.20257325,6.8677251 0.20304762,8.6050955 Z" />
+      <path id="front--noped-fill" fill-opacity=".33" fill="#9d9d9d" d="M 9.0266636,15.365934 17.844318,9.7998757 V 7.1303325 L 9.0266636,11.908344 Z" />
+      <path id="top--noped-fill"   fill-opacity=".33" fill="#b8b8b8" d="M 8.9966298,11.920039 18,7.0435158 9.0266636,3.8968251 l -8.82409035,2.9709 z" />
+   </g>
+   <g>
+      <path id="base-w--noped-frame"  fill="none" stroke="#e0e0e0" stroke-width="0.25" d="m 0.65783536,8.9461565 -0.004455,2.7113835 7.88437244,4.967477 8.3436582,-5.312695 0.0803,-0.973892" />
+      <path id="cap--noped-frame"   fill="none" stroke="#e0e0e0" stroke-width="0.35" d="M 9.0266636,3.8968251 17.844318,7.1303325 V 9.7998757 L 9.0266636,15.365934 0.24241141,8.589992 0.24193703,6.8526216 Z" />
+      <path id="vcap--noped-frame"  fill="none" stroke="#e0e0e0" stroke-width="0.25" d="m 9.0266636,15.365934 v -3.45759" />
+      <path id="top--noped-frame"   fill="none" stroke="#e0e0e0" stroke-width="0.25" d="M 0.24193703,6.8526216 9.0266636,11.908344 17.784741,7.160107" />
+      <path id="vbase--noped-frame" fill="none" stroke="#e0e0e0" stroke-width="0.25" d="m 8.538,16.625 0,-1.529" />
+   </g>
+</svg>

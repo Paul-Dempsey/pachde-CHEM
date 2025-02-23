@@ -5,7 +5,8 @@
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/selector-widget.hpp"
-#include "../../widgets/themed-widgets.hpp"
+#include "../../widgets/symbol-set.hpp"
+#include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 
 using namespace pachde;
@@ -19,6 +20,8 @@ struct JackModule : ChemModule, IChemClient
     JackUi* ui;
 
     bool glow_knobs;
+    int last_assign_1;
+    int last_assign_2;
 
     JackModule();
     ~JackModule() {
@@ -26,6 +29,10 @@ struct JackModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
+    IChemHost* get_host() override {
+        return chem_host;
+    }
+    bool connected() { return chem_host && !device_claim.empty(); }
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -62,6 +69,8 @@ struct JackModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void pull_jack_data();
+    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -82,8 +91,12 @@ struct JackUi : ChemModuleWidget, IChemClient
 
     StaticTextLabel* assign_1_label;
     StaticTextLabel* assign_2_label;
+    SymbolProvider symbols;
+    SymbolSetWidget* pedal_image_1;
+    SymbolSetWidget* pedal_image_2;
 
     float last_1, last_2;
+    int last_p1, last_p2;
 
     JackUi(JackModule *module);
 

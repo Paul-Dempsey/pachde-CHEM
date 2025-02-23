@@ -11,6 +11,19 @@ void HakenMidi::key_pressure(uint8_t channel, uint8_t note, uint8_t pressure) {
     send_message(MakePolyKeyPressure(channel, note, pressure));
 }
 
+void HakenMidi::begin_stream(uint8_t stream)
+{
+    send_message(MakeCC(Haken::ch16, Haken::ccStream, stream));
+}
+void HakenMidi::stream_data(uint8_t d1, uint8_t d2)
+{
+    send_message(MakePolyKeyPressure(Haken::ch16, d1, d2));
+}
+void HakenMidi::end_stream()
+{
+    send_message(MakeCC(Haken::ch16, Haken::ccStream, 127));
+}
+
 void HakenMidi::select_preset(PresetId id)
 {
     if (log) {

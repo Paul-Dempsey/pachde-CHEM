@@ -33,6 +33,7 @@ bool isPeerModule(Module* me, Module* candidate)
 			|| (model == modelConvo)
 			|| (model == modelJack)
             || (model == modelPreset)
+			|| (model == modelBlank)
             // add new models here
         );
 }

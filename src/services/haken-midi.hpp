@@ -44,6 +44,10 @@ struct HakenMidi
     void refine_calibration();
     void factory_calibration();
     void surface_alignment();
+
+    void begin_stream(uint8_t stream);
+    void stream_data(uint8_t d1, uint8_t d2);
+    void end_stream();
 };
 
     

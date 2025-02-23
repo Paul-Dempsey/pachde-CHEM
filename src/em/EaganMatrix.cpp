@@ -7,7 +7,6 @@ EaganMatrix::EaganMatrix()
 :   ready(false),
     firmware_version(0),
     hardware(0),
-    reverse_surface(false),
     broken_midi(false),
     in_preset(false),
     in_user(false),
@@ -16,7 +15,9 @@ EaganMatrix::EaganMatrix()
     pending_config(false),
     frac_hi(false),
     frac_lsb(0),
-    data_stream(-1)
+    data_stream(-1),
+    jack_1(0),
+    jack_2(0)
 {
 }
 
@@ -24,7 +25,6 @@ void EaganMatrix::reset()
 {
     firmware_version = 0;
     hardware = 0;
-    reverse_surface = false;
     broken_midi = false;
     in_preset = false;
     in_user = false;
@@ -34,12 +34,13 @@ void EaganMatrix::reset()
     frac_hi = false;
     frac_lsb = 0,
     data_stream = -1;
+    jack_1 = jack_2 = 0;
     preset.clear();
     ch1.clear();
     ch2.clear();
     ch16.clear();
-    std::memset(macro, 0, 180);
-
+    std::memset(macro, 0, sizeof(macro));
+    std::memset(mat, 0, sizeof(mat)); // $TODO: init default? (e.g. mat[idFrontBack] = ccBrightness)
     notifyHardwareChanged();
     notifyPresetChanged();
 }
@@ -141,6 +142,16 @@ void EaganMatrix::onChannelTwoCC(uint8_t cc, uint8_t value)
 {
 }
 
+bool EaganMatrix::set_checked_data_stream(uint8_t stream_id) {
+    if (data_stream != -1) {
+        broken_midi = true;
+        return false;
+    } else {
+        data_stream = static_cast<int>(stream_id);
+        return true;
+    }
+}
+
 bool EaganMatrix::handle_macro_cc(uint8_t cc, uint8_t value)
 {
     // 12-17
@@ -181,6 +192,22 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
         frac_lsb = value;
         return;
     }
+    if (get_jack_1_assign() == cc) {
+        jack_1 = (value << 7) + ch1.pedal_fraction();
+    }
+    if (get_jack_2_assign() == cc) {
+        jack_2 = (value << 7) + ch1.pedal_fraction();
+    }
+
+    switch (cc) {
+    case Haken::ccJack1:
+        jack_1 = (value << 7) + ch1.pedal_fraction();
+        break;
+    case Haken::ccJack2:
+        jack_2 = (value << 7) + ch1.pedal_fraction();
+        break;
+    }
+
     if (handle_macro_cc(cc, value)) {
         return;
     }
@@ -204,10 +231,7 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         switch (value) {
         case Haken::s_Name: {
             name_buffer.clear();
-            if (data_stream != -1) {
-                broken_midi = true;
-            } else {
-                data_stream = value;
+            if (set_checked_data_stream(value)) {
                 if (!in_preset) {
                     begin_preset();
                 }
@@ -216,22 +240,27 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
 
         case Haken::s_ConText: {
             text_buffer.clear();
-            if (data_stream != -1) {
-                broken_midi = true;
-            } else {
-                data_stream = value;
-            }
+            set_checked_data_stream(value);
+        } break;
+
+        case Haken::s_Mat_Poke: {
+            set_checked_data_stream(value);
+            // zero mat?
         } break;
 
         case Haken::s_StreamEnd: {
             if (in_preset) {
                 switch (data_stream) {
-                case Haken::s_Name:
+                case Haken::s_Name: {
                     preset.name = name_buffer.str();
-                    break;
-                case Haken::s_ConText:
+                } break;
+
+                case Haken::s_ConText: {
                     preset.text = text_buffer.str();
-                    break;
+                } break;
+
+                // case Haken::s_Mat_Poke: {
+                // } break;
                 }
             }
             data_stream = -1;
@@ -360,11 +389,16 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                     name_buffer.build(msg.bytes.data1);
                     name_buffer.build(msg.bytes.data2);
                     break;
+
                 case Haken::s_ConText:
                     text_buffer.build(msg.bytes.data1);
                     text_buffer.build(msg.bytes.data2);
                     break;
+
                 }
+            }
+            if (Haken::s_Mat_Poke == data_stream) {
+                mat[msg.bytes.data1] = msg.bytes.data2;
             }
             break;
 

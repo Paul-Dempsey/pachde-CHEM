@@ -69,13 +69,6 @@ float GetFloat(const json_t* root, const char* key, float default_value);
 //     bool any() { return !empty(); }
 // };
 
-inline int getParamIndex(ParamQuantity*pq) {
-    return static_cast<int>(std::floor(pq->getValue() - pq->getMinValue()));
-}
-inline int getParamInt(Param& p) {
-    return static_cast<int>(std::floor(p.getValue()));
-}
-
 class WallTimer
 {
     double start_time;

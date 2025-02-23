@@ -5,7 +5,8 @@
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/selector-widget.hpp"
-#include "../../widgets/themed-widgets.hpp"
+#include "../../widgets/theme-button.hpp"
+#include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 
 using namespace pachde;
@@ -25,6 +26,10 @@ struct PreModule : ChemModule, IChemClient
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
+    }
+
+    IChemHost* get_host() override {
+        return chem_host;
     }
 
     // IChemClient

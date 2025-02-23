@@ -1,6 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "plugin.hpp"
+#include "chem-core.hpp"
 #include "services/colors.hpp"
 #include "widgets/themed-widgets.hpp"
 
@@ -17,17 +18,11 @@ struct ChemModule : Module, IThemeHolder
     bool follow_rack{false};
     ChemModuleWidget* chem_ui{nullptr};
 
+    virtual IChemHost* get_host() = 0;
     void set_chem_ui(ChemModuleWidget* ui) { chem_ui = ui; };
 
-    void setThemeName(const std::string& name, void *) override { this->theme_name = name; }
-
-    std::string getThemeName() override {
-        if (follow_rack) {
-            return ::rack::settings::preferDarkPanels ? "Dark": "Light";
-        }
-        if (theme_name.empty()) return DEFAULT_THEME;
-        return theme_name;
-    }
+    void setThemeName(const std::string& name, void *) override;
+    std::string getThemeName() override;
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;

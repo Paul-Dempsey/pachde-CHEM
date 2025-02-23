@@ -1,6 +1,38 @@
 #include "Jack.hpp"
 using namespace pachde;
 
+static const std::vector<uint8_t> ccmap = {
+    Haken::ccVol,
+    Haken::ccPre,
+    Haken::ccPost,
+    Haken::ccAudIn,
+    Haken::ccI,
+    Haken::ccII,
+    Haken::ccIII,
+    Haken::ccIV,
+    Haken::ccV,
+    Haken::ccVI,
+    Haken::ccSus,
+    Haken::ccSos,
+    Haken::ccSos2,
+    Haken::ccOctShift,
+    Haken::ccMonoSwitch,
+    Haken::ccRoundRate,
+    Haken::ccRndIni,
+    Haken::ccStretch,
+    Haken::ccFineTune,
+    Haken::ccAdvance
+};
+
+int pedal_to_index(uint8_t assign) {
+    auto it = std::find(ccmap.cbegin(), ccmap.cend(), assign);
+    return it == ccmap.cend() ? 0 : it - ccmap.cbegin();
+}
+
+uint8_t index_to_pedal_cc(int index) {
+    return ccmap[index];
+}
+
 JackModule::JackModule()
 :   chem_host(nullptr),
     ui(nullptr),
@@ -16,7 +48,7 @@ JackModule::JackModule()
         "Audio in",
         "Macro i",
         "Macro ii",
-        "Macro ii",
+        "Macro iii",
         "Macro iv",
         "Macro v",
         "Macro vi",
@@ -91,6 +123,7 @@ void JackModule::onConnectHost(IChemHost* host)
 
 void JackModule::onPresetChange()
 {
+    pull_jack_data();
     if (ui) ui->onPresetChange();
 }
 
@@ -99,9 +132,57 @@ void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
     if (ui) ui->onConnectionChange(device, connection);
 }
 
-void JackModule::process(const ProcessArgs& args)
+void JackModule::pull_jack_data()
 {
+    assert(chem_host);
+    auto em = chem_host->host_matrix();
+    last_assign_1 = pedal_to_index(em->get_jack_1_assign());
+    last_assign_2 = pedal_to_index(em->get_jack_2_assign());
+    getParam(P_ASSIGN_JACK_1).setValue(last_assign_1);
+    getParam(P_ASSIGN_JACK_2).setValue(last_assign_2);
+    getParam(P_MIN_JACK_1).setValue(unipolar_7_to_rack(em->get_pedal_1_min()));
+    getParam(P_MAX_JACK_1).setValue(unipolar_7_to_rack(em->get_pedal_1_max()));
+    getParam(P_MIN_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_min()));
+    getParam(P_MAX_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_max()));
+}
 
+void JackModule::process_params(const ProcessArgs &args)
+{
+    assert(chem_host);
+    
+    int assign_1 = getParamInt(getParam(P_ASSIGN_JACK_1));
+    int assign_2 = getParamInt(getParam(P_ASSIGN_JACK_2));
+    if ((assign_1 != last_assign_1) || (assign_2 != last_assign_2)) {
+        auto haken = chem_host->host_haken();
+        haken->log->logMessage("Jack", "Pedal assign");
+        haken->begin_stream(Haken::s_Mat_Poke);
+        if (assign_1 != last_assign_1) {
+            haken->stream_data(Haken::idPedal1, index_to_pedal_cc(assign_1));
+        }
+        if (assign_2 != last_assign_2) {
+            haken->stream_data(Haken::idPedal2, index_to_pedal_cc(assign_2));
+        }
+        haken->end_stream();
+
+        last_assign_1 = assign_1;
+        last_assign_2 = assign_2;
+    }
+}
+
+void JackModule::process(const ProcessArgs &args)
+{
+    if (!connected()) return;
+
+    if (0 == ((args.frame + id) % 45)) {
+        process_params(args);
+    }
+
+    auto em = chem_host->host_matrix();
+    uint16_t j = em->get_jack_1();
+    getOutput(OUT_JACK_1).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
+
+    j = em->get_jack_2();
+    getOutput(OUT_JACK_2).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
 }
 
 Model *modelJack = createModel<JackModule, JackUi>("chem-jack");

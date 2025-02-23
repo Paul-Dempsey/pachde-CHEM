@@ -1,7 +1,8 @@
 #pragma once
 #include <rack.hpp>
 #include "em/preset.hpp"
-#include "em/eaganmatrix.hpp"
+#include "em/EaganMatrix.hpp"
+#include "services/rack_em_convert.hpp"
 #include "services/midi-devices.hpp"
 #include "services/haken-midi.hpp"
 

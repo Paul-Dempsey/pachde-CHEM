@@ -134,16 +134,19 @@ void MacroModule::update_from_em()
 
 void MacroModule::process_params(const ProcessArgs& args)
 {
+
     if (attenuator_target >= 0) {
         auto pq = getParamQuantity(P_ATTENUVERT);
         if (pq) {
             attenuation[attenuator_target] = pq->getValue();
         }
     }
+    update_from_em();
 }
 
 void MacroModule::process(const ProcessArgs& args)
 {
+    if (!chem_host) return;
     
     if (((args.frame + id) % 40) == 0) {
         process_params(args);

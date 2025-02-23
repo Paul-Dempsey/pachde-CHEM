@@ -21,6 +21,7 @@ SOURCES += src/em/preset-macro.cpp
 
 # services
 SOURCES += src/services/colors.cpp
+SOURCES += src/services/em-param-quantity.cpp
 SOURCES += src/services/haken-midi.cpp
 SOURCES += src/services/HakenMidiOutput.cpp
 SOURCES += src/services/midi-devices.cpp

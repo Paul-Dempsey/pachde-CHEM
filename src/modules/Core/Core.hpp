@@ -83,6 +83,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // IMidiDeviceNotify
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
+    IChemHost* get_host() override { return this; }
+
     // IChemHost
     void register_chem_client(IChemClient* client) override;
     void unregister_chem_client(IChemClient* client) override;

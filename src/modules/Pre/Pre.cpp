@@ -1,5 +1,7 @@
 #include "Pre.hpp"
 using namespace pachde;
+#include "../../services/em-param-quantity.hpp"
+#include "../../em/wrap-HakenMidi.hpp"
 
 PreModule::PreModule()
 :   chem_host(nullptr),
@@ -14,11 +16,12 @@ PreModule::PreModule()
     configInput(IN_ATTACK,    "Attack");
     configInput(IN_RATIO,     "Ratio");
     
-    configParam(P_PRE_LEVEL,       0.f, 10.f,  5.f, "Pre-level")->displayPrecision = 4;
-    configParam(P_MIX,             0.f, 10.f,  0.f, "Mix")->displayPrecision = 4;
-    configParam(P_THRESHOLD_DRIVE, 0.f, 10.f, 10.f, "Threshold")->displayPrecision = 4;
-    configParam(P_ATTACK_,         0.f, 10.f,  5.f, "Attack")->displayPrecision = 4;
-    configParam(P_RATIO_MAKEUP,    0.f, 10.f,  5.f, "Ratio")->displayPrecision = 4;
+    configSimpleEmParam(Haken::ch1, Haken::ccPre,     this, Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level");
+    configSimpleEmParam(Haken::ch1, Haken::ccCoThMix, this, Params::P_MIX,             0.f, 10.f,  0.f, "Mix");
+    configSimpleEmParam(Haken::ch1, Haken::ccThrDrv,  this, Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 10.f, "Threshold");
+    configSimpleEmParam(Haken::ch1, Haken::ccAtkCut,  this, Params::P_ATTACK_,         0.f, 10.f,  5.f, "Attack");
+    configSimpleEmParam(Haken::ch1, Haken::ccRatMkp,  this, Params::P_RATIO_MAKEUP,    0.f, 10.f,  5.f, "Ratio");
+
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
     configSwitch(P_SELECT, 0.f, 1.f, 0.f, "Select Compressor or Tanh", { "Compressor", "Tanh"});

@@ -1,0 +1,193 @@
+// Copyright (C) Paul Chase Dempsey
+#pragma once
+#include "../plugin.hpp"
+#include "../services/svgtheme.hpp"
+#include "../services/colors.hpp"
+#include "TipWidget.hpp"
+using namespace svg_theme;
+
+namespace pachde {
+
+template<typename TSvg>
+struct TButton : SvgButton, IApplyTheme
+{
+    using Base = SvgButton;
+
+    bool key_ctrl;
+    bool key_shift;
+    std::function<void(bool, bool)> handler;
+    TipHolder * tip_holder;
+
+    TButton() 
+    :   key_ctrl(false),
+        key_shift(false),
+        handler(nullptr),
+        tip_holder(nullptr)
+    {
+        this->shadow->hide();
+    }
+
+    virtual ~TButton()
+    {
+        if (tip_holder) {
+            delete tip_holder;
+            tip_holder = nullptr;
+        }
+    }
+
+    void describe(std::string text)
+    {
+        if (!tip_holder) {
+            tip_holder = new TipHolder();
+        }
+        tip_holder->setText(text);
+    }
+
+    void setHandler(std::function<void(bool,bool)> callback)
+    {
+        handler = callback;
+    }
+
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        bool refresh = frames.size() > 0; 
+        if (refresh) {
+            frames.clear();
+            sw->setSvg(nullptr);
+        }
+
+        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
+        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
+
+        if (refresh) {
+            sw->setSvg(frames[0]);
+            if (fb) {
+                fb->setDirty();
+            }
+        }
+        return true;
+    }
+    
+    void onHover(const HoverEvent& e) override {
+        e.consume(this);
+    }
+
+    void destroyTip() {
+        if (tip_holder) { tip_holder->destroyTip(); }
+    }
+    void createTip() {
+        if (tip_holder) { tip_holder->createTip(); }
+    }
+
+    void onEnter(const EnterEvent& e) override {
+        Base::onEnter(e);
+        createTip();
+    }
+
+    void onLeave(const LeaveEvent& e) override {
+        destroyTip();
+        Base::onLeave(e);
+    }
+
+    void onDragStart(const DragStartEvent& e) override
+    {
+        destroyTip();
+        Base::onDragStart(e);
+    }
+
+    void onDragLeave(const DragLeaveEvent& e) override {
+        destroyTip();
+        Base::onDragLeave(e);
+    }
+
+    void onDragEnd(const DragEndEvent& e) override
+    {
+        Base::onDragEnd(e);
+        destroyTip();
+    }
+
+    void onHoverKey(const HoverKeyEvent& e) override
+    {
+        Base::onHoverKey(e);
+        key_ctrl = (e.mods & RACK_MOD_MASK) & RACK_MOD_CTRL;
+        key_shift = (e.mods & RACK_MOD_MASK) & GLFW_MOD_SHIFT;
+    }
+
+    void onAction(const ActionEvent& e) override
+    {
+        destroyTip();
+        if (handler) {
+            handler(key_ctrl, key_shift);
+        } else {
+            Base::onAction(e);
+        }
+    }
+
+    virtual void appendContextMenu(ui::Menu* menu) {}
+
+    void createContextMenu() {
+        ui::Menu* menu = createMenu();
+    	appendContextMenu(menu);
+    }
+
+};
+
+template <typename TButton>
+TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+    TButton * o  = new(TButton);
+    o->applyTheme(engine, theme);
+	o->box.pos = pos;
+    if (tip) {
+        o->describe(tip);
+    }
+    return o;
+}
+
+template <typename TButton, typename TLight>
+TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lightId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+    TButton * o  = new(TButton);
+    o->applyTheme(engine, theme);
+	o->box.pos = pos;
+
+    if (tip) {
+        o->describe(tip);
+    }
+
+    auto light = createLight<TLight>(Vec(0,0), module, lightId);
+    light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
+    o->addChildBottom(light);
+    return o;
+}
+
+struct SmallRoundButtonSvg {
+    static std::string up() { return "res/widgets/round-push-up.svg"; }
+    static std::string down() { return "res/widgets/round-push-down.svg"; }
+};
+
+struct LargeRoundButtonSvg {
+    static std::string up() { return "res/widgets/round-push-lg-up.svg"; }
+    static std::string down() { return "res/widgets/round-push-lg-down.svg"; }
+};
+
+struct SquareButtonSvg {
+    static std::string up() { return "res/widgets/square-push-up.svg"; }
+    static std::string down() { return "res/widgets/square-push-down.svg"; }
+};
+
+struct LinkButtonSvg {
+    static std::string up() { return "res/widgets/link-button-up.svg"; }
+    static std::string down() { return "res/widgets/link-button-down.svg"; }
+};
+
+struct HeartButtonSvg {
+    static std::string up() { return "res/widgets/heart-button.svg"; }
+    static std::string down() { return "res/widgets/heart-button-down.svg"; }
+};
+
+using SmallRoundButton = TButton<SmallRoundButtonSvg>;
+using LargeRoundButton = TButton<LargeRoundButtonSvg>;
+using SquareButton = TButton<SquareButtonSvg>;
+using LinkButton = TButton<LinkButtonSvg>;
+using HeartButton = TButton<HeartButtonSvg>;
+
+}

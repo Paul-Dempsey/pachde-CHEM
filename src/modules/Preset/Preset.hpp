@@ -20,6 +20,9 @@ struct PresetModule : ChemModule, IChemClient
 
     // IChemClient
     IChemHost* chem_host;
+    IChemHost* get_host() override {
+        return chem_host;
+    }
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
     void onConnectHost(IChemHost* host) override;

@@ -1,6 +1,20 @@
 #include "chem.hpp"
 #include "widgets/logo-widget.hpp"
 
+void ChemModule::setThemeName(const std::string &name, void *)
+{
+    theme_name = name;
+}
+
+std::string ChemModule::getThemeName()
+{
+    if (follow_rack) {
+        return ::rack::settings::preferDarkPanels ? "Dark": "Light";
+    }
+    if (theme_name.empty()) return DEFAULT_THEME;
+    return theme_name;
+}
+
 void ChemModule::dataFromJson(json_t* root)
 {
     json_t* j = json_object_get(root, "theme");

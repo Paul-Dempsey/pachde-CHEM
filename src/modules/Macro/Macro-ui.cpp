@@ -205,13 +205,39 @@ void MacroUi::onPresetChange()
     }
 }
 
+void set_pedal_text(StaticTextLabel* label, uint8_t item_cc, uint8_t a1, uint8_t a2)
+{
+    if (item_cc == a1 || item_cc == a2) {
+        if (a1 == a2) {
+            label->text("p1,p2");
+        } else if (item_cc == a1) {
+            label->text("p1");
+        } else {
+            label->text("p2");
+        }
+    } else {
+        label->text("");
+    }
+
+}
+
 void MacroUi::step()
 {
     Base::step();
     if (!my_module) return;
-
     knobs[K_ATTENUVERTER]->enable(my_module->attenuator_target >= 0);
 
+    if (!chem_host) return;
+
+    auto em = chem_host->host_matrix();
+    auto a1 = em->get_jack_1_assign();
+    auto a2 = em->get_jack_2_assign();
+    set_pedal_text(m1_ped_label, Haken::ccI, a1, a2);
+    set_pedal_text(m2_ped_label, Haken::ccII, a1, a2);
+    set_pedal_text(m3_ped_label, Haken::ccIII, a1, a2);
+    set_pedal_text(m4_ped_label, Haken::ccIV, a1, a2);
+    set_pedal_text(m5_ped_label, Haken::ccV, a1, a2);
+    set_pedal_text(m6_ped_label, Haken::ccVI, a1, a2);
 }
 
 void MacroUi::draw(const DrawArgs& args)

@@ -4,7 +4,7 @@
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/blip-widget.hpp"
-#include "../../widgets/themed-widgets.hpp"
+#include "../../widgets/theme-button.hpp"
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/hamburger.hpp"
 #include "../../widgets/label-widget.hpp"
@@ -36,6 +36,9 @@ struct PlayModule : ChemModule, IChemClient
     void update_mru(std::string path);
     void clear_mru() { playlist_mru.clear(); }
 
+    IChemHost* get_host() override {
+        return chem_host;
+    }
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;

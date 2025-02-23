@@ -1,105 +1,95 @@
 #include "../../plugin.hpp"
+#include "../../chem.hpp"
+#include "../../widgets/symbol-set.hpp"
+using namespace pachde;
 
-struct BlankModule : Module
+struct BlankModule : ChemModule
 {
-    // A module with inputs, outputs, parameters (knobs and switches),
-    // and/or lights will define enums to identify each one:
-    //
-    //enum Params {
-    //    // your params
-    //    NUM_PARAMS // last one counts how many
-    //};
-    //enum Inputs {
-    //    // your inputs
-    //    NUM_INPUTS
-    //};
-    //enum Outputs {
-    //    // your outputs
-    //    NUM_OUTPUTS
-    //};
-    //enum Lights {
-    //    // your lights
-    //    NUM_LIGHTS
-    //};
+    using Base = ChemModule;
 
-    // To make this module more than a Blanking plate, configure inputs and outputs
-    // in the Module constructor
-    //
-    //BlankModule()
-    //{
-    // config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
-    //
-    // Configure each param, input, output, and light:
-    // configParam(Params::some_param, minValue, maxValue, defaultValue, "name", "unit");
-    // configInput(Inputs::some_input, "input name");
-    // configOutput(Outputs::some_output, "output name");
-    // configLight(Lights::some_light, "light_name");
-    //
-    //}
+    enum Params {
+       NUM_PARAMS
+    };
+    enum Inputs {
+       NUM_INPUTS
+    };
+    enum Outputs {
+       NUM_OUTPUTS
+    };
+    enum Lights {
+       NUM_LIGHTS
+    };
 
-    // Save and restore configuration and settings by overriding dataToJson/dataFromJson
-    //json_t* dataToJson() override
-    //{
-    //    auto root = json_object(); //create container
-    //    // json_object_set_new(root, "flag", json_boolean(some_bool));
-    //    // json_object_set_new(root, "number", json_real(some_float);
-    //    return root;
-    //}
-    //void dataFromJson(json_t* root) override
-    //{
-    //    auto j = json_object_get(root, "flag");
-    //    if (j) {
-    //        some_bool = json_is_true(j);
-    //    }
-    //    j = json_object_get(root, "number");
-    //    if (j) {
-    //        some_float = json_number_value(j);
-    //    }
-    //}
+    BlankModule()
+    {
+        config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+    }
 
-    // To save precious CPU, many modules will process parameter changes at 
-    // a slower rate than the audio rate.
-    //
-    // This example shows a simple parameter update rate of 1/64th the sample rate.
-    // You can use a ::rack::dsp::timer to update relative to clock time, rather
-    // than change based on sample rate.
-    //
-    //const int PARAM_INTERVAL = 64;
-    //int check_params = 0;
-    //void processParams()
-    //{
-    //    // process parameters here
-    //}
+    json_t* dataToJson() override
+    {
+       auto root = Base::dataToJson();
+       return root;
+    }
+    void dataFromJson(json_t* root) override
+    {
+        Base::dataFromJson(root);
+    }
 
-    // To process inputs and outputs, override process()
-    //
-    //void process(const ProcessArgs& args) override
-    //{
-    //    // Process params at intervals
-    //    if (++check_params > PARAM_INTERVAL) {
-    //        check_params = 0;    
-    //        processParams();
-    //    }
-
-    //    // Read inputs
-
-    //    // Produce output
-    //}
-
+    IChemHost* get_host() override { return nullptr; }
 };
 
-struct BlankModuleWidget : ModuleWidget
+constexpr const float PANEL_WIDTH = 105;
+constexpr const float CENTER = PANEL_WIDTH*.5;
+
+struct BlankModuleWidget : ChemModuleWidget
 {
+    SymbolProvider symbols;
+    SymbolSetWidget* pedal_image[8];
+
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-blank.svg"); }
+
     BlankModuleWidget(BlankModule *module)
     {
         setModule(module);
-        setPanel(createPanel(asset::plugin(pluginInstance, "res/Blank.svg"), asset::plugin(pluginInstance, "res/Blank-dark.svg")));
-
+        initThemeEngine();
+        auto theme = theme_engine.getTheme(getThemeName());
+        auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
+        panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+        setPanel(panel);
+    
         // Add standard rack screws
         // addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
         // addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
         addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
         addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+        symbols.add_source("res/symbols/pedal-none.svg");
+        symbols.add_source("res/symbols/pedal-switch.svg");
+        symbols.add_source("res/symbols/pedal-expression.svg");
+        symbols.add_source("res/symbols/pedal-damper.svg");
+        symbols.add_source("res/symbols/pedal-tristate.svg");
+        symbols.add_source("res/symbols/pedal-cv.svg");
+        symbols.add_source("res/symbols/pedal-pot.svg");
+        symbols.add_source("res/symbols/pedal-other.svg");
+        symbols.applyTheme(theme_engine, theme);
+
+        float x = PANEL_WIDTH / 3.f;
+        float dx = x;
+        float y = 156.f;
+        float dy = 48.f;
+        for (int i = 0; i < 8; ++i) {
+            auto p = new SymbolSetWidget(&symbols);
+            p->box.pos = Vec(x, y);
+            p->set_index(i);
+            addChild(Center(p));
+            if (i & 1) {
+                x = dx;
+                y += dy;
+            } else {
+                x += dx;
+            }
+        }
+
     }
 
     // Add options to your module's menu here

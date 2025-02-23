@@ -253,7 +253,6 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
         break;
 
     case ChemDevice::Unknown:
-        DEFAULT_UNREACHABLE
         break;
     }
 }
@@ -337,10 +336,19 @@ std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice dev
     }
 }
 
-constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 120;
+constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 48;
 void CoreModule::processLights(const ProcessArgs &args)
 {
     getLight(L_READY).setBrightnessSmooth(em.ready ? 1.0f : 0.f, args.sampleTime * 20);
+
+    bool round = em.get_round_rate() > 0;
+    bool initial = em.is_round_initial();
+    bool on_y = em.get_round_mode() >= Haken::rViaY;
+    bool release = em.get_round_mode() <= Haken::rRelease;
+    getLight(Lights::L_ROUND_Y).setBrightness(1.0f * on_y);
+    getLight(Lights::L_ROUND_INITIAL).setBrightness(1.0f * initial);
+    getLight(Lights::L_ROUND).setBrightness(1.0f * round);
+    getLight(Lights::L_ROUND_RELEASE).setBrightness(1.0f * (round && release));
 }
 
 void CoreModule::process(const ProcessArgs &args)

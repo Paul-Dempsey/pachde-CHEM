@@ -4,7 +4,8 @@
 #include "../../em/preset-macro.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/themed-widgets.hpp"
+#include "../../widgets/theme-button.hpp"
+#include "../../widgets/theme-knob.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 
@@ -58,6 +59,10 @@ struct MacroModule : ChemModule, IChemClient
     }
 
     void update_from_em();
+
+    IChemHost* get_host() override {
+        return chem_host;
+    }
 
     // IChemClient
     rack::engine::Module* client_module() override;

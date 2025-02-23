@@ -1,14 +1,16 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/uniform-style.hpp"
+#include "../../widgets/theme-button.hpp"
 
 // Layout
 constexpr const int MODULE_WIDTH = 165;
+constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
 constexpr const float PICKER_TOP = 200.f;
 constexpr const float PICKER_INTERVAL = 42.f;
 constexpr const float PICKER_LABEL_OFFSET = 14.f;
 constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
-constexpr const float ROUND_LIGHT_SPREAD = 4.f;
+constexpr const float ROUND_LIGHT_SPREAD = 6.f;
 constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
 
 CoreModuleWidget::~CoreModuleWidget()
@@ -43,16 +45,17 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     createScrews(theme);
     createMidiPickers(theme);
-    createRoundingLeds(RACK_GRID_WIDTH * 1.5f - 7.5f, 50.f, ROUND_LIGHT_SPREAD);
-    createIndicatorsCentered((box.size.x * 0.5f) - ((6.f + 7.f * 9.f) * .5f), 354.f, 9.f);
+    float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
+    createRoundingLeds(r_col - 1.5 * ROUND_LIGHT_SPREAD, 40.f, ROUND_LIGHT_SPREAD);
+    createIndicatorsCentered(CENTER - ((6.f + 7.f * 9.f) * .5f), 354.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createStaticTextLabel<TipLabel>(
-        Vec(box.size.x *.5f, 145.f), box.size.x, "[preset]", theme_engine, theme, style));
+        Vec(CENTER, 145.f), box.size.x, "[preset]", theme_engine, theme, style));
     preset_label->glowing(true);
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
-    addChild(blip = createBlipCentered(box.size.x - RACK_GRID_WIDTH * 1.5f, 30, "LED"));
+    addChild(blip = createBlipCentered(r_col, 30, "EM LED"));
 
     float x, y;
     x = RACK_GRID_WIDTH * 1.5f;
@@ -67,7 +70,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     y = 174.f;
     addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(box.size.x*.5f, y), box.size.x - 15.f, "", theme_engine, theme, style));
+        Vec(CENTER, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
         my_module->set_chem_ui(this);
@@ -103,7 +106,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     }
     LabelStyle style{"dytext", TextAlignment::Center, 10.f};
     addChild(firmware_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(box.size.x * .5f, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
+        Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
         theme, style));
 
     style.align = TextAlignment::Left;
