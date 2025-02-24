@@ -6,6 +6,7 @@ using namespace pachde;
 PreModule::PreModule()
 :   chem_host(nullptr),
     ui(nullptr),
+    last_select(-1),
     glow_knobs(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
@@ -78,7 +79,8 @@ void PreModule::pull_params()
     pq = get_u7_em_param_quantity(this, P_RATIO_MAKEUP);
     if (pq) pq->set_em_midi_value(em->get_ratio_makeup());
 
-    getParam(P_SELECT).setValue(em->is_tanh());
+    last_select = em->is_tanh();
+    getParam(P_SELECT).setValue(last_select);
 }
 
 // IChemClient
@@ -102,8 +104,10 @@ void PreModule::onConnectHost(IChemHost* host)
 
 void PreModule::onPresetChange()
 {
-    if (connected())
-    if (ui) ui->onPresetChange();
+    if (connected()) {
+        pull_params();
+        if (ui) ui->onPresetChange();
+    }
 }
 
 void PreModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -115,6 +119,12 @@ void PreModule::process_params(const ProcessArgs &args)
 {
     auto v = getParam(Params::P_MIX).getValue()*.1f;
     getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
+
+    int sel = getParamInt(getParam(Params::P_SELECT));
+    if (sel != last_select) {
+        last_select = sel;
+        chem_host->host_haken()->compressor_option(sel);
+    }
 }
 
 void PreModule::process(const ProcessArgs &args)

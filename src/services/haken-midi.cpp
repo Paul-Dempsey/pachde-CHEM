@@ -31,6 +31,13 @@ void HakenMidi::disable_recirculator(bool disable)
     end_stream();
 }
 
+void HakenMidi::compressor_option(bool tanh)
+{
+    begin_stream(Haken::s_Mat_Poke);
+    key_pressure(Haken::ch16, Haken::idCompOpt, tanh);
+    end_stream();
+}
+
 void HakenMidi::keep_pedals(bool keep)
 {
     begin_stream(Haken::s_Mat_Poke);

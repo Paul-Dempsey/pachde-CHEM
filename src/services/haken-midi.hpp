@@ -51,6 +51,7 @@ struct HakenMidi
     void surface_alignment();
 
     void disable_recirculator(bool disable);
+    void compressor_option(bool tanh);
     void keep_pedals(bool keep);
     void keep_midi(bool keep);
     void keep_surface(bool keep);

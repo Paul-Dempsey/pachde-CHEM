@@ -19,6 +19,7 @@ struct PreModule : ChemModule, IChemClient
     IChemHost* chem_host;
     PreUi* ui;
 
+    int last_select;
     bool glow_knobs;
 
     PreModule();
