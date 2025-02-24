@@ -188,9 +188,9 @@ struct EaganMatrix
     uint8_t get_row_2_type(){ return mat[Haken::idRowTyp2]; }
     uint8_t get_action() { return mat[Haken::idAction]; }
     uint8_t get_aes3() { return mat[Haken::idAes3]; }
-    bool is_preserve_surface_processing() { return mat[Haken::idPresSurf]; }
-    bool is_preserve_pedal() { return mat[Haken::idPresPed]; }
-    bool is_preserve_midi_encoding() { return mat[Haken::idPresEnc]; }
+    bool is_keep_surface_processing() { return mat[Haken::idPresSurf]; }
+    bool is_keep_pedals() { return mat[Haken::idPresPed]; }
+    bool is_keep_midi_encoding() { return mat[Haken::idPresEnc]; }
     bool is_big_popup_font() { return mat[Haken::idBigFontPop]; }
     uint8_t get_from_analysis_slot() { return mat[Haken::idFromAnlys]; }
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }

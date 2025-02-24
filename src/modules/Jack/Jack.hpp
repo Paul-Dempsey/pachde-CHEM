@@ -20,8 +20,10 @@ struct JackModule : ChemModule, IChemClient
     JackUi* ui;
 
     bool glow_knobs;
+    bool host_connection;
     int last_assign_1;
     int last_assign_2;
+    int last_keep;
 
     JackModule();
     ~JackModule() {
@@ -32,7 +34,7 @@ struct JackModule : ChemModule, IChemClient
     IChemHost* get_host() override {
         return chem_host;
     }
-    bool connected() { return chem_host && !device_claim.empty(); }
+    bool connected() { return chem_host && host_connection; }
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -52,6 +54,7 @@ struct JackModule : ChemModule, IChemClient
         P_MIN_JACK_2,
         P_MAX_JACK_2, 
 
+        P_KEEP,
         NUM_PARAMS
     };
     enum Inputs {
@@ -63,6 +66,7 @@ struct JackModule : ChemModule, IChemClient
         NUM_OUTPUTS
     };
     enum Lights {
+        L_KEEP,
         NUM_LIGHTS
     };
 

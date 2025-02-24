@@ -2,7 +2,7 @@
 using namespace pachde;
 
 static const std::vector<uint8_t> ccmap = {
-    Haken::ccVol,
+    Haken::ccExpres,
     Haken::ccPre,
     Haken::ccPost,
     Haken::ccAudIn,
@@ -36,7 +36,11 @@ uint8_t index_to_pedal_cc(int index) {
 JackModule::JackModule()
 :   chem_host(nullptr),
     ui(nullptr),
-    glow_knobs(false)
+    glow_knobs(false),
+    host_connection(false),
+    last_assign_1(-1),
+    last_assign_2(-1),
+    last_keep(-1)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     // What happened to recirculator assignments that were in 10.09?
@@ -75,6 +79,8 @@ JackModule::JackModule()
     pq->displayPrecision = 2;
     pq = configParam(Params::P_MAX_JACK_2, 0.f, 10.f, 10.f, "Jack 1 maximum");
     pq->displayPrecision = 2;
+
+    configSwitch(Params::P_KEEP, 0.f, 1.f, 0.f, "Keep pedal settings", {"off", "on"});
 
     configOutput(Outputs::OUT_JACK_1, "Jack 1");
     configOutput(Outputs::OUT_JACK_2, "Jack 2");
@@ -129,6 +135,7 @@ void JackModule::onPresetChange()
 
 void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
+    host_connection = connection ? connection->identified() : false;
     if (ui) ui->onConnectionChange(device, connection);
 }
 
@@ -144,11 +151,23 @@ void JackModule::pull_jack_data()
     getParam(P_MAX_JACK_1).setValue(unipolar_7_to_rack(em->get_pedal_1_max()));
     getParam(P_MIN_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_min()));
     getParam(P_MAX_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_max()));
+
+    last_keep = em->is_keep_pedals();
+    getParam(P_KEEP).setValue(last_keep);
 }
 
 void JackModule::process_params(const ProcessArgs &args)
 {
     assert(chem_host);
+
+    auto pkeep = getParamInt(getParam(P_KEEP));
+    if (last_keep == -1) {
+        last_keep = pkeep;
+    } else if (last_keep != pkeep) {
+        last_keep = pkeep;
+        chem_host->host_haken()->keep_pedals(pkeep);
+    }
+    getLight(L_KEEP).setBrightnessSmooth(pkeep, 45.f);
     
     int assign_1 = getParamInt(getParam(P_ASSIGN_JACK_1));
     int assign_2 = getParamInt(getParam(P_ASSIGN_JACK_2));

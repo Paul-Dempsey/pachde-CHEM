@@ -20,7 +20,7 @@
             "k-gnomen": { "fill": " #a2d2ea" },
             "k-taper": {  "fill": " #9cbecf" },
             "k-pin": { "fill": " #226f98", "stroke":"none" },            
-            "k-disabled": {"fill": "hsl(200, 50%, 30%)", "opacity": 0.6 },
+            "k-disabled": {"fill": "hsl(200, 50%, 30%)", "opacity": 0.75 },
 
             "kb-rim":  { "stroke" : " #4b529b" },
             "ky-rim":  { "stroke" : "hsl(45, 35%, 35%)" },

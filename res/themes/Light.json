@@ -23,6 +23,7 @@
             "k-gnomen": { "fill": " #f5f5ef" },
             "k-taper": {  "fill": " #ebebe0" },
             "k-pin": { "fill": "none", "stroke": { "color": " #202020", "width":1 }},
+            "k-disabled": {"fill": "g85", "opacity": 0.75 },
 
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
             "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },

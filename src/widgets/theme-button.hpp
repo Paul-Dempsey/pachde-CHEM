@@ -123,7 +123,7 @@ struct TButton : SvgButton, IApplyTheme
         }
     }
 
-    virtual void appendContextMenu(ui::Menu* menu) {}
+    void appendContextMenu(ui::Menu* menu) {}
 
     void createContextMenu() {
         ui::Menu* menu = createMenu();
@@ -152,6 +152,59 @@ TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lig
     if (tip) {
         o->describe(tip);
     }
+
+    auto light = createLight<TLight>(Vec(0,0), module, lightId);
+    light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
+    o->addChildBottom(light);
+    return o;
+}
+
+template<typename TSvg>
+struct TParamButton : SvgSwitch, IApplyTheme
+{
+    using Base = SvgSwitch;
+
+    TParamButton() 
+    {
+        this->shadow->hide();
+    }
+
+    void step() override {
+        Base::step();
+    }
+
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    {
+        bool refresh = frames.size() > 0; 
+        if (refresh) {
+            frames.clear();
+            sw->setSvg(nullptr);
+        }
+
+        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
+        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
+
+        if (refresh) {
+            sw->setSvg(frames[0]);
+            if (fb) {
+                fb->setDirty();
+            }
+        }
+        return true;
+    }
+};
+
+
+template <typename TPButton>
+TPButton * createThemedParamButton(math::Vec pos, engine::Module*module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+    TPButton * o  = createParam<TPButton>(pos, module, paramId);
+    o->applyTheme(engine, theme);
+    return o;
+}
+
+template <typename TPButton, typename TLight>
+TPButton * createThemedParamLightButton(math::Vec pos, engine::Module* module, int paramId, int lightId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+    TPButton * o = createThemedParamButton<TPButton>(pos, module, paramId, theme_engine, theme);
 
     auto light = createLight<TLight>(Vec(0,0), module, lightId);
     light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
@@ -189,5 +242,8 @@ using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
+
+using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
+using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
 
 }

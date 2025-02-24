@@ -39,7 +39,7 @@ struct PostModule : ChemModule, IChemClient
         NUM_OUTPUTS
     };
     enum Lights {
-        L_EQ,
+        L_MIX,
         L_MUTE,
         NUM_LIGHTS
     };

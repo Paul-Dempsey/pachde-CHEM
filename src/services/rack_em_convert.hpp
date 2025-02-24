@@ -23,6 +23,11 @@ inline uint8_t unipolar_rack_to_unipolar_7(float value) {
     return static_cast<uint8_t>(std::round(rescale(v, 0.f, 10.f, 0.f, 127.f))); 
 }
 
+inline uint16_t unipolar_rack_to_unipolar_14(float value) {
+    auto r = clamp(value, 0.0, 10.0);
+    return static_cast<uint16_t>(std::round(rescale(r, 0.f, 10.f, 0.f, Haken::max14)));
+}
+
 inline uint16_t bipolar_rack_to_bipolar_14(float value) {
     auto r = 0.2 * clamp(value, -5.0, 5.0) + zero14;
     return static_cast<uint16_t>(std::round(r));

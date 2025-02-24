@@ -78,15 +78,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     addChild(type_label = createStaticTextLabel<StaticTextLabel>(Vec(x + KNOB_LABEL_DX, y+KNOB_LABEL_DY), 80.f, "",
         theme_engine, theme, LabelStyle {"dytext", TextAlignment::Left, 14.f}));
 
-    extend_button = Center(createThemedLightButton<SmallRoundButton, TinySimpleLight<BlueLight>>(
-        Vec(22.f, y + 6.f), my_module, CM::L_EXTEND, theme_engine, theme, "Toggle extended processing"));
+    extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+        Vec(22.f, y + 6.f), my_module, CM::P_EXTEND, CM::L_EXTEND, theme_engine, theme));
     addChild(extend_button);
-    if (my_module) {
-        extend_button->setHandler([=](bool, bool) {
-            auto v = my_module->getParam(CM::P_EXTEND).getValue();
-            my_module->getParam(CM::P_EXTEND).setValue(v > .5f ? 0.f : 1.f);
-        });
-    }
 
     x = CENTER;
     y += knob_dy;
@@ -233,22 +227,11 @@ void ConvoUi::sync_type_label()
     }
 }
 
-void ConvoUi::sync_extend()
-{
-    if (!my_module) return;
-    auto current = my_module->getParam(CM::P_EXTEND).getValue();
-    if (last_extend != current) {
-        last_extend = current;
-        extend_button->describe(format_string("Extended processing: %s", current > .5f ? "on": "off"));
-    }
-}
-
 void ConvoUi::step()
 {
     Base::step();
     sync_select_label();
     sync_type_label();
-    sync_extend();
 }
 
 void ConvoUi::draw(const DrawArgs& args)

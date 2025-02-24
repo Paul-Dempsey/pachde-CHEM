@@ -44,14 +44,13 @@ PostUi::PostUi(PostModule *module) :
     //bool browsing = !module;
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
-    
     // knobs
     x = CENTER;
     addChild(knobs[K_POST_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), module, PostModule::P_POST_LEVEL, theme_engine, theme));
     
     // MUTE
     y = 68.f;
-    addChild(mute_button = Center(createThemedLightButton<LargeRoundButton, TinyLight<RedLight>>(
+    addChild(mute_button = Center(createThemedLightButton<LargeRoundButton, SmallLight<RedLight>>(
         Vec(x, y), my_module, PostModule::L_MUTE, theme_engine, theme, "Mute")));
     if (my_module) {
         mute_button->setHandler([=](bool, bool) {
@@ -65,6 +64,7 @@ PostUi::PostUi(PostModule *module) :
     addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
     y += 34;
     addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), module, PostModule::P_MIX, theme_engine, theme));
+    addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, PostModule::L_MIX));
 
     y += 40;
     const float PARAM_DY = 54.5f;

@@ -1,4 +1,5 @@
 #include "Macro.hpp"
+#include "../../services/em-param-quantity.hpp"
 using namespace pachde;
 
 MacroModule::MacroModule()
@@ -16,12 +17,12 @@ MacroModule::MacroModule()
     configInput(IN_M5, "Macro 5 (v)");
     configInput(IN_M6, "Macro 6 (vi)");
 
-    configParam(P_M1, 0.f, 10.f, 0.f, "Macro 1 (i)", "v")->displayPrecision = 4;
-    configParam(P_M2, 0.f, 10.f, 0.f, "Macro 2 (ii)", "v")->displayPrecision = 4;
-    configParam(P_M3, 0.f, 10.f, 0.f, "Macro 3 (iii)", "v")->displayPrecision = 4;
-    configParam(P_M4, 0.f, 10.f, 0.f, "Macro 4 (iv)", "v")->displayPrecision = 4;
-    configParam(P_M5, 0.f, 10.f, 0.f, "Macro 5 (v)", "v")->displayPrecision = 4;
-    configParam(P_M6, 0.f, 10.f, 0.f, "Macro 6 (vi)", "v")->displayPrecision = 4;
+    configU14ccEmParam(Haken::ch1, Haken::ccI,   this, Params::P_M1, 0.f, 10.f, 0.f, "Macro 1", "v");
+    configU14ccEmParam(Haken::ch1, Haken::ccII,  this, Params::P_M2, 0.f, 10.f, 0.f, "Macro 2", "v");
+    configU14ccEmParam(Haken::ch1, Haken::ccIII, this, Params::P_M3, 0.f, 10.f, 0.f, "Macro 3", "v");
+    configU14ccEmParam(Haken::ch1, Haken::ccIV,  this, Params::P_M4, 0.f, 10.f, 0.f, "Macro 4", "v");
+    configU14ccEmParam(Haken::ch1, Haken::ccV,   this, Params::P_M5, 0.f, 10.f, 0.f, "Macro 5", "v");
+    configU14ccEmParam(Haken::ch1, Haken::ccVI,  this, Params::P_M6, 0.f, 10.f, 0.f, "Macro 6", "v");
     configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
     configLight(L_M1a, "Attenuverter on M1");

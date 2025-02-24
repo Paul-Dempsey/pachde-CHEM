@@ -63,12 +63,18 @@ struct PreModule : ChemModule, IChemClient
         NUM_OUTPUTS
     };
     enum Lights {
+        L_MIX,
         NUM_LIGHTS
     };
+
+    bool connected();
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void pull_params();
+
+    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 

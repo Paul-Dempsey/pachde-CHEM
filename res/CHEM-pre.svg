@@ -13,11 +13,8 @@
    </defs>
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="105.5" height="380" />
-
       <path id="t--div" fill="none" stroke="#737373" stroke-width="0.5"  d="M 2,58 h 102" />
       <path id="b--div" fill="none" stroke="#737373" stroke-width="0.5"  d="M 2,278 h 102" />
-
-      <circle id="comp-light" cx="75" cy="85" r="5" fill="#20415f" stroke="#333333" stroke-width="1" />
    </g>
 
    <g id="small-logo" opacity="0" transform="translate(2.5, 2.5) scale(.125, .125)">

@@ -11,13 +11,13 @@ PostModule::PostModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configSimpleEmParam(Haken::ch1, Haken::ccPost,   this, Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level");
-    configSimpleEmParam(Haken::ch1, Haken::ccEqMix,  this, Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix");
-    configSimpleEmParam(Haken::ch1, Haken::ccEqTilt, this, Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt");
-    configSimpleEmParam(Haken::ch1, Haken::ccEqFreq, this, Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency");
-    configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
+    configU14ccEmParam(Haken::ch1, Haken::ccPost, this, Params::P_POST_LEVEL,  0.f, 10.f, 5.f, "Post-level");
+    configU7EmParam(Haken::ch1, Haken::ccEqMix,  this, Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix");
+    configU7EmParam(Haken::ch1, Haken::ccEqTilt, this, Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt");
+    configU7EmParam(Haken::ch1, Haken::ccEqFreq, this, Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency");
+    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
-    configSwitch(P_MUTE,        0.f, 1.f, 0.f, "Mute", { "Voice", "Mute" });
+    configSwitch(P_MUTE, 0.f, 1.f, 0.f, "Mute", { "Voice", "Mute" });
 
     configInput(IN_POST_LEVEL, "Post-level");
     configInput(IN_MIX,        "EQ Mix");
@@ -25,7 +25,7 @@ PostModule::PostModule()
     configInput(IN_FREQUENCY,  "EQ Frequency");
     configInput(IN_MUTE,       "Mute trigger");
 
-    configLight(L_EQ, "EQ active");
+    configLight(L_MIX, "EQ active");
     configLight(L_MUTE, "Mute");
 }
 
@@ -95,6 +95,10 @@ void PostModule::process_params(const ProcessArgs& args)
     auto v = getParam(Params::P_MUTE).getValue();
     v = (v > 0.5f) ? 1.f : 0.f;
     getLight(Lights::L_MUTE).setBrightnessSmooth(v, 45.f);
+
+    v = getParam(Params::P_MIX).getValue()* .1f;
+    getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
+
 }
 
 void PostModule::process(const ProcessArgs& args)
@@ -102,7 +106,6 @@ void PostModule::process(const ProcessArgs& args)
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
     }
-
 
     if (attenuator_target != Inputs::IN_INVALID) {
         // 

@@ -19,6 +19,7 @@ struct FxModule : ChemModule, IChemClient
     IChemHost* chem_host;
     FxUi* ui;
 
+    int last_disable;
     bool glow_knobs;
 
     FxModule();
@@ -51,7 +52,7 @@ struct FxModule : ChemModule, IChemClient
         P_ATTENUVERT,
 
         // Switches
-        P_ENABLE, NUM_KNOBS = P_ENABLE,
+        P_DISABLE, NUM_KNOBS = P_DISABLE,
         P_EFFECT,
 
         NUM_PARAMS
@@ -65,14 +66,15 @@ struct FxModule : ChemModule, IChemClient
         IN_R6,
         IN_MIX,
         // gate/trigger
-        IN_ENABLE,
+        //IN_ENABLE,
         NUM_INPUTS
     };
     enum Outputs {
         NUM_OUTPUTS
     };
     enum Lights {
-        L_ENABLE,
+        L_DISABLE,
+        L_MIX,
         NUM_LIGHTS
     };
 
@@ -91,12 +93,12 @@ struct FxUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
-    IChemHost*    chem_host{nullptr};
-    FxModule*  my_module{nullptr};
+    IChemHost*  chem_host{nullptr};
+    FxModule*   my_module{nullptr};
 
-    LinkButton*   link_button{nullptr};
-    TipLabel*     haken{nullptr};
-    TipLabel*     warn{nullptr};
+    LinkButton* link_button{nullptr};
+    TipLabel*   haken{nullptr};
+    TipLabel*   warn{nullptr};
 
     SelectorWidget* selector{nullptr};
     StaticTextLabel* effect_label;

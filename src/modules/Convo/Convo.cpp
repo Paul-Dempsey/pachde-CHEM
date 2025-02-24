@@ -46,7 +46,7 @@ ConvoModule::ConvoModule()
     configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
 
     configSwitch(P_SELECT, 0.f, 3.f, 0.f, "Select convolution", { "Convolution #1", "Convolution #2", "Convolution #3", "Convolution #4"});
-    configSwitch(P_EXTEND, 0.f, 1.f, 0.f, "Extend computation", {"on", "off"});
+    configSwitch(P_EXTEND, 0.f, 1.f, 0.f, "Extend computation", {"off", "on"});
 
     configInput(IN_PRE_MIX,    "Pre mix");
     configInput(IN_PRE_INDEX,  "Pre index");
@@ -57,7 +57,7 @@ ConvoModule::ConvoModule()
     configLight(L_IN_PRE_INDEX, "Attenuverter on Pre index");
     configLight(L_IN_POST_MIX,  "Attenuverter on Post mix");
     configLight(L_IN_POST_INDEX,"Attenuverter on Post index");
-    configLight(L_EXTEND,"Extended computation");
+    // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for lights under buttons
 
 }
 
@@ -115,8 +115,7 @@ void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
 void ConvoModule::process_params(const ProcessArgs& args)
 {
     {
-        auto v = getParam(Params::P_EXTEND).getValue();
-        v = (v > 0.5f) ? 1.f : 0.f;
+        auto v = getParamInt(getParam(Params::P_EXTEND));
         getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
     }
 

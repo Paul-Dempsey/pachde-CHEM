@@ -84,12 +84,12 @@ MacroUi::MacroUi(MacroModule *module) :
 
     // knob pedal annotations
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m2_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m4_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m5_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m6_ped_label = createStaticTextLabel(Vec(x,y),40.f, "", theme_engine, theme, S::pedal_label));
+    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m2_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m4_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m5_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m6_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;

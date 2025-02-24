@@ -53,7 +53,7 @@ JackUi::JackUi(JackModule *module) :
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 10.f, false};
     
     x = CENTER;
-    y = 54.f;
+    y = 40.f;
     addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
     y += LABEL_DY;
     addChild(assign_1_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
@@ -71,7 +71,7 @@ JackUi::JackUi(JackModule *module) :
     pedal_image_1->set_index(0);
     addChild(Center(pedal_image_1));
 
-    y = 180.f;
+    y = 150.f;
     addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
     y += LABEL_DY;
     addChild(assign_2_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
@@ -88,6 +88,11 @@ JackUi::JackUi(JackModule *module) :
     pedal_image_2->box.pos = Vec(CENTER, y);
     pedal_image_2->set_index(0);
     addChild(Center(pedal_image_2));
+
+    y += 34.f;
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+        Vec(x, y), my_module, JackModule::P_KEEP, JackModule::L_KEEP, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y+9.f), 80.f, "Keep", theme_engine, theme, S::control_label));
 
     // outputs
     auto co_port = PORT_ORANGE;

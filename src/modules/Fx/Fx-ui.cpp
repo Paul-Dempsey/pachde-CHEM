@@ -55,8 +55,17 @@ FxUi::FxUi(FxModule *module) :
         }
     }
 
-    knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(CENTER, 70.f), my_module, FxModule::P_MIX, theme_engine, theme);
+    x = CENTER + KNOB_DX;
+    y = 70.f;
+    knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme);
     addChild(knobs[K_MIX]);
+    addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
+
+    x = CENTER - KNOB_DX;
+    y -= 8.f;
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+        Vec(x, y), my_module, FxModule::P_DISABLE, FxModule::L_DISABLE, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", theme_engine, theme, S::control_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -163,6 +172,7 @@ void FxUi::step()
 {
     Base::step();
 
+    // TODO: stop polling start eventing
     auto pq = my_module ? my_module->getParamQuantity(FxModule::P_EFFECT) : nullptr;
     auto index = pq ? getParamIndex(pq) : 0;
     if (index != effect) {

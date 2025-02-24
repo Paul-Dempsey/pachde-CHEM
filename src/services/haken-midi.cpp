@@ -24,6 +24,34 @@ void HakenMidi::end_stream()
     send_message(MakeCC(Haken::ch16, Haken::ccStream, 127));
 }
 
+void HakenMidi::disable_recirculator(bool disable)
+{
+    begin_stream(Haken::s_Mat_Poke);
+    key_pressure(Haken::ch16, Haken::idNoRecirc, disable);
+    end_stream();
+}
+
+void HakenMidi::keep_pedals(bool keep)
+{
+    begin_stream(Haken::s_Mat_Poke);
+    key_pressure(Haken::ch16, Haken::idPresPed, keep);
+    end_stream();
+}
+
+void HakenMidi::keep_surface(bool keep)
+{
+    begin_stream(Haken::s_Mat_Poke);
+    key_pressure(Haken::ch16, Haken::idPresSurf, keep);
+    end_stream();
+}
+
+void HakenMidi::keep_midi(bool keep)
+{
+    begin_stream(Haken::s_Mat_Poke);
+    key_pressure(Haken::ch16, Haken::idPresEnc, keep);
+    end_stream();
+}
+
 void HakenMidi::select_preset(PresetId id)
 {
     if (log) {
@@ -77,9 +105,9 @@ void HakenMidi::request_updates()
 //    control_change(Haken::ch16, 55, 1); // bit 1 means request config
 
     // firmware > 1009
-    send_message(MakeCC(Haken::ch16, Haken::ccStream, Haken::s_Mat_Poke)); //s_Mat_Poke
+    begin_stream(Haken::s_Mat_Poke); //s_Mat_Poke
     key_pressure(Haken::ch16, Haken::idCfgOut, 1);
-    send_message(MakeCC(Haken::ch16, Haken::ccStream, 127)); //end
+    end_stream();
 }
 
 void HakenMidi::request_user()

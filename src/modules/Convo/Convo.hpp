@@ -129,8 +129,8 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
-
-    SmallRoundButton* extend_button;
+    
+    SmallRoundParamButton* extend_button;
     SelectorWidget* selector{nullptr};
 
     //MiniVUWidget* l_vu;
@@ -163,7 +163,6 @@ struct ConvoUi : ChemModuleWidget, IChemClient
 
     void sync_select_label();
     void sync_type_label();
-    void sync_extend();
 
     void step() override;
     void draw(const DrawArgs& args) override;

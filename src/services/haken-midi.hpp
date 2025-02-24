@@ -29,6 +29,11 @@ struct HakenMidi
 
     void control_change(uint8_t channel, uint8_t cc, uint8_t value);
     void key_pressure(uint8_t channel, uint8_t note, uint8_t pressure);
+
+    void begin_stream(uint8_t stream);
+    void stream_data(uint8_t d1, uint8_t d2);
+    void end_stream();
+
     void select_preset(PresetId id);
     void editor_present();
     void request_configuration();
@@ -45,9 +50,11 @@ struct HakenMidi
     void factory_calibration();
     void surface_alignment();
 
-    void begin_stream(uint8_t stream);
-    void stream_data(uint8_t d1, uint8_t d2);
-    void end_stream();
+    void disable_recirculator(bool disable);
+    void keep_pedals(bool keep);
+    void keep_midi(bool keep);
+    void keep_surface(bool keep);
+
 };
 
     

@@ -16,18 +16,27 @@ PreModule::PreModule()
     configInput(IN_ATTACK,    "Attack");
     configInput(IN_RATIO,     "Ratio");
     
-    configSimpleEmParam(Haken::ch1, Haken::ccPre,     this, Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level");
-    configSimpleEmParam(Haken::ch1, Haken::ccCoThMix, this, Params::P_MIX,             0.f, 10.f,  0.f, "Mix");
-    configSimpleEmParam(Haken::ch1, Haken::ccThrDrv,  this, Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 10.f, "Threshold");
-    configSimpleEmParam(Haken::ch1, Haken::ccAtkCut,  this, Params::P_ATTACK_,         0.f, 10.f,  5.f, "Attack");
-    configSimpleEmParam(Haken::ch1, Haken::ccRatMkp,  this, Params::P_RATIO_MAKEUP,    0.f, 10.f,  5.f, "Ratio");
+    configU7EmParam(Haken::ch1, Haken::ccPre,     this, Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level");
+    configU7EmParam(Haken::ch1, Haken::ccCoThMix, this, Params::P_MIX,             0.f, 10.f,  0.f, "Mix");
+    configU7EmParam(Haken::ch1, Haken::ccThrDrv,  this, Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 10.f, "Threshold");
+    configU7EmParam(Haken::ch1, Haken::ccAtkCut,  this, Params::P_ATTACK_,         0.f, 10.f,  5.f, "Attack");
+    configU7EmParam(Haken::ch1, Haken::ccRatMkp,  this, Params::P_RATIO_MAKEUP,    0.f, 10.f,  5.f, "Ratio");
 
     configParam(P_ATTENUVERT,   -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
-    configSwitch(P_SELECT, 0.f, 1.f, 0.f, "Select Compressor or Tanh", { "Compressor", "Tanh"});
+    configSwitch(P_SELECT, 0.f, 1.f, 0.f, "Select Compressor/Tanh", { "Compressor", "Tanh"});
+
+    configLight(L_MIX, "Compressor/Tanh Mix");
 }
 
-void PreModule::dataFromJson(json_t* root)
+bool PreModule::connected()
+{
+    if (!chem_host) return false;
+    auto conn = chem_host->host_connection(ChemDevice::Haken);
+    return conn && conn->identified();
+}
+
+void PreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
     json_t* j = json_object_get(root, "haken-device");
@@ -47,6 +56,29 @@ json_t* PreModule::dataToJson()
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
+}
+
+void PreModule::pull_params()
+{
+    if (!connected()) return;
+    auto em = chem_host->host_matrix();
+    
+    auto pq = get_u7_em_param_quantity(this, P_PRE_LEVEL);
+    if (pq) pq->set_em_midi_value(em->get_pre());
+    
+    pq = get_u7_em_param_quantity(this, P_MIX);
+    if (pq) pq->set_em_midi_value(em->get_cotan_mix());
+
+    pq = get_u7_em_param_quantity(this, P_THRESHOLD_DRIVE);
+    if (pq) pq->set_em_midi_value(em->get_thresh_drive());
+
+    pq = get_u7_em_param_quantity(this, P_ATTACK_);
+    if (pq) pq->set_em_midi_value(em->get_attack());
+
+    pq = get_u7_em_param_quantity(this, P_RATIO_MAKEUP);
+    if (pq) pq->set_em_midi_value(em->get_ratio_makeup());
+
+    getParam(P_SELECT).setValue(em->is_tanh());
 }
 
 // IChemClient
@@ -70,6 +102,7 @@ void PreModule::onConnectHost(IChemHost* host)
 
 void PreModule::onPresetChange()
 {
+    if (connected())
     if (ui) ui->onPresetChange();
 }
 
@@ -78,8 +111,18 @@ void PreModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevice
     if (ui) ui->onConnectionChange(device, connection);
 }
 
-void PreModule::process(const ProcessArgs& args)
+void PreModule::process_params(const ProcessArgs &args)
 {
+    auto v = getParam(Params::P_MIX).getValue()*.1f;
+    getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
+}
+
+void PreModule::process(const ProcessArgs &args)
+{
+    if (!connected()) return;
+    if (0 == ((args.frame + id) % 45)) {
+        process_params(args);
+    }
 }
 
 Model *modelPre = createModel<PreModule, PreUi>("chem-pre");
