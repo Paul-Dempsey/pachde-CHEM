@@ -103,6 +103,8 @@ void PostModule::process_params(const ProcessArgs& args)
 
 void PostModule::process(const ProcessArgs& args)
 {
+    if (!chem_host || chem_host->host_busy()) return;
+
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
     }

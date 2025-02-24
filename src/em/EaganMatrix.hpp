@@ -9,14 +9,41 @@
 namespace pachde {
 
 struct IHandleEmEvents {
-    virtual void onLoopDetect(uint8_t cc, uint8_t value) = 0;
-    virtual void onEditorReply(uint8_t reply) = 0;
-    virtual void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) = 0;
-    virtual void onPresetChanged() = 0;
-    virtual void onUserComplete() = 0;
-    virtual void onSystemComplete() = 0;
-    virtual void onTaskMessage(uint8_t code) = 0;
-    virtual void onLED(uint8_t led) = 0;
+    enum EventMask : uint16_t {
+        LoopDetect       = 1,
+        EditorReply      = 1 << 1,
+        HardwareChanged  = 1 << 2,
+        PresetChanged    = 1 << 3,
+        UserBegin        = 1 << 4,
+        UserComplete     = 1 << 5,
+        SystemBegin      = 1 << 6,
+        SystemComplete   = 1 << 7,
+        TaskMessage      = 1 << 8,
+        LED              = 1 << 9,
+
+        All = LoopDetect
+            + EditorReply
+            + HardwareChanged
+            + PresetChanged
+            + UserBegin
+            + UserComplete
+            + SystemBegin
+            + SystemComplete
+            + TaskMessage
+            + LED
+    };
+    uint16_t em_event_mask{EventMask::All};
+
+    virtual void onLoopDetect(uint8_t cc, uint8_t value) {}
+    virtual void onEditorReply(uint8_t reply) {}
+    virtual void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) {}
+    virtual void onPresetChanged() {}
+    virtual void onUserBegin() {}
+    virtual void onUserComplete() {}
+    virtual void onSystemBegin() {}
+    virtual void onSystemComplete() {}
+    virtual void onTaskMessage(uint8_t code) {}
+    virtual void onLED(uint8_t led) {}
 };
 
 struct ChannelData
@@ -207,7 +234,9 @@ struct EaganMatrix
     void notifyEditorReply(uint8_t editor_reply);
     void notifyHardwareChanged();
     void notifyPresetChanged();
+    void notifyUserBegin();
     void notifyUserComplete();
+    void notifySystemBegin();
     void notifySystemComplete();
     void notifyTaskMessage(uint8_t code);
     void notifyLED(uint8_t led);

@@ -15,8 +15,6 @@ const char * TaskKey(HakenTask task)
     case HakenTask::MidiDevice:    return "task-midi-device";
     case HakenTask::HeartBeat:     return "task-heart-beat";
     case HakenTask::Updates:       return "task-updates";
-    case HakenTask::UserPresets:   return "task-user-presets";
-    case HakenTask::SystemPresets: return "task-system-presets";
     case HakenTask::PresetInfo:    return "task-preset-info";
     case HakenTask::LastPreset:    return "task-last-preset";
     default: return "task-unknown";
@@ -31,8 +29,6 @@ const char * TaskName(HakenTask task)
     case HakenTask::MidiDevice:    return "connect midi device";
     case HakenTask::HeartBeat:     return "heartbeat";
     case HakenTask::Updates:       return "request updates";
-    case HakenTask::UserPresets:   return "request user presets";
-    case HakenTask::SystemPresets: return "request system presets";
     case HakenTask::PresetInfo:    return "request preset info";
     case HakenTask::LastPreset:    return "select last preset";
     case HakenTask::SyncDevices:   return "synchronize midi devices";
@@ -91,8 +87,6 @@ HakenTasks::HakenTasks()
         HakenTaskInfo( HakenTask::MidiDevice,    TaskState::Uninitialized,  2.0f,  0.0f, false ),
         HakenTaskInfo( HakenTask::HeartBeat,     TaskState::Uninitialized, 15.0f,  2.0f, true ),
         HakenTaskInfo( HakenTask::Updates,       TaskState::Uninitialized,  1.0f,  0.0f, false ),
-        HakenTaskInfo( HakenTask::UserPresets,   TaskState::Unscheduled,    0.0f, 12.0f, false ),
-        HakenTaskInfo( HakenTask::SystemPresets, TaskState::Unscheduled,    1.0f, 25.0f, false ),
         HakenTaskInfo( HakenTask::PresetInfo,    TaskState::Uninitialized,  2.0f,  4.0f, false ),
         HakenTaskInfo( HakenTask::LastPreset,    TaskState::Unscheduled,    2.0f,  4.0f, false ),
         HakenTaskInfo( HakenTask::SyncDevices,   TaskState::Uninitialized, 30.0f,  0.0f, true ),
@@ -126,8 +120,6 @@ HakenTaskInfo * HakenTasks::get_task(HakenTask id)
     case MidiDevice:
     case HeartBeat:
     case Updates:
-    case UserPresets:
-    case SystemPresets:
     case PresetInfo:
     case LastPreset:
     case SyncDevices:
@@ -356,37 +348,6 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 task->done();
                 notifyChange(HakenTask::Updates);
                 current = next_task(current);
-            } else {
-                task->not_applicable();
-                notifyChange(current);
-                current = next_task(current);
-            }
-            break;
-
-        case HakenTask::UserPresets:
-            if (chem->isHakenConnected()) {
-                chem->logMessage("CHEM", "Starting task UserPresets");
-                assert(task->scheduled()); // should have been handled in process_task_timing
-                task->pend();
-                chem->haken_midi.request_user();
-                //chem->haken_midi_out.dispatch(DISPATCH_NOW);
-                notifyChange(HakenTask::UserPresets);
-            } else {
-                task->not_applicable();
-                notifyChange(current);
-                current = next_task(current);
-            }
-            break;
-
-        case HakenTask::SystemPresets:
-            if (chem->isHakenConnected()) {
-                chem->logMessage("CHEM", "Starting task SystemPresets");
-                assert(task->scheduled()); // should have been handled in process_task_timing
-                assert(chem->isHakenConnected());
-                task->pend();
-                chem->haken_midi.request_system();
-                //chem->haken_midi_out.dispatch(DISPATCH_NOW);
-                notifyChange(HakenTask::SystemPresets);
             } else {
                 task->not_applicable();
                 notifyChange(current);

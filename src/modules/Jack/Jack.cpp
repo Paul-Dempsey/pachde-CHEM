@@ -2,7 +2,7 @@
 using namespace pachde;
 
 static const std::vector<uint8_t> ccmap = {
-    Haken::ccExpres,
+    Haken::ccUndef,
     Haken::ccPre,
     Haken::ccPost,
     Haken::ccAudIn,
@@ -21,7 +21,15 @@ static const std::vector<uint8_t> ccmap = {
     Haken::ccRndIni,
     Haken::ccStretch,
     Haken::ccFineTune,
-    Haken::ccAdvance
+    Haken::ccAdvance,
+    Haken::ccReci1,
+    Haken::ccReci2,
+    Haken::ccReci3,
+    Haken::ccReci4,
+    Haken::ccReci5,
+    Haken::ccReci6,
+    Haken::ccReciMix
+
 };
 
 int pedal_to_index(uint8_t assign) {
@@ -65,10 +73,17 @@ JackModule::JackModule()
         "Round initial",
         "Oct stretch",
         "Fine tune",
-        "Advance"
+        "Advance",
+        "R1",
+        "R2", 
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "RMix"
     };
-    configSwitch(Params::P_ASSIGN_JACK_1, 0.f, 20.f, 10.f, "Jack 1 assign", labels);
-    configSwitch(Params::P_ASSIGN_JACK_2, 0.f, 20.f, 12.f, "Jack 2 assign", labels);
+    configSwitch(Params::P_ASSIGN_JACK_1, 0.f, labels.size(), 10.f, "Jack 1 assign", labels);
+    configSwitch(Params::P_ASSIGN_JACK_2, 0.f, labels.size(), 12.f, "Jack 2 assign", labels);
 
     auto pq = configParam(Params::P_MIN_JACK_1, 0.f, 10.f, 0.f, "Jack 1 minimum");
     pq->displayPrecision = 2;
@@ -191,6 +206,7 @@ void JackModule::process_params(const ProcessArgs &args)
 void JackModule::process(const ProcessArgs &args)
 {
     if (!connected()) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);

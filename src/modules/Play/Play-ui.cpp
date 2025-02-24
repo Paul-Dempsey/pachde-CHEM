@@ -67,8 +67,13 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
                 }
             }
         }));
-        menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); } , false));
+        menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); }, false));
     }
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createSubmenuItem("Fill empty playlist", "", [=](Menu* menu) {
+        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(false); }, !ui->presets.empty()));
+        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(true); }, !ui->presets.empty()));
+    }));
 
     menu->addChild(new MenuSeparator);
     bool no_selection =  ui->selected.empty();
@@ -173,7 +178,7 @@ PlayUi::PlayUi(PlayModule *module) :
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
     up_button->describe("Scroll up");
     up_button->setHandler([this](bool c, bool s){ 
-        page_up(c, s, false);
+        page_up(c, s, true);
     });
     up_button->applyTheme(theme_engine, theme);
     addChild(up_button);
@@ -181,7 +186,7 @@ PlayUi::PlayUi(PlayModule *module) :
     down_button = createWidgetCentered<DownButton>(Vec(RIGHT_MARGIN_CENTER, 67.f));
     down_button->describe("Scroll down");
     down_button->setHandler([this](bool c, bool s){
-        page_down(c, s, false);
+        page_down(c, s, true);
     });
     down_button->applyTheme(theme_engine, theme);
     addChild(down_button);
@@ -598,7 +603,7 @@ void PlayUi::page_up(bool ctrl, bool shift, bool refresh)
 
 void PlayUi::page_down(bool ctrl, bool shift, bool refresh)
 {
-    ssize_t last_page = preset_count() / PLAYLIST_LENGTH;
+    ssize_t last_page = (preset_count() / PLAYLIST_LENGTH) * PLAYLIST_LENGTH;
 
     if (ctrl) {
         scroll_to(last_page, refresh);
@@ -836,6 +841,23 @@ void PlayUi::to_down()
 
 void PlayUi::onPresetChange()
 {
+    if (gather) {
+        auto preset = chem_host->host_preset();
+        if (preset) {
+            if (preset->empty()) return;
+            auto it = std::find_if(presets.cbegin(), presets.cend(), [this, preset](std::shared_ptr<pachde::PresetDescription> p){
+                return preset->id.key() == p->id.key();
+            });
+            if (it == presets.cend()) {
+                auto new_preset = std::make_shared<PresetDescription>();
+                new_preset->init(preset);
+                presets.push_back(new_preset);
+                set_modified(true);
+            }
+        }
+        return;
+    }
+
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
@@ -880,6 +902,45 @@ void PlayUi::check_playlist_device()
     }
 }
 
+struct EmHandler: IHandleEmEvents
+{
+    PlayUi* ui;
+    EmHandler(PlayUi* host) : ui(host) {
+        em_event_mask = EventMask::UserComplete 
+            + EventMask::SystemComplete;
+    }
+    virtual ~EmHandler() {};
+
+    void onUserComplete() override {
+        ui->on_fill_complete();
+    }
+    void onSystemComplete() override {
+        ui->on_fill_complete();
+    }
+};
+
+void PlayUi::fill(bool system)
+{
+    if (!chem_host) return;
+    auto haken = chem_host->host_haken();
+    if (!haken) return;
+    auto matrix = chem_host->host_matrix();
+    em_handler = new EmHandler(this);
+    matrix->subscribeEMEvents(em_handler);
+    gather = true;
+    system ? haken->request_system() : haken->request_user();
+}
+
+void PlayUi::on_fill_complete()
+{
+    gather = false;
+    auto matrix = chem_host->host_matrix();
+    matrix->unsubscribeEMEvents(em_handler);
+    delete em_handler;
+    em_handler = nullptr;
+    sync_to_presets();
+}
+
 void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
@@ -887,7 +948,6 @@ void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
     haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
     check_playlist_device();
 }
-
 
 // IPresetAction
 void PlayUi::onClearSelection()

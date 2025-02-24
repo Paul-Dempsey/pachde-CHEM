@@ -94,7 +94,7 @@ void FxModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
 
 void FxModule::process(const ProcessArgs& args)
 {
-    if (!chem_host) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 47)) {
         int disable = getParamInt(getParam(Params::P_DISABLE));

@@ -3,16 +3,6 @@
 #include "../../widgets/uniform-style.hpp"
 #include "../../widgets/theme-button.hpp"
 
-// Layout
-constexpr const int MODULE_WIDTH = 165;
-constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
-constexpr const float PICKER_TOP = 200.f;
-constexpr const float PICKER_INTERVAL = 42.f;
-constexpr const float PICKER_LABEL_OFFSET = 14.f;
-constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
-constexpr const float ROUND_LIGHT_SPREAD = 6.f;
-constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
-
 CoreModuleWidget::~CoreModuleWidget()
 {
     if (my_module) {
@@ -25,6 +15,18 @@ CoreModuleWidget::~CoreModuleWidget()
     }
 }
 
+using EME = IHandleEmEvents::EventMask;
+
+// Layout
+constexpr const int MODULE_WIDTH = 165;
+constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
+constexpr const float PICKER_TOP = 200.f;
+constexpr const float PICKER_INTERVAL = 42.f;
+constexpr const float PICKER_LABEL_OFFSET = 14.f;
+constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
+constexpr const float ROUND_LIGHT_SPREAD = 6.f;
+constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
+
 CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     my_module(module),
     chem_host(nullptr)
@@ -34,6 +36,14 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     if (my_module) {
         my_module->ui = this;
     }
+
+    em_event_mask = EME::LoopDetect
+        + EME::EditorReply
+        + EME::HardwareChanged
+        + EME::PresetChanged
+        + EME::TaskMessage
+        + EME::LED
+        ;
 
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
@@ -171,8 +181,6 @@ void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
     addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::MidiDevice))); x += spread;
     addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, TaskName(HakenTask::HeartBeat))); x += spread;
     addChild(updates_indicator       = createIndicatorCentered(x, y, co, TaskName(HakenTask::Updates))); x += spread;
-    addChild(userpresets_indicator   = createIndicatorCentered(x, y, co, TaskName(HakenTask::UserPresets))); x += spread;
-    addChild(systempresets_indicator = createIndicatorCentered(x, y, co, TaskName(HakenTask::SystemPresets))); x += spread;
     addChild(presetinfo_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::PresetInfo))); x += spread;
     addChild(lastpreset_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::LastPreset))); x += spread;
     addChild(syncdevices_indicator   = createIndicatorCentered(x, y, co, TaskName(HakenTask::SyncDevices)));
@@ -184,8 +192,6 @@ void CoreModuleWidget::resetIndicators()
     mididevice_indicator   ->setColor(co); mididevice_indicator   ->setFill(false);
     heartbeat_indicator    ->setColor(co); heartbeat_indicator    ->setFill(false);
     updates_indicator      ->setColor(co); updates_indicator      ->setFill(false);
-    userpresets_indicator  ->setColor(co); userpresets_indicator  ->setFill(false);
-    systempresets_indicator->setColor(co); systempresets_indicator->setFill(false);
     presetinfo_indicator   ->setColor(co); presetinfo_indicator   ->setFill(false);
     lastpreset_indicator   ->setColor(co); lastpreset_indicator   ->setFill(false);
     syncdevices_indicator  ->setColor(co); syncdevices_indicator  ->setFill(false);
@@ -290,9 +296,6 @@ void CoreModuleWidget::onPresetChanged()
     }
 }
 
-void CoreModuleWidget::onUserComplete() {}
-void CoreModuleWidget::onSystemComplete() {}
-
 void CoreModuleWidget::onTaskMessage(uint8_t code)
 {
     switch (code) {
@@ -365,8 +368,6 @@ IndicatorWidget* CoreModuleWidget::widget_for_task(HakenTask task)
     case HakenTask::MidiDevice:    return mididevice_indicator;
     case HakenTask::HeartBeat:     return heartbeat_indicator;
     case HakenTask::Updates:       return updates_indicator;
-    case HakenTask::UserPresets:   return userpresets_indicator;
-    case HakenTask::SystemPresets: return systempresets_indicator;
     case HakenTask::PresetInfo:    return presetinfo_indicator;
     case HakenTask::LastPreset:    return lastpreset_indicator;
     case HakenTask::SyncDevices:   return syncdevices_indicator;

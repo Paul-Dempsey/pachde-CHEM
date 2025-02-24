@@ -77,6 +77,7 @@ void MacroModule::onConnectHost(IChemHost* host)
 void MacroModule::onPresetChange()
 {
     if (chem_host) {
+        if (chem_host->host_busy()) return;
         auto preset = chem_host->host_preset();
         if (preset) {
             macro_names.fill_macro_names();
@@ -147,7 +148,7 @@ void MacroModule::process_params(const ProcessArgs& args)
 
 void MacroModule::process(const ProcessArgs& args)
 {
-    if (!chem_host) return;
+    if (!chem_host || chem_host->host_busy()) return;
     
     if (((args.frame + id) % 40) == 0) {
         process_params(args);

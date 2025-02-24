@@ -111,9 +111,10 @@ void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
     if (ui) ui->onConnectionChange(device, connection);
 }
 
-void PlayModule::process(const ProcessArgs& args)
-{
-}
+// void PlayModule::process(const ProcessArgs& args)
+// {
+//     //if (!chem_host || chem_host->host_busy()) return;
+// }
 
 Model *modelPlay = createModel<PlayModule, PlayUi>("chem-play");
 

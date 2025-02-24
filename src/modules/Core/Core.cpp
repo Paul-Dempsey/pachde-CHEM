@@ -9,11 +9,22 @@ void RelayMidiToEM::doMessage(PackedMidiMessage message)
     core->em.onMessage(message);
 }
 
+using EME = IHandleEmEvents::EventMask;
+
 CoreModule::CoreModule() :
+    is_busy(false),
+    is_logging(false),
     in_reboot(false),
-    heartbeat(false),
-    loop(0)
+    heartbeat(false)
 {
+    em_event_mask = EME::LoopDetect
+        + EME::EditorReply 
+        + EME::PresetChanged
+        + EME::UserBegin
+        + EME::UserComplete
+        + EME::SystemBegin
+        + EME::SystemComplete;
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configLight(L_READY, "Haken device ready");
     configLight(L_ROUND_Y, "Round on Y");
@@ -119,21 +130,13 @@ void CoreModule::restore_midi_rate()
 // IHandleEmEvents
 void CoreModule::onLoopDetect(uint8_t cc, uint8_t value)
 {
-    ++loop;
-    //if (0 == (loop & 1)) {
-        heartbeat = !heartbeat;
-        getLight(L_PULSE).setBrightness(heartbeat ? 0.f : value);
-   // }
+    heartbeat = !heartbeat;
+    getLight(L_PULSE).setBrightness(heartbeat ? 0.f : value);
 }
 
 void CoreModule::onEditorReply(uint8_t reply)
 {
     tasks.complete_task(HakenTask::HeartBeat);
-//    getLight(L_PULSE).setBrightnessSmooth(0.f, 4.f * APP->engine->getSampleTime());
-}
-
-void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
-{
 }
 
 void CoreModule::onPresetChanged()
@@ -149,19 +152,25 @@ void CoreModule::onPresetChanged()
     logMessage("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     notify_preset_changed();
 }
+
+void CoreModule::onUserBegin()
+{
+    is_busy = true;
+}
+
 void CoreModule::onUserComplete()
 {
-    tasks.complete_task(HakenTask::UserPresets);
+    is_busy = false;
 }
+
+void CoreModule::onSystemBegin()
+{
+    is_busy = true;
+}
+
 void CoreModule::onSystemComplete()
 {
-    tasks.complete_task(HakenTask::SystemPresets);
-}
-void CoreModule::onTaskMessage(uint8_t code)
-{
-}
-void CoreModule::onLED(uint8_t led)
-{
+    is_busy = false;
 }
 
 void CoreModule::onHakenTaskChange(HakenTask id)

@@ -10,8 +10,6 @@ enum HakenTask : uint8_t {
     MidiDevice = First,
     HeartBeat,
     Updates,
-    UserPresets,
-    SystemPresets,
     PresetInfo,
     LastPreset,
     SyncDevices,

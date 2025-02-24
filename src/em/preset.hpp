@@ -31,6 +31,10 @@ struct PresetDescription
         }
     }
 
+    bool empty() const {
+        return !id.valid() || name.empty() || name == "-";
+    }
+
     void clear() {
         id.clear();
         name.clear();

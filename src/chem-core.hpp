@@ -22,6 +22,7 @@ struct IChemHost
     virtual const PresetDescription* host_preset() = 0;
     virtual HakenMidi* host_haken() = 0;
     virtual EaganMatrix* host_matrix() = 0;
+    virtual bool host_busy() = 0;
 };
 
 struct IChemClient

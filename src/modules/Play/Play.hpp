@@ -66,11 +66,12 @@ struct PlayModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    void process(const ProcessArgs& args) override;
+    //void process(const ProcessArgs& args) override;
 };
 
 // -- Play UI -----------------------------------
 
+struct EmHandler;
 struct PlayMenu;
 constexpr const int PLAYLIST_LENGTH = 15;
 
@@ -90,6 +91,9 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     StaticTextLabel* live_preset_label{nullptr};
     TipLabel*        warning_label{nullptr};
     Blip*            blip{nullptr};
+
+    EmHandler* em_handler{nullptr};
+    bool gather{false};
 
     bool modified{false};
     void set_modified(bool schmutz) {
@@ -159,6 +163,8 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void to_down();
     void to_n(int dx);
     void check_playlist_device();
+    void fill(bool system);
+    void on_fill_complete();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

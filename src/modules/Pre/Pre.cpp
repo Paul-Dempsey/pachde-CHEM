@@ -119,7 +119,7 @@ void PreModule::process_params(const ProcessArgs &args)
 
 void PreModule::process(const ProcessArgs &args)
 {
-    if (!connected()) return;
+    if (!connected() || chem_host->host_busy()) return;
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
     }

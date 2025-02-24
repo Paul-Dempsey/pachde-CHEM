@@ -44,10 +44,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     MidiLog midi_log;
     
     EaganMatrix em;
+    bool is_busy;
     bool is_logging;
     bool in_reboot;
     bool heartbeat;
-    uint64_t loop;
 
     std::vector<IChemClient*> chem_clients;
     HakenTasks tasks;
@@ -103,18 +103,23 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     EaganMatrix* host_matrix() override {
         return &em;
     }
+    bool host_busy() override {
+        return is_busy || in_reboot || !em.ready || em.pending_config || em.in_preset;
+    }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
     
     // IHandleEmEvents
     void onLoopDetect(uint8_t cc, uint8_t value) override;
     void onEditorReply(uint8_t reply) override;
-    void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
+    //void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetChanged() override;
+    void onUserBegin() override;
     void onUserComplete() override;
+    void onSystemBegin() override;
     void onSystemComplete() override;
-    void onTaskMessage(uint8_t code) override;
-    void onLED(uint8_t led) override;
+    //void onTaskMessage(uint8_t code) override;
+    //void onLED(uint8_t led) override;
 
     // IHakenTaskEvents
     void onHakenTaskChange(HakenTask task) override;
@@ -184,8 +189,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     IndicatorWidget* mididevice_indicator = nullptr;
     IndicatorWidget* heartbeat_indicator = nullptr;
     IndicatorWidget* updates_indicator = nullptr;
-    IndicatorWidget* userpresets_indicator = nullptr;
-    IndicatorWidget* systempresets_indicator = nullptr;
     IndicatorWidget* presetinfo_indicator = nullptr;
     IndicatorWidget* lastpreset_indicator = nullptr;
     IndicatorWidget* syncdevices_indicator = nullptr;
@@ -222,8 +225,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void onEditorReply(uint8_t reply) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetChanged() override;
-    void onUserComplete() override;
-    void onSystemComplete() override;
     void onTaskMessage(uint8_t code) override;
     void onLED(uint8_t led) override;
 

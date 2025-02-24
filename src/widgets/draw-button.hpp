@@ -130,8 +130,8 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
     void onHoverKey(const HoverKeyEvent& e) override
     {
         Base::onHoverKey(e);
-        key_ctrl = (e.mods & RACK_MOD_MASK) & RACK_MOD_CTRL;
-        key_shift = (e.mods & RACK_MOD_MASK) & GLFW_MOD_SHIFT;
+        key_ctrl = e.mods & RACK_MOD_CTRL;
+        key_shift = e.mods & GLFW_MOD_SHIFT;
     }
 
     void onButton(const ButtonEvent& e) override {
@@ -140,6 +140,8 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         if (!enabled) return;
         // Dispatch ActionEvent on left click
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+            key_ctrl = e.mods & RACK_MOD_CTRL;
+            key_shift = e.mods & GLFW_MOD_SHIFT;
             ActionEvent eAction;
             onAction(eAction);
         }

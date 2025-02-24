@@ -77,48 +77,85 @@ void EaganMatrix::unsubscribeEMEvents(IHandleEmEvents* client)
 void EaganMatrix::notifyLoopDetect(uint8_t cc, uint8_t value)
 {
     for (auto client : clients) {
-        client->onLoopDetect(cc, value);
+        if (client->em_event_mask & IHandleEmEvents::LoopDetect) {
+            client->onLoopDetect(cc, value);
+        }
     }
 }
 void EaganMatrix::notifyEditorReply(uint8_t editor_reply)
 {
     for (auto client : clients) {
-        client->onEditorReply(editor_reply);
+        if (client->em_event_mask & IHandleEmEvents::EditorReply) {
+            client->onEditorReply(editor_reply);
+        }
     }
 }
 void EaganMatrix::notifyPresetChanged()
 {
     for (auto client : clients) {
-        client->onPresetChanged();
+        if (client->em_event_mask & IHandleEmEvents::PresetChanged) {
+            client->onPresetChanged();
+        }
     }
 }
-void EaganMatrix::notifyHardwareChanged() {
+void EaganMatrix::notifyHardwareChanged()
+{
     for (auto client : clients) {
-        client->onHardwareChanged(hardware, firmware_version);
+        if (client->em_event_mask & IHandleEmEvents::HardwareChanged) {
+            client->onHardwareChanged(hardware, firmware_version);
+        }
     }
 }
+
+void EaganMatrix::notifyUserBegin()
+{
+    for (auto client : clients) {
+        if (client->em_event_mask & IHandleEmEvents::UserBegin) {
+            client->onUserBegin();
+        }
+    }
+}
+
 void EaganMatrix::notifyUserComplete()
 {
     for (auto client : clients) {
-        client->onUserComplete();
+        if (client->em_event_mask & IHandleEmEvents::UserComplete) {
+            client->onUserComplete();
+        }
     }
 }
+
+void EaganMatrix::notifySystemBegin()
+{
+    for (auto client : clients) {
+        if (client->em_event_mask & IHandleEmEvents::SystemBegin) {
+            client->onSystemBegin();
+        }
+    }
+}
+
 void EaganMatrix::notifySystemComplete()
 {
     for (auto client : clients) {
-        client->onSystemComplete();
+        if (client->em_event_mask & IHandleEmEvents::SystemComplete) {
+            client->onSystemComplete();
+        }
     }
 }
 void EaganMatrix::notifyTaskMessage(uint8_t code)
 {
     for (auto client : clients) {
-        client->onTaskMessage(code);
+        if (client->em_event_mask & IHandleEmEvents::TaskMessage) {
+            client->onTaskMessage(code);
+        }
     }
 }
 void EaganMatrix::notifyLED(uint8_t led)
 {
     for (auto client : clients) {
-        client->onLED(led);
+        if (client->em_event_mask & IHandleEmEvents::LED) {
+            client->onLED(led);
+        }
     }
 
 }
@@ -199,15 +236,6 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
         jack_2 = (value << 7) + ch1.pedal_fraction();
     }
 
-    switch (cc) {
-    case Haken::ccJack1:
-        jack_1 = (value << 7) + ch1.pedal_fraction();
-        break;
-    case Haken::ccJack2:
-        jack_2 = (value << 7) + ch1.pedal_fraction();
-        break;
-    }
-
     if (handle_macro_cc(cc, value)) {
         return;
     }
@@ -215,6 +243,18 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
 
 void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
 {
+    // The ccs ccMod, ccBreath, ccUndef, ccFoot, ccVol, ccExpres
+    // can be used for pedal assignment. 
+    // When assigned, the cc comes to channel 16. 
+    // Other assigned ccs come to channel 1.
+
+    if (get_jack_1_assign() == cc) {
+        jack_1 = (value << 7) + ch16.pedal_fraction();
+    }
+    if (get_jack_2_assign() == cc) {
+        jack_2 = (value << 7) + ch16.pedal_fraction();
+    }
+
     switch (cc) {
     case Haken::ccBankH:
         if (in_system) {
@@ -295,15 +335,19 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
             break;
         case Haken::beginUserNames:
             in_user = true;
+            notifyUserBegin();
             break;
         case Haken::endUserNames:
+            in_user = false;
             notifyUserComplete();
             break;
         case Haken::endSysNames:
+            in_system = false;
             notifySystemComplete();
             break;
         case Haken::beginSysNames:
             in_system = true;
+            notifySystemBegin();
             break;
         }
         break;

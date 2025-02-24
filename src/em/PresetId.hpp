@@ -9,7 +9,7 @@ typedef union RawPresetId {
         uint8_t number;  // program change
         uint8_t bank_lo; // cc32
         uint8_t bank_hi; // cc0
-        uint8_t pad;
+        uint8_t pad;     // used by PresetId for validity
     } bytes;
 } RawPresetId;
 #pragma pack(pop)
@@ -22,9 +22,9 @@ private:
     void make_valid() { id.bytes.pad = 0; }
 public:
     static const uint32_t InvalidKey = 0xff000000;
-    PresetId(){ invalidate(); }
+    PresetId() { invalidate(); }
     PresetId& operator=(const PresetId& other) { id = other.id; return *this; }
-    bool valid() { return 0 == id.bytes.pad; }
+    bool valid() const { return 0 == id.bytes.pad; }
     void invalidate() { id.data = InvalidKey; }
     bool operator==(const PresetId& other) { return id.data == other.id.data; }
     PresetId(const PresetId& other) { id = other.id; }
