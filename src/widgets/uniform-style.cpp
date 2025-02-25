@@ -10,6 +10,6 @@ LabelStyle in_port_label      {"in-label",   TextAlignment::Center,   12.f, true
 LabelStyle control_label      {"ctl-label",  TextAlignment::Center,   14.f, false};
 LabelStyle control_label_left {"ctl-label",  TextAlignment::Left,     14.f, false};
 LabelStyle heading_label      {"ctl-label",  TextAlignment::Center,   16.f, true};
-LabelStyle pedal_label        {"ped-assign", TextAlignment::Left,      9.f, false};
+LabelStyle pedal_label        {"ped-assign", TextAlignment::Left,     10.f, false};
 
 }}

@@ -57,7 +57,8 @@ PostUi::PostUi(PostModule *module) :
     addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
     y += 34;
     addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), module, PostModule::P_MIX, theme_engine, theme));
-    addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, PostModule::L_MIX));
+    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, PostModule::L_MIX));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
     y += 40;
     const float PARAM_DY = 54.5f;
@@ -144,7 +145,7 @@ void PostUi::glowing_knobs(bool glow) {
 
 void PostUi::setThemeName(const std::string& name, void * context)
 {
-//    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
 }
 

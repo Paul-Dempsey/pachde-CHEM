@@ -33,7 +33,7 @@
             "selector-sel": { "fill": " #0b873c" },
             "selector-item": { "fill": " #a0a0a0" },
 
-            "ped-assign": { "fill": "brand" },
+            "ped-assign": { "fill": "hsl(143, 90%, 20.00%)" },
 
             "dytext": { "fill": "#457aa6"},
             
@@ -45,8 +45,8 @@
             "tab-label":       { "fill": "g50" },
             "tab-label-hi":    { "fill": "g20" },
             "preset":          { "fill": "g20" },
-            "preset-live":     { "fill": "#250b91" },
-            "preset-livetext": { "fill": "#3c2a84" },
+            "preset-live":     { "fill": " #250b91" },
+            "preset-livetext": { "fill": " #3c2a84" },
             "preset-current":  { "fill": " #06833c" },
             "preset-selected": { "fill": "brand" },
             "preset-seltext":  { "fill": "g10" },
@@ -55,8 +55,8 @@
             "preset-dragcur" : { "fill": " #9d9131"},
             "grid-bg":         { "fill": " #d6d6d6" },
             "grid-line":       { "stroke": "rack-white" },
-            "grid-new":        { "fill": " #c6bbf4" },
-            "curpreset":     { "fill": "#c04a00" },
+            "grid-new":        { "fill": "hsl(220, 50%, 80%)" },
+            "curpreset":     { "fill": "#742c00" },
             "heart":         { "fill": "#bd0808" },
             "heart-fill":    { "fill": "#bd0808", "opacity": 0.5 },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
@@ -65,11 +65,14 @@
             "ctl-glyph":   { "fill": "g20", "stroke": "g20" },
             "ctl-disabled":{ "fill": "g50", "stroke": "g20"  },
             "ctl-hovered": { "fill": "#cd6146" },
-            "ctl-label":   { "fill": "g20" },
-            "ctl-label-hi":{ "fill": "g10" },
+            "ctl-label":   { "fill": "g10" },
+            "ctl-label-hi":{ "fill": "g0" },
             "in-label":    { "fill": "g55" },
 
             "menu":        { "fill" : "g20" },
+            "led": { "fill" : "g60", "stroke": "#00000080" },
+            "fswhi": { "stroke": { "color":"g10", "width": 1.75}},
+            "fswlo": { "stroke": "g45"},
 
             "port-bezel":     { "fill": "debug" },
             "port-ring":      { "fill": "#808080" },

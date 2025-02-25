@@ -59,7 +59,8 @@ FxUi::FxUi(FxModule *module) :
     y = 70.f;
     knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme);
     addChild(knobs[K_MIX]);
-    addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
+    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
     x = CENTER - KNOB_DX;
     y -= 8.f;
@@ -136,7 +137,7 @@ void FxUi::glowing_knobs(bool glow) {
 
 void FxUi::setThemeName(const std::string& name, void * context)
 {
-//    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
 }
 

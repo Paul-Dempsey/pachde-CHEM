@@ -49,7 +49,8 @@ PreUi::PreUi(PreModule *module) :
     x = CENTER;
     addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), my_module, PreModule::P_PRE_LEVEL, theme_engine, theme));
     addChild(knobs[K_MIX]       = createChemKnob<BlueKnob>(Vec(x, 96.f), my_module, PreModule::P_MIX, theme_engine, theme));
-    addChild(createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, 96.f-9.f), my_module, PreModule::L_MIX));
+    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, 96.f-9.f), my_module, PreModule::L_MIX));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
     const float PARAM_TOP = 135.f;
     const float PARAM_DY = 54.5f;
@@ -146,7 +147,7 @@ void PreUi::glowing_knobs(bool glow) {
 
 void PreUi::setThemeName(const std::string& name, void * context)
 {
-//    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
 }
 

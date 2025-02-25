@@ -99,7 +99,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
-
+    SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
 
     PostUi(PostModule *module);

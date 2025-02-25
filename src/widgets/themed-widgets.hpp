@@ -11,6 +11,23 @@ namespace pachde {
 // send a change notification to widget
 void notifyChange(Widget* widget);
 
+template <typename TLight>
+void applyLightTheme( TLight* light, const std::string& theme_name, const std::string& theme_key = "led")
+{
+    auto theme = theme_engine.getTheme(theme_name);
+    if (theme) {
+        auto style = theme->getStyle(theme_key);
+        if (style) {
+            if (style->isApplyFill()) {
+                light->bgColor = fromPacked(style->fillWithOpacity());
+            }
+            if (style->isApplyStroke()) {
+                light->borderColor = fromPacked(style->strokeWithOpacity());
+            }
+        }
+    }
+}
+
 // A Themed screw, based on the standard Rack screw.
 struct ThemeScrew : app::SvgScrew, IApplyTheme
 {

@@ -104,7 +104,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     StaticTextLabel* in_thresh_drive;
     StaticTextLabel* in_attack_x;
     StaticTextLabel* in_ratio_makeup;
-
+    SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PreModule::NUM_KNOBS];
 
     PreUi(PreModule *module);

@@ -128,13 +128,18 @@ void ChemModuleWidget::draw(const DrawArgs& args)
     ModuleWidget::draw(args);
     if (showGrid) {
         auto vg = args.vg;
-        NVGcolor co = Overlay(GetStockColor(StockColor::Gold), 0.35f);
+        NVGcolor co = Overlay(GetStockColor(StockColor::Coral), 0.35f);
+        NVGcolor co2 = Overlay(GetStockColor(StockColor::Gold), 0.35f);
 
-        for (float x = 0.f; x < box.size.x; x += 7.5f) {
-            Line(vg, x, 0.f, x, box.size.y, co, 0.5f); 
+        bool odd = true;
+        for (float x = 7.5f; x < box.size.x; x += 7.5f) {
+            Line(vg, x, 0.f, x, box.size.y, odd ? co : co2, 0.35f);
+            odd = !odd;
         }
-        for (float y = 0.f; y < box.size.y; y += 7.5f) {
-            Line(vg, 0.f, y, box.size.x, y, co, 0.5f);
+        odd = true;
+        for (float y = 7.5f; y < box.size.y; y += 7.5f) {
+            Line(vg, 0.f, y, box.size.x, y, odd ? co : co2, 0.35f);
+            odd = !odd;
         }
     }
     if (hints) {

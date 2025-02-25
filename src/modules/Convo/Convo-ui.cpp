@@ -46,6 +46,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
+
     float x, y;
     bool browsing = !module;
 

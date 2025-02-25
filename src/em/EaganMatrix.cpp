@@ -412,7 +412,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 preset.id.set_number(msg.bytes.data1);
                 if (Haken::catEdBuf == preset.id.bank_hi()) {
                     uint16_t pn = (static_cast<uint16_t>(preset.id.bank_lo()) << 7) + preset.id.number();
-                    // 129 because 1-based numbering where 0 == raw/from file
+                    // 129 because 1-based numbering where 0 == raw/from file in edit slot
                     if (pn < 129) {
                         preset.id.set_bank_hi(Haken::catUser);
                         --pn;

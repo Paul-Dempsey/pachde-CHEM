@@ -82,6 +82,7 @@
             "ctl-bar":     { "stroke": "#052d68"},
 
             "menu":        { "fill" : "black" },
+            "led": { "fill" : " #6f9de3", "stroke": " #80808080" },
 
             "selector": { "fill": " #202020", "stroke": { "color": "hsl(276, 23.60%, 39.00%)", "width":1 }},
             "selector-sel": { "fill": "hsl(144, 94.50%, 50.20%)" },

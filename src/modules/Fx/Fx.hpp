@@ -103,6 +103,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     SelectorWidget* selector{nullptr};
     StaticTextLabel* effect_label;
     StaticTextLabel* r_labels[6];
+    SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[FxModule::NUM_KNOBS];
 
     int effect{-1};

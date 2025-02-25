@@ -65,6 +65,7 @@
             "in-label":    { "fill": "g45" },
 
             "menu":        { "fill" : "#63c663" },
+            "led": { "fill" : "hsl(190, 50%, 40%)", "stroke": " #80808080" },
 
             "port-bezel":     { "fill": "#595959" },
             "port-ring":      { "fill": "#808080" },
