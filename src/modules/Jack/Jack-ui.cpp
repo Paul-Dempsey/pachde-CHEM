@@ -90,7 +90,7 @@ JackUi::JackUi(JackModule *module) :
     addChild(Center(pedal_image_2));
 
     y += 34.f;
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
         Vec(x, y), my_module, JackModule::P_KEEP, JackModule::L_KEEP, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y+9.f), 80.f, "Keep", theme_engine, theme, S::control_label));
 

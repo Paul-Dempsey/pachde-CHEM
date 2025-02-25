@@ -7,6 +7,7 @@ PostModule::PostModule()
 :   chem_host(nullptr),
     ui(nullptr),
     glow_knobs(false),
+    muted(false),
     attenuator_target(IN_INVALID)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
@@ -17,7 +18,7 @@ PostModule::PostModule()
     configU7EmParam(Haken::ch1, Haken::ccEqFreq, this, Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency");
     configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
 
-    configSwitch(P_MUTE, 0.f, 1.f, 0.f, "Mute", { "Voice", "Mute" });
+    configSwitch(P_MUTE, 0.f, 1.f, 0.f, "Mute", { "Voiced", "Muted" });
 
     configInput(IN_POST_LEVEL, "Post-level");
     configInput(IN_MIX,        "EQ Mix");
@@ -82,6 +83,8 @@ void PostModule::onConnectHost(IChemHost* host)
 
 void PostModule::onPresetChange()
 {
+    if (!connected()) return;
+    pull_params();
     if (ui) ui->onPresetChange();
 }
 
@@ -90,15 +93,51 @@ void PostModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
     if (ui) ui->onConnectionChange(device, connection);
 }
 
-void PostModule::process_params(const ProcessArgs& args)
+bool PostModule::connected()
 {
-    auto v = getParam(Params::P_MUTE).getValue();
-    v = (v > 0.5f) ? 1.f : 0.f;
-    getLight(Lights::L_MUTE).setBrightnessSmooth(v, 45.f);
+    if (!chem_host) return false;
+    auto conn = chem_host->host_connection(ChemDevice::Haken);
+    return conn && conn->identified();
+}
 
-    v = getParam(Params::P_MIX).getValue()* .1f;
+void PostModule::pull_params()
+{
+    if (!connected()) return;
+    auto em = chem_host->host_matrix();
+
+    auto pq14 = get_u14cc_em_param_quantity(this, P_POST_LEVEL);
+    if (pq14) pq14->set_em_midi_value(em->get_post());
+    
+    auto pq = get_u7_em_param_quantity(this, P_MIX);
+    if (pq) pq->setValue(em->get_eq_mix());
+    
+    pq = get_u7_em_param_quantity(this, P_TILT);
+    if (pq) pq->setValue(em->get_eq_tilt());
+
+    pq = get_u7_em_param_quantity(this, P_FREQUENCY);
+    if (pq) pq->setValue(em->get_eq_freq());
+}
+
+void PostModule::process_params(const ProcessArgs &args)
+{
+    auto new_mute = getParamInt(getParam(Params::P_MUTE));
+    getLight(Lights::L_MUTE).setBrightnessSmooth(new_mute, 45.f);
+    if (new_mute != muted) {
+        muted = new_mute;
+        auto haken = chem_host->host_haken();
+        if (muted) {
+            haken->control_change(Haken::ch1, Haken::ccFracPed, 0);
+            haken->control_change(Haken::ch1, Haken::ccPost, 0);
+        } else {
+            auto pq = get_u14cc_em_param_quantity(this, P_POST_LEVEL);
+            if (pq) {
+                pq->send_midi();
+            }
+        }
+    }
+
+    float v = getParam(Params::P_MIX).getValue()* .1f;
     getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
-
 }
 
 void PostModule::process(const ProcessArgs& args)

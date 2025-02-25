@@ -81,6 +81,7 @@ struct EaganMatrix
 
     uint16_t jack_1;
     uint16_t jack_2;
+    uint16_t post;
 
     float get_macro_voltage(int id);
 
@@ -93,6 +94,7 @@ struct EaganMatrix
 
     uint16_t get_jack_1() { return jack_1; }
     uint16_t get_jack_2() { return jack_2; }
+    uint16_t get_post() { return post; }
 
     // simple cc value retreival
     uint8_t get_led() { return ch16.cc[Haken::ccEdState] & Haken::sLedBits; }
@@ -107,7 +109,6 @@ struct EaganMatrix
     uint8_t get_fine_tune() { return ch1.cc[Haken::ccFineTune]; }
 
     uint8_t get_pre() { return ch1.cc[Haken::ccPre]; } // 14-bit?
-    uint8_t get_post() { return ch1.cc[Haken::ccPost]; } // 14-bit?
     uint8_t get_attenuation() { return ch1.cc[Haken::ccAtten]; }
 
     uint8_t get_round_rate() { return ch1.cc[Haken::ccRoundRate]; }
@@ -127,7 +128,7 @@ struct EaganMatrix
     uint8_t get_pedal_2_min() { return ch1.cc[Haken::ccMin2]; }
     uint8_t get_pedal_2_max() { return ch1.cc[Haken::ccMax2]; }
 
-    uint8_t get_eq_title() { return ch1.cc[Haken::ccEqTilt]; }
+    uint8_t get_eq_tilt() { return ch1.cc[Haken::ccEqTilt]; }
     uint8_t get_eq_freq() { return ch1.cc[Haken::ccEqFreq]; }
     uint8_t get_eq_mix() { return ch1.cc[Haken::ccEqMix]; }
     uint8_t get_thresh_drive() { return ch1.cc[Haken::ccThrDrv]; }

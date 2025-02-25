@@ -289,7 +289,12 @@ void CoreModuleWidget::onPresetChanged()
     auto preset = my_module->host_preset();
     if (preset) {
         preset_label->text(preset->name);
-        preset_label->describe(preset->text.empty() ? preset->summary() : preset->text);
+        if (preset->text.empty()) {
+            preset_label->describe(preset->summary());
+        } else {
+            auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), preset->text.c_str());
+            preset_label->describe(text);
+        }
     } else {
         preset_label->text("");
         preset_label->describe("");

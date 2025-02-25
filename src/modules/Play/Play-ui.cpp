@@ -661,13 +661,12 @@ void PlayUi::make_visible(ssize_t index)
 void PlayUi::scroll_to_live()
 {
     if (!live_preset) return;
-    int index = 0;
-    for (auto p : presets) {
-        if (live_preset->id == p->id) {
-            make_visible(index);
-            break;
-        }
-        ++index;
+    auto id = live_preset->id;
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<pachde::PresetDescription>& p){
+        return p->id == id;
+    });
+    if (it != presets.cend()) {
+        make_visible(it - presets.cbegin());
     }
 }
 
@@ -871,6 +870,9 @@ void PlayUi::onPresetChange()
         live_preset_label->text("");
     }
 
+    if (live_preset && my_module->track_live) {
+        scroll_to_live();
+    }
     auto live_id = get_live_id();
     for (auto pw : preset_widgets) {
         if (pw->empty()) break;
@@ -880,7 +882,6 @@ void PlayUi::onPresetChange()
             current_preset = presets[current_index];
         }
     }
-    scroll_to_live();
 }
 
 void PlayUi::check_playlist_device()

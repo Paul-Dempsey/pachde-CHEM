@@ -17,7 +17,8 @@ EaganMatrix::EaganMatrix()
     frac_lsb(0),
     data_stream(-1),
     jack_1(0),
-    jack_2(0)
+    jack_2(0),
+    post(0)
 {
 }
 
@@ -239,6 +240,9 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
     if (handle_macro_cc(cc, value)) {
         return;
     }
+    if (Haken::ccPost == cc) {
+        this->post = (value << 7) + ch1.pedal_fraction();
+    }
 }
 
 void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
@@ -408,6 +412,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 preset.id.set_number(msg.bytes.data1);
                 if (Haken::catEdBuf == preset.id.bank_hi()) {
                     uint16_t pn = (static_cast<uint16_t>(preset.id.bank_lo()) << 7) + preset.id.number();
+                    // 129 because 1-based numbering where 0 == raw/from file
                     if (pn < 129) {
                         preset.id.set_bank_hi(Haken::catUser);
                         --pn;
@@ -415,8 +420,8 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                         pn -= 129;
                         preset.id.set_bank_hi(Haken::catSSlot);
                     }
-                    preset.id.set_bank_lo((pn & 0xff00) >> 7);
-                    preset.id.set_number(pn & 0xff);
+                    preset.id.set_bank_lo((pn & 0xff80) >> 7);
+                    preset.id.set_number(pn & 0x7f);
                 }
                 in_preset = false;
                 pending_config = false;

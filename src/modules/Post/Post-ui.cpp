@@ -31,8 +31,7 @@ enum K {
 };
 
 PostUi::PostUi(PostModule *module) :
-    my_module(module),
-    last_mute(-1.f)
+    my_module(module)
 {
     setModule(module);
     initThemeEngine();
@@ -50,14 +49,8 @@ PostUi::PostUi(PostModule *module) :
     
     // MUTE
     y = 68.f;
-    addChild(mute_button = Center(createThemedLightButton<LargeRoundButton, SmallLight<RedLight>>(
-        Vec(x, y), my_module, PostModule::L_MUTE, theme_engine, theme, "Mute")));
-    if (my_module) {
-        mute_button->setHandler([=](bool, bool) {
-            auto v = my_module->getParam(PostModule::P_MUTE).getValue();
-            my_module->getParam(PostModule::P_MUTE).setValue(v > .5f ? 0.f : 1.f);
-        });
-    }
+    addChild(Center(createThemedParamLightButton<LargeRoundParamButton, SmallLight<RedLight>>(
+        Vec(x, y), my_module, PostModule::P_MUTE, PostModule::L_MUTE, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x,y + 14.f), 50.f, "Mute", theme_engine, theme, knob_label_style));
     
     y = 104.f;
@@ -181,13 +174,6 @@ void PostUi::step()
 {
     Base::step();
     if (!my_module) return;
-
-    auto current = my_module->getParam(PostModule::P_MUTE).getValue();
-    if (last_mute != current) {
-        last_mute = current;
-        mute_button->describe(format_string("Mute: %s", current > .5f ? "on": "off"));
-    }
-    
 }
 
 void PostUi::draw(const DrawArgs& args)

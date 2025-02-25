@@ -49,6 +49,8 @@ struct PostModule : ChemModule, IChemClient
     PostUi* ui;
 
     bool glow_knobs;
+    bool muted;
+
     int attenuator_target;
     float attenuation[ATTENUATED_INPUTS];
     
@@ -62,6 +64,8 @@ struct PostModule : ChemModule, IChemClient
     IChemHost* get_host() override {
         return chem_host;
     }
+    bool connected();
+
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
@@ -74,6 +78,7 @@ struct PostModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void pull_params();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -95,10 +100,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
-    LargeRoundButton* mute_button;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
-
-    float last_mute;
 
     PostUi(PostModule *module);
 
