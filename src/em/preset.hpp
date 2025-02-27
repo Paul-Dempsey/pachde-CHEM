@@ -41,7 +41,7 @@ struct PresetDescription
         text.clear();
     }
 
-    json_t* toJson();
+    json_t* toJson(bool include_id, bool include_name, bool include_text);
     void fromJson(const json_t* root);
     std::string summary() const;
 

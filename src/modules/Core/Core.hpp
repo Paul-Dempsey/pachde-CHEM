@@ -52,6 +52,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     std::vector<IChemClient*> chem_clients;
     HakenTasks tasks;
 
+    PresetDescription last_preset;
+    bool restore_last_preset;
+
     // ------------------------------------------
     CoreModule();
     virtual ~CoreModule();

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="165" height="380" viewBox="0 0 165 380"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
    <defs>
-      <linearGradient id="panel-stops">
+      <linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse" >
          <stop offset="0" stop-color="#282828"/>
          <stop offset="1" stop-color="#181818" />
       </linearGradient>
-      <linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" xlink:href="#panel-stops" gradientUnits="userSpaceOnUse" />
    </defs>
   <rect id="g-panel" fill="url(#gpanel)" x="0" y="0" width="195" height="380" />
   <path id="th" stroke="#f9a54b" stroke-width="0.25" d="M 5,6.25 H 40 M 160,6.25 h -40" />

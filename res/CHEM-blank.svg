@@ -2,8 +2,14 @@
 <svg width="105" height="380" viewBox="0 0 105 380" 
 xmlns="http://www.w3.org/2000/svg"
 xmlns:svg="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse" >
+   <stop offset=".2" stop-color="#7f1c2b" />
+   <stop offset="1" stop-color="#f2ff05" />
+</linearGradient>
+</defs>
 <g>
-   <rect id="panel" fill="#1f1f1f" x="0" y="0" width="105" height="380" />
+   <rect id="panel" fill="url(#gpanel)" x="0" y="0" width="105" height="380" />
 
    <rect fill="#000000" id="foot" width="100" height="18" x="2.5" y="368" />
    <g aria-label="#d (pachde logo)" id="g2" transform="translate(45.2065,366.23087)"

@@ -206,8 +206,6 @@ std::vector<unsigned char> ParseHex(std::string hex) {
     return result;
 }
 
-const PackedColor OPAQUE_BLACK = 255 << 24;
-
 inline bool is_number_sep(char ch) { return ' ' == ch || ',' == ch; }
 
 uint64_t parse_uint64(std::string::const_iterator& pos, std::string::const_iterator end)
@@ -439,9 +437,7 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
     if (ogradient) {
         if (!requireArray(ogradient, "gradient")) return false;
 
-        int index = 0;
-        PackedColor color = OPAQUE_BLACK;
-        float offset = 0.f;
+        GradientStop stop;
 
         json_t * item;
         size_t n;
@@ -453,13 +449,13 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             auto oindex = json_object_get(item, "index");
             if (oindex) {
                 if (requireInteger(oindex, "index")) {
-                    index = json_integer_value(oindex);
-                    if (!(0 == index || 1 == index)) {
+                    stop.index = json_integer_value(oindex);
+                    if (!(0 == stop.index || 1 == stop.index)) {
                         logError(ErrorCode::GradientStopIndexZeroOrOne, "Gradient stop index must be 0 or 1");
                         ok = false;
                     } 
                 } else {
-                    index = 0;
+                    stop.index = 0;
                     ok = false;
                 }
             }
@@ -468,11 +464,11 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             if (ocolor) {
                 if (requireString(ocolor, "color")) {
                     auto text = strip_space(json_string_value(ocolor));
-                    if (!parseColor(text, "color", &color)) {
+                    if (!parseColor(text, "color", &stop.color)) {
                         ok = false;
                     }
                 } else {
-                    color = 0;
+                    stop.color = 0;
                     ok = false;
                 }
             }
@@ -480,15 +476,14 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
             auto ooffset = json_object_get(item, "offset");
             if (ooffset) {
                 if (requireNumber(ooffset, "offset")) {
-                    offset = getNumber(ooffset);
+                    stop.offset = getNumber(ooffset);
                 } else {
-                    offset = 0.f;
                     ok = false;
                 }
             }
 
             if (ok) {
-                gradient.stops[index] = GradientStop(index, offset, color);
+                gradient.stops[stop.index] = stop;
             }
         }
         if (ok) {
@@ -728,9 +723,9 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
                     for (int i = 0; i < target.gradient->nstops; ++i) {
                         target.gradient->stops[i].color = NoColor;
                     }
-                    return true;
+                } else {
+                    target.type = NSVG_PAINT_NONE;
                 }
-                target.type = NSVG_PAINT_NONE;
                 return true;
             }
             break;
@@ -772,7 +767,7 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
                             format_string("'%s': Gradient stop %d not present in SVG", tag.c_str()));
                     } else {
                         NSVGgradientStop& target_stop = target.gradient->stops[stop.index];
-                        if (target_stop.offset != stop.offset) {
+                        if (stop.hasOffset() && target_stop.offset != stop.offset) {
                             target_stop.offset = stop.offset;
                             changed = true;
                         }

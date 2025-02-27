@@ -96,7 +96,7 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
 {
     auto mods = e.mods & RACK_MOD_MASK;
     switch (e.key) {
-    case GLFW_KEY_F4: {
+    case GLFW_KEY_F5: {
         if (e.action == GLFW_RELEASE && (0 == mods)) {
             e.consume(this);
             reloadThemes();
@@ -149,6 +149,11 @@ void ChemModuleWidget::draw(const DrawArgs& args)
         Line(vg, 0, box.size.y - 15, box.size.x, box.size.y - 15, co, .5f);
         Line(vg, 15, 0, 15, box.size.y, co, .5f);
         Line(vg, box.size.x - 15, 0, box.size.x - 15, box.size.y, co, .5f);
+
+        co = Overlay(GetStockColor(StockColor::Coral), 0.35f);
+        Line(vg, box.size.x*.5f, 0, box.size.x*.5f, box.size.y, co, .5f);
+        Line(vg, 0, box.size.y*.5f, box.size.x, box.size.y*.5f, co, .5f);
+
     }
 }
 
@@ -182,7 +187,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
             this->setThemeName(getThemeName(), nullptr);
         }));
 
-    menu->addChild(createMenuItem("Hot-reload themes", "F4", [this]() {
+    menu->addChild(createMenuItem("Hot-reload themes", "F5", [this]() {
         reloadThemes();
         this->setThemeName(getThemeName(), this);
     }));

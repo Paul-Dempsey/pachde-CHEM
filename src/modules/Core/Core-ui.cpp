@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/draw-button.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "../../widgets/theme-button.hpp"
 
@@ -57,12 +58,28 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
     createRoundingLeds(r_col - 1.5 * ROUND_LIGHT_SPREAD, 40.f, ROUND_LIGHT_SPREAD);
-    createIndicatorsCentered(CENTER - ((6.f + 7.f * 9.f) * .5f), 354.f, 9.f);
+    createIndicatorsCentered(CENTER, 354.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createStaticTextLabel<TipLabel>(
-        Vec(CENTER, 145.f), box.size.x, "[preset]", theme_engine, theme, style));
+        Vec(CENTER, 126.f), box.size.x, "[preset]", theme_engine, theme, style));
     preset_label->glowing(true);
+
+    auto prev = createWidgetCentered<PrevButton>(Vec(CENTER - 9.5f, 154.f));
+    if (my_module) {
+        prev->describe("Select previous preset");
+        prev->setHandler([this](bool c, bool s){ my_module->haken_midi.previous_system_preset(); });
+    }
+    prev->applyTheme(theme_engine, theme);
+    addChild(prev);
+    
+    auto next = createWidgetCentered<NextButton>(Vec(CENTER + 9.f, 154.f));
+    if (my_module) {
+        next->describe("Select next preset");
+        next->setHandler([this](bool c, bool s){ my_module->haken_midi.next_system_preset(); });
+    }
+    next->applyTheme(theme_engine, theme);
+    addChild(next);
 
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(r_col, 30, "EM LED"));
@@ -178,6 +195,7 @@ void CoreModuleWidget::createRoundingLeds(float x, float y, float spread)
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
 {
     auto co = themeColor(coTaskUnscheduled);
+    x -= (spread * 5) *.5f;
     addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::MidiDevice))); x += spread;
     addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, TaskName(HakenTask::HeartBeat))); x += spread;
     addChild(updates_indicator       = createIndicatorCentered(x, y, co, TaskName(HakenTask::Updates))); x += spread;
@@ -494,16 +512,17 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
         menu->addChild(createCheckMenuItem(
             "Log MIDI", "",
             [this]() { return my_module->is_logging; },
-            [this]() { my_module->enable_logging(!my_module->is_logging); }));
+            [this]() { my_module->enable_logging(!my_module->is_logging);
+        }));
+
+        menu->addChild(createCheckMenuItem(
+            "Restore last preset", "",
+            [this]() { return my_module->restore_last_preset; },
+            [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;
+        }));
 
         menu->addChild(createSubmenuItem("Themes", "", [=](Menu* menu) {
             ChemModuleWidget::appendContextMenu(menu);
-        }));
-        menu->addChild(createMenuItem("Previous sys preset", "", [this]() {
-            my_module->haken_midi.previous_system_preset();
-        }));
-        menu->addChild(createMenuItem("Next sys preset", "", [this]() {
-            my_module->haken_midi.next_system_preset();
         }));
 
         menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {

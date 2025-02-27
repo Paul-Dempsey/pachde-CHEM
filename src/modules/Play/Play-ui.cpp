@@ -267,7 +267,7 @@ void PlayUi::presets_to_json(json_t * root)
 
     auto jaru = json_array();
     for (auto preset: presets) {
-        json_array_append_new(jaru, preset->toJson());
+        json_array_append_new(jaru, preset->toJson(true, true, false));
     }
     json_object_set_new(root, "playlist", jaru);
 }

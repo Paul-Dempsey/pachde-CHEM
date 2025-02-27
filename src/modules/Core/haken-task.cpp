@@ -26,12 +26,12 @@ const char * TaskName(HakenTask task)
 {
     switch (task) {
     case HakenTask::None:          return "--";
-    case HakenTask::MidiDevice:    return "connect midi device";
-    case HakenTask::HeartBeat:     return "heartbeat";
-    case HakenTask::Updates:       return "request updates";
-    case HakenTask::PresetInfo:    return "request preset info";
-    case HakenTask::LastPreset:    return "select last preset";
-    case HakenTask::SyncDevices:   return "synchronize midi devices";
+    case HakenTask::MidiDevice:    return "Connect midi device";
+    case HakenTask::HeartBeat:     return "Heartbeat";
+    case HakenTask::Updates:       return "Request updates";
+    case HakenTask::PresetInfo:    return "Request preset info";
+    case HakenTask::LastPreset:    return "Restore last preset";
+    case HakenTask::SyncDevices:   return "Synchronize midi devices";
     default: return "unknown task";
     }
 }
@@ -50,34 +50,34 @@ const char * TaskStateName(TaskState state)
     }
 }
 
-void HakenTaskInfo::fromJson(json_t* root) {
-    if (!root) return;
+// void HakenTaskInfo::fromJson(json_t* root) {
+//     if (!root) return;
 
-    auto j = json_object_get(root, "delay");
-    if (j) { post_delay = json_number_value(j); }
+//     auto j = json_object_get(root, "delay");
+//     if (j) { post_delay = json_number_value(j); }
 
-    j = json_object_get(root, "budget");
-    if (j) { 
-        budget = json_number_value(j);
-        if (budget < 0.f) budget = 0.f;
-    }
+//     j = json_object_get(root, "budget");
+//     if (j) { 
+//         budget = json_number_value(j);
+//         if (budget < 0.f) budget = 0.f;
+//     }
 
-    // j = json_object_get(root, "midi-rate");
-    // if (j) {
-    //     rate = static_cast<HakenMidiRate>(json_integer_value(j));
-    //     if (!in_range(static_cast<int>(rate), 0, 2)) {
-    //         rate = HakenMidiRate::Third;
-    //     }
-    // }
-}
+//     // j = json_object_get(root, "midi-rate");
+//     // if (j) {
+//     //     rate = static_cast<HakenMidiRate>(json_integer_value(j));
+//     //     if (!in_range(static_cast<int>(rate), 0, 2)) {
+//     //         rate = HakenMidiRate::Third;
+//     //     }
+//     // }
+// }
 
-json_t* HakenTaskInfo::toJson() const {
-    auto root = json_object();
-    json_object_set_new(root, "delay", json_real(post_delay));
-    json_object_set_new(root, "budget", json_integer(static_cast<int>(budget)));
-    //json_object_set_new(root, "midi_rate", json_integer(static_cast<int>(rate)));
-    return root;
-}
+// json_t* HakenTaskInfo::toJson() const {
+//     auto root = json_object();
+//     json_object_set_new(root, "delay", json_real(post_delay));
+//     json_object_set_new(root, "budget", json_integer(static_cast<int>(budget)));
+//     //json_object_set_new(root, "midi_rate", json_integer(static_cast<int>(rate)));
+//     return root;
+// }
 
 HakenTasks::HakenTasks()
 :   current(HakenTask::None)
@@ -88,7 +88,7 @@ HakenTasks::HakenTasks()
         HakenTaskInfo( HakenTask::HeartBeat,     TaskState::Uninitialized, 15.0f,  2.0f, true ),
         HakenTaskInfo( HakenTask::Updates,       TaskState::Uninitialized,  1.0f,  0.0f, false ),
         HakenTaskInfo( HakenTask::PresetInfo,    TaskState::Uninitialized,  2.0f,  4.0f, false ),
-        HakenTaskInfo( HakenTask::LastPreset,    TaskState::Unscheduled,    2.0f,  4.0f, false ),
+        HakenTaskInfo( HakenTask::LastPreset,    TaskState::Uninitialized,  2.0f,  4.0f, false ),
         HakenTaskInfo( HakenTask::SyncDevices,   TaskState::Uninitialized, 30.0f,  0.0f, true ),
     };
 }
@@ -128,19 +128,19 @@ HakenTaskInfo * HakenTasks::get_task(HakenTask id)
         return nullptr;
     }
 }
-void HakenTasks::toJson(json_t* root)
-{
-    for (const HakenTaskInfo& task: tasks) {
-        json_object_set_new(root, TaskKey(task.id), task.toJson());
-    }
-}
+// void HakenTasks::toJson(json_t* root)
+// {
+//     for (const HakenTaskInfo& task: tasks) {
+//         json_object_set_new(root, TaskKey(task.id), task.toJson());
+//     }
+// }
 
-void HakenTasks::fromJson(json_t* root)
-{
-    for (HakenTaskInfo& task: tasks) {
-        task.fromJson(json_object_get(root, TaskKey(task.id)));
-    }
-}
+// void HakenTasks::fromJson(json_t* root)
+// {
+//     for (HakenTaskInfo& task: tasks) {
+//         task.fromJson(json_object_get(root, TaskKey(task.id)));
+//     }
+// }
 
 void HakenTasks::refresh()
 {
@@ -370,12 +370,14 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::LastPreset:
-            if (chem->isHakenConnected()) {
-                // TODO
-                //chem->midilog.logMessage("CHEM", "Starting task LastPreset");
-                task->done();
+            if (chem->isHakenConnected() 
+                && chem->restore_last_preset
+                && !chem->last_preset.empty()) 
+            {
+                chem->logMessage("CHEM", "Starting task LastPreset");
+                task->pend();
+                chem->haken_midi.select_preset(chem->last_preset.id);
                 notifyChange(HakenTask::LastPreset);
-                current = next_task(current);
             } else {
                 task->not_applicable();
                 notifyChange(current);

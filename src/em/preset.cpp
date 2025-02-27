@@ -3,14 +3,18 @@
 
 namespace pachde {
 
-json_t* PresetDescription::toJson()
+json_t* PresetDescription::toJson(bool include_id, bool include_name, bool include_text)
 {
     json_t* root = json_object();
-    json_object_set_new(root, "hi", json_integer(id.bank_hi()));
-    json_object_set_new(root, "lo", json_integer(id.bank_lo()));
-    json_object_set_new(root, "num", json_integer(id.number()));
-    json_object_set_new(root, "name", json_stringn(name.c_str(), name.size()));
-    if (text.size()) {
+    if (include_id) {
+        json_object_set_new(root, "hi", json_integer(id.bank_hi()));
+        json_object_set_new(root, "lo", json_integer(id.bank_lo()));
+        json_object_set_new(root, "num", json_integer(id.number()));
+    }
+    if (include_name) {
+        json_object_set_new(root, "name", json_stringn(name.c_str(), name.size()));
+    }
+    if (include_text && text.size()) {
         json_object_set_new(root, "text", json_stringn(text.c_str(), text.size()));
     }
     return root;

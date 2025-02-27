@@ -21,6 +21,7 @@ const PackedColor NoColor = 0;
 bool isVisibleColor(PackedColor co);
 PackedColor applyOpacity(PackedColor color, float alpha);
 std::string hex_string(PackedColor co);
+constexpr const PackedColor OPAQUE_BLACK = 255 << 24; // returned for errors (maybe this should be NoColor, or just something obnoxious)
 
 enum Severity { Info, Warn, Error, Critical };
 const char * SeverityName(Severity sev);
@@ -49,23 +50,27 @@ enum ErrorCode {
 // optional logging callback function you provide.
 typedef std::function<void(Severity severity, ErrorCode code, std::string info)> LogCallback;
 
+const float NoOffset = std::nanf("");
+
 struct GradientStop {
-    int index = -1;
-    float offset = 0.f;
-    PackedColor color = 0;
+    int index;
+    float offset;
+    PackedColor color;
  
-    GradientStop() {}
-    GradientStop(int i, float off, PackedColor co)  : index(i), offset(off), color(co) {}
+    GradientStop()  : index(-1), offset(NoOffset), color(OPAQUE_BLACK) {}
+    //GradientStop(int index, float offset, PackedColor color) : index(index), offset(offset), color(color) {}
+    bool hasIndex() const { return index >= 0; }
+    bool hasOffset() const { return !isnanf(offset); }
 };
 
 struct Gradient {
-    int nstops = 0;
+    int nstops{0};
     GradientStop stops[2];
 };
 
 enum class PaintKind { Unset, Color, Gradient, None };
 class Paint {
-    PaintKind kind = PaintKind::Unset;
+    PaintKind kind{PaintKind::Unset};
     union {
         PackedColor color;
         Gradient gradient;

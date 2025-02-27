@@ -15,7 +15,8 @@ CoreModule::CoreModule() :
     is_busy(false),
     is_logging(false),
     in_reboot(false),
-    heartbeat(false)
+    heartbeat(false),
+    restore_last_preset(false)
 {
     em_event_mask = EME::LoopDetect
         + EME::EditorReply 
@@ -288,6 +289,15 @@ void CoreModule::dataFromJson(json_t* root)
         is_logging = json_boolean_value(j);
     }
     enable_logging(is_logging);
+
+    j = json_object_get(root, "restore-preset");
+    if (j) {
+        restore_last_preset = json_boolean_value(j);
+    }
+    j = json_object_get(root, "last-preset");
+    if (j) {
+        last_preset.fromJson(j);
+    }
 }
 
 json_t* CoreModule::dataToJson()
@@ -297,6 +307,10 @@ json_t* CoreModule::dataToJson()
     json_object_set_new(root, "controller-1", json_string(controller1.getClaim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.getClaim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging));
+    json_object_set_new(root, "restore-preset", json_boolean(restore_last_preset));
+    if (!last_preset.empty()) {
+        json_object_set_new(root, "last-preset", last_preset.toJson(true, true, false));
+    }
     return root;
 }
 

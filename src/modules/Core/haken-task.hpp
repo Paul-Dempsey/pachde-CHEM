@@ -94,8 +94,8 @@ struct HakenTaskInfo
     void not_applicable() { state = TaskState::NotApplicable;}
     void fail() { state = TaskState::Broken; }
 
-    void fromJson(json_t* root);
-    json_t* toJson() const;
+    //void fromJson(json_t* root);
+    //json_t* toJson() const;
 };
 
 struct HakenTasks
@@ -117,8 +117,8 @@ struct HakenTasks
     bool process_task_timing(const rack::Module::ProcessArgs& args, HakenTaskInfo* task);
 
     void complete_task(HakenTask id);
-    void toJson(json_t* root);
-    void fromJson(json_t* root);
+    //void toJson(json_t* root);
+    //void fromJson(json_t* root);
     void process(const rack::Module::ProcessArgs& args);
 };
 
