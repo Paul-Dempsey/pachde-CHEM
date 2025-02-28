@@ -99,7 +99,7 @@ MacroUi::MacroUi(MacroModule *module) :
     x += INPUT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= M6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, co_port, theme_engine, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, i));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         x += INPUT_DX;

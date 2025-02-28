@@ -306,15 +306,15 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::MidiDevice:
-            chem->logMessage("CHEM", "Starting task MidiDevice");
-            if (chem->isHakenConnected()) {
+            chem->log_message("CHEM", "Starting task MidiDevice");
+            if (chem->is_haken_connected()) {
                 task->done();
                 notifyChange(HakenTask::MidiDevice);
                 current = next_task(current);
             } else {
                 auto broker = MidiDeviceBroker::get();
                 broker->sync();
-                if (chem->isHakenConnected()) {
+                if (chem->is_haken_connected()) {
                     task->done();
                 } else if (broker->bindAvailableEm(&chem->haken_device)) {
                     task->done();
@@ -327,8 +327,8 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::HeartBeat:
-            if (chem->isHakenConnected()){
-                chem->logMessage("CHEM", "Starting task Heartbeat");
+            if (chem->is_haken_connected()){
+                chem->log_message("CHEM", "Starting task Heartbeat");
                 chem->haken_midi.editor_present();
                 chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 task->pend();
@@ -341,8 +341,8 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::Updates:
-            if (chem->isHakenConnected()) {
-                chem->logMessage("CHEM", "Starting task Updates");
+            if (chem->is_haken_connected()) {
+                chem->log_message("CHEM", "Starting task Updates");
                 chem->haken_midi.request_updates();
                 // chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 task->done();
@@ -356,8 +356,8 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::PresetInfo:
-            if (chem->isHakenConnected()) {
-                chem->logMessage("CHEM", "Starting task PresetInfo");
+            if (chem->is_haken_connected()) {
+                chem->log_message("CHEM", "Starting task PresetInfo");
                 task->pend();
                 chem->haken_midi.request_configuration();
                 //chem->haken_midi_out.dispatch(DISPATCH_NOW);
@@ -370,11 +370,11 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             break;
 
         case HakenTask::LastPreset:
-            if (chem->isHakenConnected() 
+            if (chem->is_haken_connected() 
                 && chem->restore_last_preset
                 && !chem->last_preset.empty()) 
             {
-                chem->logMessage("CHEM", "Starting task LastPreset");
+                chem->log_message("CHEM", "Starting task LastPreset");
                 task->pend();
                 chem->haken_midi.select_preset(chem->last_preset.id);
                 notifyChange(HakenTask::LastPreset);
@@ -388,7 +388,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
         case HakenTask::SyncDevices: {
             auto broker = ModuleBroker::get();
             if (broker->is_primary(chem)) {
-                chem->logMessage("CHEM", "Task SyncDevices");
+                chem->log_message("CHEM", "Task SyncDevices");
                 MidiDeviceBroker::get()->sync();
                 task->done();
                 notifyChange(HakenTask::SyncDevices);

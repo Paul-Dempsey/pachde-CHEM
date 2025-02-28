@@ -76,24 +76,24 @@ PreUi::PreUi(PreModule *module) :
     addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, PreModule::P_ATTENUVERT, theme_engine, theme));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35, "LVL", theme_engine, theme, S::in_port_label));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "MIX", theme_engine, theme, S::in_port_label));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
     
     // footer

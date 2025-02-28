@@ -3,6 +3,8 @@ namespace pachde {
 namespace style {
 
 const char * const NotConnected = "[not connected]";
+const char * const InputColorKey = "in-ring";
+const char * const OutputColorKey = "out-ring";
 
 LabelStyle warning_label      {"warning",    TextAlignment::Left,      9.f, false};
 LabelStyle haken_label        {"dytext",     TextAlignment::Left,     10.f, false};

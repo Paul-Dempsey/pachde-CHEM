@@ -19,6 +19,6 @@ void ThemeColorPort::draw(const DrawArgs& args)
     if (pachde::isColorTransparent(ring)) {
         return;
     }
-    OpenCircle(args.vg, 8, 8, 4.0f, ring, 2.0f);
+    OpenCircle(args.vg, 8, 8, 4.0f, ring, ring_width);
 }
 }

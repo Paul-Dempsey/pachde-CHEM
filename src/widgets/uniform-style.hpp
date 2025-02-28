@@ -32,5 +32,7 @@ extern pachde::LabelStyle heading_label; // "ctl-label" 16px Center bold
 extern pachde::LabelStyle pedal_label;   // "ped-assign" 9px Lext
 
 extern const char * const NotConnected;
+extern const char * const InputColorKey;
+extern const char * const OutputColorKey;
 
 }}

@@ -88,7 +88,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     x = RACK_GRID_WIDTH * 1.5f;
     y = 42;
     addChild(createLightCentered<TinySimpleLight<YellowLight>>(Vec(x, y), my_module, CoreModule::L_PULSE));
-    addChild(Center(createThemedColorOutput(Vec(RACK_GRID_WIDTH+2, RACK_GRID_HEIGHT - 50.f), my_module, CoreModule::OUT_READY, PORT_MAGENTA, theme_engine, theme)));
+    addChild(Center(createThemedColorOutput(Vec(RACK_GRID_WIDTH+2, RACK_GRID_HEIGHT - 50.f), my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA, theme_engine, theme)));
 
     style.key = "brand";
     style.align = TextAlignment::Center;
@@ -146,14 +146,18 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     controller1_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
     addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
         Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
-
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+        Vec(155.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
+    
     y += PICKER_INTERVAL;
     controller2_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
     addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
         Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
-
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+        Vec(155.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));
+    
     float x = 18.f;
-    y = PICKER_TOP - 16.f;
+    y = PICKER_TOP - 18.f;
     auto w = Center(createThemedButton<SmallRoundButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(Ctrl+Click to clear)"));
     if (my_module) {
         w->setHandler([=](bool ctrl, bool shift) {
@@ -466,14 +470,14 @@ void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
     drawDotHalo(args.vg, x, y, co, halo);
 
     y += PICKER_INTERVAL;
-    if (my_module->isController1Connected()) {
+    if (my_module->is_controller_1_connected()) {
         co = themeColor(ThemeColor::coC1MidiIn);
         x = midi_animation_cx(my_module->controller1_midi_in.count());
         drawDotHalo(args.vg, x, y, co, halo);
     }
 
     y += PICKER_INTERVAL;
-    if (my_module->isController2Connected()) {
+    if (my_module->is_controller_2_connected()) {
         co = themeColor(ThemeColor::coC2MidiIn);
         x = midi_animation_cx(my_module->controller2_midi_in.count());
         drawDotHalo(args.vg, x, y, co, halo);
@@ -481,7 +485,7 @@ void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
 }
 
 bool connected (CoreModule* core) {
-    return core ? core->isHakenConnected() : false;
+    return core ? core->is_haken_connected() : false;
 }
 
 void CoreModuleWidget::drawLayer(const DrawArgs& args, int layer)

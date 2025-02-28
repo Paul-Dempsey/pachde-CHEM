@@ -7,6 +7,55 @@ using namespace ::rack;
 
 namespace pachde {
 
+inline bool is_note_cc(uint8_t cc)
+{
+    switch (cc) {
+    case Haken::ccMod:
+    case Haken::ccBreath:
+    case Haken::ccUndef:
+    case Haken::ccVol:
+    case Haken::ccExpres:
+    case Haken::ccBrightness:
+    case Haken::ccFrac:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool is_music_message(PackedMidiMessage msg)
+{
+    switch (msg.bytes.status_byte) {
+    case Haken::ccStat1:
+    case Haken::ccStat2:
+        if (is_note_cc(midi_cc(msg))) {
+            return true;
+        }
+        break;
+
+    // no program change
+    case Haken::progChg1:
+    case Haken::progChg2:
+    case Haken::progChg16:
+    // no cc on ch16
+    case Haken::ccStat16:
+        return false;
+
+    default:
+        break;
+    }
+    return true;
+}
+    
+
+void MidiInput::removeTarget(IDoMidi *out)
+{
+    auto it = std::find(targets.begin(), targets.end(), out);
+    if (it != targets.end()) {
+        targets.erase(it);
+    }
+}
+
 void MidiInput::setLogger(const std::string& source, MidiLog* logger) {
     source_name = source;
     log = logger;
@@ -52,7 +101,9 @@ void MidiInput::queueMessage(PackedMidiMessage msg)
 
 void MidiInput::onMessage(const midi::Message& message)
 {
-    queueMessage(packedFromRack(message));
+    auto msg = packedFromRack(message);
+    if (music_pass_filter && !is_music_message(msg)) return;
+    queueMessage(msg);
 }
 
 // ---------------------------------------------------------------------------

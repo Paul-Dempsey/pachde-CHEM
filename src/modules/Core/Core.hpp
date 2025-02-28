@@ -60,14 +60,14 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     virtual ~CoreModule();
 
     void enable_logging(bool enable);
-    void logMessage(const char *prefix, const char *info) {
+    void log_message(const char *prefix, const char *info) {
         midi_log.logMessage(prefix, info);
     }
     void logMessage(const char *prefix, const std::string& info) {
         midi_log.logMessage(prefix, info);
     }
 
-    ChemDevice DeviceIdentifier(const MidiDeviceHolder* holder)
+    ChemDevice device_identifier(const MidiDeviceHolder* holder)
     {
         if (holder == &haken_device) return ChemDevice::Haken;
         if (holder == &controller1) return ChemDevice::Midi1;
@@ -75,9 +75,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return ChemDevice::Unknown;
     }
 
-    bool isHakenConnected() { return (haken_midi_out.output.deviceId != -1) && (nullptr != haken_device.connection); }
-    bool isController1Connected() { return (-1 != controller1_midi_in.deviceId) && (nullptr != controller1.connection); }
-    bool isController2Connected() { return (-1 != controller2_midi_in.deviceId) && (nullptr != controller2.connection); }
+    bool is_haken_connected() { return (haken_midi_out.output.deviceId >= 0) && (nullptr != haken_device.connection); }
+    bool is_controller_1_connected() { return (controller1_midi_in.deviceId >= 0) && (nullptr != controller1.connection); }
+    bool is_controller_2_connected() { return (controller2_midi_in.deviceId >= 0) && (nullptr != controller2.connection); }
 
     void reboot();
     void send_midi_rate(HakenMidiRate rate);
@@ -130,10 +130,12 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // ----  Rack  ------------------------------------------
 
     enum Params {
-       NUM_PARAMS
+        P_C1_MUSIC_FILTER,
+        P_C2_MUSIC_FILTER,
+        NUM_PARAMS
     };
     enum Inputs {
-       NUM_INPUTS
+        NUM_INPUTS
     };
     enum Outputs {
         OUT_READY,
@@ -146,14 +148,16 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_ROUND,
         L_ROUND_RELEASE,
         L_PULSE,
-        //L_LED,
+        L_C1_MUSIC_FILTER,
+        L_C2_MUSIC_FILTER,
         NUM_LIGHTS
     };
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    void processLights(const ProcessArgs &args);
+    void process_params(const ProcessArgs &args);
+    void process_lights(const ProcessArgs &args);
     void process(const ProcessArgs &args) override;
 };
 

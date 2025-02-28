@@ -27,6 +27,10 @@ CoreModule::CoreModule() :
         + EME::SystemComplete;
 
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+
+    configSwitch(Params::P_C1_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
+    configSwitch(Params::P_C2_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
+
     configLight(L_READY, "Haken device ready");
     configLight(L_ROUND_Y, "Round on Y");
     configLight(L_ROUND_INITIAL, "Round initial");
@@ -216,7 +220,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     getLight(L_PULSE).setBrightnessSmooth(0.f, 10 * sample_time);
     getLight(L_READY).setBrightnessSmooth(0.f, 20 * sample_time);
 
-    auto id = DeviceIdentifier(source);
+    auto id = device_identifier(source);
     switch (id) {
     case ChemDevice::Haken: {
         em.ready = false; // todo clear?
@@ -228,11 +232,11 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.setDeviceId(source->connection->output_device_id);
             haken_midi_out.output.channel = -1;
 
-            logMessage("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
             haken_midi.editor_present();
             haken_midi_out.dispatch(DISPATCH_NOW);
         } else {
-            logMessage("Core", "--- disconnect HAKEN");
+            log_message("Core", "--- disconnect HAKEN");
             haken_midi_in.reset();
             haken_midi_out.output.reset();
             haken_midi_out.output.channel = -1;
@@ -244,9 +248,11 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi1:
         if (source->connection) {
-            logMessage("Core", format_string("+++ connect MIDI1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            logMessage("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            controller1_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
+            getParam(P_C1_MUSIC_FILTER).setValue(controller1_midi_in.music_pass_filter);
         } else {
-            logMessage("Core", "--- disconnect Midi1");
+            log_message("Core", "--- disconnect Midi 1");
         }
         HandleMidiDeviceChange(&controller1_midi_in, source);
         notify_connection_changed(ChemDevice::Midi1, source->connection);
@@ -254,9 +260,11 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi2:
         if (source->connection) {
-            logMessage("Core", format_string("+++ connect MIDI2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            logMessage("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            controller2_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
+            getParam(P_C2_MUSIC_FILTER).setValue(controller2_midi_in.music_pass_filter);
         } else {
-            logMessage("Core", "--- disconnect Midi2");
+            log_message("Core", "--- disconnect Midi 2");
         }
         HandleMidiDeviceChange(&controller2_midi_in, source);
         notify_connection_changed(ChemDevice::Midi2, source->connection);
@@ -360,7 +368,9 @@ std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice dev
 }
 
 constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 48;
-void CoreModule::processLights(const ProcessArgs &args)
+constexpr const uint64_t PROCESS_PARAM_INTERVAL = 47;
+
+void CoreModule::process_lights(const ProcessArgs &args)
 {
     getLight(L_READY).setBrightnessSmooth(em.ready ? 1.0f : 0.f, args.sampleTime * 20);
 
@@ -372,6 +382,26 @@ void CoreModule::processLights(const ProcessArgs &args)
     getLight(Lights::L_ROUND_INITIAL).setBrightness(1.0f * initial);
     getLight(Lights::L_ROUND).setBrightness(1.0f * round);
     getLight(Lights::L_ROUND_RELEASE).setBrightness(1.0f * (round && release));
+
+    getLight(L_C1_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C1_MUSIC_FILTER).getValue(), 45.f);
+    getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);
+}
+
+void CoreModule::process_params(const ProcessArgs &args)
+{
+    if (is_controller_1_connected()) {
+        controller1_midi_in.setMusicPassFilter(getParamInt(getParam(P_C1_MUSIC_FILTER)));
+    } else {
+        controller1_midi_in.setMusicPassFilter(false);
+        getParam(P_C1_MUSIC_FILTER).setValue(0.f);
+    }
+
+    if (is_controller_2_connected()) {
+        controller2_midi_in.setMusicPassFilter(getParamInt(getParam(P_C2_MUSIC_FILTER)));
+    } else {
+        controller2_midi_in.setMusicPassFilter(false);
+        getParam(P_C2_MUSIC_FILTER).setValue(0.f);
+    }
 }
 
 void CoreModule::process(const ProcessArgs &args)
@@ -393,12 +423,15 @@ void CoreModule::process(const ProcessArgs &args)
     if (!haken_midi_out.pending()) {
         tasks.process(args);
     }
-
+    
     if (getOutput(OUT_READY).isConnected()) {
         getOutput(OUT_READY).setVoltage(em.ready ? 10.0f : 0.0f);
     }
+    if (0 == ((args.frame + id) % PROCESS_PARAM_INTERVAL)) {
+        process_params(args);
+    }
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
-        processLights(args);
+        process_lights(args);
     }
 }
 

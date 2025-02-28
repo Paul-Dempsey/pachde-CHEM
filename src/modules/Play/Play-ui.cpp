@@ -203,8 +203,8 @@ PlayUi::PlayUi(PlayModule *module) :
     next->applyTheme(theme_engine, theme);
     addChild(next);
 
-    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_PREV, PORT_CORN, theme_engine, theme)));
-    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_NEXT, PORT_CORN, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_PREV, S::InputColorKey, PORT_CORN, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_NEXT, S::InputColorKey, PORT_CORN, theme_engine, theme)));
 
     if (!module) {
         addChild(createWidgetCentered<WatermarkLogo>(Vec(90.f, box.size.y*.5)));

@@ -75,7 +75,7 @@ FxUi::FxUi(FxModule *module) :
     x = PORT_LEFT + S::PORT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= K_R6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, co_port, theme_engine, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
         x += S::PORT_DX;
         if (i == 2) {
@@ -87,7 +87,7 @@ FxUi::FxUi(FxModule *module) :
     x = PORT_LEFT;
     addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_ATTENUVERT, theme_engine, theme));
     y += S::PORT_DY;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
 
     // footer

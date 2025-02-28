@@ -44,6 +44,7 @@ struct MidiInput : midi::Input
     uint64_t message_count;
     MidiLog* log;
     std::string source_name;
+    bool music_pass_filter;
 
     rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
     void queueMessage(PackedMidiMessage msg);
@@ -52,18 +53,20 @@ struct MidiInput : midi::Input
     rack::dsp::Timer midi_timer;
 
     MidiInput(const MidiInput &) = delete; // no copy constructor
-    MidiInput() : message_count(0), log(nullptr) { this->channel = -1; }
+    MidiInput() : message_count(0), log(nullptr), music_pass_filter(false) { this->channel = -1; }
 
     uint64_t count() { return message_count; }
     void clear()
     {
         targets.clear(); 
         reset();
+        this->setDeviceId(-1);
         this->channel = -1;
     }
-    void addTarget(struct IDoMidi* out) { targets.push_back(out); }
+    void addTarget(IDoMidi* out) { targets.push_back(out); }
+    void removeTarget(IDoMidi* out);
     void setLogger(const std::string& source, MidiLog* logger);
-
+    void setMusicPassFilter(bool pass_music) { music_pass_filter = pass_music; }
     void onMessage(const midi::Message& message) override;
 };
 

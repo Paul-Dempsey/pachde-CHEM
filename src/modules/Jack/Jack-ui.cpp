@@ -99,11 +99,11 @@ JackUi::JackUi(JackModule *module) :
     x = CENTER;
     y = S::PORT_TOP;
 
-    addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "1", theme_engine, theme, S::in_port_label));
 
     y += S::PORT_DY;
-    addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "2", theme_engine, theme, S::in_port_label));
 
     // footer

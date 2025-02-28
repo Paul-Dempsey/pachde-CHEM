@@ -108,20 +108,20 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     auto co_port = PORT_CORN;
     y = S::PORT_TOP;
     x = CENTER - (PORT_DX + PORT_DX);
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_MIX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_PRE_MIX));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
     x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_INDEX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_INDEX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_PRE_INDEX));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "IDX", theme_engine, theme, S::in_port_label));
 
     x = CENTER + PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_MIX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_POST_MIX));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
     x += PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_INDEX, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_INDEX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_POST_INDEX));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "IDX", theme_engine, theme, S::in_port_label));
 

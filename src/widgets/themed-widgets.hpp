@@ -52,14 +52,19 @@ struct ThemePort : app::SvgPort, IApplyTheme
 
 struct ThemeColorPort : app::SvgPort,  IApplyTheme
 {
-    NVGcolor ring = nvgRGBA(0, 0, 0, 0);
+    NVGcolor ring;
+    const char* key;
+    float ring_width;
 
-    ThemeColorPort()
+    ThemeColorPort() :
+        ring(nvgRGBA(0, 0, 0, 0)),
+        key("cop-xxxx"),
+        ring_width(2.f)
     {
         this->shadow->hide();
     }
 
-    void ringColor(const NVGcolor& color) { ring = color; }
+    void ringColor(const char* key, const NVGcolor& color) { this->key = key; ring = color; }
 
     void draw(const DrawArgs& args) override;
 
@@ -67,31 +72,42 @@ struct ThemeColorPort : app::SvgPort,  IApplyTheme
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
         setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/ColorPort.svg"), theme));
+        auto style = theme->getStyle(key);
+        if (style) {
+            if (style->isApplyStroke()) {
+                ring = fromPacked(style->strokeWithOpacity());
+            } else if (style->isApplyFill()) {
+                ring = fromPacked(style->fillWithOpacity());
+            }
+            if (style->isApplyStrokeWidth()) {
+                ring_width = style->stroke_width;
+            }
+        }
         return true;
     }
 };
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorInput(math::Vec pos, engine::Module* module, int inputId, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorInput(math::Vec pos, engine::Module* module, int inputId, const char * key, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
 	o->box.pos = pos;
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::INPUT;
 	o->app::PortWidget::portId = inputId;
 	o->applyTheme(engine, theme);
-    o->ringColor(color);
+    o->ringColor(key, color);
 	return o;
 }
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorOutput(math::Vec pos, engine::Module* module, int outputId, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorOutput(math::Vec pos, engine::Module* module, int outputId, const char*  key, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
 	o->box.pos = pos;
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::OUTPUT;
 	o->app::PortWidget::portId = outputId;
 	o->applyTheme(engine, theme);
-    o->ringColor(color);
+    o->ringColor(key, color);
 	return o;
 }
 
