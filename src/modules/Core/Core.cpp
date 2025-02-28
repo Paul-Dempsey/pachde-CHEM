@@ -31,14 +31,15 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C1_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
     configSwitch(Params::P_C2_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
 
-    configLight(L_READY, "Haken device ready");
-    configLight(L_ROUND_Y, "Round on Y");
+    configLight(L_ROUND_Y,       "Round on Y");
     configLight(L_ROUND_INITIAL, "Round initial");
-    configLight(L_ROUND, "Rounding");
+    configLight(L_ROUND,         "Rounding");
     configLight(L_ROUND_RELEASE, "Round on release");
-    configLight(L_PULSE, "Loopback pulse");
+    
+    configLight(L_READY,         "Haken device ready");
+    configLight(L_PULSE,         "Loopback pulse");
 
-    configOutput(Outputs::OUT_READY, "Ready trigger");
+    configOutput(Outputs::OUT_READY, "Ready gate");
 
     ModuleBroker::get()->register_host(this);
     to_em.core = this;
@@ -275,7 +276,16 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     }
 }
 
-void CoreModule::dataFromJson(json_t* root)
+void CoreModule::onReset(const ResetEvent &e)
+{
+    midi_log.logMessage("Core", "onReset");
+    haken_device.clear();
+    controller1.clear();
+    controller2.clear();
+    reboot();
+}
+
+void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
     json_t* j;
@@ -370,7 +380,7 @@ std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice dev
 constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 48;
 constexpr const uint64_t PROCESS_PARAM_INTERVAL = 47;
 
-void CoreModule::process_lights(const ProcessArgs &args)
+void CoreModule::processLights(const ProcessArgs &args)
 {
     getLight(L_READY).setBrightnessSmooth(em.ready ? 1.0f : 0.f, args.sampleTime * 20);
 
@@ -425,13 +435,13 @@ void CoreModule::process(const ProcessArgs &args)
     }
     
     if (getOutput(OUT_READY).isConnected()) {
-        getOutput(OUT_READY).setVoltage(em.ready ? 10.0f : 0.0f);
+        getOutput(OUT_READY).setVoltage(em.ready && !host_busy() ? 10.0f : 0.0f);
     }
     if (0 == ((args.frame + id) % PROCESS_PARAM_INTERVAL)) {
         process_params(args);
     }
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
-        process_lights(args);
+        processLights(args);
     }
 }
 

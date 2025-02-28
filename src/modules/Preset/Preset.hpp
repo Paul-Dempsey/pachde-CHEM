@@ -10,7 +10,7 @@ struct PresetModule : ChemModule, IChemClient
 {
     std::string device_claim;
 
-    PresetModule() : chem_host(nullptr) {}
+    //PresetModule() : {}
     ~PresetModule() {
         if (chem_host) chem_host->unregister_chem_client(this);
     }
@@ -19,10 +19,7 @@ struct PresetModule : ChemModule, IChemClient
     json_t* dataToJson() override;
 
     // IChemClient
-    IChemHost* chem_host;
-    IChemHost* get_host() override {
-        return chem_host;
-    }
+
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
     void onConnectHost(IChemHost* host) override;

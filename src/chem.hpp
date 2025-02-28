@@ -16,9 +16,12 @@ struct ChemModule : Module, IThemeHolder
 {
     std::string theme_name;
     bool follow_rack{false};
+    IChemHost* chem_host{nullptr};
     ChemModuleWidget* chem_ui{nullptr};
 
-    virtual IChemHost* get_host() = 0;
+    virtual IChemHost* get_host() { return chem_host; };
+
+    void set_chem_host(IChemHost* host) { chem_host = host; }
     void set_chem_ui(ChemModuleWidget* ui) { chem_ui = ui; };
 
     void setThemeName(const std::string& name, void *) override;
@@ -27,6 +30,11 @@ struct ChemModule : Module, IThemeHolder
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 };
+
+
+enum class LeftRight: uint8_t { Left, Right };
+inline bool left(LeftRight lr) { return LeftRight::Left == lr; }
+inline bool right(LeftRight lr) { return LeftRight::Right == lr; }
 
 struct ChemModuleWidget : ModuleWidget, IThemeHolder
 {
@@ -47,7 +55,7 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
         return module ? getChemModule()->getThemeName() : ::rack::settings::preferDarkPanels ? "Dark": "Light";
     }
 
-    void set_extender_theme(bool left, const std::string& name);
+    void set_extender_theme(LeftRight which, const std::string& name);
 
     void setThemeName(const std::string& name, void *context) override;
 

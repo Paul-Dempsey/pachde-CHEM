@@ -9,7 +9,6 @@ CoreModuleWidget::~CoreModuleWidget()
     if (my_module) {
         my_module->em.unsubscribeEMEvents(this);
         my_module->tasks.unsubscribeChange(this);
-        my_module->ui = nullptr;
     }
     if (chem_host) {
         chem_host->unregister_chem_client(this);
@@ -35,7 +34,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     setModule(module);
 
     if (my_module) {
-        my_module->ui = this;
+        my_module->set_chem_ui(this);
     }
 
     em_event_mask = EME::LoopDetect

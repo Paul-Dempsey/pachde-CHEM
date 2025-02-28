@@ -16,8 +16,7 @@ struct FxUi;
 struct FxModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    IChemHost* chem_host;
-    FxUi* ui;
+    FxUi* ui() { return reinterpret_cast<FxUi*>(chem_ui); };
 
     int last_disable;
     bool glow_knobs;
@@ -28,9 +27,7 @@ struct FxModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
-    IChemHost* get_host() override {
-        return chem_host;
-    }
+
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;

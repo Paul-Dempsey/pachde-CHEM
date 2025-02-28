@@ -15,6 +15,8 @@ struct MacroUi;
 
 struct MacroModule : ChemModule, IChemClient
 {
+    MacroUi* ui() { return reinterpret_cast<MacroUi*>(chem_ui); }
+
     enum Params {
         P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
         P_ATTENUVERT,
@@ -39,8 +41,6 @@ struct MacroModule : ChemModule, IChemClient
     };
 
     std::string device_claim;
-    IChemHost* chem_host;
-    MacroUi* ui;
 
     int attenuator_target;
     int last_attenuator_target;
@@ -115,7 +115,6 @@ struct MacroUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
 
     MacroUi(MacroModule *module);
-    ~MacroUi();
     bool connected();
     void glowing_knobs(bool glow);
 

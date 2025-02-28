@@ -16,8 +16,7 @@ struct PreUi;
 struct PreModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    IChemHost* chem_host;
-    PreUi* ui;
+    PreUi* ui() { return reinterpret_cast<PreUi*>(chem_ui); }
 
     int last_select;
     bool glow_knobs;
@@ -27,10 +26,6 @@ struct PreModule : ChemModule, IChemClient
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
-    }
-
-    IChemHost* get_host() override {
-        return chem_host;
     }
 
     // IChemClient

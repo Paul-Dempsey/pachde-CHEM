@@ -16,8 +16,7 @@ struct JackUi;
 struct JackModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    IChemHost* chem_host;
-    JackUi* ui;
+    JackUi* ui() { return reinterpret_cast<JackUi*>(chem_ui); }
 
     bool glow_knobs;
     bool host_connection;
@@ -31,9 +30,7 @@ struct JackModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
-    IChemHost* get_host() override {
-        return chem_host;
-    }
+
     bool connected() { return chem_host && host_connection; }
 
     // IChemClient

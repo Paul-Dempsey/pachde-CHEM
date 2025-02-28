@@ -30,8 +30,7 @@ struct ConvoUi;
 struct ConvoModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    IChemHost* chem_host;
-    ConvoUi* ui;
+    ConvoUi* ui() { return reinterpret_cast<ConvoUi*>(chem_ui); };
 
     bool glow_knobs;
 
@@ -58,10 +57,6 @@ struct ConvoModule : ChemModule, IChemClient
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
-    }
-
-    IChemHost* get_host() override {
-        return chem_host;
     }
 
     // IChemClient

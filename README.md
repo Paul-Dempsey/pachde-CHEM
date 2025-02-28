@@ -13,12 +13,12 @@ Read the [Documentation](./doc/index.md) for information on **#d CHEM**.
 
 ## Acknowledgements
 
-Special thanks to Lippold Haken (and the Haken Audio team), for creating the Continuum.
+Special thanks to Lippold Haken (and the Haken Audio team), for creating the Continuum family of devices.
 Lippold personally has provided generous support by sharing internal technical details that make this software possible.
 
-Special thanks to Richard Kram for stellar docs, testing, and encouragement.
+Special thanks to Richard Kram for encouragement, stellar docs, and testing.
 
-# Appreciation
+## Appreciation
 
 The pachde line of software for Eagan Matrix devices is a labor of love. The products are free to use.
 Creating them requires an large investment of time and $$.
@@ -33,7 +33,8 @@ Thank you!
 
 This repo is nominally MIT-licensed.
 
-If you make a derivative work using this source code for profit, a contribution back to the author would be appreciated. Even though the license does not create a legal obligation to do so, it's just the right thing to do.
+If you make a derivative work using this source code for profit, a contribution back to the author would be appreciated so that this kind of work can continue.
+Even though the license does not create a legal obligation to do so, it's just the right thing to do.
 
 All graphics and documentation are Copyright (c) Paul Chase Dempsey.
 

@@ -2,9 +2,7 @@
 using namespace pachde;
 
 ConvoModule::ConvoModule()
-:   chem_host(nullptr),
-    ui(nullptr),
-    glow_knobs(false),
+:   glow_knobs(false),
     conv_number(0),
     last_conv(-1),
     extend(false)
@@ -92,24 +90,24 @@ void ConvoModule::onConnectHost(IChemHost* host)
     chem_host = host;
     if (!host) {
         device_claim = "";
-        if (ui) ui->onConnectHost(nullptr);
+        if (chem_ui) ui()->onConnectHost(nullptr);
         return;
     }
     auto conn = chem_host->host_connection(ChemDevice::Haken);
     if (conn) {
         device_claim = conn->info.claim();
     }
-    if (ui) ui->onConnectHost(host);
+    if (chem_ui) ui()->onConnectHost(host);
 }
 
 void ConvoModule::onPresetChange()
 {
-    if (ui) ui->onPresetChange();
+    if (chem_ui) ui()->onPresetChange();
 }
 
 void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (ui) ui->onConnectionChange(device, connection);
+    if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
 void ConvoModule::process_params(const ProcessArgs& args)

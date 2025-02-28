@@ -18,27 +18,27 @@ struct PlayUi;
 struct PlayModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    IChemHost* chem_host;
-    PlayUi* ui;
-
+    
+    rack::dsp::SchmittTrigger prev_trigger;
+    rack::dsp::SchmittTrigger next_trigger;
+    
     std::string playlist_folder;
     std::string playlist_file;
     std::deque<std::string> playlist_mru;
     bool track_live;
-
+    
     PlayModule();
     ~PlayModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
     }
+    
+    PlayUi* ui() { return reinterpret_cast<PlayUi*>(chem_ui); }
 
     void update_mru(std::string path);
     void clear_mru() { playlist_mru.clear(); }
 
-    IChemHost* get_host() override {
-        return chem_host;
-    }
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
@@ -66,7 +66,7 @@ struct PlayModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    //void process(const ProcessArgs& args) override;
+    void process(const ProcessArgs& args) override;
 };
 
 // -- Play UI -----------------------------------
@@ -94,7 +94,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 
     EmHandler* em_handler{nullptr};
     bool gather{false};
-
+    bool pending_device_check{false};
     bool modified{false};
     void set_modified(bool schmutz) {
         modified = schmutz;
@@ -188,7 +188,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void setThemeName(const std::string& name, void * context) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;
-    //void step() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

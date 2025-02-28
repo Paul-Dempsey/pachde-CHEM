@@ -224,7 +224,6 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(link_button);
 
     if (my_module) {
-        my_module->ui = this;
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
         if (!my_module->playlist_file.empty()) {
@@ -888,6 +887,7 @@ void PlayUi::check_playlist_device()
 {
     if (!connected() || playlist_device.empty()) {
         warning_label->text("");
+        pending_device_check = false;
         return;
     }
     if (chem_host) {
@@ -899,6 +899,9 @@ void PlayUi::check_playlist_device()
             } else {
                 warning_label->text("");
             }
+            pending_device_check = false;
+        } else {
+            warning_label->text("");
         }
     }
 }
@@ -1132,11 +1135,13 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
     Base::onHoverKey(e);
 }
 
-// void PlayUi::step()
-// {
-//     Base::step();
-    
-// }
+void PlayUi::step()
+{
+    Base::step();
+    if (pending_device_check) {
+        check_playlist_device();
+    }
+}
 
 void PlayUi::draw(const DrawArgs& args)
 {

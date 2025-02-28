@@ -3,9 +3,7 @@
 using namespace pachde;
 
 MacroModule::MacroModule()
-:   chem_host(nullptr),
-    ui(nullptr),
-    attenuator_target(IN_INVALID),
+:   attenuator_target(IN_INVALID),
     last_attenuator_target(IN_INVALID),
     glow_knobs(false)
 {
@@ -64,14 +62,14 @@ void MacroModule::onConnectHost(IChemHost* host)
     chem_host = host;
     if (!host) {
         device_claim = "";
-        if (ui) ui->onConnectHost(nullptr);
+        if (chem_ui) ui()->onConnectHost(nullptr);
         return;
     }
     auto conn = chem_host->host_connection(ChemDevice::Haken);
     if (conn) {
         device_claim = conn->info.claim();
     }
-    if (ui) ui->onConnectHost(host);
+    if (chem_ui) ui()->onConnectHost(host);
 }
 
 void MacroModule::onPresetChange()
@@ -85,12 +83,12 @@ void MacroModule::onPresetChange()
             update_from_em();
         }
     }
-    if (ui) ui->onPresetChange();
+    if (chem_ui) ui()->onPresetChange();
 }
 
 void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (ui) ui->onConnectionChange(device, connection);
+    if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
 void MacroModule::onPortChange(const PortChangeEvent& e)

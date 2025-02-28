@@ -25,7 +25,7 @@ struct RelayMidiToEM : IDoMidi
 
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents
 {
-    CoreModuleWidget* ui = nullptr;
+    CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
 
     MidiDeviceHolder haken_device;
     MidiDeviceHolder controller1;
@@ -153,11 +153,23 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         NUM_LIGHTS
     };
 
+    //virtual void onAdd(const AddEvent& e) override;
+    //virtual void onRemove(const RemoveEvent& e) override;
+    //virtual void onBypass(const BypassEvent& e) override;
+    //virtual void onUnBypass(const UnBypassEvent& e) override;
+    //virtual void onPortChange(const PortChangeEvent& e) override;
+    //virtual void onSampleRateChange(const SampleRateChangeEvent& e) override;
+    //virtual void onExpanderChange(const ExpanderChangeEvent& e) override;
+    virtual void onReset(const ResetEvent& e) override;
+    //virtual void onSetMaster(const SetMasterEvent& e) override;
+    //virtual void onRandomize(const RandomizeEvent& e) override;
+    //virtual void onSave(const SaveEvent& e) override;
+
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
     void process_params(const ProcessArgs &args);
-    void process_lights(const ProcessArgs &args);
+    void processLights(const ProcessArgs &args);
     void process(const ProcessArgs &args) override;
 };
 

@@ -25,7 +25,6 @@ void ChemModule::dataFromJson(json_t* root)
     if (j) {
         follow_rack = json_boolean_value(j);
     }
-
 }
 
 json_t* ChemModule::dataToJson()
@@ -40,14 +39,14 @@ json_t* ChemModule::dataToJson()
 // UI
 //
 
-void ChemModuleWidget::set_extender_theme(bool left, const std::string& name)
+void ChemModuleWidget::set_extender_theme(LeftRight which, const std::string& name)
 {
-    auto expander = left ? module->getLeftExpander().module : module->getRightExpander().module;
+    auto expander = left(which) ? module->getLeftExpander().module : module->getRightExpander().module;
     if (isPeerModule(module, expander)) {
         auto chem = static_cast<ChemModule*>(expander);
         if (chem->chem_ui) {
             chem->chem_ui->setThemeName(name, nullptr);
-            chem->chem_ui->set_extender_theme(left, name);
+            chem->chem_ui->set_extender_theme(which, name);
         }
     }
 }
@@ -72,8 +71,8 @@ void ChemModuleWidget::setThemeName(const std::string& name, void *context)
     sendDirty(this);
 
     if (context == this) {
-        set_extender_theme(true, name);
-        set_extender_theme(false, name);
+        set_extender_theme(LeftRight::Left, name);
+        set_extender_theme(LeftRight::Right, name);
     }
 }
 
@@ -170,15 +169,6 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     AppendThemeMenu(menu, this, theme_engine, follow, this);
 
     menu->addChild(new MenuSeparator);
-    // menu->addChild(createCheckMenuItem("Sync theme with expanders", "",
-    //     [=](){ return sync; },
-    //     [=](){
-    //         auto chem = getChemModule();
-    //         chem->sync_theme = !sync;
-    //         if (chem->sync_theme) {
-    //             this->setThemeName(getThemeName());
-    //         }
-    //     }));
     menu->addChild(createCheckMenuItem("Follow Rack theme", "",
         [=](){ return follow; },
         [=](){

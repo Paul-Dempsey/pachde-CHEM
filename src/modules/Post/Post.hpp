@@ -45,8 +45,7 @@ struct PostModule : ChemModule, IChemClient
     };
 
     std::string device_claim;
-    IChemHost* chem_host;
-    PostUi* ui;
+    PostUi* ui() { return reinterpret_cast<PostUi*>(chem_ui); };
 
     bool glow_knobs;
     bool muted;
@@ -61,9 +60,6 @@ struct PostModule : ChemModule, IChemClient
         }
     }
 
-    IChemHost* get_host() override {
-        return chem_host;
-    }
     bool connected();
 
     // IChemClient

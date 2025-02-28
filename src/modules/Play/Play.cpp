@@ -4,9 +4,7 @@ using namespace pachde;
 namespace fs = ghc::filesystem;
 
 PlayModule::PlayModule()
-:   chem_host(nullptr),
-    ui(nullptr),
-    track_live(false)
+:   track_live(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configInput(IN_PRESET_PREV, "Previous preset trigger");
@@ -91,30 +89,49 @@ void PlayModule::onConnectHost(IChemHost* host)
     chem_host = host;
     if (!host) {
         device_claim = "";
-        if (ui) ui->onConnectHost(nullptr);
+        if (chem_ui) ui()->onConnectHost(nullptr);
         return;
     }
     auto conn = chem_host->host_connection(ChemDevice::Haken);
     if (conn) {
         device_claim = conn->info.claim();
     }
-    if (ui) ui->onConnectHost(host);
+    if (chem_ui) ui()->onConnectHost(host);
 }
 
 void PlayModule::onPresetChange()
 {
-    if (ui) ui->onPresetChange();
+    if (chem_ui) ui()->onPresetChange();
 }
 
 void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (ui) ui->onConnectionChange(device, connection);
+    if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-// void PlayModule::process(const ProcessArgs& args)
-// {
-//     //if (!chem_host || chem_host->host_busy()) return;
-// }
+void PlayModule::process(const ProcessArgs& args)
+{
+    if (!chem_host || chem_host->host_busy() || !ui()) return;
+
+    if (ui()->preset_count()) {
+        auto prev_in = getInput(Inputs::IN_PRESET_PREV);
+        if (prev_in.isConnected()) {
+            auto v = prev_in.getVoltage();
+            if (prev_trigger.process(v, 0.1f, 5.f)) {
+                prev_trigger.reset();
+                ui()->prev_preset();
+            }
+        }
+        auto next_in = getInput(Inputs::IN_PRESET_NEXT);
+        if (next_in.isConnected()) {
+            auto v = next_in.getVoltage();
+            if (next_trigger.process(v, 0.1f, 5.f)) {
+                next_trigger.reset();
+                ui()->next_preset();
+            }
+        }
+    }
+}
 
 Model *modelPlay = createModel<PlayModule, PlayUi>("chem-play");
 

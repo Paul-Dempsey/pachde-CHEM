@@ -18,13 +18,6 @@ bool MacroUi::connected()
     return true;
 }
 
-MacroUi::~MacroUi()
-{
-    if (my_module) {
-        my_module->ui = nullptr;
-    }
-}
-
 using MM = MacroModule;
 constexpr const float PANEL_WIDTH = 120.f;
 constexpr const float CENTER = PANEL_WIDTH * .5f;
@@ -152,7 +145,6 @@ MacroUi::MacroUi(MacroModule *module) :
     }
 
     if (my_module) {
-        my_module->ui = this;
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }

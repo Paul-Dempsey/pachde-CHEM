@@ -42,9 +42,7 @@ uint8_t index_to_pedal_cc(int index) {
 }
 
 JackModule::JackModule()
-:   chem_host(nullptr),
-    ui(nullptr),
-    glow_knobs(false),
+:   glow_knobs(false),
     host_connection(false),
     last_assign_1(-1),
     last_assign_2(-1),
@@ -132,26 +130,26 @@ void JackModule::onConnectHost(IChemHost* host)
     chem_host = host;
     if (!host) {
         device_claim = "";
-        if (ui) ui->onConnectHost(nullptr);
+        if (chem_ui) ui()->onConnectHost(nullptr);
         return;
     }
     auto conn = chem_host->host_connection(ChemDevice::Haken);
     if (conn) {
         device_claim = conn->info.claim();
     }
-    if (ui) ui->onConnectHost(host);
+    if (chem_ui) ui()->onConnectHost(host);
 }
 
 void JackModule::onPresetChange()
 {
     pull_jack_data();
-    if (ui) ui->onPresetChange();
+    if (chem_ui) ui()->onPresetChange();
 }
 
 void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     host_connection = connection ? connection->identified() : false;
-    if (ui) ui->onConnectionChange(device, connection);
+    if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
 void JackModule::pull_jack_data()
