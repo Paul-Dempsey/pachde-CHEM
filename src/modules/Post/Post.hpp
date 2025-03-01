@@ -49,6 +49,7 @@ struct PostModule : ChemModule, IChemClient
 
     bool glow_knobs;
     bool muted;
+    rack::dsp::SchmittTrigger mute_trigger;
 
     int attenuator_target;
     float attenuation[ATTENUATED_INPUTS];
@@ -75,6 +76,7 @@ struct PostModule : ChemModule, IChemClient
     json_t* dataToJson() override;
 
     void pull_params();
+    void sync_mute();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };

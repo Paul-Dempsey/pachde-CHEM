@@ -116,7 +116,7 @@ void PostModule::pull_params()
     if (pq) pq->setValue(em->get_eq_freq());
 }
 
-void PostModule::process_params(const ProcessArgs &args)
+void PostModule::sync_mute()
 {
     auto new_mute = getParamInt(getParam(Params::P_MUTE));
     getLight(Lights::L_MUTE).setBrightnessSmooth(new_mute, 45.f);
@@ -133,9 +133,14 @@ void PostModule::process_params(const ProcessArgs &args)
             }
         }
     }
+}
 
+void PostModule::process_params(const ProcessArgs &args)
+{
     float v = getParam(Params::P_MIX).getValue()* .1f;
     getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
+
+    sync_mute();
 }
 
 void PostModule::process(const ProcessArgs& args)
@@ -144,6 +149,16 @@ void PostModule::process(const ProcessArgs& args)
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
+    }
+
+    auto mute_in = getInput(Inputs::IN_MUTE);
+    if (mute_in.isConnected()) {
+        auto v = mute_in.getVoltage();
+        if (mute_trigger.process(v, 0.1f, 5.f)) {
+            mute_trigger.reset();
+            getParam(P_MUTE).setValue(getParamInt(getParam(Params::P_MUTE)) ? 0.f : 1.f);
+            sync_mute();
+        }
     }
 
     if (attenuator_target != Inputs::IN_INVALID) {
