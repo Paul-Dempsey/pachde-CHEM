@@ -434,4 +434,14 @@ void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_rad
     nvgFill(vg);
 }
 
+void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color)
+{
+    nvgBeginPath(vg);
+    nvgArc(vg, cx, cy, track_radius, minAngle - M_PI*.5f, maxAngle - M_PI*.5f, NVG_CW);
+    nvgStrokeWidth(vg, track_width);
+    nvgStrokeColor(vg, color);
+    nvgLineCap(vg, NVG_ROUND);
+    nvgStroke(vg);
+}
+
 }

@@ -8,6 +8,9 @@ namespace pachde {
 #define BLACK nvgGRAYf(0.0f)
 #define WHITE nvgGRAYf(1.0f)
 #define COLOR_NONE nvgRGBAf(0.0f,0.0f,0.0f,0.0f)
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 // HSL grays per InkScape
 #define GRAY05 nvgRGB(0x0d, 0x0d, 0x0d) // #0d0d0d
@@ -402,6 +405,9 @@ void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& st
 void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f);
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
 void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
+
+// VEC_ARGS(knob->box.getCenter())  , knob->minAngle, knob->maxAngle
+void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 
 template <class TMenuItem = rack::ui::MenuEntry>
 rack::ui::MenuEntry* createColorMenuItem(
