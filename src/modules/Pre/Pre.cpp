@@ -63,19 +63,19 @@ void PreModule::pull_params()
     auto em = chem_host->host_matrix();
     
     auto pq = get_u7_em_param_quantity(this, P_PRE_LEVEL);
-    if (pq) pq->set_em_midi_value(em->get_pre());
+    if (pq) pq->set_em_value(em->get_pre());
     
     pq = get_u7_em_param_quantity(this, P_MIX);
-    if (pq) pq->set_em_midi_value(em->get_cotan_mix());
+    if (pq) pq->set_em_value(em->get_cotan_mix());
 
     pq = get_u7_em_param_quantity(this, P_THRESHOLD_DRIVE);
-    if (pq) pq->set_em_midi_value(em->get_thresh_drive());
+    if (pq) pq->set_em_value(em->get_thresh_drive());
 
     pq = get_u7_em_param_quantity(this, P_ATTACK_);
-    if (pq) pq->set_em_midi_value(em->get_attack());
+    if (pq) pq->set_em_value(em->get_attack());
 
     pq = get_u7_em_param_quantity(this, P_RATIO_MAKEUP);
-    if (pq) pq->set_em_midi_value(em->get_ratio_makeup());
+    if (pq) pq->set_em_value(em->get_ratio_makeup());
 
     last_select = em->is_tanh();
     getParam(P_SELECT).setValue(last_select);

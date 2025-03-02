@@ -76,6 +76,8 @@
             "out-ring":   { "stroke": { "color":"#e57f19", "width":0.75 }},
             "ready-ring": { "stroke": { "color":"#bf3fbf", "width":0.75 }},
 
+            "k-track": { "fill": " #f9a54b", "stroke": {"color": " #f9a54b", "width": 0.25 }},
+
             "k-face": { "opacity":0 },
             "t-face": { "opacity":0 },
             "kr-face": { "opacity":0 },

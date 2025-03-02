@@ -8,6 +8,7 @@
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 
@@ -44,8 +45,8 @@ struct MacroModule : ChemModule, IChemClient
 
     int attenuator_target;
     int last_attenuator_target;
-    float attenuation[NUM_INPUTS]{0.f};
-
+    float attenuation[NUM_INPUTS] {0.f};
+    float modulated[NUM_INPUTS] {0.f};
     PresetMacro macro_names;
 
     // options
@@ -113,6 +114,8 @@ struct MacroUi : ChemModuleWidget, IChemClient
     StaticTextLabel* m6_ped_label;
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
+    TrackWidget* tracks[MacroModule::NUM_KNOBS];
+    bool layout_hinting{false};
 
     MacroUi(MacroModule *module);
     bool connected();
@@ -130,7 +133,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void step() override;
-    void draw(const DrawArgs& args) override;
+    //void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

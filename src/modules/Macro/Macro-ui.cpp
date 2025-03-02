@@ -1,6 +1,7 @@
 #include "Macro.hpp"
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 
@@ -52,11 +53,17 @@ MacroUi::MacroUi(MacroModule *module) :
     x = KNOB_CX;
     y = KNOB_CY;
     addChild(knobs[M1] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M1, theme_engine, theme)); y += MACRO_DY;
+    addChild(tracks[M1] = createTrackWidget(knobs[M1], theme_engine, theme));
     addChild(knobs[M2] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M2, theme_engine, theme)); y += MACRO_DY;
+    addChild(tracks[M2] = createTrackWidget(knobs[M2], theme_engine, theme));
     addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M3, theme_engine, theme)); y += MACRO_DY;
+    addChild(tracks[M3] = createTrackWidget(knobs[M3], theme_engine, theme));
     addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M4, theme_engine, theme)); y += MACRO_DY;
+    addChild(tracks[M4] = createTrackWidget(knobs[M4], theme_engine, theme));
     addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
+    addChild(tracks[M5] = createTrackWidget(knobs[M5], theme_engine, theme));
     addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme)); 
+    addChild(tracks[M6] = createTrackWidget(knobs[M6], theme_engine, theme));
     
     addChild(preset_label = createStaticTextLabel<TipLabel>(
         Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "", theme_engine, theme,
@@ -92,6 +99,19 @@ MacroUi::MacroUi(MacroModule *module) :
     x += INPUT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= M6; ++i) {
+        if (my_module) {
+            float xoff {0};
+            float w {29.25f};
+            if (i == 0 || i == 3) {
+                xoff = -3.f;
+                w += 5.f;
+            }
+            addChild(Center(createClickRegion(x + xoff, y -14.f, w, 21.f, i, [=](int id, int mods) {
+                if (my_module->getInput(i).isConnected()) {
+                    my_module->attenuator_target = i;
+                }
+            })));
+        }
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, i));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
@@ -217,10 +237,23 @@ void MacroUi::step()
 {
     Base::step();
     if (!my_module) return;
+
     knobs[K_ATTENUVERTER]->enable(my_module->attenuator_target >= 0);
 
-    if (!chem_host) return;
+    for (int i = 0; i <= M6; ++i) {
+        tracks[i]->set_value(my_module->modulated[i]);
+        tracks[i]->set_active(my_module->getInput(i).isConnected());
+    }
 
+    if (hints != layout_hinting) {
+        layout_hinting = hints;
+        for (auto child: children) {
+            auto tr = dynamic_cast<ClickRegion*>(child);
+            if (tr) tr->visible = layout_hinting;
+        }
+    }
+
+    if (!chem_host) return;
     auto em = chem_host->host_matrix();
     auto a1 = em->get_jack_1_assign();
     auto a2 = em->get_jack_2_assign();
@@ -232,10 +265,11 @@ void MacroUi::step()
     set_pedal_text(m6_ped_label, Haken::ccVI, a1, a2);
 }
 
-void MacroUi::draw(const DrawArgs& args)
-{
-    Base::draw(args);
-}
+// void MacroUi::draw(const DrawArgs& args)
+// {
+//     Base::draw(args);
+//     if (!my_module) return;
+// }
 
 void MacroUi::appendContextMenu(Menu *menu)
 {

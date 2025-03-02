@@ -25,7 +25,7 @@ void U7EmParamQuantity::send_midi()
 }
 
 // do not send midi
-void U7EmParamQuantity::set_em_midi_value(uint8_t value)
+void U7EmParamQuantity::set_em_value(uint8_t value)
 {
     em_value = value;
     float param_value = unipolar_7_to_rack(value);
@@ -70,8 +70,8 @@ void U14ccEmParamQuantity::send_midi()
     haken->control_change(channel, cc, em_value >> 7);
 }
 
-// Set value from em (does not send midi) (TODO:rename not "midi")
-void U14ccEmParamQuantity::set_em_midi_value(uint16_t value)
+// Set value from em (does not send midi)
+void U14ccEmParamQuantity::set_em_value(uint16_t value)
 {
     em_value = value;
     float param_value = unipolar_14_to_rack(value);

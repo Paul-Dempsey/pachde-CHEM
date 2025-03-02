@@ -21,14 +21,14 @@ MacroModule::MacroModule()
     configU14ccEmParam(Haken::ch1, Haken::ccIV,  this, Params::P_M4, 0.f, 10.f, 0.f, "Macro 4", "v");
     configU14ccEmParam(Haken::ch1, Haken::ccV,   this, Params::P_M5, 0.f, 10.f, 0.f, "Macro 5", "v");
     configU14ccEmParam(Haken::ch1, Haken::ccVI,  this, Params::P_M6, 0.f, 10.f, 0.f, "Macro 6", "v");
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
+    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
 
-    configLight(L_M1a, "Attenuverter on M1");
-    configLight(L_M2a, "Attenuverter on M2");
-    configLight(L_M3a, "Attenuverter on M3");
-    configLight(L_M4a, "Attenuverter on M4");
-    configLight(L_M5a, "Attenuverter on M5");
-    configLight(L_M6a, "Attenuverter on M6");
+    configLight(L_M1a, "Modulation amount on M1");
+    configLight(L_M2a, "Modulation amount on M2");
+    configLight(L_M3a, "Modulation amount on M3");
+    configLight(L_M4a, "Modulation amount on M4");
+    configLight(L_M5a, "Modulation amount on M5");
+    configLight(L_M6a, "Modulation amount on M6");
 }
 
 void MacroModule::dataFromJson(json_t* root)
@@ -42,6 +42,16 @@ void MacroModule::dataFromJson(json_t* root)
     if (j) {
         glow_knobs = json_boolean_value(j);
     }
+    if (!device_claim.empty()) {
+        auto jar = json_object_get(root, "attenuation");
+        if (jar) {
+            json_t* jp;
+            size_t index;
+            json_array_foreach(jar, index, jp) {
+                attenuation[index] = json_real_value(jp);
+            }
+        }
+    }
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -49,6 +59,15 @@ json_t* MacroModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+
+    if (!device_claim.empty()) {
+        auto jaru = json_array();
+        for (int i = 0; i <= IN_M6; ++i) {
+            json_array_append_new(jaru, json_real(attenuation[i]));
+        }
+        json_object_set_new(root, "attenuation", jaru);
+    }
+
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
 }
@@ -134,7 +153,6 @@ void MacroModule::update_from_em()
 
 void MacroModule::process_params(const ProcessArgs& args)
 {
-
     if (attenuator_target >= 0) {
         auto pq = getParamQuantity(P_ATTENUVERT);
         if (pq) {
@@ -152,6 +170,15 @@ void MacroModule::process(const ProcessArgs& args)
         process_params(args);
     }
 
+    for (int i = IN_M1; i <= IN_M6; ++i) {
+        if (getInput(i).isConnected()) {
+            auto in = getInput(i).getVoltage();
+            modulated[i] = modulated_value(getParam(i).getValue(), in, attenuation[i]);
+        } else {
+            modulated[i] = getParam(i).getValue();
+        }
+    }
+
     if (((args.frame + id) % 63) == 0) {
         // attenuator lights
         if (last_attenuator_target != attenuator_target) {
@@ -161,6 +188,7 @@ void MacroModule::process(const ProcessArgs& args)
         }
         last_attenuator_target = attenuator_target;
     }
+
 }
 
 Model *modelMacro = createModel<MacroModule, MacroUi>("chem-macro");

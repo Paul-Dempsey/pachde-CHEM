@@ -22,7 +22,7 @@ struct U7EmParamQuantity : ::rack::engine::ParamQuantity
     void send_midi();
 
     // Set value from em (does not send midi)
-    void set_em_midi_value(uint8_t value);
+    void set_em_value(uint8_t value);
 
     // If changing greater than em granularity, send midi
     void setValue(float value) override;
@@ -76,7 +76,7 @@ struct U14ccEmParamQuantity : ::rack::engine::ParamQuantity
     void send_midi();
 
     // Set value from em (does not send midi)
-    void set_em_midi_value(uint16_t value);
+    void set_em_value(uint16_t value);
 
     // If changing greater than em granularity, send midi
     void setValue(float value) override;

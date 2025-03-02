@@ -104,16 +104,16 @@ void PostModule::pull_params()
     auto em = chem_host->host_matrix();
 
     auto pq14 = get_u14cc_em_param_quantity(this, P_POST_LEVEL);
-    if (pq14) pq14->set_em_midi_value(em->get_post());
+    if (pq14) pq14->set_em_value(em->get_post());
     
     auto pq = get_u7_em_param_quantity(this, P_MIX);
-    if (pq) pq->setValue(em->get_eq_mix());
+    if (pq) pq->set_em_value(em->get_eq_mix());
     
     pq = get_u7_em_param_quantity(this, P_TILT);
-    if (pq) pq->setValue(em->get_eq_tilt());
+    if (pq) pq->set_em_value(em->get_eq_tilt());
 
     pq = get_u7_em_param_quantity(this, P_FREQUENCY);
-    if (pq) pq->setValue(em->get_eq_freq());
+    if (pq) pq->set_em_value(em->get_eq_freq());
 }
 
 void PostModule::sync_mute()

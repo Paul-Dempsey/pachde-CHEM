@@ -22,6 +22,7 @@
             "k-taper": {  "fill": " #cacf83" },
             "k-pin": { "fill": "#69572f", "stroke":"none" },
             "k-disabled": {"fill": "hsl(41, 40%, 35%)", "opacity": 0.6 },
+            "k-track": { "fill": " #f9a54b", "stroke": {"color": " #f9a54b", "width": 1 }},
 
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
             "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
