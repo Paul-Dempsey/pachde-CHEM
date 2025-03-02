@@ -302,6 +302,7 @@ PackedColor parseHslColor(const std::string& text)
 
     auto l = parse_float(it, text.cend());
     if ((l < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    while (it != text.cend() && is_number_sep(*it)) it++;
 
     float alpha = 100.f;
     if (is_alpha) {
@@ -402,12 +403,20 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
     if (is_rgb(spec)) {
         PackedColor r = parseRgbColor(spec);
         *result = r;
-        return OPAQUE_BLACK != r;
+        if (OPAQUE_BLACK == r) {
+            logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+            return false;
+        }
+        return true;
     }
     if (is_hsl(spec)) {
         PackedColor r = parseHslColor(spec);
         *result = r;
-        return OPAQUE_BLACK != r;
+        if (OPAQUE_BLACK == r) {
+            logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+            return false;
+        }
+        return true;
     }
 
     auto item = colors.find(spec);
@@ -417,7 +426,8 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
     }
 
     *result = OPAQUE_BLACK;
-    return requireValidColor(spec, name);
+    logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+    return false;
 }
 
 bool SvgThemeEngine::parseOpacity(json_t * root, std::shared_ptr<Style> style)
@@ -547,7 +557,9 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
             if (value == "none") {
                 style->stroke.setNone();
             } else {
-            if (!parseColor(value, "stroke", &color)) return false;
+                if (!parseColor(value, "stroke", &color)) {
+                    return false; 
+                }
                 style->stroke.setColor(color);
             }
         } else {
@@ -561,7 +573,9 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
             if (ocolor) {
                 if (!requireString(ocolor, "color")) return false;
                 auto text = strip_space(json_string_value(ocolor));
-                if (!parseColor(text, "color", &color)) return false;
+                if (!parseColor(text, "color", &color)) {
+                    return false;
+                }
                 style->stroke.setColor(color);
             }
 
