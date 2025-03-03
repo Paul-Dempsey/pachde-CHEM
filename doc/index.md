@@ -11,14 +11,14 @@ Each other module must be connected to a Core module, using the link button in t
 
 | Module | Description |
 | -- | -- |
-| **Core**  | An instance of Core must exist in the patch. It provides the connection to an EaganMatrix device for the rest of the modules. Certain Eagan Matrix utility functions are available in the right-click menu. |
-| **Play**  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
-| **Macro** | Tha main i-vi macro controls. |
-| **Pre**   | The pre-master section controls, with general pre-level, and controls for the Compressor/Tanh. Pre-convolution controls are in the Convolution module. |
-| **Fx**    | The "effects", a.k.a. Recirculator section. |
-| **Post**  | Th post-master section controls, including a global Mute, post level (Volume), and EQ. Post-convolution controls are in the Convolution module.|
-| **Convo** | Controls for pre- and post- convolutions. |
-| **Jack**  | Pedal assignment, min/max settings and jack output CV. |
+| [**Core**](./core.md)  | An instance of Core must exist in the patch. It provides the connection to an EaganMatrix device for the rest of the modules. Certain Eagan Matrix utility functions are available in the right-click menu. |
+| [**Play**](./play.md)  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
+| [**Macro**](./macro.md) | Tha main i-vi macro controls. |
+| [**Pre**](./pre.md)   | The pre-master section controls, with general pre-effects level, and controls for the Compressor/Tanh. Pre-section convolution controls are in the Convolution module. |
+| [**Fx**](./fx.md)    | The "effects", a.k.a. Recirculator section. |
+| [**Post**](./post.md)  | The post- master section controls, including a global Mute, post level (Volume), and EQ. Post-section convolution controls are in the Convolution module.|
+| [**Convo**](./convo.md) | Controls for pre- and post- convolutions. |
+| [**Jack**](./jack.md)  | Pedal assignment, min/max settings and jack output CV. |
 
 More modules are planned to cover other important controls, such as rounding and polyphony,
 and a means to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
