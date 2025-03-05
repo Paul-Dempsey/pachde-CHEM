@@ -1,11 +1,13 @@
 # CHEM To-Do
 
-- Get Convo sync/knobs working
 - Implement CV
+- Get Convo sync/knobs working
 - Global settings module (poly/mpe, mono, routing, surface, ...)
 - Use expander linkage for wiring Core connection
 - Research EaganMatrix::reset() -- default values for em params
 - Refactor labels for just the requirements
+- Reconcile host availability states across modules ( `connected()`/`ready()` ...)
+- Ensure logging off completely silences logging and log-file creation.
 
 ## Before release
 
