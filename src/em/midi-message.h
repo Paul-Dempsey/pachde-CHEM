@@ -32,13 +32,22 @@ typedef union PackedMidiMessage {
         uint8_t status_byte;
         uint8_t data1;
         uint8_t data2;
-        uint8_t pad;
+        uint8_t tag;
     } bytes;
 } PackedMidiMessage;
+
+struct IDoMidi {
+    virtual void doMessage(PackedMidiMessage message) {}
+};
 
 inline uint8_t midi_status(PackedMidiMessage msg) { return msg.bytes.status_byte & STATUS_MASK; }
 inline uint8_t midi_channel(PackedMidiMessage msg) { return msg.bytes.status_byte & CHANNEL_MASK; }
 inline uint8_t midi_cc(PackedMidiMessage msg) { return msg.bytes.data1; }
+inline uint8_t midi_tag(PackedMidiMessage msg) { return msg.bytes.tag; }
+inline PackedMidiMessage Tag(PackedMidiMessage msg, uint8_t tag) {
+    msg.bytes.tag = tag;
+    return msg;
+}
 
 PackedMidiMessage MakeRawBase(uint8_t status_byte, uint8_t value, uint8_t value2);
 PackedMidiMessage MakeRaw(uint8_t status, uint8_t channel, uint8_t value, uint8_t value2);

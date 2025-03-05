@@ -2,6 +2,7 @@ RACK_DIR ?= ../..
 
 ifdef BUILD_DEBUG
 FLAGS += -O0
+FLAGS += -DLAYOUT_HELP
 else
 FLAGS += -O3
 FLAGS += -DNDEBUG
@@ -21,15 +22,16 @@ SOURCES += src/em/preset-macro.cpp
 
 # services
 SOURCES += src/services/colors.cpp
-SOURCES += src/services/em-param-quantity.cpp
+SOURCES += src/services/em-midi-port.cpp
 SOURCES += src/services/haken-midi.cpp
 SOURCES += src/services/HakenMidiOutput.cpp
 SOURCES += src/services/midi-devices.cpp
 SOURCES += src/services/midi-io.cpp
+SOURCES += src/services/midi-log.cpp
 SOURCES += src/services/MidiDeviceBroker.cpp
 SOURCES += src/services/MidiDeviceHolder.cpp
-SOURCES += src/services/ModuleBroker.cpp
 SOURCES += src/services/misc.cpp
+SOURCES += src/services/ModuleBroker.cpp
 SOURCES += src/services/open-file.cpp
 SOURCES += src/services/svgtheme.cpp
 SOURCES += src/services/text.cpp
@@ -38,7 +40,6 @@ SOURCES += src/services/text.cpp
 SOURCES += src/widgets/blip-widget.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
-#SOURCES += src/widgets/mini-fader.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/selector-widget.cpp

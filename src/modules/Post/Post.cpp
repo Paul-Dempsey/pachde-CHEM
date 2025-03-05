@@ -1,20 +1,27 @@
 #include "Post.hpp"
 using namespace pachde;
-#include "../../services/em-param-quantity.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
 
-PostModule::PostModule()
-:   glow_knobs(false),
-    muted(false),
-    attenuator_target(IN_INVALID)
+PostModule::PostModule() :
+    modulation(this, MidiTag::Post),
+    glow_knobs(false),
+    muted(false)
 {
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccPost, false),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqMix, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqTilt, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqFreq, true),
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_POST_LEVEL, Inputs::IN_POST_LEVEL, Lights::L_POST_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configU14ccEmParam(Haken::ch1, Haken::ccPost, this, Params::P_POST_LEVEL,  0.f, 10.f, 5.f, "Post-level");
-    configU7EmParam(Haken::ch1, Haken::ccEqMix,  this, Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix");
-    configU7EmParam(Haken::ch1, Haken::ccEqTilt, this, Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt");
-    configU7EmParam(Haken::ch1, Haken::ccEqFreq, this, Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency");
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%")->displayPrecision = 4;
+    configParam(Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level")->displayPrecision = 4;
+    configParam(Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix")->displayPrecision = 4;
+    configParam(Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt")->displayPrecision = 4;
+    configParam(Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency")->displayPrecision = 4;
+    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
 
     configSwitch(P_MUTE, 0.f, 1.f, 0.f, "Mute", { "Voiced", "Muted" });
 
@@ -22,20 +29,15 @@ PostModule::PostModule()
     configInput(IN_MIX,        "EQ Mix");
     configInput(IN_TILT,       "EQ Tilt");
     configInput(IN_FREQUENCY,  "EQ Frequency");
+
     configInput(IN_MUTE,       "Mute trigger");
 
+    configLight(L_POST_LEVEL_MOD, "Modulation amount on Post level");
+    configLight(L_MIX_MOD,        "Modulation amount on EQ Mix");
+    configLight(L_TILT_MOD,       "Modulation amount on EQ Tilt");
+    configLight(L_FREQUENCY_MOD,  "Modulation amount on EQ Frequency");
     configLight(L_MIX, "EQ active");
     configLight(L_MUTE, "Mute");
-}
-
-void PostModule::onPortChange(const PortChangeEvent& e)
-{
-    if (e.type == Port::OUTPUT) return;
-    if (e.connecting) {
-        attenuator_target = e.portId;
-    } else {
-        attenuator_target = Inputs::IN_INVALID;
-    }
 }
 
 void PostModule::dataFromJson(json_t* root)
@@ -44,6 +46,9 @@ void PostModule::dataFromJson(json_t* root)
     json_t* j = json_object_get(root, "haken-device");
     if (j) {
         device_claim = json_string_value(j);
+    }
+    if (!device_claim.empty()) {
+        modulation.mod_from_json(root);
     }
     j = json_object_get(root, "glow-knobs");
     if (j) {
@@ -56,6 +61,9 @@ json_t* PostModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    if (!device_claim.empty()) {
+        modulation.mod_to_json(root);
+    }
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
 }
@@ -82,7 +90,7 @@ void PostModule::onConnectHost(IChemHost* host)
 void PostModule::onPresetChange()
 {
     if (!connected()) return;
-    pull_params();
+    update_from_em(true);
     if (chem_ui) ui()->onPresetChange();
 }
 
@@ -98,22 +106,14 @@ bool PostModule::connected()
     return conn && conn->identified();
 }
 
-void PostModule::pull_params()
+void PostModule::update_from_em(bool with_knobs)
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
-
-    auto pq14 = get_u14cc_em_param_quantity(this, P_POST_LEVEL);
-    if (pq14) pq14->set_em_value(em->get_post());
-    
-    auto pq = get_u7_em_param_quantity(this, P_MIX);
-    if (pq) pq->set_em_value(em->get_eq_mix());
-    
-    pq = get_u7_em_param_quantity(this, P_TILT);
-    if (pq) pq->set_em_value(em->get_eq_tilt());
-
-    pq = get_u7_em_param_quantity(this, P_FREQUENCY);
-    if (pq) pq->set_em_value(em->get_eq_freq());
+    modulation.set_em_and_param(P_POST_LEVEL, em->get_post(), with_knobs);
+    modulation.set_em_and_param_low(P_MIX, em->get_eq_mix(), with_knobs);
+    modulation.set_em_and_param_low(P_TILT, em->get_eq_tilt(), with_knobs);
+    modulation.set_em_and_param_low(P_FREQUENCY, em->get_eq_freq(), with_knobs);
 }
 
 void PostModule::sync_mute()
@@ -124,13 +124,10 @@ void PostModule::sync_mute()
         muted = new_mute;
         auto haken = chem_host->host_haken();
         if (muted) {
-            haken->control_change(Haken::ch1, Haken::ccFracPed, 0);
-            haken->control_change(Haken::ch1, Haken::ccPost, 0);
+            haken->control_change(MidiTag::Post, Haken::ch1, Haken::ccFracPed, 0);
+            haken->control_change(MidiTag::Post, Haken::ch1, Haken::ccPost, 0);
         } else {
-            auto pq = get_u14cc_em_param_quantity(this, P_POST_LEVEL);
-            if (pq) {
-                pq->send_midi();
-            }
+            modulation.get_port(P_POST_LEVEL).send(chem_host, MidiTag::Post, true);
         }
     }
 }
@@ -140,12 +137,17 @@ void PostModule::process_params(const ProcessArgs &args)
     float v = getParam(Params::P_MIX).getValue()* .1f;
     getLight(Lights::L_MIX).setBrightnessSmooth(v, 45.f);
 
+    modulation.pull_mod_amount();
     sync_mute();
 }
 
 void PostModule::process(const ProcessArgs& args)
 {
     if (!chem_host || chem_host->host_busy()) return;
+
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
+    }
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
@@ -160,9 +162,8 @@ void PostModule::process(const ProcessArgs& args)
             sync_mute();
         }
     }
-
-    if (attenuator_target != Inputs::IN_INVALID) {
-        // 
+    if (((args.frame + id) % 61) == 0) {
+        modulation.update_lights();
     }
 }
 

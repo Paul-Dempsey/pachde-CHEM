@@ -4,11 +4,6 @@
 
 using namespace pachde;
 
-void RelayMidiToEM::doMessage(PackedMidiMessage message)
-{
-    core->em.onMessage(message);
-}
-
 using EME = IHandleEmEvents::EventMask;
 
 CoreModule::CoreModule() :
@@ -42,18 +37,20 @@ CoreModule::CoreModule() :
     configOutput(Outputs::OUT_READY, "Ready gate");
 
     ModuleBroker::get()->register_host(this);
-    to_em.core = this;
-    tasks.setCoreModule(this);
+
+    midi_relay.set_em(&em);
+    midi_relay.register_target(&haken_midi_out);
+
     em.subscribeEMEvents(this);
-    haken_midi_out.setEm(&em);
-    haken_midi.init(&midi_log, &haken_midi_out);
+    tasks.setCoreModule(this);
+    haken_midi.init(&midi_log, &midi_relay);
     haken_device.subscribe(this);
     controller1.subscribe(this);
     controller2.subscribe(this);
 
-    haken_midi_in.addTarget(&to_em);
-    controller1_midi_in.addTarget(&haken_midi_out);
-    controller2_midi_in.addTarget(&haken_midi_out);
+    haken_midi_in.setTarget(&midi_relay);
+    controller1_midi_in.setTarget(&midi_relay);
+    controller2_midi_in.setTarget(&midi_relay);
 
     auto broker = MidiDeviceBroker::get();
     broker->registerDeviceHolder(&haken_device);
@@ -122,13 +119,13 @@ void CoreModule::reboot()
 
 void CoreModule::send_midi_rate(HakenMidiRate rate)
 {
-    haken_midi.midi_rate(rate);
+    haken_midi.midi_rate(MidiTag::Core, rate);
 }
 
 void CoreModule::restore_midi_rate()
 {
     if (HakenMidiRate::Full != tasks.midi_rate) {
-        haken_midi.midi_rate(HakenMidiRate::Full);
+        haken_midi.midi_rate(MidiTag::Core, HakenMidiRate::Full);
         tasks.midi_rate = HakenMidiRate::Full;
     }
 }
@@ -234,7 +231,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.channel = -1;
 
             log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
-            haken_midi.editor_present();
+            haken_midi.editor_present(MidiTag::Core);
             haken_midi_out.dispatch(DISPATCH_NOW);
         } else {
             log_message("Core", "--- disconnect HAKEN");
@@ -337,6 +334,10 @@ void CoreModule::register_chem_client(IChemClient* client)
     if (chem_clients.cend() == std::find(chem_clients.cbegin(), chem_clients.cend(), client)) {
         chem_clients.push_back(client);
         client->onConnectHost(this);
+        auto do_midi = client->client_do_midi();
+        if (do_midi) {
+            midi_relay.register_target(do_midi);
+        }
     }
 }
 
@@ -345,6 +346,10 @@ void CoreModule::unregister_chem_client(IChemClient* client)
     auto item = std::find(chem_clients.cbegin(), chem_clients.cend(), client);
     if (item != chem_clients.cend())
     {
+        auto do_midi = client->client_do_midi();
+        if (do_midi) {
+            midi_relay.unregister_target(do_midi);
+        }
         chem_clients.erase(item);
     }
 }

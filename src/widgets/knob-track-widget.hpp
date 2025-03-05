@@ -8,15 +8,15 @@ using namespace svg_theme;
 
 namespace pachde {
 
-namespace TW {
-static constexpr const float default_radius{18.f};
-static constexpr const float default_track_width{1.25f};
-static constexpr const float default_dot_radius{2.25f};
-static const NVGcolor default_track_color {nvgRGB(0x99, 0x69, 0x33)};
-static const NVGcolor default_dot_color {nvgRGB(0xf9, 0xa5, 0x4b)};
-static const NVGcolor default_inactive_color {0,0,0,0};
-static const char * default_track_key {"k-track"};
-static const char * default_inactive_track_key {"k-track-na"};
+namespace track_constant {
+    static constexpr const float default_radius{18.f};
+    static constexpr const float default_track_width{1.25f};
+    static constexpr const float default_dot_radius{2.25f};
+    static const NVGcolor default_track_color {nvgRGB(0x99, 0x69, 0x33)};
+    static const NVGcolor default_dot_color {nvgRGB(0xf9, 0xa5, 0x4b)};
+    static const NVGcolor default_inactive_color {0,0,0,0};
+    static const char * default_track_key {"k-track"};
+    static const char * default_inactive_track_key {"k-track-na"};
 }
 
 struct TrackWidget : TransparentWidget, IApplyTheme
@@ -40,16 +40,16 @@ struct TrackWidget : TransparentWidget, IApplyTheme
     TrackWidget() :
         value(0.f),
         radius(18.f), 
-        track_width(TW::default_track_width),
-        dot_radius(TW::default_dot_radius),
+        track_width(track_constant::default_track_width),
+        dot_radius(track_constant::default_dot_radius),
         min_angle(),
         max_angle(),
         active(false),
-        track_key(TW::default_track_key),
-        inactive_key(TW::default_inactive_track_key),
-        track_color(TW::default_track_color),
-        dot_color(TW::default_dot_color),
-        inactive_track_color(TW::default_inactive_color) // no track
+        track_key(track_constant::default_track_key),
+        inactive_key(track_constant::default_inactive_track_key),
+        track_color(track_constant::default_track_color),
+        dot_color(track_constant::default_dot_color),
+        inactive_track_color(track_constant::default_inactive_color) // no track
     {
         box.size = {radius, radius};
     }
@@ -69,16 +69,16 @@ struct TrackWidget : TransparentWidget, IApplyTheme
                 track_width = style->isApplyStrokeWidth() ? style->stroke_width: 1.25f;
                 dot_radius = std::max(1 + track_width, dot_radius);
             } else {
-                track_color = TW::default_track_color;
+                track_color = track_constant::default_track_color;
             }
             if (style->isApplyFill()) {
                 dot_color = fromPacked(style->fillWithOpacity());
             } else {
-                dot_color = TW::default_dot_color;
+                dot_color = track_constant::default_dot_color;
             }
         } else {
-            track_color = TW::default_track_color;
-            dot_color = TW::default_dot_color;
+            track_color = track_constant::default_track_color;
+            dot_color = track_constant::default_dot_color;
         }
 
         style = theme->getStyle(inactive_key);
@@ -88,10 +88,10 @@ struct TrackWidget : TransparentWidget, IApplyTheme
             } else if (style->isApplyFill()) {
                 inactive_track_color = fromPacked(style->fillWithOpacity());
             } else {
-                inactive_track_color = TW::default_inactive_color;
+                inactive_track_color = track_constant::default_inactive_color;
             }
         } else {
-            inactive_track_color = TW::default_inactive_color;
+            inactive_track_color = track_constant::default_inactive_color;
         }
         return true;
     }
@@ -130,17 +130,13 @@ struct TrackWidget : TransparentWidget, IApplyTheme
     }
 };
 
-inline float modulated_value(float param_value, float cv, float att_percent) {
-    return clamp(param_value + (cv * (att_percent * .01)), 0.f, 10.f);
-}
-
 template <typename TTrack = TrackWidget>
 TTrack * createTrackWidget(
     Knob * knob,
     SvgThemeEngine &engine,
     std::shared_ptr<SvgTheme> theme,
-    const char * track_theme_key = TW::default_track_key,
-    const char * inactive_theme_key = TW::default_inactive_track_key
+    const char * track_theme_key = track_constant::default_track_key,
+    const char * inactive_theme_key = track_constant::default_inactive_track_key
     )
 {
     auto o = new TTrack();

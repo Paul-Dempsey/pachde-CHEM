@@ -3,63 +3,63 @@
 
 namespace pachde {
 
-void HakenMidi::control_change(uint8_t channel, uint8_t cc, uint8_t value) {
-    send_message(MakeCC(channel, cc, value));
+void HakenMidi::control_change(MidiTag tag, uint8_t channel, uint8_t cc, uint8_t value) {
+    send_message(Tag(MakeCC(channel, cc, value), tag));
 }
 
-void HakenMidi::key_pressure(uint8_t channel, uint8_t note, uint8_t pressure) {
-    send_message(MakePolyKeyPressure(channel, note, pressure));
+void HakenMidi::key_pressure(MidiTag tag, uint8_t channel, uint8_t note, uint8_t pressure) {
+    send_message(Tag(MakePolyKeyPressure(channel, note, pressure), tag));
 }
 
-void HakenMidi::begin_stream(uint8_t stream)
+void HakenMidi::begin_stream(MidiTag tag, uint8_t stream)
 {
-    send_message(MakeCC(Haken::ch16, Haken::ccStream, stream));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccStream, stream), tag));
 }
-void HakenMidi::stream_data(uint8_t d1, uint8_t d2)
+void HakenMidi::stream_data(MidiTag tag,uint8_t d1, uint8_t d2)
 {
-    send_message(MakePolyKeyPressure(Haken::ch16, d1, d2));
+    send_message(Tag(MakePolyKeyPressure(Haken::ch16, d1, d2), tag));
 }
-void HakenMidi::end_stream()
+void HakenMidi::end_stream(MidiTag tag)
 {
-    send_message(MakeCC(Haken::ch16, Haken::ccStream, 127));
-}
-
-void HakenMidi::disable_recirculator(bool disable)
-{
-    begin_stream(Haken::s_Mat_Poke);
-    key_pressure(Haken::ch16, Haken::idNoRecirc, disable);
-    end_stream();
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccStream, 127), tag));
 }
 
-void HakenMidi::compressor_option(bool tanh)
+void HakenMidi::disable_recirculator(MidiTag tag, bool disable)
 {
-    begin_stream(Haken::s_Mat_Poke);
-    key_pressure(Haken::ch16, Haken::idCompOpt, tanh);
-    end_stream();
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idNoRecirc, disable);
+    end_stream(tag);
 }
 
-void HakenMidi::keep_pedals(bool keep)
+void HakenMidi::compressor_option(MidiTag tag, bool tanh)
 {
-    begin_stream(Haken::s_Mat_Poke);
-    key_pressure(Haken::ch16, Haken::idPresPed, keep);
-    end_stream();
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idCompOpt, tanh);
+    end_stream(tag);
 }
 
-void HakenMidi::keep_surface(bool keep)
+void HakenMidi::keep_pedals(MidiTag tag, bool keep)
 {
-    begin_stream(Haken::s_Mat_Poke);
-    key_pressure(Haken::ch16, Haken::idPresSurf, keep);
-    end_stream();
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idPresPed, keep);
+    end_stream(tag);
 }
 
-void HakenMidi::keep_midi(bool keep)
+void HakenMidi::keep_surface(MidiTag tag, bool keep)
 {
-    begin_stream(Haken::s_Mat_Poke);
-    key_pressure(Haken::ch16, Haken::idPresEnc, keep);
-    end_stream();
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idPresSurf, keep);
+    end_stream(tag);
 }
 
-void HakenMidi::select_preset(PresetId id)
+void HakenMidi::keep_midi(MidiTag tag, bool keep)
+{
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idPresEnc, keep);
+    end_stream(tag);
+}
+
+void HakenMidi::select_preset(MidiTag tag, PresetId id)
 {
     if (log) {
         log->logMessage(">>H", "---- Select Preset");
@@ -67,126 +67,125 @@ void HakenMidi::select_preset(PresetId id)
     assert(id.valid());
     //send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42)); tick_tock = !tick_tock;
     //send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
-    send_message(MakeCC(Haken::ch16, Haken::ccBankH, id.bank_hi()));
-    send_message(MakeCC(Haken::ch16, Haken::ccBankL, id.bank_lo()));
-    send_message(MakeProgramChange(Haken::ch16, id.number()));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccBankH, id.bank_hi()), tag));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccBankL, id.bank_lo()), tag));
+    send_message(Tag(MakeProgramChange(Haken::ch16, id.number()), tag));
 }
 
-void HakenMidi::midi_rate(HakenMidiRate rate)
+void HakenMidi::midi_rate(MidiTag tag, HakenMidiRate rate)
 {
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, static_cast<uint8_t>(rate)));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, static_cast<uint8_t>(rate)), tag));
 }
 
-void HakenMidi::editor_present() {
+void HakenMidi::editor_present(MidiTag tag) {
     if (log) {
         log->logMessage(">>H", "---- EditorPresent");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42), tag));
     tick_tock = !tick_tock;
 }
 
-void HakenMidi::request_configuration() {
+void HakenMidi::request_configuration(MidiTag tag) {
     if (log) {
         log->logMessage(">>H", "---- RequestConfiguration");
     }
     //doMessage(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi), tag));
 }
 
-void HakenMidi::request_con_text() {
+void HakenMidi::request_con_text(MidiTag tag) {
     if (log) {
         log->logMessage(">>H", "---- RequestConText");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi), tag));
 }
 
-void HakenMidi::request_updates()
+void HakenMidi::request_updates(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- RequestUpdates");
     }
     // send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42));
     // tick_tock = !tick_tock;
-
     // firmware 1009
-//    control_change(Haken::ch16, 55, 1); // bit 1 means request config
+    // control_change(Haken::ch16, 55, 1); // bit 1 means request config
 
     // firmware > 1009
-    begin_stream(Haken::s_Mat_Poke); //s_Mat_Poke
-    key_pressure(Haken::ch16, Haken::idCfgOut, 1);
-    end_stream();
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idCfgOut, 1);
+    end_stream(tag);
 }
 
-void HakenMidi::request_user()
+void HakenMidi::request_user(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Request User");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::userToMidi));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::userToMidi), tag));
 }
 
-void HakenMidi::request_system()
+void HakenMidi::request_system(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Request System");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::sysToMidi));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::sysToMidi), tag));
 }
 
-void HakenMidi::remake_mahling()
+void HakenMidi::remake_mahling(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Remake Mahling data");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::remakeSRMahl));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::remakeSRMahl), tag));
 }
 
-void HakenMidi::previous_system_preset()
+void HakenMidi::previous_system_preset(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Previous sys preset");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::decPreset));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::decPreset), tag));
 }
 
-void HakenMidi::next_system_preset()
+void HakenMidi::next_system_preset(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Next sys preset");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::incPreset));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::incPreset),tag));
 }
 
-void HakenMidi::reset_calibration()
+void HakenMidi::reset_calibration(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Reset calibration");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::doResetCalib));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doResetCalib), tag));
 }
 
-void HakenMidi::refine_calibration()
+void HakenMidi::refine_calibration(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Refine calibration");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::doRefineCalib));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doRefineCalib), tag));
 }
 
-void HakenMidi::factory_calibration()
+void HakenMidi::factory_calibration(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Factory calibration");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::doFactCalib));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doFactCalib), tag));
 }
 
-void HakenMidi::surface_alignment()
+void HakenMidi::surface_alignment(MidiTag tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Surface alignment");
     }
-    send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::surfAlign));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::surfAlign), tag));
 }
 
 }

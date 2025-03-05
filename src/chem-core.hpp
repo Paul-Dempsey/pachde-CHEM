@@ -1,5 +1,6 @@
 #pragma once
 #include <rack.hpp>
+#include "chem-id.hpp"
 #include "em/preset.hpp"
 #include "em/EaganMatrix.hpp"
 #include "services/rack_em_convert.hpp"
@@ -9,7 +10,8 @@
 namespace pachde {
 
 struct IChemClient;
-enum class ChemDevice { Unknown, Haken, Midi1, Midi2 };
+
+enum class ChemDevice : uint8_t { Unknown, Haken, Midi1, Midi2 };
 
 struct IChemHost
 {
@@ -29,6 +31,7 @@ struct IChemClient
 {
     virtual ::rack::engine::Module* client_module() = 0;
     virtual std::string client_claim() = 0;
+    virtual IDoMidi* client_do_midi() { return nullptr; }
 
     virtual void onConnectHost(IChemHost* host) = 0;
     virtual void onPresetChange() = 0;

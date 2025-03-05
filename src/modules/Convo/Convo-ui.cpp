@@ -1,6 +1,7 @@
 #include "Convo.hpp"
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 
@@ -14,17 +15,17 @@ bool ConvoUi::connected() {
 }
 
 enum K { 
+    K_PRE_MIX,
+    K_PRE_INDEX,
+    K_POST_MIX,
+    K_POST_INDEX,
     K_TYPE,
     K_LENGTH,
     K_TUNING,
     K_WIDTH,
     K_L, 
     K_R,
-    K_PRE_MIX,
-    K_PRE_INDEX,
-    K_POST_MIX,
-    K_POST_INDEX,
-    K_ATTENUVERT
+    K_MODULATION
 };
 
 constexpr const float PANEL_WIDTH = 165.f;
@@ -68,9 +69,13 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float knob_dx = 34.f;
     const float center_dx = 22.f;
     addChild(knobs[K_PRE_MIX]    = createChemKnob<BlueKnob>(Vec(CENTER-center_dx-knob_dx, y), my_module, CM::P_PRE_MIX, theme_engine, theme));
+    addChild(tracks[K_PRE_MIX] = createTrackWidget(knobs[K_PRE_MIX], theme_engine, theme));
     addChild(knobs[K_PRE_INDEX]  = createChemKnob<BasicKnob>(Vec(CENTER-center_dx, y), my_module, CM::P_PRE_INDEX, theme_engine, theme));
+    addChild(tracks[K_PRE_INDEX] = createTrackWidget(knobs[K_PRE_INDEX], theme_engine, theme));
     addChild(knobs[K_POST_MIX]   = createChemKnob<BlueKnob>(Vec(CENTER+center_dx, y), my_module, CM::P_POST_MIX, theme_engine, theme));
+    addChild(tracks[K_POST_MIX] = createTrackWidget(knobs[K_POST_MIX], theme_engine, theme));
     addChild(knobs[K_POST_INDEX] = createChemKnob<BasicKnob>(Vec(CENTER+center_dx+knob_dx, y), my_module, CM::P_POST_INDEX, theme_engine, theme));
+    addChild(tracks[K_POST_INDEX] = createTrackWidget(knobs[K_POST_INDEX], theme_engine, theme));
 
     x = 56.5f;
     y = 95.f;
@@ -102,28 +107,37 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     addChild(knobs[K_R] = createChemKnob<BasicKnob>(Vec(CENTER + lr_knob_dx, y), my_module, CM::P_RIGHT, theme_engine, theme));
     addChild( createStaticTextLabel<StaticTextLabel>(Vec(CENTER + lr_knob_dx + 20, y), 80.f, "R", theme_engine, theme, S::control_label_left));
 
-    addChild(knobs[K_ATTENUVERT] = createChemKnob<TrimPot>(Vec(CENTER,S::PORT_TOP), my_module, CM::P_ATTENUVERT, theme_engine, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(CENTER,S::PORT_TOP), my_module, CM::P_MOD_AMOUNT, theme_engine, theme));
 
     // inputs
     auto co_port = PORT_CORN;
+    const float click_width = 32.f;
+    const float click_height = 21.f;
+    const float click_dy = 14.f;
     y = S::PORT_TOP;
     x = CENTER - (PORT_DX + PORT_DX);
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_PRE_MIX));
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, CM::L_PRE_MIX_MOD));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, CM::IN_PRE_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    
     x += PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_PRE_INDEX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_PRE_INDEX));
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, CM::L_PRE_INDEX_MOD));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "IDX", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, CM::IN_PRE_INDEX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
 
     x = CENTER + PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_POST_MIX));
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, CM::L_POST_MIX_MOD));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, CM::IN_POST_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    
     x += PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CM::IN_POST_INDEX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, CM::L_IN_POST_INDEX));
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, CM::L_POST_INDEX_MOD));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "IDX", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, CM::IN_POST_INDEX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
 
     // footer
     addChild(warning_label = createStaticTextLabel<TipLabel>(
@@ -200,10 +214,6 @@ void ConvoUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCo
     haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
 }
 
-void ConvoUi::onPresetChange()
-{
-}
-
 void ConvoUi::sync_select_label()
 {
     if (!my_module) return;
@@ -230,8 +240,27 @@ void ConvoUi::sync_type_label()
 void ConvoUi::step()
 {
     Base::step();
+    if (!my_module) return;
     sync_select_label();
     sync_type_label();
+
+    knobs[K_MODULATION]->enable(my_module->modulation.has_target());
+
+    for (int i = 0; i <= K_POST_INDEX; ++i) {
+        tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
+        tracks[i]->set_active(my_module->getInput(i).isConnected());
+    }
+
+#ifdef LAYOUT_HELP
+    if (hints != layout_hinting) {
+        layout_hinting = hints;
+        for (auto child: children) {
+            auto tr = dynamic_cast<ClickRegion*>(child);
+            if (tr) tr->visible = layout_hinting;
+        }
+    }
+#endif
+
 }
 
 void ConvoUi::draw(const DrawArgs& args)

@@ -15,9 +15,9 @@ constexpr const float PORT_DX = 34.f;
 constexpr const float PORT_DY = 36.f;
 constexpr const float PORT_LABEL_DY = -20.f;
 
-// port active attenuator light
-constexpr const float PORT_ATT_DX = 12.75f;
-constexpr const float PORT_ATT_DY = 12.75f;
+// port active modulation light
+constexpr const float PORT_MOD_DX = 12.75f;
+constexpr const float PORT_MOD_DY = 12.75f;
 
 constexpr const float CORE_LINK_LEFT = 12.f;
 constexpr const float CORE_LINK_TEXT = 28.f;

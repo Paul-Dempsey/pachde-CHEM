@@ -83,6 +83,7 @@ struct EaganMatrix
     uint16_t jack_2;
     uint16_t post;
 
+    uint16_t get_macro_value(int id) { return macro[id]; }
     float get_macro_voltage(int id);
 
     FixedStringBuffer<32> name_buffer;

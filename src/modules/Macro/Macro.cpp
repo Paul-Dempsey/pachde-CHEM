@@ -1,12 +1,21 @@
 #include "Macro.hpp"
-#include "../../services/em-param-quantity.hpp"
+#include "../../em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
-MacroModule::MacroModule()
-:   attenuator_target(IN_INVALID),
-    last_attenuator_target(IN_INVALID),
+MacroModule::MacroModule() :
+    modulation(this, MidiTag::Macro),
     glow_knobs(false)
 {
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccI),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccII),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccIII),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccIV),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccV),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccVI)
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_M1, Inputs::IN_M1, Lights::L_M1a, NUM_MOD_PARAMS, cfg);
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configInput(IN_M1, "Macro 1 (i)");
     configInput(IN_M2, "Macro 2 (ii)");
@@ -15,13 +24,14 @@ MacroModule::MacroModule()
     configInput(IN_M5, "Macro 5 (v)");
     configInput(IN_M6, "Macro 6 (vi)");
 
-    configU14ccEmParam(Haken::ch1, Haken::ccI,   this, Params::P_M1, 0.f, 10.f, 0.f, "Macro 1", "v");
-    configU14ccEmParam(Haken::ch1, Haken::ccII,  this, Params::P_M2, 0.f, 10.f, 0.f, "Macro 2", "v");
-    configU14ccEmParam(Haken::ch1, Haken::ccIII, this, Params::P_M3, 0.f, 10.f, 0.f, "Macro 3", "v");
-    configU14ccEmParam(Haken::ch1, Haken::ccIV,  this, Params::P_M4, 0.f, 10.f, 0.f, "Macro 4", "v");
-    configU14ccEmParam(Haken::ch1, Haken::ccV,   this, Params::P_M5, 0.f, 10.f, 0.f, "Macro 5", "v");
-    configU14ccEmParam(Haken::ch1, Haken::ccVI,  this, Params::P_M6, 0.f, 10.f, 0.f, "Macro 6", "v");
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
+    configParam(Params::P_M1, 0.f, 10.f, 5.f, "Macro 1", "v")->displayPrecision = 4;
+    configParam(Params::P_M2, 0.f, 10.f, 5.f, "Macro 2", "v")->displayPrecision = 4;
+    configParam(Params::P_M3, 0.f, 10.f, 5.f, "Macro 3", "v")->displayPrecision = 4;
+    configParam(Params::P_M4, 0.f, 10.f, 5.f, "Macro 4", "v")->displayPrecision = 4;
+    configParam(Params::P_M5, 0.f, 10.f, 5.f, "Macro 5", "v")->displayPrecision = 4;
+    configParam(Params::P_M6, 0.f, 10.f, 5.f, "Macro 6", "v")->displayPrecision = 4;
+
+    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
 
     configLight(L_M1a, "Modulation amount on M1");
     configLight(L_M2a, "Modulation amount on M2");
@@ -43,14 +53,7 @@ void MacroModule::dataFromJson(json_t* root)
         glow_knobs = json_boolean_value(j);
     }
     if (!device_claim.empty()) {
-        auto jar = json_object_get(root, "attenuation");
-        if (jar) {
-            json_t* jp;
-            size_t index;
-            json_array_foreach(jar, index, jp) {
-                attenuation[index] = json_real_value(jp);
-            }
-        }
+        modulation.mod_from_json(root);
     }
     ModuleBroker::get()->try_bind_client(this);
 }
@@ -59,17 +62,18 @@ json_t* MacroModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-
     if (!device_claim.empty()) {
-        auto jaru = json_array();
-        for (int i = 0; i <= IN_M6; ++i) {
-            json_array_append_new(jaru, json_real(attenuation[i]));
-        }
-        json_object_set_new(root, "attenuation", jaru);
+        modulation.mod_to_json(root);
     }
-
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
+}
+
+bool MacroModule::connected()
+{
+    if (!chem_host) return false;
+    auto conn = chem_host->host_connection(ChemDevice::Haken);
+    return conn && conn->identified();
 }
 
 // IChemClient
@@ -99,7 +103,7 @@ void MacroModule::onPresetChange()
         if (preset) {
             macro_names.fill_macro_names();
             macro_names.parse_text(preset->text);
-            update_from_em();
+            update_from_em(true);
         }
     }
     if (chem_ui) ui()->onPresetChange();
@@ -110,42 +114,45 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-void MacroModule::onPortChange(const PortChangeEvent& e)
+void MacroModule::doMessage(PackedMidiMessage msg)
 {
-    if (e.type == Port::OUTPUT) return;
-    if (e.connecting) {
-        attenuator_target = e.portId;
-        auto pq = getParamQuantity(P_ATTENUVERT);
-        if (pq) {
-            pq->setImmediateValue(attenuation[attenuator_target]);
-        }
-    } else {
-        for (int i = IN_M1; i <= IN_M6; ++i) {
-            if (getInput(i).isConnected()) {
-                attenuator_target = i;
-                auto pq = getParamQuantity(P_ATTENUVERT);
-                if (pq) {
-                    pq->setImmediateValue(attenuation[i]);
-                }
-                return;
-            }
-        }
-        attenuator_target = Inputs::IN_INVALID;
-        auto pq = getParamQuantity(P_ATTENUVERT);
-        if (pq) {
-            pq->setImmediateValue(0.f);
-        }
+    if (Haken::ccStat1 != msg.bytes.status_byte) return;
+    if (as_u8(MidiTag::Macro) == msg.bytes.tag) return;
+
+    auto cc = msg.bytes.data1;
+    switch (cc) {
+
+    case Haken::ccFracPed:
+        macro_lsb = msg.bytes.data2;
+        break;
+
+    case Haken::ccI:
+    case Haken::ccII:
+    case Haken::ccIII:
+    case Haken::ccIV:
+    case Haken::ccV:
+    case Haken::ccVI: {
+        int param = cc - Haken::ccI;
+        uint16_t value = ((msg.bytes.data2 << 7) + macro_lsb);
+        macro_lsb = 0;
+        modulation.set_em_and_param(param, value, true);
+    } break;
     }
 }
 
-void MacroModule::update_from_em()
+void MacroModule::update_from_em(bool with_knob)
 {
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
-        if (em) {
-            for (int param = Params::P_M1; param <= P_M6; ++param) {
-                float m = em->get_macro_voltage(param);
-                getParam(param).setValue(m);
+        for (int param = 0; param <= P_M6; ++param) {
+            if (with_knob) {
+               modulation.set_em_and_param(param, em->get_macro_value(param), with_knob);
+            } else {
+                // auto mac = em->get_macro_value(param);
+                // auto port{modulation.get_port(param)};
+                // if (port.modulated_em_value(mac) != port.modulated()) {
+                //     modulation.set_em_and_param(param, em->get_macro_value(param), true);
+                // }
             }
         }
     }
@@ -153,40 +160,24 @@ void MacroModule::update_from_em()
 
 void MacroModule::process_params(const ProcessArgs& args)
 {
-    if (attenuator_target >= 0) {
-        auto pq = getParamQuantity(P_ATTENUVERT);
-        if (pq) {
-            attenuation[attenuator_target] = pq->getValue();
-        }
-    }
-    update_from_em();
+    modulation.pull_mod_amount();
+    //update_from_em(false);
 }
 
 void MacroModule::process(const ProcessArgs& args)
 {
     if (!chem_host || chem_host->host_busy()) return;
     
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
+    }
+
     if (((args.frame + id) % 40) == 0) {
         process_params(args);
     }
 
-    for (int i = IN_M1; i <= IN_M6; ++i) {
-        if (getInput(i).isConnected()) {
-            auto in = getInput(i).getVoltage();
-            modulated[i] = modulated_value(getParam(i).getValue(), in, attenuation[i]);
-        } else {
-            modulated[i] = getParam(i).getValue();
-        }
-    }
-
     if (((args.frame + id) % 63) == 0) {
-        // attenuator lights
-        if (last_attenuator_target != attenuator_target) {
-            for (int i = L_M1a; i <= L_M6a; ++i) {
-                getLight(i).setSmoothBrightness(i == attenuator_target ? .6f : 0.f, 90);
-            }
-        }
-        last_attenuator_target = attenuator_target;
+        modulation.update_lights();
     }
 
 }

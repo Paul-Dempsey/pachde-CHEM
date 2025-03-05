@@ -13,10 +13,9 @@ void HakenMidiOutput::dispatch(float sampleTime)
     while (!ring.empty()) {
         auto message = ring.shift();
         if (log) {
-            log->logMessage(">>H", message);
+            log->logMidi(IO_Direction::Out, message);
         }
         ++message_count;
-        em->onMessage(message);
         output.setChannel(-1);
         output.sendMessage(rackFromPacked(message));
     }
@@ -33,6 +32,7 @@ void HakenMidiOutput::queueMessage(PackedMidiMessage msg)
 
 void HakenMidiOutput::doMessage(PackedMidiMessage message)
 {
+    if (MidiTag::Haken == as_midi_tag(message.bytes.tag)) return;
     queueMessage(message);
 }
 

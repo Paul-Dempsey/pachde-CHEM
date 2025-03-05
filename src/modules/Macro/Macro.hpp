@@ -3,6 +3,7 @@
 #include "../../chem.hpp"
 #include "../../em/preset-macro.hpp"
 #include "../../services/colors.hpp"
+#include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
@@ -14,13 +15,13 @@ using namespace pachde;
 
 struct MacroUi;
 
-struct MacroModule : ChemModule, IChemClient
+struct MacroModule : ChemModule, IChemClient, IDoMidi
 {
     MacroUi* ui() { return reinterpret_cast<MacroUi*>(chem_ui); }
 
     enum Params {
         P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
-        P_ATTENUVERT,
+        P_MOD_AMOUNT, NUM_MOD_PARAMS = P_MOD_AMOUNT,
         NUM_PARAMS, NUM_KNOBS = NUM_PARAMS
     };
     enum Inputs {
@@ -33,23 +34,13 @@ struct MacroModule : ChemModule, IChemClient
         IN_M6,
         NUM_INPUTS
     };
-    enum Outputs {
-        NUM_OUTPUTS
-    };
-    enum Lights {
-        L_M1a, L_M2a, L_M3a, L_M4a, L_M5a, L_M6a,
-        NUM_LIGHTS
-    };
+    enum Outputs { NUM_OUTPUTS };
+    enum Lights { L_M1a, L_M2a, L_M3a, L_M4a, L_M5a, L_M6a, NUM_LIGHTS };
 
     std::string device_claim;
-
-    int attenuator_target;
-    int last_attenuator_target;
-    float attenuation[NUM_INPUTS] {0.f};
-    float modulated[NUM_INPUTS] {0.f};
     PresetMacro macro_names;
-
-    // options
+    Modulation modulation;
+    uint8_t macro_lsb;
     bool glow_knobs;
 
     MacroModule();
@@ -59,15 +50,21 @@ struct MacroModule : ChemModule, IChemClient
         }
     }
 
-    void update_from_em();
+    void set_modulation_target(int id) {
+        modulation.set_modulation_target(id);
+    }
+    void doMessage(PackedMidiMessage message) override;
+    void update_from_em(bool with_knob);
 
     IChemHost* get_host() override {
         return chem_host;
     }
+    bool connected();
 
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
+    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
@@ -76,9 +73,9 @@ struct MacroModule : ChemModule, IChemClient
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-
-    void onPortChange(const PortChangeEvent& e) override;
-
+    void onPortChange(const PortChangeEvent& e) override {
+        modulation.onPortChange(e);
+    }
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -115,9 +112,12 @@ struct MacroUi : ChemModuleWidget, IChemClient
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
     TrackWidget* tracks[MacroModule::NUM_KNOBS];
+#ifdef LAYOUT_HELP
     bool layout_hinting{false};
+#endif
 
     MacroUi(MacroModule *module);
+
     bool connected();
     void glowing_knobs(bool glow);
 

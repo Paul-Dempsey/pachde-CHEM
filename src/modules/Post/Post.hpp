@@ -2,11 +2,13 @@
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
 #include "../../services/colors.hpp"
+#include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 
@@ -20,10 +22,10 @@ struct PostModule : ChemModule, IChemClient
         P_MIX,
         P_TILT,
         P_FREQUENCY,
-        P_ATTENUVERT,
+        P_MOD_AMOUNT, NUM_MOD_PARAMS = P_MOD_AMOUNT,
         P_MUTE,
         NUM_PARAMS,
-        NUM_KNOBS = 1 + P_ATTENUVERT
+        NUM_KNOBS = 1 + P_MOD_AMOUNT
     };
     enum Inputs {
         IN_INVALID = -1,
@@ -31,7 +33,7 @@ struct PostModule : ChemModule, IChemClient
         IN_MIX,
         IN_TILT,
         IN_FREQUENCY,
-        ATTENUATED_INPUTS = IN_FREQUENCY,
+        NUM_MOD_INPUTS = IN_FREQUENCY,
         IN_MUTE,
         NUM_INPUTS
     };
@@ -39,6 +41,10 @@ struct PostModule : ChemModule, IChemClient
         NUM_OUTPUTS
     };
     enum Lights {
+        L_POST_LEVEL_MOD,
+        L_MIX_MOD,
+        L_TILT_MOD,
+        L_FREQUENCY_MOD,
         L_MIX,
         L_MUTE,
         NUM_LIGHTS
@@ -47,12 +53,10 @@ struct PostModule : ChemModule, IChemClient
     std::string device_claim;
     PostUi* ui() { return reinterpret_cast<PostUi*>(chem_ui); };
 
+    Modulation modulation;
     bool glow_knobs;
     bool muted;
     rack::dsp::SchmittTrigger mute_trigger;
-
-    int attenuator_target;
-    float attenuation[ATTENUATED_INPUTS];
     
     PostModule();
     ~PostModule() {
@@ -63,6 +67,10 @@ struct PostModule : ChemModule, IChemClient
 
     bool connected();
 
+    void set_modulation_target(int id) {
+        modulation.set_modulation_target(id);
+    }
+
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
@@ -71,12 +79,14 @@ struct PostModule : ChemModule, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // ----  Rack  ------------------------------------------
-    void onPortChange(const PortChangeEvent& e) override;
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    void pull_params();
+    void update_from_em(bool with_knobs);
     void sync_mute();
+    void onPortChange(const PortChangeEvent& e) override {
+        modulation.onPortChange(e);
+    }
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -99,7 +109,10 @@ struct PostUi : ChemModuleWidget, IChemClient
     TipLabel*     warning_label{nullptr};
     SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
-
+    TrackWidget* tracks[PostModule::NUM_PARAMS];
+#ifdef LAYOUT_HELP
+    bool layout_hinting{false};
+#endif
     PostUi(PostModule *module);
 
     bool connected();

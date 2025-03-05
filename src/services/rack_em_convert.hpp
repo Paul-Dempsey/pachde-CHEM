@@ -41,5 +41,12 @@ inline int getParamInt(Param& p) {
     return static_cast<int>(std::floor(p.getValue()));
 }
 
+// modulated value for knob track
+// param_value =  unipolar knob value, 0v to 10v
+// cv = bipolar control voltage, -5v to 5v
+// amount = is bipolar amount in percent, -100% to 100%
+inline float modulated_value(float param_value, float cv, float amount) {
+    return clamp(param_value + (cv * (amount * .01)), 0.f, 10.f);
+}
 
 }

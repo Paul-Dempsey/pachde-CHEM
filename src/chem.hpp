@@ -40,12 +40,14 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 {
     using Base = ModuleWidget;
 
+#ifdef LAYOUT_HELP
     bool showGrid{false};
     bool hints{false};
+#endif
 
     virtual std::string panelFilename() = 0;
 
-    PartnerPanelBorder * panelBorder = nullptr;
+    PartnerPanelBorder * panelBorder {nullptr};
 
     ChemModule* getChemModule() { return static_cast<ChemModule*>(module); }
 
@@ -61,7 +63,10 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 
     void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;
+
+    #ifdef LAYOUT_HELP
     void drawCrossLine(NVGcontext *vg, float x, float y);
+    #endif
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

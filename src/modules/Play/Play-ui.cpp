@@ -7,9 +7,9 @@
 #include "../../widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
+namespace fs = ghc::filesystem;
 using namespace svg_theme;
 using namespace pachde;
-namespace fs = ghc::filesystem;
 
 // -- Play Menu ---------------------------------
 
@@ -70,9 +70,9 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
         menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); }, false));
     }
     menu->addChild(new MenuSeparator);
-    menu->addChild(createSubmenuItem("Fill empty playlist", "", [=](Menu* menu) {
-        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(false); }, !ui->presets.empty()));
-        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(true); }, !ui->presets.empty()));
+    menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
+        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(false); }));
+        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(true); }));
     }));
 
     menu->addChild(new MenuSeparator);
@@ -316,7 +316,7 @@ void PlayUi::select_preset(PresetId id)
     auto haken = chem_host->host_haken();
     if (haken) {
         haken->log->logMessage("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
-        haken->select_preset(id);
+        haken->select_preset(MidiTag::Play, id);
     }
 }
 
@@ -932,7 +932,7 @@ void PlayUi::fill(bool system)
     em_handler = new EmHandler(this);
     matrix->subscribeEMEvents(em_handler);
     gather = true;
-    system ? haken->request_system() : haken->request_user();
+    system ? haken->request_system(MidiTag::Play) : haken->request_user(MidiTag::Play);
 }
 
 void PlayUi::on_fill_complete()
@@ -1020,7 +1020,7 @@ void PlayUi::onChoosePreset(PresetWidget* source)
     auto haken = chem_host->host_haken();
     if (haken) {
         haken->log->logMessage("play", format_string("Selecting %s", current_preset->summary().c_str()));
-        haken->select_preset(id);
+        haken->select_preset(MidiTag::Play, id);
     }
 }
 
@@ -1146,9 +1146,11 @@ void PlayUi::step()
 void PlayUi::draw(const DrawArgs& args)
 {
     Base::draw(args);
+#ifdef LAYOUT_HELP
     if (hints) {
         Line(args.vg, RIGHT_MARGIN_CENTER, 0, RIGHT_MARGIN_CENTER, 380, nvgTransRGBAf(PORT_VIOLET, .5f), .5f);
     }
+#endif
 }
 
 void PlayUi::appendContextMenu(Menu *menu)

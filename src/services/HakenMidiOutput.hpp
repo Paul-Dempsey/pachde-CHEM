@@ -10,7 +10,6 @@ struct HakenMidiOutput : IDoMidi
     midi::Output output;
     uint64_t message_count;
     MidiLog* log;
-    EaganMatrix* em;
 
     rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
     void queueMessage(PackedMidiMessage msg);
@@ -18,7 +17,7 @@ struct HakenMidiOutput : IDoMidi
     rack::dsp::Timer midi_timer;
     
     HakenMidiOutput(const HakenMidiOutput&) = delete; // no copy constructor
-    HakenMidiOutput() : message_count(0), log(nullptr), em(nullptr) {
+    HakenMidiOutput() : message_count(0), log(nullptr) {
         output.setChannel(-1);
     }
 
@@ -34,9 +33,6 @@ struct HakenMidiOutput : IDoMidi
 
     void setLogger(MidiLog* logger) {
         log = logger;
-    }
-    void setEm(EaganMatrix* matrix) {
-        em = matrix;
     }
 
     // IDoMidi

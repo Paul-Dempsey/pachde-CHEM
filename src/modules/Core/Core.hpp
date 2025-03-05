@@ -10,18 +10,12 @@
 #include "../../widgets/MidiPicker.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "haken-task.hpp"
-//#include "midi-input-worker.hpp"
+#include "relay-midi.hpp"
 
 using namespace pachde;
 
 struct CoreModuleWidget;
 struct CoreModule;
-
-struct RelayMidiToEM : IDoMidi
-{
-    CoreModule* core{nullptr};
-    void doMessage(PackedMidiMessage message) override;
-};
 
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents
 {
@@ -31,16 +25,16 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     MidiDeviceHolder controller1;
     MidiDeviceHolder controller2;
 
-    MidiInput haken_midi_in;
-    MidiInput controller1_midi_in;
-    MidiInput controller2_midi_in;
+    MidiInput haken_midi_in { MidiTag::Haken };
+    MidiInput controller1_midi_in { MidiTag::Midi1 };
+    MidiInput controller2_midi_in { MidiTag::Midi2 };
 
     HakenMidiOutput haken_midi_out;
 
     HakenMidi haken_midi;
     HakenMidi& get_haken_midi() { return haken_midi; }
 
-    RelayMidiToEM to_em;
+    RelayMidi midi_relay;
     MidiLog midi_log;
     
     EaganMatrix em;

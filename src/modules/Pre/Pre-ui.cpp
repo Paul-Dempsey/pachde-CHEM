@@ -1,12 +1,12 @@
 #include "Pre.hpp"
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace pachde;
-namespace fs = ghc::filesystem;
 
 // -- Pre UI -----------------------------------
 
@@ -24,7 +24,7 @@ enum K {
     K_THRESH_DRIVE, 
     K_ATTACK_X, 
     K_RATIO_MAKEUP,
-    K_ATTENUVERTER
+    K_MODULATION
 };
 
 PreUi::PreUi(PreModule *module) :
@@ -48,7 +48,11 @@ PreUi::PreUi(PreModule *module) :
     // knobs
     x = CENTER;
     addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), my_module, PreModule::P_PRE_LEVEL, theme_engine, theme));
-    addChild(knobs[K_MIX]       = createChemKnob<BlueKnob>(Vec(x, 96.f), my_module, PreModule::P_MIX, theme_engine, theme));
+    addChild(tracks[K_PRE_LEVEL] = createTrackWidget(knobs[K_PRE_LEVEL], theme_engine, theme));
+
+    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, 96.f), my_module, PreModule::P_MIX, theme_engine, theme));
+    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
+
     addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, 96.f-9.f), my_module, PreModule::L_MIX));
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
@@ -59,42 +63,58 @@ PreUi::PreUi(PreModule *module) :
 
     y = PARAM_TOP;
     addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
+    addChild(tracks[K_THRESH_DRIVE] = createTrackWidget(knobs[K_THRESH_DRIVE], theme_engine, theme));
     addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
-    addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK_, theme_engine, theme));
+    addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK, theme_engine, theme));
+    addChild(tracks[K_ATTACK_X] = createTrackWidget(knobs[K_ATTACK_X], theme_engine, theme));
     addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
     addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
+    addChild(tracks[K_RATIO_MAKEUP] = createTrackWidget(knobs[K_RATIO_MAKEUP], theme_engine, theme));
     addChild(bot_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
 
     // inputs
     auto co_port = PORT_CORN;
+    const float click_width = 32.f;
+    const float click_height = 21.f;
+    const float click_dy = 14.f;
     y = S::PORT_TOP;
     x = CENTER - S::PORT_DX;
-    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, PreModule::P_ATTENUVERT, theme_engine, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, PreModule::P_MOD_AMOUNT, theme_engine, theme));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35, "LVL", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_PRE_LEVEL_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_ATTACK_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "MIX", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_MIX_MOD));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD, S::InputColorKey, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD_DRIVE, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_THRESHOLD_DRIVE_MOD));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO, S::InputColorKey, co_port, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO_MAKEUP, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
     
     // footer
     addChild(warning_label = createStaticTextLabel<TipLabel>(
@@ -214,6 +234,21 @@ void PreUi::step()
     Base::step();
     if (!my_module) return;
     sync_labels();
+    knobs[K_MODULATION]->enable(my_module->modulation.has_target());
+
+    for (int i = 0; i < K_MODULATION; ++i) {
+        tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
+        tracks[i]->set_active(my_module->getInput(i).isConnected());
+    }
+#ifdef LAYOUT_HELP
+    if (hints != layout_hinting) {
+        layout_hinting = hints;
+        for (auto child: children) {
+            auto tr = dynamic_cast<ClickRegion*>(child);
+            if (tr) tr->visible = layout_hinting;
+        }
+    }
+#endif
 }
 
 void PreUi::draw(const DrawArgs& args)

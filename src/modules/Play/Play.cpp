@@ -1,7 +1,7 @@
 #include "Play.hpp"
 #include <ghc/filesystem.hpp>
-using namespace pachde;
 namespace fs = ghc::filesystem;
+using namespace pachde;
 
 PlayModule::PlayModule()
 :   track_live(false)

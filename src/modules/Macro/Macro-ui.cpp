@@ -35,7 +35,7 @@ constexpr const float INPUT_LEFT = CENTER - (1.5f*INPUT_DX);
 constexpr const float ATT_CONNECTOR_X = INPUT_LEFT + 10.f;
 constexpr const float ATT_CONNECTOR_Y = S::PORT_TOP + S::PORT_DY*.5f + 10.f;
 
-enum M { M1, M2, M3, M4, M5, M6, K_ATTENUVERTER };
+enum M { M1, M2, M3, M4, M5, M6, K_MODULATION };
 
 MacroUi::MacroUi(MacroModule *module) :
     my_module(module)
@@ -95,25 +95,21 @@ MacroUi::MacroUi(MacroModule *module) :
     const NVGcolor co_port = PORT_CORN;
     x = INPUT_LEFT;
     y = S::PORT_TOP + S::PORT_DY*.5f;
-    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, MacroModule::P_ATTENUVERT, theme_engine, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, MacroModule::P_MOD_AMOUNT, theme_engine, theme));
     x += INPUT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= M6; ++i) {
         if (my_module) {
-            float xoff {0};
+            float xoff {0.f};
             float w {29.25f};
             if (i == 0 || i == 3) {
                 xoff = -3.f;
                 w += 5.f;
             }
-            addChild(Center(createClickRegion(x + xoff, y -14.f, w, 21.f, i, [=](int id, int mods) {
-                if (my_module->getInput(i).isConnected()) {
-                    my_module->attenuator_target = i;
-                }
-            })));
+            addChild(Center(createClickRegion(x + xoff, y -14.f, w, 21.f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_ATT_DX, y - S::PORT_ATT_DY), my_module, i));
+        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         x += INPUT_DX;
         if (i == 2) {
@@ -238,13 +234,14 @@ void MacroUi::step()
     Base::step();
     if (!my_module) return;
 
-    knobs[K_ATTENUVERTER]->enable(my_module->attenuator_target >= 0);
+    knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 
     for (int i = 0; i <= M6; ++i) {
-        tracks[i]->set_value(my_module->modulated[i]);
+        tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
         tracks[i]->set_active(my_module->getInput(i).isConnected());
     }
 
+#ifdef LAYOUT_HELP
     if (hints != layout_hinting) {
         layout_hinting = hints;
         for (auto child: children) {
@@ -252,7 +249,7 @@ void MacroUi::step()
             if (tr) tr->visible = layout_hinting;
         }
     }
-
+#endif
     if (!chem_host) return;
     auto em = chem_host->host_matrix();
     auto a1 = em->get_jack_1_assign();

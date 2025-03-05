@@ -114,17 +114,19 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
 
 }
 
-// Debug layout
+#ifdef LAYOUT_HELP
 void ChemModuleWidget::drawCrossLine(NVGcontext *vg, float x, float y)
 {
     NVGcolor co = Overlay(GetStockColor(StockColor::Gold), 0.35f);
     Line(vg, 0.f, y, box.size.x, y, co, 0.5f);
     Line(vg, x, 0.f, x, box.size.y, co, 0.5f);
 }
+#endif
 
 void ChemModuleWidget::draw(const DrawArgs& args)
 {
     ModuleWidget::draw(args);
+#ifdef LAYOUT_HELP
     if (showGrid) {
         auto vg = args.vg;
         NVGcolor co = Overlay(GetStockColor(StockColor::Coral), 0.35f);
@@ -154,6 +156,7 @@ void ChemModuleWidget::draw(const DrawArgs& args)
         Line(vg, 0, box.size.y*.5f, box.size.x, box.size.y*.5f, co, .5f);
 
     }
+#endif
 }
 
 void ChemModuleWidget::appendContextMenu(Menu *menu)
@@ -182,6 +185,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
         this->setThemeName(getThemeName(), this);
     }));
 
+#ifdef LAYOUT_HELP
     menu->addChild(new MenuSeparator);
     menu->addChild(createCheckMenuItem(
         "Grid", "",
@@ -191,6 +195,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
         "Layout help", "",
         [this]() { return hints; },
         [this]() { hints = !hints; }));
+#endif
 }
 
 // ---------------------------------------------------------------------------

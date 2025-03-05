@@ -2,12 +2,14 @@
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
 #include "../../services/colors.hpp"
+#include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/selector-widget.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 
@@ -29,9 +31,48 @@ struct ConvoUi;
 
 struct ConvoModule : ChemModule, IChemClient
 {
-    std::string device_claim;
-    ConvoUi* ui() { return reinterpret_cast<ConvoUi*>(chem_ui); };
+    enum Params {
+        P_PRE_MIX,
+        P_PRE_INDEX,
+        P_POST_MIX,
+        P_POST_INDEX,
 
+        P_TYPE,
+        P_LENGTH,
+        P_TUNING,
+        P_WIDTH,
+        P_LEFT, 
+        P_RIGHT,
+
+        P_MOD_AMOUNT, 
+
+        P_SELECT, 
+        P_EXTEND,
+        NUM_PARAMS,
+        NUM_MOD_PARAMS = P_TYPE,
+        NUM_KNOBS = P_SELECT
+    };
+    enum Inputs {
+        IN_PRE_MIX,
+        IN_PRE_INDEX,
+        IN_POST_MIX,
+        IN_POST_INDEX,
+        NUM_INPUTS
+    };
+    enum Outputs {
+        NUM_OUTPUTS
+    };
+    enum Lights {
+        L_PRE_MIX_MOD,
+        L_PRE_INDEX_MOD,
+        L_POST_MIX_MOD,
+        L_POST_INDEX_MOD,
+        L_EXTEND,
+        NUM_LIGHTS
+    };
+
+    std::string device_claim;
+    Modulation modulation;
     bool glow_knobs;
 
     int conv_number;
@@ -58,6 +99,12 @@ struct ConvoModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
+    ConvoUi* ui() { return reinterpret_cast<ConvoUi*>(chem_ui); };
+
+    void set_modulation_target(int id) {
+        //modulation.set_modulation_target(id);
+    }
+    void update_from_em();
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -66,46 +113,11 @@ struct ConvoModule : ChemModule, IChemClient
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
-    // ----  Rack  ------------------------------------------
-
-    enum Params {
-        P_TYPE,
-        P_LENGTH,
-        P_TUNING,
-        P_WIDTH,
-        P_LEFT, 
-        P_RIGHT,
-        P_PRE_MIX,
-        P_PRE_INDEX,
-        P_POST_MIX,
-        P_POST_INDEX,
-        P_ATTENUVERT, NUM_KNOBS = 1 + P_ATTENUVERT,
-        P_SELECT, 
-        P_EXTEND,
-        NUM_PARAMS
-    };
-    enum Inputs {
-        IN_PRE_MIX,
-        IN_PRE_INDEX,
-        IN_POST_MIX,
-        IN_POST_INDEX,
-        NUM_INPUTS
-    };
-    enum Outputs {
-        NUM_OUTPUTS
-    };
-    enum Lights {
-        L_IN_PRE_MIX,
-        L_IN_PRE_INDEX,
-        L_IN_POST_MIX,
-        L_IN_POST_INDEX,
-        L_EXTEND,
-        NUM_LIGHTS
-    };
-
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-
+    void onPortChange(const PortChangeEvent& e) override {
+        modulation.onPortChange(e);
+    }
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -128,10 +140,6 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     SmallRoundParamButton* extend_button;
     SelectorWidget* selector{nullptr};
 
-    //MiniVUWidget* l_vu;
-    //MiniVUWidget* r_vu;
-
-    // dynamic labels
     StaticTextLabel* selector_label;
     StaticTextLabel* type_label;
     int last_convo;
@@ -139,6 +147,10 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     float last_extend;
 
     GlowKnob* knobs[ConvoModule::NUM_KNOBS];
+    TrackWidget* tracks[ConvoModule::NUM_MOD_PARAMS];
+#ifdef LAYOUT_HELP
+    bool layout_hinting{false};
+#endif
 
     ConvoUi(ConvoModule *module);
 
@@ -149,7 +161,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
+    void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget

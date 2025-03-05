@@ -67,7 +67,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     auto prev = createWidgetCentered<PrevButton>(Vec(CENTER - 9.5f, 154.f));
     if (my_module) {
         prev->describe("Select previous preset");
-        prev->setHandler([this](bool c, bool s){ my_module->haken_midi.previous_system_preset(); });
+        prev->setHandler([this](bool c, bool s){ my_module->haken_midi.previous_system_preset(MidiTag::Core); });
     }
     prev->applyTheme(theme_engine, theme);
     addChild(prev);
@@ -75,7 +75,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     auto next = createWidgetCentered<NextButton>(Vec(CENTER + 9.f, 154.f));
     if (my_module) {
         next->describe("Select next preset");
-        next->setHandler([this](bool c, bool s){ my_module->haken_midi.next_system_preset(); });
+        next->setHandler([this](bool c, bool s){ my_module->haken_midi.next_system_preset(MidiTag::Core); });
     }
     next->applyTheme(theme_engine, theme);
     addChild(next);
@@ -530,43 +530,43 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
 
         menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {
             menu->addChild(createMenuItem("Reset calibration", "", [this]() {
-                my_module->haken_midi.reset_calibration();
+                my_module->haken_midi.reset_calibration(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("Refine calibration", "", [this]() {
-                my_module->haken_midi.refine_calibration();
+                my_module->haken_midi.refine_calibration(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("Factory calibration", "", [this]() {
-                my_module->haken_midi.factory_calibration();
+                my_module->haken_midi.factory_calibration(MidiTag::Core);
             }));
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Surface alignment", "", [this]() {
-                my_module->haken_midi.surface_alignment();
+                my_module->haken_midi.surface_alignment(MidiTag::Core);
             }));
         }));
 
         menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Editor Hello", "", [this]() {
-                my_module->haken_midi.editor_present();
+                my_module->haken_midi.editor_present(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("ConText", "", [this]() {
-                my_module->haken_midi.request_con_text();
+                my_module->haken_midi.request_con_text(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("Updates", "", [this]() {
-                my_module->haken_midi.request_updates();
+                my_module->haken_midi.request_updates(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("Configuration", "", [this]() {
-                my_module->haken_midi.request_configuration();
+                my_module->haken_midi.request_configuration(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("User presets", "", [this]() {
-                my_module->haken_midi.request_user();
+                my_module->haken_midi.request_user(MidiTag::Core);
             }));
             menu->addChild(createMenuItem("System presets", "", [this]() {
-                my_module->haken_midi.request_system();
+                my_module->haken_midi.request_system(MidiTag::Core);
             }));
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Remake Mahling data", "", [this]() {
-                my_module->haken_midi.remake_mahling();
+                my_module->haken_midi.remake_mahling(MidiTag::Core);
             }));
 
         }));

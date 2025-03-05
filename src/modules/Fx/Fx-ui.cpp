@@ -1,17 +1,17 @@
 #include "Fx.hpp"
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
+#include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
-namespace fs = ghc::filesystem;
 
 // -- Fx UI -----------------------------------
 
-enum K { K_R1, K_R2, K_R3, K_R4, K_R5, K_R6, K_MIX, K_ATTENUVERTER };
+enum K { K_R1, K_R2, K_R3, K_R4, K_R5, K_R6, K_MIX, K_MODULATION };
 
 FxUi::FxUi(FxModule *module) :
     my_module(module)
@@ -43,6 +43,7 @@ FxUi::FxUi(FxModule *module) :
     for (int i = 0; i < K_MIX; ++i) {
         knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme);
         addChild(knobs[i]);
+        addChild(tracks[i] = createTrackWidget(knobs[i], theme_engine, theme));
 
         r_labels[i] = createStaticTextLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme_engine, theme, S::control_label);
         addChild(r_labels[i]);
@@ -59,6 +60,8 @@ FxUi::FxUi(FxModule *module) :
     y = 70.f;
     knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme);
     addChild(knobs[K_MIX]);
+    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
+
     addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
@@ -71,12 +74,17 @@ FxUi::FxUi(FxModule *module) :
     // inputs
     const NVGcolor co_port = PORT_CORN;
     const float PORT_LEFT = CENTER - (1.5f*S::PORT_DX);
-
+    const float click_width = 32.f;
+    const float click_height = 21.f;
+    const float click_dy = 14.f;
     x = PORT_LEFT + S::PORT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= K_R6; ++i) {
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
+        if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
+
         x += S::PORT_DX;
         if (i == 2) {
             y += S::PORT_DY;
@@ -85,10 +93,12 @@ FxUi::FxUi(FxModule *module) :
     }
     y = S::PORT_TOP;
     x = PORT_LEFT;
-    addChild(knobs[K_ATTENUVERTER] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_ATTENUVERT, theme_engine, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_MOD_AMOUNT, theme_engine, theme));
     y += S::PORT_DY;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
+    if (my_module){ addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, FxModule::L_MIX_MOD));
 
     // footer
 
@@ -168,10 +178,8 @@ bool FxUi::connected() {
     return true;
 }
 
-void FxUi::step()
+void FxUi::sync_labels()
 {
-    Base::step();
-
     // TODO: stop polling start eventing
     auto pq = my_module ? my_module->getParamQuantity(FxModule::P_EFFECT) : nullptr;
     auto index = pq ? getParamIndex(pq) : 0;
@@ -224,6 +232,32 @@ void FxUi::step()
             break;
         }
     }
+}
+
+void FxUi::step()
+{
+    Base::step();
+    if (!my_module) return;
+
+    knobs[K_MODULATION]->enable(my_module->modulation.has_target());
+
+    for (int i = 0; i < K_MODULATION; ++i) {
+        tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
+        tracks[i]->set_active(my_module->getInput(i).isConnected());
+    }
+
+    sync_labels();
+
+#ifdef LAYOUT_HELP
+    if (hints != layout_hinting) {
+        layout_hinting = hints;
+        for (auto child: children) {
+            auto tr = dynamic_cast<ClickRegion*>(child);
+            if (tr) tr->visible = layout_hinting;
+        }
+    }
+#endif
+
 }
 
 void FxUi::draw(const DrawArgs& args)

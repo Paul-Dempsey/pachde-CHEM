@@ -1,12 +1,27 @@
 #include "Convo.hpp"
 using namespace pachde;
 
-ConvoModule::ConvoModule()
-:   glow_knobs(false),
+ConvoModule::ConvoModule() :
+    modulation(this, MidiTag::Convo),
+    glow_knobs(false),
     conv_number(0),
     last_conv(-1),
     extend(false)
 {
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix1), // P_PRE_MIX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx1), // P_PRE_INDEX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix2), // P_POST_MIX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx2), // P_POST_INDEX
+        // EmccPortConfig::no_send(0, 0, true), // P_TYPE
+        // EmccPortConfig::no_send(0, 0, true), // P_LENGTH
+        // EmccPortConfig::no_send(0, 0, true), // P_TUNING
+        // EmccPortConfig::no_send(0, 0, true), // P_WIDTH
+        // EmccPortConfig::no_send(0, 0, true), // P_LEFT
+        // EmccPortConfig::no_send(0, 0, true)  // P_RIGHT
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_MIX, Inputs::IN_PRE_MIX, Lights::L_PRE_MIX_MOD, NUM_MOD_PARAMS, cfg);
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     configSwitch(P_TYPE, 0.f, 18.f, 6.f, "Convolution type", {
@@ -30,18 +45,18 @@ ConvoModule::ConvoModule()
         "White",
         "Grey"
     });
-    configParam(P_LENGTH, 0.f, 10.f, 10.f, "Length");
-    configParam(P_TUNING, 0.f, 10.f,  5.f, "Tuning");
-    configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width");
-    configParam(P_LEFT,   0.f, 10.f, 10.f, "Left attenuation");
-    configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right attenuation");
+    configParam(P_LENGTH, 0.f, 10.f, 10.f, "Length")->displayPrecision = 4;
+    configParam(P_TUNING, 0.f, 10.f,  5.f, "Tuning")->displayPrecision = 4;
+    configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width")->displayPrecision = 4;
+    configParam(P_LEFT,   0.f, 10.f, 10.f, "Left attenuation")->displayPrecision = 4;
+    configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right attenuation")->displayPrecision = 4;
 
-    configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix");
-    configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index");
-    configParam(P_POST_MIX,   0.f, 10.f, 0.f, "Post Mix");
-    configParam(P_POST_INDEX, 0.f, 10.f, 0.f, "Post Index");
+    configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix")->displayPrecision = 4;
+    configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index")->displayPrecision = 4;
+    configParam(P_POST_MIX,   0.f, 10.f, 0.f, "Post Mix")->displayPrecision = 4;
+    configParam(P_POST_INDEX, 0.f, 10.f, 0.f, "Post Index")->displayPrecision = 4;
 
-    configParam(P_ATTENUVERT, -100.f, 100.f, 0.f, "Input attenuverter", "%");
+    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
 
     configSwitch(P_SELECT, 0.f, 3.f, 0.f, "Select convolution", { "Convolution #1", "Convolution #2", "Convolution #3", "Convolution #4"});
     configSwitch(P_EXTEND, 0.f, 1.f, 0.f, "Extend computation", {"off", "on"});
@@ -51,11 +66,11 @@ ConvoModule::ConvoModule()
     configInput(IN_POST_MIX,   "Post mix");
     configInput(IN_POST_INDEX, "Post index");
 
-    configLight(L_IN_PRE_MIX,   "Attenuverter on Pre mix");
-    configLight(L_IN_PRE_INDEX, "Attenuverter on Pre index");
-    configLight(L_IN_POST_MIX,  "Attenuverter on Post mix");
-    configLight(L_IN_POST_INDEX,"Attenuverter on Post index");
-    // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for lights under buttons
+    configLight(L_PRE_MIX_MOD,   "Modulation control on Pre mix");
+    configLight(L_PRE_INDEX_MOD, "Modulation control on Pre index");
+    configLight(L_POST_MIX_MOD,  "Modulation control on Post mix");
+    configLight(L_POST_INDEX_MOD,"Modulation control on Post index");
+    // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for button lights 
 
 }
 
@@ -81,6 +96,10 @@ json_t* ConvoModule::dataToJson()
     return root;
 }
 
+void ConvoModule::update_from_em()
+{
+}
+
 // IChemClient
 ::rack::engine::Module* ConvoModule::client_module() { return this; }
 std::string ConvoModule::client_claim() { return device_claim; }
@@ -102,6 +121,7 @@ void ConvoModule::onConnectHost(IChemHost* host)
 
 void ConvoModule::onPresetChange()
 {
+    update_from_em();
     if (chem_ui) ui()->onPresetChange();
 }
 
@@ -112,10 +132,12 @@ void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
 
 void ConvoModule::process_params(const ProcessArgs& args)
 {
+    modulation.pull_mod_amount();
+
     {
         auto v = getParamInt(getParam(Params::P_EXTEND));
         getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
-    }
+    }    
 
     int current = getParamInt(getParam(Params::P_SELECT));
     if (last_conv != current) {
@@ -142,6 +164,9 @@ void ConvoModule::process(const ProcessArgs& args)
 {
     if (!chem_host || chem_host->host_busy()) return;
 
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
+    }
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
     }
