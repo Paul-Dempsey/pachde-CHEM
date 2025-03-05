@@ -129,7 +129,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-macro.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-macro.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void step() override;

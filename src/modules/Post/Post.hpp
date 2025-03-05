@@ -126,7 +126,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-post.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-post.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void step() override;

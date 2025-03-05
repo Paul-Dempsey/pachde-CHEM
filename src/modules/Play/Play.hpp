@@ -184,7 +184,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void onDropPreset(PresetWidget* target) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-play.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-play.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;

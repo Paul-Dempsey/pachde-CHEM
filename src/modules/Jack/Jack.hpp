@@ -111,7 +111,7 @@ struct JackUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-jack.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-jack.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void sync_labels();

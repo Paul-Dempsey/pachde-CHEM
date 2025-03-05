@@ -165,7 +165,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-convo.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-convo.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void sync_select_label();

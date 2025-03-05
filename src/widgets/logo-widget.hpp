@@ -67,10 +67,10 @@ struct TSymbolWidget: OpaqueWidget
 };
 
 struct LogoSvg {
-    static std::string symbol() { return "res/CHEM-logo.svg"; }
+    static std::string symbol() { return "res/logo/CHEM-logo.svg"; }
 };
 struct LogoWatermarkSvg {
-    static std::string symbol() { return "res/CHEM-logo-watermark.svg"; }
+    static std::string symbol() { return "res/logo/CHEM-logo-watermark.svg"; }
 };
 
 using Logo = TSymbolWidget<LogoSvg>;

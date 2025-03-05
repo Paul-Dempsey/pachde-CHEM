@@ -46,7 +46,7 @@ struct BlankModuleWidget : ChemModuleWidget
     SymbolProvider symbols;
     SymbolSetWidget* pedal_image[8];
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-blank.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-blank.svg"); }
 
     BlankModuleWidget(BlankModule *module)
     {

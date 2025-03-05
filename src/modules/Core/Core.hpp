@@ -215,7 +215,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     const NVGcolor& taskStateColor(TaskState state);
     void set_theme_colors(const std::string& theme = "");
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-core.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
     MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device, std::shared_ptr<SvgTheme> theme);
 
     void createScrews(std::shared_ptr<SvgTheme> theme);

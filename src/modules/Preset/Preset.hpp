@@ -33,7 +33,7 @@ struct PresetModuleWidget : ChemModuleWidget
     using Base = ChemModuleWidget;
     PresetModule *my_module = nullptr;
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/CHEM-preset.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
 
     PresetModuleWidget(PresetModule *module);
 
