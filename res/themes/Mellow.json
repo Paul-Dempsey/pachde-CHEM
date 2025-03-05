@@ -44,9 +44,10 @@
 
             "ped-assign": { "fill": "hsl(32, 90%, 80%)" },
 
-            "midi-frame" : { "fill": "#d4b268" },
-            "midi-face"  : { "fill": "#60502d" },
-            "midi-label" : { "fill": "#e6c070" },
+            "midi-frame" : { "fill": " #d4b268" },
+            "midi-face"  : { "fill": " #60502d" },
+            "midi-label" : { "fill": " #e6c070" },
+            "midi-name"  : { "fill": "#4dff97" },
 
             "dytext": { "fill": "#dcc13b"},
             "curpreset": { "fill": "brand" },

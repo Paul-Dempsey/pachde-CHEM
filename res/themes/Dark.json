@@ -36,6 +36,7 @@
             "midi-frame" : { "fill": "#a6a6a6" },
             "midi-face"  : { "fill": "#1f1f1f" },
             "midi-label" : { "fill": "#d9d9d9" },
+            "midi-name"  : { "fill": "g90" },
 
             "haken-in": { "fill": "#54a754" },
             "haken-out": { "fill": "#4556e7" },

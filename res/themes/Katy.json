@@ -3,19 +3,19 @@
         "name": "Katy",
         "theme": {
             "panel" :  { "fill": "#df62a7" },
-            "g-panel": { "fill": { "gradient": [{ "index":0, "color":"hsl(327, 66.10%, 62%)"}, { "index":1, "color":"hsl(327, 53.40%, 48%)"}]}},
+            "g-panel": { "fill": { "gradient": [{ "index":0, "color":"hsl(327, 100.00%, 75.90%)"}, { "index":1, "color":"hsl(327, 53.40%, 48%)"}]}},
             "panel-border": { "stroke": {"color":"#decc2f", "width": 0.5 }},
-            "th": {"stroke": { "color":"hsl(56, 80%, 70%)", "width": 0.5 }},
+            "th": {"stroke": { "color":"hsl(56, 100.00%, 48.60%)", "width": 0.5 }},
             "jack-glyph": {"fill": " #052d68" },
 
-            "grid-bg":   { "fill": "hsl(54, 80%, 55%)" },
+            "grid-bg":   { "fill": " #f9eb6a" },
             "grid-line": { "stroke": " #df62a6" },
             "grid-new": { "fill": " #3b6ab0" },
             "dytext": { "fill": " #052d68" },
 
-            "hexoid": { "fill": "brand" },
-            "CHEM": {"fill": "brand"},
-            "pachde": {"fill": "brand"},
+            "hexoid": { "fill": "#810047" },
+            "CHEM": {"fill": " #810047"},
+            "pachde": {"fill": "#810047"},
             "title": {"fill": "#1f1f1f" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":" #df62a6"}, { "index":1, "color":" #c84a90"}]}},
@@ -49,13 +49,14 @@
             "midi-frame" : { "fill": " #decc2f" },
             "midi-face"  : { "fill": " #1f1f1f" },
             "midi-label" : { "fill": " #d9d9d9" },
+            "midi-name"  : { "fill": "g90" },
 
             "haken-in": { "fill": "#54a754" },
             "haken-out": { "fill": "#4556e7" },
             "c1-in": { "fill": "#e744be" },
             "c2-in": { "fill": "#e744be" },
 
-            "curpreset": { "fill": "#decc2f" },
+            "curpreset": { "fill": "rgb(255, 234, 44)" },
 
             "tab-label":       { "fill": "g80" },
             "tab-label-hi":    { "fill": "g95" },
@@ -82,7 +83,7 @@
             "ctl-label-hi":{ "fill": "g90" },
             "ctl-bar":     { "stroke": "#052d68"},
 
-            "menu":        { "fill" : "black" },
+            "menu": { "fill" : "black" },
             "led": { "fill" : " #6f9de3", "stroke": " #80808080" },
 
             "selector": { "fill": " #202020", "stroke": { "color": "hsl(276, 23.60%, 39.00%)", "width":1 }},
@@ -115,8 +116,8 @@
             "cop-ring": { "fill": "g40" },
             "cop-hole": { "fill": "g5" },
 
-            "patty": { "stroke": "#decc2f"},
-            "patty-hover": { "stroke": "brand"},
+            "patty": { "stroke": " #810047"},
+            "patty-hover": { "stroke": "#8c72f5"},
 
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e38dbc" }, { "index":1, "offset":1, "color": "#a14b7a" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e389ba" }, { "index":1, "offset":1, "color": "#8a3b67" }]}},
