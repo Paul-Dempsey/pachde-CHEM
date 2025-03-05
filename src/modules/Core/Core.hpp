@@ -61,13 +61,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         midi_log.logMessage(prefix, info);
     }
 
-    ChemDevice device_identifier(const MidiDeviceHolder* holder)
-    {
-        if (holder == &haken_device) return ChemDevice::Haken;
-        if (holder == &controller1) return ChemDevice::Midi1;
-        if (holder == &controller2) return ChemDevice::Midi2;
-        return ChemDevice::Unknown;
-    }
+    ChemDevice device_identifier(const MidiDeviceHolder* holder);
+    std::string device_name(const MidiDeviceHolder& holder);
+    std::string device_name(ChemDevice which);
 
     bool is_haken_connected() { return (haken_midi_out.output.deviceId >= 0) && (nullptr != haken_device.connection); }
     bool is_controller_1_connected() { return (controller1_midi_in.deviceId >= 0) && (nullptr != controller1.connection); }
@@ -126,9 +122,13 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     enum Params {
         P_C1_MUSIC_FILTER,
         P_C2_MUSIC_FILTER,
+        P_C1_MUTE,
+        P_C2_MUTE,
         NUM_PARAMS
     };
     enum Inputs {
+        IN_C1_MUTE_GATE,
+        IN_C2_MUTE_GATE,
         NUM_INPUTS
     };
     enum Outputs {
@@ -144,6 +144,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_PULSE,
         L_C1_MUSIC_FILTER,
         L_C2_MUSIC_FILTER,
+        L_C1_MUTE,
+        L_C2_MUTE,
         NUM_LIGHTS
     };
 

@@ -25,6 +25,11 @@ CoreModule::CoreModule() :
 
     configSwitch(Params::P_C1_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
     configSwitch(Params::P_C2_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
+    configSwitch(Params::P_C1_MUTE, 0.f, 1.f, 0.f, "MIDI 1 data", { "passed", "blocked" } );
+    configSwitch(Params::P_C2_MUTE, 0.f, 1.f, 0.f, "MIDI 2 data", { "passed", "blocked" } );
+
+    configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
+    configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
 
     configLight(L_ROUND_Y,       "Round on Y");
     configLight(L_ROUND_INITIAL, "Round initial");
@@ -92,6 +97,33 @@ void CoreModule::enable_logging(bool enable)
         controller1_midi_in.setLogger("", nullptr);
         controller2_midi_in.setLogger("", nullptr);
         midi_log.close();
+    }
+}
+
+ChemDevice CoreModule::device_identifier(const MidiDeviceHolder* holder)
+{
+    if (holder == &haken_device) return ChemDevice::Haken;
+    if (holder == &controller1) return ChemDevice::Midi1;
+    if (holder == &controller2) return ChemDevice::Midi2;
+    return ChemDevice::Unknown;
+}
+
+std::string CoreModule::device_name(const MidiDeviceHolder& holder) {
+    if (holder.connection) {
+        return holder.connection->info.friendly(TextFormatLength::Short);
+    } else if (!holder.device_claim.empty()) {
+        return holder.device_claim;
+    }
+    return "";
+}
+
+std::string CoreModule::device_name(ChemDevice which) {
+    switch (which)
+    {
+    case ChemDevice::Haken: return device_name(haken_device);
+    case ChemDevice::Midi1: return device_name(controller1);
+    case ChemDevice::Midi2: return device_name(controller2);
+    default: return "";
     }
 }
 
@@ -400,21 +432,28 @@ void CoreModule::processLights(const ProcessArgs &args)
 
     getLight(L_C1_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C1_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);
+    getLight(L_C1_MUTE).setBrightnessSmooth(getParam(P_C1_MUTE).getValue(), 45.f);
+    getLight(L_C2_MUTE).setBrightnessSmooth(getParam(P_C2_MUTE).getValue(), 45.f);
 }
 
 void CoreModule::process_params(const ProcessArgs &args)
 {
     if (is_controller_1_connected()) {
         controller1_midi_in.setMusicPassFilter(getParamInt(getParam(P_C1_MUSIC_FILTER)));
+        controller1_midi_in.enable(0 == getParamInt(getParam(P_C1_MUTE)));
     } else {
         controller1_midi_in.setMusicPassFilter(false);
+        getParam(P_C1_MUTE).setValue(0.f);
         getParam(P_C1_MUSIC_FILTER).setValue(0.f);
     }
 
     if (is_controller_2_connected()) {
         controller2_midi_in.setMusicPassFilter(getParamInt(getParam(P_C2_MUSIC_FILTER)));
+        controller2_midi_in.enable(0 == getParamInt(getParam(P_C2_MUTE)));
     } else {
         controller2_midi_in.setMusicPassFilter(false);
+        controller2_midi_in.enable(true);
+        getParam(P_C2_MUTE).setValue(0.f);
         getParam(P_C2_MUSIC_FILTER).setValue(0.f);
     }
 }
@@ -437,6 +476,18 @@ void CoreModule::process(const ProcessArgs &args)
     // todo: after a reset, need to have a ~20sec pause before rescanning
     if (!haken_midi_out.pending()) {
         tasks.process(args);
+    }
+
+    if (getInput(IN_C1_MUTE_GATE).isConnected()) {
+        bool mute = getInput(IN_C1_MUTE_GATE).getVoltage() >= 0.8f;
+        getParam(P_C1_MUTE).setValue(mute ? 1.f : 0.f);
+        controller1_midi_in.enable(!mute);
+    }
+
+    if (getInput(IN_C2_MUTE_GATE).isConnected()) {
+        bool mute = getInput(IN_C2_MUTE_GATE).getVoltage() >= 0.8f;
+        getParam(P_C2_MUTE).setValue(mute ? 1.f : 0.f);
+        controller2_midi_in.enable(!mute);
     }
     
     if (getOutput(OUT_READY).isConnected()) {

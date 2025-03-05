@@ -126,6 +126,7 @@ void MidiInput::queueMessage(PackedMidiMessage msg)
 
 void MidiInput::onMessage(const midi::Message& message)
 {
+    if (mute) return;
     auto msg = packedFromRack(message, my_tag);
     if (music_pass_filter && !is_music_message(msg)) return;
     queueMessage(msg);

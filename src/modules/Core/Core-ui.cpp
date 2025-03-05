@@ -26,6 +26,7 @@ constexpr const float PICKER_LABEL_OFFSET = 14.f;
 constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
 constexpr const float ROUND_LIGHT_SPREAD = 6.f;
 constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
+namespace S = pachde::style;
 
 CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     my_module(module),
@@ -57,7 +58,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
     createRoundingLeds(r_col - 1.5 * ROUND_LIGHT_SPREAD, 40.f, ROUND_LIGHT_SPREAD);
-    createIndicatorsCentered(CENTER, 354.f, 9.f);
+    createIndicatorsCentered(CENTER, PICKER_TOP - 18.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createStaticTextLabel<TipLabel>(
@@ -87,7 +88,18 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     x = RACK_GRID_WIDTH * 1.5f;
     y = 42;
     addChild(createLightCentered<TinySimpleLight<YellowLight>>(Vec(x, y), my_module, CoreModule::L_PULSE));
-    addChild(Center(createThemedColorOutput(Vec(RACK_GRID_WIDTH+2, RACK_GRID_HEIGHT - 50.f), my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA, theme_engine, theme)));
+    
+    const NVGcolor co_port = PORT_CORN;
+    y = S::PORT_TOP + S::PORT_DY;
+    x = RACK_GRID_WIDTH+2;
+    addChild(Center(createThemedColorOutput(Vec(x, y), my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "OK", theme_engine, theme, S::in_port_label));
+    x = 125.f;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C1_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
+    x += 25.f;
+    addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
 
     style.key = "brand";
     style.align = TextAlignment::Center;
@@ -121,40 +133,38 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 {
     float y = PICKER_TOP;
-    haken_picker = createMidiPicker(style::UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
-    std::string text = "[Eagan Matrix Device]";
-    if (my_module) {
-        if (my_module->haken_device.connection) {
-            text = my_module->haken_device.connection->info.friendly(TextFormatLength::Short);
-        } else if (!my_module->haken_device.device_claim.empty()) {
-            text = my_module->haken_device.device_claim;
-        }
-    }
+    haken_picker = createMidiPicker(S::UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
     LabelStyle style{"dytext", TextAlignment::Center, 10.f};
     addChild(firmware_label = createStaticTextLabel<StaticTextLabel>(
         Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
         theme, style));
 
-    style.align = TextAlignment::Left;
-    style.height = 14.f;
+    LabelStyle midi_style{"midi-name", TextAlignment::Left, 14.f};
 
+    std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
     addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, midi_style));
 
     y += PICKER_INTERVAL;
-    controller1_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
+    controller1_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
+    text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
-        Vec(155.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
-    
+        Vec(138.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
+        Vec(155.f, y + 6.f), my_module, CoreModule::P_C1_MUTE, CoreModule::L_C1_MUTE, theme_engine, theme)));
+
     y += PICKER_INTERVAL;
-    controller2_picker = createMidiPicker(style::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
+    controller2_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
+    text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
-        Vec(style::UHALF, y + PICKER_LABEL_OFFSET), 120.f, "", theme_engine, theme, style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
-        Vec(155.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));
-    
+        Vec(138.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
+        Vec(155.f, y + 6.f), my_module, CoreModule::P_C2_MUTE, CoreModule::L_C2_MUTE, theme_engine, theme)));
+        
     float x = 18.f;
     y = PICKER_TOP - 18.f;
     auto w = Center(createThemedButton<SmallRoundButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(Ctrl+Click to clear)"));
@@ -171,6 +181,8 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
                 my_module->haken_device.clear();
                 my_module->controller1.clear();
                 my_module->controller2.clear();
+                my_module->controller1_midi_in.enable();
+                my_module->controller2_midi_in.enable();
             } else {
                 // drop connections
                 my_module->haken_device.connect(nullptr);
@@ -180,7 +192,9 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
                 my_module->haken_midi_out.output.reset();
                 my_module->haken_midi_out.output.channel = -1;
                 my_module->controller1_midi_in.reset();
+                my_module->controller1_midi_in.enable();
                 my_module->controller2_midi_in.reset();
+                my_module->controller2_midi_in.enable();
             }
         });
     }
