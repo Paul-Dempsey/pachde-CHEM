@@ -35,6 +35,22 @@ json_t* ChemModule::dataToJson()
     return root;
 }
 
+IChemHost *ChemModule::find_expander_host()
+{
+    Module* scan = this;
+    for (scan = leftExpander.module; nullptr != scan; scan = scan->leftExpander.module) {
+        if (!isPeerModule(this, scan)) break;
+        auto host = static_cast<ChemModule*>(scan)->get_host();
+        if (host) return host;
+    }
+    for (scan = rightExpander.module; nullptr != scan; scan = scan->rightExpander.module) {
+        if (!isPeerModule(this, scan)) return nullptr;
+        auto host = static_cast<ChemModule*>(scan)->get_host();
+        if (host) return host;
+    }
+    return nullptr;
+}
+
 // ---------------------------------------------------------------------------
 // UI
 //

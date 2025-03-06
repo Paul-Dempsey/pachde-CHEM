@@ -3,7 +3,7 @@
 
 namespace pachde {
 
-void EmControlPort::send(IChemHost* chem, MidiTag tag, bool force)
+void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
 {
     if (!chem) return;
     if (no_send()) return;
@@ -65,7 +65,7 @@ float EmControlPort::modulate()
 
 // ----  Modulation -----------------------------
 
-Modulation::Modulation(ChemModule* module, MidiTag client_tag) :
+Modulation::Modulation(ChemModule* module, ChemId client_tag) :
     module(module),
     mod_target(-1),
     last_mod_target(-1),

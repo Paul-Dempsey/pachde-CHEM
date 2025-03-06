@@ -96,7 +96,7 @@ struct EmControlPort
     }
 
     void force_send_at_next_opportunity() { last_em_value = UNSET_16; }
-    void send(IChemHost* chem, MidiTag tag, bool force = false);
+    void send(IChemHost* chem, ChemId tag, bool force = false);
 };
 
 struct Modulation
@@ -111,7 +111,7 @@ struct Modulation
     int first_input;
     int first_light;
     bool have_stream;
-    MidiTag client_tag;
+    ChemId client_tag;
 
     const float MIDI_RATE = 0.05f;
     rack::dsp::Timer midi_timer;
@@ -128,7 +128,7 @@ struct Modulation
     EmControlPort& get_port(int index) {
         return ports[index];
     }
-    Modulation(ChemModule* module, MidiTag client_tag);
+    Modulation(ChemModule* module, ChemId client_tag);
 
     void configure(int mod_param_id, int first_param, int first_input, int first_light, int data_length, const EmccPortConfig* data);
     bool has_target() { return mod_target >= 0; }

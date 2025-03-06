@@ -151,13 +151,13 @@ void CoreModule::reboot()
 
 void CoreModule::send_midi_rate(HakenMidiRate rate)
 {
-    haken_midi.midi_rate(MidiTag::Core, rate);
+    haken_midi.midi_rate(ChemId::Core, rate);
 }
 
 void CoreModule::restore_midi_rate()
 {
     if (HakenMidiRate::Full != tasks.midi_rate) {
-        haken_midi.midi_rate(MidiTag::Core, HakenMidiRate::Full);
+        haken_midi.midi_rate(ChemId::Core, HakenMidiRate::Full);
         tasks.midi_rate = HakenMidiRate::Full;
     }
 }
@@ -263,7 +263,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.channel = -1;
 
             log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
-            haken_midi.editor_present(MidiTag::Core);
+            haken_midi.editor_present(ChemId::Core);
             haken_midi_out.dispatch(DISPATCH_NOW);
         } else {
             log_message("Core", "--- disconnect HAKEN");

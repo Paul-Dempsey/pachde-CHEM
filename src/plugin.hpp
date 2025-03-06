@@ -26,3 +26,5 @@ extern Model* modelPreset;
 extern svg_theme::SvgThemeEngine theme_engine;
 bool initThemeEngine();
 bool reloadThemes();
+
+bool isPeerModule(Module* me, Module* candidate);

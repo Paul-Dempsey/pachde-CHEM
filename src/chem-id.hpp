@@ -2,7 +2,7 @@
 #include <stdint.h>
 namespace pachde {
 
-enum class MidiTag : uint8_t {
+enum class ChemId : uint8_t {
     Unknown,
     Haken,
     Midi1,
@@ -15,10 +15,11 @@ enum class MidiTag : uint8_t {
     Convo,
     Jack,
     Play,
-    Preset
+    Preset,
+    Blank
 };
 
-inline uint8_t as_u8(MidiTag tag) { return static_cast<uint8_t>(tag); }
-inline MidiTag as_midi_tag(uint8_t byte) { return static_cast<MidiTag>(byte); }
+inline uint8_t as_u8(ChemId tag) { return static_cast<uint8_t>(tag); }
+inline ChemId as_chem_id(uint8_t byte) { return static_cast<ChemId>(byte); }
 
 }

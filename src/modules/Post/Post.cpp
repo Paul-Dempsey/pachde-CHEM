@@ -3,7 +3,7 @@ using namespace pachde;
 #include "../../em/wrap-HakenMidi.hpp"
 
 PostModule::PostModule() :
-    modulation(this, MidiTag::Post),
+    modulation(this, ChemId::Post),
     glow_knobs(false),
     muted(false)
 {
@@ -124,10 +124,10 @@ void PostModule::sync_mute()
         muted = new_mute;
         auto haken = chem_host->host_haken();
         if (muted) {
-            haken->control_change(MidiTag::Post, Haken::ch1, Haken::ccFracPed, 0);
-            haken->control_change(MidiTag::Post, Haken::ch1, Haken::ccPost, 0);
+            haken->control_change(ChemId::Post, Haken::ch1, Haken::ccFracPed, 0);
+            haken->control_change(ChemId::Post, Haken::ch1, Haken::ccPost, 0);
         } else {
-            modulation.get_port(P_POST_LEVEL).send(chem_host, MidiTag::Post, true);
+            modulation.get_port(P_POST_LEVEL).send(chem_host, ChemId::Post, true);
         }
     }
 }
@@ -143,6 +143,8 @@ void PostModule::process_params(const ProcessArgs &args)
 
 void PostModule::process(const ProcessArgs& args)
 {
+    find_and_bind_host(this, args);
+
     if (!chem_host || chem_host->host_busy()) return;
 
     if (modulation.sync_params_ready(args)) {

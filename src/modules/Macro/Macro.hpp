@@ -54,11 +54,8 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
         modulation.set_modulation_target(id);
     }
     void doMessage(PackedMidiMessage message) override;
-    void update_from_em(bool with_knob);
+    void update_from_em();
 
-    IChemHost* get_host() override {
-        return chem_host;
-    }
     bool connected();
 
     // IChemClient

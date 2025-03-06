@@ -3,7 +3,7 @@ using namespace pachde;
 #include "../../em/wrap-HakenMidi.hpp"
 
 PreModule::PreModule() :
-    modulation(this, MidiTag::Pre),
+    modulation(this, ChemId::Pre),
     last_select(-1),
     glow_knobs(false)
 {
@@ -134,7 +134,7 @@ void PreModule::process_params(const ProcessArgs &args)
     int sel = getParamInt(getParam(Params::P_SELECT));
     if (sel != last_select) {
         last_select = sel;
-        chem_host->host_haken()->compressor_option(MidiTag::Pre, sel);
+        chem_host->host_haken()->compressor_option(ChemId::Pre, sel);
     }
 
     modulation.pull_mod_amount();
@@ -143,6 +143,8 @@ void PreModule::process_params(const ProcessArgs &args)
 
 void PreModule::process(const ProcessArgs &args)
 {
+    find_and_bind_host(this, args);
+
     if (!connected() || chem_host->host_busy()) return;
 
     if (modulation.sync_params_ready(args)) {

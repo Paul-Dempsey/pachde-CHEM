@@ -329,7 +329,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
         case HakenTask::HeartBeat:
             if (chem->is_haken_connected()){
                 chem->log_message("CHEM", "Starting task Heartbeat");
-                chem->haken_midi.editor_present(MidiTag::Core);
+                chem->haken_midi.editor_present(ChemId::Core);
                 chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 task->pend();
                 notifyChange(HakenTask::HeartBeat);
@@ -343,7 +343,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
         case HakenTask::Updates:
             if (chem->is_haken_connected()) {
                 chem->log_message("CHEM", "Starting task Updates");
-                chem->haken_midi.request_updates(MidiTag::Core);
+                chem->haken_midi.request_updates(ChemId::Core);
                 // chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 task->done();
                 notifyChange(HakenTask::Updates);
@@ -359,7 +359,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             if (chem->is_haken_connected()) {
                 chem->log_message("CHEM", "Starting task PresetInfo");
                 task->pend();
-                chem->haken_midi.request_configuration(MidiTag::Core);
+                chem->haken_midi.request_configuration(ChemId::Core);
                 //chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 notifyChange(HakenTask::PresetInfo);
             } else {
@@ -376,7 +376,7 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             {
                 chem->log_message("CHEM", "Starting task LastPreset");
                 task->pend();
-                chem->haken_midi.select_preset(MidiTag::Core, chem->last_preset.id);
+                chem->haken_midi.select_preset(ChemId::Core, chem->last_preset.id);
                 notifyChange(HakenTask::LastPreset);
             } else {
                 task->not_applicable();

@@ -3,7 +3,7 @@
 using namespace pachde;
 
 MacroModule::MacroModule() :
-    modulation(this, MidiTag::Macro),
+    modulation(this, ChemId::Macro),
     glow_knobs(false)
 {
     EmccPortConfig cfg[] = {
@@ -103,7 +103,7 @@ void MacroModule::onPresetChange()
         if (preset) {
             macro_names.fill_macro_names();
             macro_names.parse_text(preset->text);
-            update_from_em(true);
+            update_from_em();
         }
     }
     if (chem_ui) ui()->onPresetChange();
@@ -117,7 +117,7 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
 void MacroModule::doMessage(PackedMidiMessage msg)
 {
     if (Haken::ccStat1 != msg.bytes.status_byte) return;
-    if (as_u8(MidiTag::Macro) == msg.bytes.tag) return;
+    if (as_u8(ChemId::Macro) == msg.bytes.tag) return;
 
     auto cc = msg.bytes.data1;
     switch (cc) {
@@ -140,20 +140,12 @@ void MacroModule::doMessage(PackedMidiMessage msg)
     }
 }
 
-void MacroModule::update_from_em(bool with_knob)
+void MacroModule::update_from_em()
 {
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
         for (int param = 0; param <= P_M6; ++param) {
-            if (with_knob) {
-               modulation.set_em_and_param(param, em->get_macro_value(param), with_knob);
-            } else {
-                // auto mac = em->get_macro_value(param);
-                // auto port{modulation.get_port(param)};
-                // if (port.modulated_em_value(mac) != port.modulated()) {
-                //     modulation.set_em_and_param(param, em->get_macro_value(param), true);
-                // }
-            }
+            modulation.set_em_and_param(param, em->get_macro_value(param), true);
         }
     }
 }
@@ -161,11 +153,12 @@ void MacroModule::update_from_em(bool with_knob)
 void MacroModule::process_params(const ProcessArgs& args)
 {
     modulation.pull_mod_amount();
-    //update_from_em(false);
 }
 
 void MacroModule::process(const ProcessArgs& args)
 {
+    find_and_bind_host(this, args);
+
     if (!chem_host || chem_host->host_busy()) return;
     
     if (modulation.sync_params_ready(args)) {

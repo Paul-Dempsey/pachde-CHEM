@@ -316,7 +316,7 @@ void PlayUi::select_preset(PresetId id)
     auto haken = chem_host->host_haken();
     if (haken) {
         haken->log->logMessage("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
-        haken->select_preset(MidiTag::Play, id);
+        haken->select_preset(ChemId::Play, id);
     }
 }
 
@@ -932,7 +932,7 @@ void PlayUi::fill(bool system)
     em_handler = new EmHandler(this);
     matrix->subscribeEMEvents(em_handler);
     gather = true;
-    system ? haken->request_system(MidiTag::Play) : haken->request_user(MidiTag::Play);
+    system ? haken->request_system(ChemId::Play) : haken->request_user(ChemId::Play);
 }
 
 void PlayUi::on_fill_complete()
@@ -1020,7 +1020,7 @@ void PlayUi::onChoosePreset(PresetWidget* source)
     auto haken = chem_host->host_haken();
     if (haken) {
         haken->log->logMessage("play", format_string("Selecting %s", current_preset->summary().c_str()));
-        haken->select_preset(MidiTag::Play, id);
+        haken->select_preset(ChemId::Play, id);
     }
 }
 

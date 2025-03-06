@@ -25,9 +25,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     MidiDeviceHolder controller1;
     MidiDeviceHolder controller2;
 
-    MidiInput haken_midi_in { MidiTag::Haken };
-    MidiInput controller1_midi_in { MidiTag::Midi1 };
-    MidiInput controller2_midi_in { MidiTag::Midi2 };
+    MidiInput haken_midi_in { ChemId::Haken };
+    MidiInput controller1_midi_in { ChemId::Midi1 };
+    MidiInput controller2_midi_in { ChemId::Midi2 };
 
     HakenMidiOutput haken_midi_out;
 

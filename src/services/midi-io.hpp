@@ -10,7 +10,7 @@ using namespace ::rack;
 namespace pachde {
 
 midi::Message rackFromPacked(PackedMidiMessage source);
-inline PackedMidiMessage Tag(PackedMidiMessage msg, MidiTag tag) {
+inline PackedMidiMessage Tag(PackedMidiMessage msg, ChemId tag) {
     msg.bytes.tag = as_u8(tag);
     return msg;
 }
@@ -20,7 +20,7 @@ constexpr const float DISPATCH_NOW = MIDI_RATE;
 
 struct MidiInput : midi::Input
 {
-    MidiTag my_tag;
+    ChemId my_tag;
     IDoMidi* target;
     uint64_t message_count;
     MidiLog* log;
@@ -35,7 +35,7 @@ struct MidiInput : midi::Input
     rack::dsp::Timer midi_timer;
 
     MidiInput(const MidiInput &) = delete; // no copy constructor
-    MidiInput(MidiTag tag) : my_tag(tag), message_count(0), log(nullptr), music_pass_filter(false), mute{false} { this->channel = -1; }
+    MidiInput(ChemId tag) : my_tag(tag), message_count(0), log(nullptr), music_pass_filter(false), mute{false} { this->channel = -1; }
 
     uint64_t count() { return message_count; }
     void clear()

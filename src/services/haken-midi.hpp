@@ -30,34 +30,34 @@ struct HakenMidi
 
     void send_message(PackedMidiMessage msg) { doer->doMessage(msg); }
 
-    void control_change(MidiTag tag, uint8_t channel, uint8_t cc, uint8_t value);
-    void key_pressure(MidiTag tag, uint8_t channel, uint8_t note, uint8_t pressure);
+    void control_change(ChemId tag, uint8_t channel, uint8_t cc, uint8_t value);
+    void key_pressure(ChemId tag, uint8_t channel, uint8_t note, uint8_t pressure);
 
-    void begin_stream(MidiTag tag, uint8_t stream);
-    void stream_data(MidiTag tag, uint8_t d1, uint8_t d2);
-    void end_stream(MidiTag tag);
+    void begin_stream(ChemId tag, uint8_t stream);
+    void stream_data(ChemId tag, uint8_t d1, uint8_t d2);
+    void end_stream(ChemId tag);
 
-    void select_preset(MidiTag tag, PresetId id);
-    void editor_present(MidiTag tag);
-    void request_configuration(MidiTag tag);
-    void request_con_text(MidiTag tag);
-    void request_updates(MidiTag tag);
-    void request_user(MidiTag tag);
-    void request_system(MidiTag tag);
-    void midi_rate(MidiTag tag, HakenMidiRate rate);
-    void remake_mahling(MidiTag tag);
-    void previous_system_preset(MidiTag tag);
-    void next_system_preset(MidiTag tag);
-    void reset_calibration(MidiTag tag);
-    void refine_calibration(MidiTag tag);
-    void factory_calibration(MidiTag tag);
-    void surface_alignment(MidiTag tag);
+    void select_preset(ChemId tag, PresetId id);
+    void editor_present(ChemId tag);
+    void request_configuration(ChemId tag);
+    void request_con_text(ChemId tag);
+    void request_updates(ChemId tag);
+    void request_user(ChemId tag);
+    void request_system(ChemId tag);
+    void midi_rate(ChemId tag, HakenMidiRate rate);
+    void remake_mahling(ChemId tag);
+    void previous_system_preset(ChemId tag);
+    void next_system_preset(ChemId tag);
+    void reset_calibration(ChemId tag);
+    void refine_calibration(ChemId tag);
+    void factory_calibration(ChemId tag);
+    void surface_alignment(ChemId tag);
 
-    void disable_recirculator(MidiTag tag, bool disable);
-    void compressor_option(MidiTag tag, bool tanh);
-    void keep_pedals(MidiTag tag, bool keep);
-    void keep_midi(MidiTag tag, bool keep);
-    void keep_surface(MidiTag tag, bool keep);
+    void disable_recirculator(ChemId tag, bool disable);
+    void compressor_option(ChemId tag, bool tanh);
+    void keep_pedals(ChemId tag, bool keep);
+    void keep_midi(ChemId tag, bool keep);
+    void keep_surface(ChemId tag, bool keep);
 
 };
 

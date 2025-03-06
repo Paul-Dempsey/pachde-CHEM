@@ -3,7 +3,7 @@ using namespace pachde;
 #include "../../em/wrap-HakenMidi.hpp"
 
 FxModule::FxModule() :
-    modulation(this, MidiTag::Fx),
+    modulation(this, ChemId::Fx),
     last_disable(-1),
     glow_knobs(false)
 {
@@ -115,6 +115,7 @@ void FxModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
 
 void FxModule::process(const ProcessArgs& args)
 {
+    find_and_bind_host(this, args);
     if (!chem_host || chem_host->host_busy()) return;
 
     if (modulation.sync_params_ready(args)) {
@@ -130,7 +131,7 @@ void FxModule::process(const ProcessArgs& args)
             last_disable = disable;
         } else if (last_disable != disable) {
             last_disable = disable;
-            chem_host->host_haken()->disable_recirculator(MidiTag::Fx, disable);
+            chem_host->host_haken()->disable_recirculator(ChemId::Fx, disable);
         }
         getLight(Lights::L_DISABLE).setBrightnessSmooth(disable, 45.f);
 

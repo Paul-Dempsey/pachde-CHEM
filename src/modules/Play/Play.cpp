@@ -111,6 +111,8 @@ void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
 
 void PlayModule::process(const ProcessArgs& args)
 {
+    find_and_bind_host(this, args);
+
     if (!chem_host || chem_host->host_busy() || !ui()) return;
 
     if (ui()->preset_count()) {

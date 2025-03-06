@@ -3,63 +3,63 @@
 
 namespace pachde {
 
-void HakenMidi::control_change(MidiTag tag, uint8_t channel, uint8_t cc, uint8_t value) {
+void HakenMidi::control_change(ChemId tag, uint8_t channel, uint8_t cc, uint8_t value) {
     send_message(Tag(MakeCC(channel, cc, value), tag));
 }
 
-void HakenMidi::key_pressure(MidiTag tag, uint8_t channel, uint8_t note, uint8_t pressure) {
+void HakenMidi::key_pressure(ChemId tag, uint8_t channel, uint8_t note, uint8_t pressure) {
     send_message(Tag(MakePolyKeyPressure(channel, note, pressure), tag));
 }
 
-void HakenMidi::begin_stream(MidiTag tag, uint8_t stream)
+void HakenMidi::begin_stream(ChemId tag, uint8_t stream)
 {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccStream, stream), tag));
 }
-void HakenMidi::stream_data(MidiTag tag,uint8_t d1, uint8_t d2)
+void HakenMidi::stream_data(ChemId tag,uint8_t d1, uint8_t d2)
 {
     send_message(Tag(MakePolyKeyPressure(Haken::ch16, d1, d2), tag));
 }
-void HakenMidi::end_stream(MidiTag tag)
+void HakenMidi::end_stream(ChemId tag)
 {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccStream, 127), tag));
 }
 
-void HakenMidi::disable_recirculator(MidiTag tag, bool disable)
+void HakenMidi::disable_recirculator(ChemId tag, bool disable)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idNoRecirc, disable);
     end_stream(tag);
 }
 
-void HakenMidi::compressor_option(MidiTag tag, bool tanh)
+void HakenMidi::compressor_option(ChemId tag, bool tanh)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idCompOpt, tanh);
     end_stream(tag);
 }
 
-void HakenMidi::keep_pedals(MidiTag tag, bool keep)
+void HakenMidi::keep_pedals(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresPed, keep);
     end_stream(tag);
 }
 
-void HakenMidi::keep_surface(MidiTag tag, bool keep)
+void HakenMidi::keep_surface(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresSurf, keep);
     end_stream(tag);
 }
 
-void HakenMidi::keep_midi(MidiTag tag, bool keep)
+void HakenMidi::keep_midi(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresEnc, keep);
     end_stream(tag);
 }
 
-void HakenMidi::select_preset(MidiTag tag, PresetId id)
+void HakenMidi::select_preset(ChemId tag, PresetId id)
 {
     if (log) {
         log->logMessage(">>H", "---- Select Preset");
@@ -72,12 +72,12 @@ void HakenMidi::select_preset(MidiTag tag, PresetId id)
     send_message(Tag(MakeProgramChange(Haken::ch16, id.number()), tag));
 }
 
-void HakenMidi::midi_rate(MidiTag tag, HakenMidiRate rate)
+void HakenMidi::midi_rate(ChemId tag, HakenMidiRate rate)
 {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, static_cast<uint8_t>(rate)), tag));
 }
 
-void HakenMidi::editor_present(MidiTag tag) {
+void HakenMidi::editor_present(ChemId tag) {
     if (log) {
         log->logMessage(">>H", "---- EditorPresent");
     }
@@ -85,7 +85,7 @@ void HakenMidi::editor_present(MidiTag tag) {
     tick_tock = !tick_tock;
 }
 
-void HakenMidi::request_configuration(MidiTag tag) {
+void HakenMidi::request_configuration(ChemId tag) {
     if (log) {
         log->logMessage(">>H", "---- RequestConfiguration");
     }
@@ -93,14 +93,14 @@ void HakenMidi::request_configuration(MidiTag tag) {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi), tag));
 }
 
-void HakenMidi::request_con_text(MidiTag tag) {
+void HakenMidi::request_con_text(ChemId tag) {
     if (log) {
         log->logMessage(">>H", "---- RequestConText");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi), tag));
 }
 
-void HakenMidi::request_updates(MidiTag tag)
+void HakenMidi::request_updates(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- RequestUpdates");
@@ -116,7 +116,7 @@ void HakenMidi::request_updates(MidiTag tag)
     end_stream(tag);
 }
 
-void HakenMidi::request_user(MidiTag tag)
+void HakenMidi::request_user(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Request User");
@@ -124,7 +124,7 @@ void HakenMidi::request_user(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::userToMidi), tag));
 }
 
-void HakenMidi::request_system(MidiTag tag)
+void HakenMidi::request_system(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Request System");
@@ -132,7 +132,7 @@ void HakenMidi::request_system(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::sysToMidi), tag));
 }
 
-void HakenMidi::remake_mahling(MidiTag tag)
+void HakenMidi::remake_mahling(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Remake Mahling data");
@@ -140,7 +140,7 @@ void HakenMidi::remake_mahling(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::remakeSRMahl), tag));
 }
 
-void HakenMidi::previous_system_preset(MidiTag tag)
+void HakenMidi::previous_system_preset(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Previous sys preset");
@@ -148,7 +148,7 @@ void HakenMidi::previous_system_preset(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::decPreset), tag));
 }
 
-void HakenMidi::next_system_preset(MidiTag tag)
+void HakenMidi::next_system_preset(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Next sys preset");
@@ -156,7 +156,7 @@ void HakenMidi::next_system_preset(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::incPreset),tag));
 }
 
-void HakenMidi::reset_calibration(MidiTag tag)
+void HakenMidi::reset_calibration(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Reset calibration");
@@ -164,7 +164,7 @@ void HakenMidi::reset_calibration(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doResetCalib), tag));
 }
 
-void HakenMidi::refine_calibration(MidiTag tag)
+void HakenMidi::refine_calibration(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Refine calibration");
@@ -172,7 +172,7 @@ void HakenMidi::refine_calibration(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doRefineCalib), tag));
 }
 
-void HakenMidi::factory_calibration(MidiTag tag)
+void HakenMidi::factory_calibration(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Factory calibration");
@@ -180,7 +180,7 @@ void HakenMidi::factory_calibration(MidiTag tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doFactCalib), tag));
 }
 
-void HakenMidi::surface_alignment(MidiTag tag)
+void HakenMidi::surface_alignment(ChemId tag)
 {
     if (log) {
         log->logMessage(">>H", "---- Surface alignment");

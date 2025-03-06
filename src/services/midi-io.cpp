@@ -32,7 +32,7 @@ midi::Message rackFromPacked(PackedMidiMessage message)
     return msg;
 }
 
-PackedMidiMessage packedFromRack(const midi::Message& source, MidiTag tag)
+PackedMidiMessage packedFromRack(const midi::Message& source, ChemId tag)
 {
     switch (source.bytes.size()) {
     case 1: return Tag(MakeRawBase(source.bytes[0], 0, 0), tag);

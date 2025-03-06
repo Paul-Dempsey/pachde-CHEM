@@ -29,8 +29,20 @@ struct ChemModule : Module, IThemeHolder
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+
+    IChemHost* find_expander_host();
 };
 
+template<typename TClientModule>
+void find_and_bind_host(TClientModule* self, const ::rack::engine::Module::ProcessArgs& args)
+{
+    if (!self->get_host() && ((args.frame + self->id) % 80) == 0) {
+        auto host = self->find_expander_host();
+        if (host) {
+            host->register_chem_client(self);
+        }
+    }    
+}
 
 enum class LeftRight: uint8_t { Left, Right };
 inline bool left(LeftRight lr) { return LeftRight::Left == lr; }

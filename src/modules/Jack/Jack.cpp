@@ -178,7 +178,7 @@ void JackModule::process_params(const ProcessArgs &args)
         last_keep = pkeep;
     } else if (last_keep != pkeep) {
         last_keep = pkeep;
-        chem_host->host_haken()->keep_pedals(MidiTag::Jack, pkeep);
+        chem_host->host_haken()->keep_pedals(ChemId::Jack, pkeep);
     }
     getLight(L_KEEP).setBrightnessSmooth(pkeep, 45.f);
     
@@ -187,14 +187,14 @@ void JackModule::process_params(const ProcessArgs &args)
     if ((assign_1 != last_assign_1) || (assign_2 != last_assign_2)) {
         auto haken = chem_host->host_haken();
         haken->log->logMessage("Jack", "Pedal assign");
-        haken->begin_stream(MidiTag::Jack, Haken::s_Mat_Poke);
+        haken->begin_stream(ChemId::Jack, Haken::s_Mat_Poke);
         if (assign_1 != last_assign_1) {
-            haken->stream_data(MidiTag::Jack, Haken::idPedal1, index_to_pedal_cc(assign_1));
+            haken->stream_data(ChemId::Jack, Haken::idPedal1, index_to_pedal_cc(assign_1));
         }
         if (assign_2 != last_assign_2) {
-            haken->stream_data(MidiTag::Jack, Haken::idPedal2, index_to_pedal_cc(assign_2));
+            haken->stream_data(ChemId::Jack, Haken::idPedal2, index_to_pedal_cc(assign_2));
         }
-        //haken->end_stream(MidiTag::Jack); // optional for poke streams
+        //haken->end_stream(ChemId::Jack); // optional for poke streams
 
         last_assign_1 = assign_1;
         last_assign_2 = assign_2;
@@ -203,6 +203,7 @@ void JackModule::process_params(const ProcessArgs &args)
 
 void JackModule::process(const ProcessArgs &args)
 {
+    find_and_bind_host(this, args);
     if (!connected()) return;
     if (!chem_host || chem_host->host_busy()) return;
 

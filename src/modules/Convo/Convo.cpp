@@ -2,7 +2,7 @@
 using namespace pachde;
 
 ConvoModule::ConvoModule() :
-    modulation(this, MidiTag::Convo),
+    modulation(this, ChemId::Convo),
     glow_knobs(false),
     conv_number(0),
     last_conv(-1),
@@ -162,6 +162,7 @@ void ConvoModule::process_params(const ProcessArgs& args)
 
 void ConvoModule::process(const ProcessArgs& args)
 {
+    find_and_bind_host(this, args);
     if (!chem_host || chem_host->host_busy()) return;
 
     if (modulation.sync_params_ready(args)) {

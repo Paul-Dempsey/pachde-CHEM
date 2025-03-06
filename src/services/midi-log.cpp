@@ -105,20 +105,20 @@ MidiLog::~MidiLog() {
 // void MidiLog::off() { logging = false; }
 
 std::string tag_prefix(uint8_t tag) {
-    switch (as_midi_tag(tag)) {
-    case MidiTag::Unknown: return "Unknown";
-    case MidiTag::Haken:   return "Haken";
-    case MidiTag::Midi1:   return "Midi1";
-    case MidiTag::Midi2:   return "Midi2";
-    case MidiTag::Core:    return "Core";
-    case MidiTag::Macro:   return "Macro";
-    case MidiTag::Pre:     return "Pre";
-    case MidiTag::Fx:      return "Fx";
-    case MidiTag::Post:    return "Post";
-    case MidiTag::Convo:   return "Convo";
-    case MidiTag::Jack:    return "Jack";
-    case MidiTag::Play:    return "Play";
-    case MidiTag::Preset:  return "Preset";
+    switch (as_chem_id(tag)) {
+    case ChemId::Unknown: return "Unknown";
+    case ChemId::Haken:   return "Haken";
+    case ChemId::Midi1:   return "Midi1";
+    case ChemId::Midi2:   return "Midi2";
+    case ChemId::Core:    return "Core";
+    case ChemId::Macro:   return "Macro";
+    case ChemId::Pre:     return "Pre";
+    case ChemId::Fx:      return "Fx";
+    case ChemId::Post:    return "Post";
+    case ChemId::Convo:   return "Convo";
+    case ChemId::Jack:    return "Jack";
+    case ChemId::Play:    return "Play";
+    case ChemId::Preset:  return "Preset";
     default:
         return format_string("%02x", tag);
     }
