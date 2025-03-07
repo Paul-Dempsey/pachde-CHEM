@@ -54,6 +54,7 @@ struct HakenMidi
     void surface_alignment(ChemId tag);
 
     void disable_recirculator(ChemId tag, bool disable);
+    void recirculator_type(ChemId tag, uint8_t kind);
     void compressor_option(ChemId tag, bool tanh);
     void keep_pedals(ChemId tag, bool keep);
     void keep_midi(ChemId tag, bool keep);

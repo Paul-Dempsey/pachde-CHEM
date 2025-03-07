@@ -53,6 +53,8 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
     void set_modulation_target(int id) {
         modulation.set_modulation_target(id);
     }
+
+    // IDoMidi
     void doMessage(PackedMidiMessage message) override;
     void update_from_em();
 

@@ -26,23 +26,36 @@ FxUi::FxUi(FxModule *module) :
     float x, y;
     bool browsing = !module;
 
-    const float PANEL_WIDTH = 165.f;
+    const float PANEL_WIDTH = 135.f;
     const float CENTER = PANEL_WIDTH*.5f;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(9.f, 30.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 30.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
     addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 22.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs with labels
     const float DY_KNOB = 60.f;
-    const float KNOB_DX = 30.f;
+    const float KNOB_DX = 28.f;
     const float KNOB_TOP = 114.f;
-    const float LABEL_DY = 18.f;
+    const float LABEL_DY = 18.5f;
+    const float KNOB_AXIS = CENTER + 4.f;
+
+    x = KNOB_AXIS + KNOB_DX;
+    y = 60.f;
+    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme));
+    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
+    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
+
+    x = KNOB_AXIS - KNOB_DX;
+    y -= 8.f;
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+        Vec(x, y), my_module, FxModule::P_DISABLE, FxModule::L_DISABLE, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", theme_engine, theme, S::control_label));
 
     y = KNOB_TOP;
-    x = CENTER - KNOB_DX;
+    x = KNOB_AXIS - KNOB_DX;
     for (int i = 0; i < K_MIX; ++i) {
-        knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme);
-        addChild(knobs[i]);
+        addChild(knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme));
         addChild(tracks[i] = createTrackWidget(knobs[i], theme_engine, theme));
 
         r_labels[i] = createStaticTextLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme_engine, theme, S::control_label);
@@ -50,55 +63,40 @@ FxUi::FxUi(FxModule *module) :
 
         if (i & 1) {
             y += DY_KNOB;
-            x = CENTER - KNOB_DX;
+            x = KNOB_AXIS - KNOB_DX;
         } else {
-            x = CENTER + KNOB_DX;
+            x = KNOB_AXIS + KNOB_DX;
         }
     }
-
-    x = CENTER + KNOB_DX;
-    y = 70.f;
-    knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme);
-    addChild(knobs[K_MIX]);
-    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
-
-    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
-    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
-
-    x = CENTER - KNOB_DX;
-    y -= 8.f;
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
-        Vec(x, y), my_module, FxModule::P_DISABLE, FxModule::L_DISABLE, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", theme_engine, theme, S::control_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
     const float PORT_LEFT = CENTER - (1.5f*S::PORT_DX);
-    const float click_width = 32.f;
-    const float click_height = 21.f;
-    const float click_dy = 14.f;
-    x = PORT_LEFT + S::PORT_DX;
-    y = S::PORT_TOP;
-    for (int i = 0; i <= K_R6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-        addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
-        if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
 
-        x += S::PORT_DX;
-        if (i == 2) {
-            y += S::PORT_DY;
-            x = PORT_LEFT + S::PORT_DX;
-        }
-    }
     y = S::PORT_TOP;
     x = PORT_LEFT;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_MOD_AMOUNT, theme_engine, theme));
-    y += S::PORT_DY;
+
+    x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
-    if (my_module){ addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module){ addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, FxModule::L_MIX_MOD));
+
+    x += S::PORT_DX;
+    for (int i = 0; i <= K_R6; ++i) {
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
+        addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
+        if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
+
+        if (i == 1) {
+            y += S::PORT_DY;
+            x = PORT_LEFT;
+        } else {
+            x += S::PORT_DX;
+        }
+    }
 
     // footer
 
@@ -166,10 +164,6 @@ void FxUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConne
     if (device != ChemDevice::Haken) return;
     haken->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
     haken->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
-}
-
-void FxUi::onPresetChange()
-{
 }
 
 bool FxUi::connected() {
@@ -258,11 +252,6 @@ void FxUi::step()
     }
 #endif
 
-}
-
-void FxUi::draw(const DrawArgs& args)
-{
-    Base::draw(args);
 }
 
 void FxUi::appendContextMenu(Menu *menu)

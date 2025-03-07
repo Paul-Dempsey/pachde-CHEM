@@ -1,6 +1,7 @@
 #include "Post.hpp"
-using namespace pachde;
+#include "../../services/rack-help.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
+using namespace pachde;
 
 PostModule::PostModule() :
     modulation(this, ChemId::Post),
@@ -17,11 +18,11 @@ PostModule::PostModule() :
 
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level")->displayPrecision = 4;
-    configParam(Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix")->displayPrecision = 4;
-    configParam(Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt")->displayPrecision = 4;
-    configParam(Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency")->displayPrecision = 4;
-    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
+    dp4(configParam(Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level"));
+    dp4(configParam(Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix"));
+    dp4(configParam(Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt"));
+    dp4(configParam(Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency"));
+    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     configSwitch(P_MUTE, 0.f, 1.f, 0.f, "Mute", { "Voiced", "Muted" });
 
@@ -68,6 +69,34 @@ json_t* PostModule::dataToJson()
     return root;
 }
 
+void PostModule::doMessage(PackedMidiMessage message)
+{
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (as_u8(ChemId::Post) == midi_tag(message)) return;
+
+    int param = -1;
+    switch (midi_cc(message)) {
+    case Haken::ccFracPed:
+        cc_lsb = midi_cc_value(message);
+        return;
+
+    case Haken::ccPost: {
+        uint16_t value = ((message.bytes.data2 << 7) + cc_lsb);
+        cc_lsb = 0;
+        modulation.set_em_and_param(P_POST_LEVEL, value, true);
+        return;
+    }
+    case Haken::ccEqMix: param = P_MIX; break;
+    case Haken::ccEqTilt: param = P_TILT; break;
+    case Haken::ccEqFreq: param = P_FREQUENCY; break;
+
+    default:
+        return;
+    }
+    assert(param != -1);
+    modulation.set_em_and_param_low(param, midi_cc_value(message), true);
+}
+
 // IChemClient
 ::rack::engine::Module* PostModule::client_module() { return this; }
 std::string PostModule::client_claim() { return device_claim; }
@@ -90,8 +119,8 @@ void PostModule::onConnectHost(IChemHost* host)
 void PostModule::onPresetChange()
 {
     if (!connected()) return;
-    update_from_em(true);
-    if (chem_ui) ui()->onPresetChange();
+    update_from_em();
+    //if (chem_ui) ui()->onPresetChange(); // ui doesn't do anything on preset change
 }
 
 void PostModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -106,14 +135,14 @@ bool PostModule::connected()
     return conn && conn->identified();
 }
 
-void PostModule::update_from_em(bool with_knobs)
+void PostModule::update_from_em()
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
-    modulation.set_em_and_param(P_POST_LEVEL, em->get_post(), with_knobs);
-    modulation.set_em_and_param_low(P_MIX, em->get_eq_mix(), with_knobs);
-    modulation.set_em_and_param_low(P_TILT, em->get_eq_tilt(), with_knobs);
-    modulation.set_em_and_param_low(P_FREQUENCY, em->get_eq_freq(), with_knobs);
+    modulation.set_em_and_param(P_POST_LEVEL, em->get_post(), true);
+    modulation.set_em_and_param_low(P_MIX, em->get_eq_mix(), true);
+    modulation.set_em_and_param_low(P_TILT, em->get_eq_tilt(), true);
+    modulation.set_em_and_param_low(P_FREQUENCY, em->get_eq_freq(), true);
 }
 
 void PostModule::sync_mute()

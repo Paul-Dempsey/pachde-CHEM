@@ -1,4 +1,5 @@
 #include "Jack.hpp"
+#include "../../services/rack-help.hpp"
 using namespace pachde;
 
 static const std::vector<uint8_t> ccmap = {
@@ -83,15 +84,10 @@ JackModule::JackModule()
     configSwitch(Params::P_ASSIGN_JACK_1, 0.f, labels.size(), 10.f, "Jack 1 assign", labels);
     configSwitch(Params::P_ASSIGN_JACK_2, 0.f, labels.size(), 12.f, "Jack 2 assign", labels);
 
-    auto pq = configParam(Params::P_MIN_JACK_1, 0.f, 10.f, 0.f, "Jack 1 minimum");
-    pq->displayPrecision = 2;
-    pq = configParam(Params::P_MAX_JACK_1, 0.f, 10.f, 10.f, "Jack 1 maximum");
-    pq->displayPrecision = 2;
-
-    pq = configParam(Params::P_MIN_JACK_2, 0.f, 10.f, 0.f, "Jack 1 minimum");
-    pq->displayPrecision = 2;
-    pq = configParam(Params::P_MAX_JACK_2, 0.f, 10.f, 10.f, "Jack 1 maximum");
-    pq->displayPrecision = 2;
+    dp2(configParam(Params::P_MIN_JACK_1, 0.f, 10.f, 0.f, "Jack 1 minimum"));
+    dp2(configParam(Params::P_MAX_JACK_1, 0.f, 10.f, 10.f, "Jack 1 maximum"));
+    dp2(configParam(Params::P_MIN_JACK_2, 0.f, 10.f, 0.f, "Jack 1 minimum"));
+    dp2(configParam(Params::P_MAX_JACK_2, 0.f, 10.f, 10.f, "Jack 1 maximum"));
 
     configSwitch(Params::P_KEEP, 0.f, 1.f, 0.f, "Keep pedal settings", {"off", "on"});
 

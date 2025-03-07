@@ -31,6 +31,13 @@ void HakenMidi::disable_recirculator(ChemId tag, bool disable)
     end_stream(tag);
 }
 
+void HakenMidi::recirculator_type(ChemId tag, uint8_t kind)
+{
+    begin_stream(tag, Haken::s_Mat_Poke);
+    key_pressure(tag, Haken::ch16, Haken::idReciType, kind);
+    end_stream(tag);
+}
+
 void HakenMidi::compressor_option(ChemId tag, bool tanh)
 {
     begin_stream(tag, Haken::s_Mat_Poke);

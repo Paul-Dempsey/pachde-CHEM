@@ -14,7 +14,7 @@ using namespace pachde;
 
 struct PostUi;
 
-struct PostModule : ChemModule, IChemClient
+struct PostModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
         P_INVALID = -1,
@@ -52,8 +52,9 @@ struct PostModule : ChemModule, IChemClient
 
     std::string device_claim;
     PostUi* ui() { return reinterpret_cast<PostUi*>(chem_ui); };
-
+    
     Modulation modulation;
+    uint8_t cc_lsb;
     bool glow_knobs;
     bool muted;
     rack::dsp::SchmittTrigger mute_trigger;
@@ -70,10 +71,13 @@ struct PostModule : ChemModule, IChemClient
     void set_modulation_target(int id) {
         modulation.set_modulation_target(id);
     }
+    // IDoMidi
+    void doMessage(PackedMidiMessage message) override;
 
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
+    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
@@ -82,7 +86,7 @@ struct PostModule : ChemModule, IChemClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    void update_from_em(bool with_knobs);
+    void update_from_em();
     void sync_mute();
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);

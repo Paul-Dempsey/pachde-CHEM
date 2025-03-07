@@ -15,7 +15,7 @@ using namespace pachde;
 
 struct PreUi;
 
-struct PreModule : ChemModule, IChemClient
+struct PreModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
         P_PRE_LEVEL,
@@ -66,10 +66,14 @@ struct PreModule : ChemModule, IChemClient
     void set_modulation_target(int id) {
         modulation.set_modulation_target(id);
     }
+
+    // IDoMidi
+    void doMessage(PackedMidiMessage message) override;
     
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
+    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
@@ -79,7 +83,7 @@ struct PreModule : ChemModule, IChemClient
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
-    void update_from_em(bool with_knobs);
+    void update_from_em();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -113,7 +117,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[PreModule::NUM_KNOBS];
     TrackWidget* tracks[PreModule::NUM_MOD_PARAMS];
 
-    #ifdef LAYOUT_HELP
+#ifdef LAYOUT_HELP
     bool layout_hinting{false};
 #endif
 

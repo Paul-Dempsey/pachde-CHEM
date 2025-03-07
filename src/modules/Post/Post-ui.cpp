@@ -14,7 +14,7 @@ using namespace pachde;
 constexpr const float ONEU = 15.f;
 constexpr const float HALFU = 7.5f;
 constexpr const ssize_t SSIZE_0 = 0;
-constexpr const float CENTER = 52.5f;
+constexpr const float CENTER = 45.f;
 
 bool PostUi::connected() {
     if (!my_module) return false;
@@ -63,7 +63,7 @@ PostUi::PostUi(PostModule *module) :
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
     y += 40;
-    const float PARAM_DY = 54.5f;
+    const float PARAM_DY = 54.f;
     const float label_offset = 18.f;
 
     addChild(knobs[K_TILT] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_TILT, theme_engine, theme));
@@ -83,9 +83,6 @@ PostUi::PostUi(PostModule *module) :
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
-    const float click_width = 32.f;
-    const float click_height = 21.f;
-    const float click_dy = 14.f;
     y = S::PORT_TOP;
     x = CENTER - S::PORT_DX;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, PostModule::P_MOD_AMOUNT, theme_engine, theme));
@@ -97,26 +94,26 @@ PostUi::PostUi(PostModule *module) :
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_POST_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "LVL", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PostModule::IN_POST_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_POST_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_POST_LEVEL_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MIX", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PostModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_TILT, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "TLT", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PostModule::IN_TILT, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_TILT, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_TILT_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_FREQUENCY, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "FRQ", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PostModule::IN_FREQUENCY, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_FREQUENCY, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_FREQUENCY_MOD));
 
     // footer

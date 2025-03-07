@@ -65,17 +65,13 @@ inline bool is_music_message(PackedMidiMessage msg)
     switch (msg.bytes.status_byte) {
     case Haken::ccStat1:
     case Haken::ccStat2:
-        if (is_note_cc(midi_cc(msg))) {
-            return true;
-        }
-        break;
+        return is_note_cc(midi_cc(msg));
 
     // no program change
     case Haken::progChg1:
     case Haken::progChg2:
     case Haken::progChg16:
-    // no cc on ch16
-    case Haken::ccStat16:
+    case Haken::ccStat16: // no ch16 cc
         return false;
 
     default:
@@ -114,6 +110,12 @@ void MidiInput::drop(int count)
         log->logMessage(printable(source_name), buffer);
     }
     ring.shiftBuffer(trash, count);
+}
+
+MidiInput::MidiInput(ChemId tag): my_tag(tag), message_count(0), log(nullptr), music_pass_filter(false), mute{false}
+{
+    this->channel = -1;
+    midi_timer.time = (random::uniform() * MIDI_RATE); // jitter
 }
 
 void MidiInput::queueMessage(PackedMidiMessage msg)

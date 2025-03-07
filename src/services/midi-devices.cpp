@@ -28,14 +28,14 @@ bool is_EMDevice(const std::string& name)
     if (name.empty()) { return false; }
     auto text = to_lower_case(name);
     // Continuum <serial> and ContinuuMini <serial>
-    if (0 == text.compare(0, 8, "continuu", 0, 8)) {
+    if (0 == text.compare(0, 9, "continuum", 0, 9)) {
         return true;
     }
     // "EaganMatrix Module"
+    // "EaganMatrix Micro <serial>"
     if (0 == text.compare(0, 11, "eaganmatrix", 0, 11)) {
         return true;
     }
-    // "Micro" ??
     // Osmose varies depending on OS, and must be Osmose port 2
     return std::string::npos != text.find_first_of('2')
         && std::string::npos != text.find("osmose");
@@ -197,7 +197,7 @@ std::vector<std::shared_ptr<MidiDeviceConnection>> EnumerateMidiConnections(bool
     for (auto id_driver : midi::getDriverIds())
     {
         auto driver = midi::getDriver(id_driver);
-        if (ExcludeDriver(driver->getName())) {
+        if (emOnly && ExcludeDriver(driver->getName())) {
             continue;
         }
 

@@ -10,7 +10,7 @@ using namespace pachde;
 
 // -- Pre UI -----------------------------------
 
-constexpr const float CENTER = 52.5f;
+constexpr const float CENTER = 45.f;
 
 bool PreUi::connected() {
     if (!my_module) return false;
@@ -43,7 +43,7 @@ PreUi::PreUi(PreModule *module) :
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
     addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 68.f), my_module, PreModule::P_SELECT, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER, 60.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER + 3.5f, 60.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
     x = CENTER;
@@ -57,7 +57,7 @@ PreUi::PreUi(PreModule *module) :
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
 
     const float PARAM_TOP = 135.f;
-    const float PARAM_DY = 54.5f;
+    const float PARAM_DY = 54.f;
     const float label_offset = 18.f;
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
@@ -78,9 +78,6 @@ PreUi::PreUi(PreModule *module) :
 
     // inputs
     auto co_port = PORT_CORN;
-    const float click_width = 32.f;
-    const float click_height = 21.f;
-    const float click_dy = 14.f;
     y = S::PORT_TOP;
     x = CENTER - S::PORT_DX;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, PreModule::P_MOD_AMOUNT, theme_engine, theme));
@@ -88,32 +85,32 @@ PreUi::PreUi(PreModule *module) :
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35, "LVL", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_PRE_LEVEL_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_attack_x = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_ATTACK_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "MIX", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_THRESHOLD_DRIVE, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_thresh_drive = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_THRESHOLD_DRIVE_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_RATIO_MAKEUP, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(in_ratio_makeup = createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
-    if (my_module) { addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
     
     // footer
@@ -175,7 +172,6 @@ void PreUi::onConnectHost(IChemHost* host)
     chem_host = host;
     if (chem_host) {
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        //onPresetChange();
     } else {
         haken_device_label->text(S::NotConnected);
     }

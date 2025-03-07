@@ -15,7 +15,7 @@ inline PackedMidiMessage Tag(PackedMidiMessage msg, ChemId tag) {
     return msg;
 }
 
-constexpr const float MIDI_RATE = 0.05f;
+constexpr const float MIDI_RATE = 0.005f;
 constexpr const float DISPATCH_NOW = MIDI_RATE;
 
 struct MidiInput : midi::Input
@@ -35,7 +35,7 @@ struct MidiInput : midi::Input
     rack::dsp::Timer midi_timer;
 
     MidiInput(const MidiInput &) = delete; // no copy constructor
-    MidiInput(ChemId tag) : my_tag(tag), message_count(0), log(nullptr), music_pass_filter(false), mute{false} { this->channel = -1; }
+    MidiInput(ChemId tag);
 
     uint64_t count() { return message_count; }
     void clear()

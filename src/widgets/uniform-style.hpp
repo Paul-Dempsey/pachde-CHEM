@@ -11,9 +11,12 @@ constexpr const ssize_t SSIZE_0 = 0;
 
 constexpr const float PORT_SECTION = 278.f;
 constexpr const float PORT_TOP = 305.f;
-constexpr const float PORT_DX = 34.f;
+constexpr const float PORT_DX = 30.f;
 constexpr const float PORT_DY = 36.f;
 constexpr const float PORT_LABEL_DY = -20.f;
+constexpr const float CLICK_WIDTH = PORT_DX - 2.f;
+constexpr const float CLICK_HEIGHT = 21.f;
+constexpr const float CLICK_DY = 14.f;
 
 // port active modulation light
 constexpr const float PORT_MOD_DX = 12.75f;

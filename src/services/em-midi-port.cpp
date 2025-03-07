@@ -1,5 +1,5 @@
 #include "em-midi-port.hpp"
-#include "rack_em_convert.hpp"
+#include "rack-em-convert.hpp"
 
 namespace pachde {
 
@@ -65,18 +65,28 @@ float EmControlPort::modulate()
 
 // ----  Modulation -----------------------------
 
-Modulation::Modulation(ChemModule* module, ChemId client_tag) :
+bool Modulation::sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate)
+{
+    if (midi_timer.process(args.sampleTime) > rate) {
+        midi_timer.reset();
+        return true;
+    }
+    return false;
+}
+
+Modulation::Modulation(ChemModule *module, ChemId client_tag) : 
     module(module),
     mod_target(-1),
     last_mod_target(-1),
     mod_param(-1),
     count(-1),
-    first_param(-1), 
-    first_input(-1), 
+    first_param(-1),
+    first_input(-1),
     first_light(-1),
     have_stream(false),
     client_tag(client_tag)
 {
+    midi_timer.time = (random::uniform() * MIDI_RATE); // jitter
 }
 
 void Modulation::configure(int mod_param_id, int first_param_id, int first_input_id, int first_light_id, int data_length, const EmccPortConfig *data)

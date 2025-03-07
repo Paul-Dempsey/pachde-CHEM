@@ -3,7 +3,7 @@
 #include "chem-id.hpp"
 #include "em/preset.hpp"
 #include "em/EaganMatrix.hpp"
-#include "services/rack_em_convert.hpp"
+#include "services/rack-em-convert.hpp"
 #include "services/midi-devices.hpp"
 #include "services/haken-midi.hpp"
 

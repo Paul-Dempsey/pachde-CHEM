@@ -1,5 +1,6 @@
 #include "Macro.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
+#include "../../services/rack-help.hpp"
 using namespace pachde;
 
 MacroModule::MacroModule() :
@@ -24,14 +25,14 @@ MacroModule::MacroModule() :
     configInput(IN_M5, "Macro 5 (v)");
     configInput(IN_M6, "Macro 6 (vi)");
 
-    configParam(Params::P_M1, 0.f, 10.f, 5.f, "Macro 1", "v")->displayPrecision = 4;
-    configParam(Params::P_M2, 0.f, 10.f, 5.f, "Macro 2", "v")->displayPrecision = 4;
-    configParam(Params::P_M3, 0.f, 10.f, 5.f, "Macro 3", "v")->displayPrecision = 4;
-    configParam(Params::P_M4, 0.f, 10.f, 5.f, "Macro 4", "v")->displayPrecision = 4;
-    configParam(Params::P_M5, 0.f, 10.f, 5.f, "Macro 5", "v")->displayPrecision = 4;
-    configParam(Params::P_M6, 0.f, 10.f, 5.f, "Macro 6", "v")->displayPrecision = 4;
+    dp4(configParam(Params::P_M1, 0.f, 10.f, 5.f, "Macro 1", "v"));
+    dp4(configParam(Params::P_M2, 0.f, 10.f, 5.f, "Macro 2", "v"));
+    dp4(configParam(Params::P_M3, 0.f, 10.f, 5.f, "Macro 3", "v"));
+    dp4(configParam(Params::P_M4, 0.f, 10.f, 5.f, "Macro 4", "v"));
+    dp4(configParam(Params::P_M5, 0.f, 10.f, 5.f, "Macro 5", "v"));
+    dp4(configParam(Params::P_M6, 0.f, 10.f, 5.f, "Macro 6", "v"));
 
-    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
+    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     configLight(L_M1a, "Modulation amount on M1");
     configLight(L_M2a, "Modulation amount on M2");
@@ -114,16 +115,16 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-void MacroModule::doMessage(PackedMidiMessage msg)
+void MacroModule::doMessage(PackedMidiMessage message)
 {
-    if (Haken::ccStat1 != msg.bytes.status_byte) return;
-    if (as_u8(ChemId::Macro) == msg.bytes.tag) return;
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (as_u8(ChemId::Macro) == midi_tag(message)) return;
 
-    auto cc = msg.bytes.data1;
+    auto cc = midi_cc(message);
     switch (cc) {
 
     case Haken::ccFracPed:
-        macro_lsb = msg.bytes.data2;
+        macro_lsb = midi_cc_value(message);
         break;
 
     case Haken::ccI:
@@ -133,7 +134,7 @@ void MacroModule::doMessage(PackedMidiMessage msg)
     case Haken::ccV:
     case Haken::ccVI: {
         int param = cc - Haken::ccI;
-        uint16_t value = ((msg.bytes.data2 << 7) + macro_lsb);
+        uint16_t value = ((midi_cc_value(message) << 7) + macro_lsb);
         macro_lsb = 0;
         modulation.set_em_and_param(param, value, true);
     } break;
@@ -158,16 +159,15 @@ void MacroModule::process_params(const ProcessArgs& args)
 void MacroModule::process(const ProcessArgs& args)
 {
     find_and_bind_host(this, args);
-
     if (!chem_host || chem_host->host_busy()) return;
     
-    if (modulation.sync_params_ready(args)) {
-        modulation.sync_send();
-    }
-
     if (((args.frame + id) % 40) == 0) {
         process_params(args);
     }
+
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
+    }    
 
     if (((args.frame + id) % 63) == 0) {
         modulation.update_lights();

@@ -99,6 +99,8 @@ struct EmControlPort
     void send(IChemHost* chem, ChemId tag, bool force = false);
 };
 
+const float MOD_MIDI_RATE = 0.05f;
+
 struct Modulation
 {
     ChemModule* module;
@@ -113,16 +115,9 @@ struct Modulation
     bool have_stream;
     ChemId client_tag;
 
-    const float MIDI_RATE = 0.05f;
     rack::dsp::Timer midi_timer;
-    bool sync_params_ready(const rack::engine::Module::ProcessArgs& args) {
-        float midi_time = midi_timer.process(args.sampleTime);
-        if (midi_time > MIDI_RATE) {
-            midi_timer.reset();
-            return true;
-        }
-        return false;
-    }
+
+    bool sync_params_ready(const rack::engine::Module::ProcessArgs& args, float rate = MOD_MIDI_RATE);
 
     std::vector<EmControlPort> ports;
     EmControlPort& get_port(int index) {

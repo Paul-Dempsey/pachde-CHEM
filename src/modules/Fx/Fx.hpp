@@ -15,7 +15,7 @@ using namespace pachde;
 
 struct FxUi;
 
-struct FxModule : ChemModule, IChemClient
+struct FxModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
         // Knobs
@@ -66,6 +66,7 @@ struct FxModule : ChemModule, IChemClient
     std::string device_claim;
     int last_disable;
     bool glow_knobs;
+    bool in_mat_poke;
     
     FxModule();
     ~FxModule() {
@@ -79,9 +80,13 @@ struct FxModule : ChemModule, IChemClient
         modulation.set_modulation_target(id);
     }
 
+    // IDoMidi
+    void doMessage(PackedMidiMessage msg) override;
+
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
+    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
@@ -91,6 +96,7 @@ struct FxModule : ChemModule, IChemClient
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
+    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -131,7 +137,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
+    void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
@@ -140,7 +146,6 @@ struct FxUi : ChemModuleWidget, IChemClient
 
     void sync_labels();
     void step() override;
-    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

@@ -1,6 +1,7 @@
 #include "Pre.hpp"
-using namespace pachde;
+#include "../../services/rack-help.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
+using namespace pachde;
 
 PreModule::PreModule() :
     modulation(this, ChemId::Pre),
@@ -18,13 +19,13 @@ PreModule::PreModule() :
 
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level")->displayPrecision = 4;
-    configParam(Params::P_MIX,             0.f, 10.f,  0.f, "Mix")->displayPrecision = 4;
-    configParam(Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 10.f, "Threshold/Drive")->displayPrecision = 4;
-    configParam(Params::P_ATTACK,          0.f, 10.f,  5.f, "Attack/-")->displayPrecision = 4;
-    configParam(Params::P_RATIO_MAKEUP,    0.f, 10.f,  5.f, "Ratio/Makeup")->displayPrecision = 4;
+    dp4(configParam(Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level"));
+    dp4(configParam(Params::P_MIX,             0.f, 10.f, 0.f, "Mix"));
+    dp4(configParam(Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 5.f, "Threshold/Drive"));
+    dp4(configParam(Params::P_ATTACK,          0.f, 10.f, 5.f, "Attack/-"));
+    dp4(configParam(Params::P_RATIO_MAKEUP,    0.f, 10.f, 5.f, "Ratio/Makeup"));
 
-    configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")->displayPrecision = 4;
+    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     configSwitch(P_SELECT, 0.f, 1.f, 0.f, "Select", { "Compressor", "Tanh"});
 
@@ -78,20 +79,38 @@ json_t* PreModule::dataToJson()
     return root;
 }
 
-void PreModule::update_from_em(bool with_knobs)
+void PreModule::update_from_em()
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
     if (!em->is_ready()) { return; }
 
-    modulation.set_em_and_param_low(P_PRE_LEVEL, em->get_pre(), with_knobs);
-    modulation.set_em_and_param_low(P_MIX, em->get_cotan_mix(), with_knobs);
-    modulation.set_em_and_param_low(P_THRESHOLD_DRIVE, em->get_thresh_drive(), with_knobs);
-    modulation.set_em_and_param_low(P_ATTACK, em->get_attack(), with_knobs);
-    modulation.set_em_and_param_low(P_RATIO_MAKEUP, em->get_ratio_makeup(), with_knobs);
+    modulation.set_em_and_param_low(P_PRE_LEVEL, em->get_pre(), true);
+    modulation.set_em_and_param_low(P_MIX, em->get_cotan_mix(), true);
+    modulation.set_em_and_param_low(P_THRESHOLD_DRIVE, em->get_thresh_drive(), true);
+    modulation.set_em_and_param_low(P_ATTACK, em->get_attack(), true);
+    modulation.set_em_and_param_low(P_RATIO_MAKEUP, em->get_ratio_makeup(), true);
 
     last_select = em->is_tanh();
     getParam(P_SELECT).setValue(last_select);
+}
+
+void PreModule::doMessage(PackedMidiMessage message)
+{
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (as_u8(ChemId::Pre) == message.bytes.tag) return;
+
+    int param = -1;
+    switch (midi_cc(message)) {
+    case Haken::ccPre: param = P_PRE_LEVEL; break;
+    case Haken::ccCoThMix: param = P_MIX; break;
+    case Haken::ccThrDrv: param = P_THRESHOLD_DRIVE; break;
+    case Haken::ccAtkCut: param = P_ATTACK; break;
+    case Haken::ccRatMkp: param =P_RATIO_MAKEUP; break;
+    default: return;
+    }
+    assert(param != -1);
+    modulation.set_em_and_param_low(param, midi_cc_value(message), true);
 }
 
 // IChemClient
@@ -116,8 +135,8 @@ void PreModule::onConnectHost(IChemHost* host)
 void PreModule::onPresetChange()
 {
     if (connected()) {
-        update_from_em(true);
-        if (chem_ui) ui()->onPresetChange();
+        update_from_em();
+        //if (chem_ui) ui()->onPresetChange(); // ui does nothing
     }
 }
 
@@ -138,7 +157,6 @@ void PreModule::process_params(const ProcessArgs &args)
     }
 
     modulation.pull_mod_amount();
-    update_from_em(false);
 }
 
 void PreModule::process(const ProcessArgs &args)
