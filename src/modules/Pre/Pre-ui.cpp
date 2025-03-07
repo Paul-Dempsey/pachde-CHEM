@@ -42,8 +42,8 @@ PreUi::PreUi(PreModule *module) :
 
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 68.f), my_module, PreModule::P_SELECT, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER + 3.5f, 60.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 66.f), my_module, PreModule::P_SELECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(CENTER + 3.5f, 58.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
     x = CENTER;

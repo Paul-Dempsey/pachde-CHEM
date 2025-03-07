@@ -29,8 +29,8 @@ FxUi::FxUi(FxModule *module) :
     const float PANEL_WIDTH = 135.f;
     const float CENTER = PANEL_WIDTH*.5f;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 30.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
-    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 22.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 28.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
+    addChild(effect_label = createStaticTextLabel<TipLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs with labels
     const float DY_KNOB = 60.f;
