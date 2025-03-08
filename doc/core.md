@@ -3,6 +3,11 @@
 The **Core** module is essential.
 It maintains the MIDI connection and handles all communications with an Eagan Matrix device. All the other modules must be paired with a **Core**.
 
+| | |
+| -- | -- |
+| Unconnected -- freshly added to Rack | Core connected to a Micro, with a ContinuuMini and a Korg nanoKONTROL2 as controllers. |
+| ![Unconnected CHEM Core](./image/core-default.png) | ![Connected CHEM Core](./image/core.png) |
+
 Press the **HAKEN** MIDI button to choose from the Eagan Matrix devices that are connected to the computer.
 Once you've successfuly connected to a device,
 the moving dots under the button indicate the transmission MIDI data to and from the device.

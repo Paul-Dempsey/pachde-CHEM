@@ -2,12 +2,12 @@
 
 # pachde CHEM
 
-**CHEM** is the successor to pachde **HC One**, for EaganMatrix devices running firmware 10.4x.
+**CHEM** is the successor to pachde (#d) **HC One**, for EaganMatrix devices running firmware 10.4x.
 
 **Note** – Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio or Expressive E.
 
 If you own more than one Eagan Matrix device, add an instance of **Core** for each device you want to control.
-Each other module must be connected to a Core module, using the link button in the module footer.
+Every other module must be connected to a **Core** module, using the link button in the module footer.
 
 | Module | Description |
 | -- | -- |
@@ -28,20 +28,16 @@ We take requests! Open an issue on the GitHub repository,
 
 ## Themes
 
-**CHEM** is thoroughly themeable, and comes with the following themes, selectable by right click:
+**CHEM** is thoroughly themeable, and comes with the following themes, selectable by right click in the module menu.
+Any set of adjacent CHEM panels change themes together in unison.
+Here, we show the **Pre** module modeling the themes against a Light-themed Rack.
 
-| Theme | Description |
-| -- | -- |
-| **Dark**   | Default Dark theme. |
-| **Light**  | Light theme. |
-| **Ice**    | Cool deep blue-green theme. |
-| **Mellow** | Cozy warm-toned theme. |
-| **Katy**   | Classic Pink teen doll theme. |
-| **Wire**   | Dark wireframe theme. |
+| **Dark** | **Light** | **Ice** | **Katy** | **Mellow** |**Wire**   |
+| -- | -- |-- |-- |-- |-- |
+| Standard default Dark\* | Standard Light\* | Cool deep blue-green | Cotton-candy Pink |  Warm cozy tones | Dark wireframe |
+| ![Dark theme](./image/dark.png) | ![Light theme](./image/light.png) | ![Ice theme](./image/ice.png) | ![Katy theme](./image/katy.png) | ![Mellow theme](./image/mellow.png)  | ![Wire theme](./image/wire.png) |
 
-Any set of adjacent CHEM panels (showing "links" in the module title bar) change themes together in unison.
-
-The setting **Follow Rack theme** does just that: follows the Rack panel preference setting with the **Dark** and **Light** themes.
+\* The setting **Follow Rack theme** in the module menu does just that: follows the Rack panel preference setting with the **Dark** and **Light** themes.
 
 ### Custom themes
 
@@ -53,12 +49,13 @@ To make your own custom theme, make a copy of one of the predefined themes and e
 **Dark** is the best one to start from becuase it contains an entry for every theme-able element in CHEM.
 The name of your theme file should match the "name" item at the top of the JSON file.
 
-If you make a mistake while editing, like a JSON syntax error,
-Rack may crash on startup with a diagnostic error message in the log with a hint of what went wrong.
-Don't worry, Rack isn't permanently damaged. Just fix the error and try again.
+If you make a mistake while editing like a JSON syntax error,
+Rack will crash on startup with a diagnostic error message in the log with a hint of what went wrong.
+Don't worry, Rack and your computer are not permanently damaged. Just fix the error and try again.
+When working on a theme, it can be helpful to run Rack from the console using -d to see the log on the console isntead of in the log file.
 
 You don't have to restart Rack to see results of each change as you work.
-Choose **Hot-reload themes** in the right click menu or press F4 after clicking on a CHEM module.
+Choose **Hot-reload themes** in the right click menu or press F5 after clicking on a CHEM module.
 
 ## Lights Down
 
