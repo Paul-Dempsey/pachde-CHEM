@@ -18,6 +18,10 @@ Once you have a list of presets, click the name of the preset in the list to loa
 When connected, the live preset on your device is shown in the box below the playlist.
 Click the **Heart** (favorite) button to add the live preset to your playlist.
 
+![Heart button](./image/play-heart-button.png)
+
+Make sure to save your changes! When your playlist has been modified, the yellow light next to the playlist name comes on.
+
 The **Up** and **Down** buttons page through the playlist.
 
 The triangle to the left of a preset indicates that it is the **current** preset. **Next** and **Previous** are relative to the **current** preset.
@@ -35,10 +39,6 @@ In this image, _TwoOneDrone_ has been right-clicked, and the menu items will app
 The **current** and **live** _Two Chords_, and the selected _Unanswered Question_ and _Unstable Wave_ are not afffected by the menu choice.
 
 ![Play preset menu](./image/play-preset-menu.png)
-
-![Heart button](./image/play-heart-button.png)
-
-Make sure to save your changes! When your playlist has been modified, the yellow light next to the playlist name comes on.
 
 ![A modified playlist](./image/play-dirty.png)
 

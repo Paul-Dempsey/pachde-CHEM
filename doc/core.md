@@ -26,13 +26,19 @@ Use the **MIDI 1** and **MIDI 2** buttons to select a MIDI controller to use wit
 MIDI data from the controller is used by CHEM modules to track the state of the EaganMatrix, and also passed through to the **HAKEN** device.
 
 If the controller is another EaganMatrix device, it can be used only for music data (notes and expression).
- Use the **MIDI FIlter** button to the right of the controller connection to toggle the music data filter.
+Use the **MIDI FIlter** button to the right of the controller connection to toggle the music data filter.
 **Core** attempts to automatically detect Eagan Matrix devices by their name, but this automatic detection may not always work.
 For example, when you're routing through a virtual cable.
 In these cases, you must make sure the filter is enabled to prevent your EM device from getting confused with data from another EM device.
 
-The **Ready gate** output can be used elsewhere in your patch to know when the EM device is ready and able to accept MIDI and produce sound.
+The right-most button for a controller turns the midi stream for that controller off and on.
+When pressed (red light), the controller is effectively "muted".
+The **M1** and **M2** input ports (blue ports) are gate inputs to turn the corresponding controller's data stream off and on.
+When the gate is high, the controller is blocked (muted).
+
+The **Ready gate** output (purple port) can be used elsewhere in your patch to know when the EM device is ready and able to accept MIDI and produce sound.
 The gate will be high when the EM is ready for input, and low when it is busy, such as when changing presets or enumerating presets on the device.
+
 
 ---
 
