@@ -14,6 +14,9 @@ void init(Plugin *p)
 	p->addModel(modelPost);
 	p->addModel(modelConvo);
 	p->addModel(modelJack);
+	p->addModel(modelSustain);
+	p->addModel(modelSostenuto);
+	p->addModel(modelSostenuto2);
 	p->addModel(modelPreset);
 }
 
@@ -32,7 +35,10 @@ bool isPeerModule(Module* me, Module* candidate)
 			|| (model == modelPost)
 			|| (model == modelConvo)
 			|| (model == modelJack)
-            || (model == modelPreset)
+			|| (model == modelSustain)
+			|| (model == modelSostenuto)
+			|| (model == modelSostenuto2)
+			|| (model == modelPreset)
 			|| (model == modelBlank)
             // add new models here
         );

@@ -87,8 +87,8 @@ inline std::string& trim_space(std::string& s) {
 }
 
 bool is_rgb(const std::string& text) {
-    assert(std::string::npos == text.find(' '));
     auto scan = text.cbegin();
+    while (' ' == *scan) { scan++; }
     if ('r' == *scan++) {
         if ('g' == *scan++) {
             if ('b' == *scan++) {
@@ -99,8 +99,8 @@ bool is_rgb(const std::string& text) {
     return false;
 }
 bool is_hsl(const std::string& text) {
-    assert(std::string::npos == text.find(' '));
     auto scan = text.cbegin();
+    while (' ' == *scan) { scan++; }
     if ('h' == *scan++) {
         if ('s' == *scan++) {
             if ('l' == *scan++) {
@@ -121,12 +121,6 @@ inline int hex_value(unsigned char ch) {
     return 10 + ch - 'a';
 }
 
-inline PackedColor PackRGB(unsigned int r, unsigned int g, unsigned int b) {
-    return r | (g << 8) | (b << 16) | (255 << 24);
-}
-inline PackedColor PackRGBA(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
-    return r | (g << 8) | (b << 16) | (a << 24);
-}
 
 bool isValidHexColor(std::string hex) {
     if (*hex.cbegin() != '#') return false;
@@ -282,7 +276,7 @@ PackedColor parseRgbColor(const std::string& text)
     return (it == text.cend()) ? OPAQUE_BLACK: PackRGB(r, g, b);
 }
 
-PackedColor parseHslColor(const std::string& text)
+PackedColor parseHslaColor(const std::string& text)
 {
     if (!is_hsl(text)) return OPAQUE_BLACK;
     auto it = text.cbegin() + 3;
@@ -410,7 +404,7 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
         return true;
     }
     if (is_hsl(spec)) {
-        PackedColor r = parseHslColor(spec);
+        PackedColor r = parseHslaColor(spec);
         *result = r;
         if (OPAQUE_BLACK == r) {
             logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));

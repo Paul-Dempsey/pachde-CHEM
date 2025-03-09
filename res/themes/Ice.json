@@ -54,9 +54,9 @@
             "preset-grip":     { "fill":"#9d9131", "opacity": 0.4 },
             "preset-drag" :    { "fill": "#9d9131" },
             "preset-dragcur" : { "fill": "#9d9131", "opacity": 0.4 },
-            "grid-bg":         { "fill": "#325566" },
-            "grid-line":       { "stroke": "#233d4a" },
-            "grid-new":        { "fill": "#457aa6" },
+            "grid-bg":         { "fill": "hsl(190, 50%, 15%)" },
+            "grid-line":       { "stroke": "hsl(200, 35.80%, 21.40%)" },
+            "grid-new":        { "fill": "hsl(206, 40%, 30%)" },
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },

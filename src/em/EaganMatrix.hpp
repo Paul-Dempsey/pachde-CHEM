@@ -173,7 +173,7 @@ struct EaganMatrix
     uint8_t get_jack_shift()  { return mat[Haken::idJackShift]; }
     uint8_t get_octave_pedal_mode() { return mat[Haken::idSwTogInst]; }
     bool is_disable_recirculator() { return mat[Haken::idNoRecirc]; }
-    uint8_t get_recirculator_type() { return mat[Haken::idReciType]; }
+    uint8_t get_recirculator_type() { return Haken::R_mask & mat[Haken::idReciType]; }
     uint8_t get_recirculator_col_1() { return mat[Haken::idReciCol1]; }
     uint8_t get_recirculator_col_2() { return mat[Haken::idReciCol2]; }
     bool is_compressor() { return Haken::masComp == mat[Haken::idCompOpt]; }

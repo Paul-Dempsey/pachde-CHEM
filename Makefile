@@ -38,11 +38,13 @@ SOURCES += src/services/text.cpp
 
 # widgets
 SOURCES += src/widgets/blip-widget.cpp
+SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/selector-widget.cpp
+SOURCES += src/widgets/slider-widget.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
@@ -73,6 +75,15 @@ SOURCES += src/modules/Convo/Convo-ui.cpp
 
 SOURCES += src/modules/Jack/Jack.cpp
 SOURCES += src/modules/Jack/Jack-ui.cpp
+
+SOURCES += src/modules/Sustain/Sustain.cpp
+SOURCES += src/modules/Sustain/Sustain-ui.cpp
+
+SOURCES += src/modules/Sostenuto/Sostenuto.cpp
+SOURCES += src/modules/Sostenuto/Sostenuto-ui.cpp
+
+SOURCES += src/modules/Sostenuto2/Sostenuto2.cpp
+SOURCES += src/modules/Sostenuto2/Sostenuto2-ui.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp

@@ -4,11 +4,11 @@ namespace fs = ghc::filesystem;
 using namespace pachde;
 
 PlayModule::PlayModule()
-:   track_live(false)
+:   track_live(true)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
-    configInput(IN_PRESET_PREV, "Previous preset trigger");
-    configInput(IN_PRESET_NEXT, "Next preset trigger");
+    configInput(IN_PRESET_PREV, "Previous trigger");
+    configInput(IN_PRESET_NEXT, "Next trigger");
 }
 
 void PlayModule::update_mru(std::string path)

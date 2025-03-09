@@ -192,8 +192,10 @@ void Modulation::pull_mod_amount()
 
 void Modulation::update_lights() {
     if (last_mod_target != mod_target) {
-        for (int i = first_light; i < first_light+count; ++i) {
-            module->getLight(i).setSmoothBrightness((i - first_light) == mod_target ? .6f : 0.f, 90);
+        if (first_light >= 0) {
+            for (int i = first_light; i < first_light+count; ++i) {
+                module->getLight(i).setSmoothBrightness((i - first_light) == mod_target ? .6f : 0.f, 90);
+            }
         }
     }
     last_mod_target = mod_target;

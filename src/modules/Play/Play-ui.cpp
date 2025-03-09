@@ -176,7 +176,7 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(play_menu);
 
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
-    up_button->describe("Scroll up");
+    up_button->describe("Page up");
     up_button->setHandler([this](bool c, bool s){ 
         page_up(c, s, true);
     });
@@ -184,7 +184,7 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(up_button);
 
     down_button = createWidgetCentered<DownButton>(Vec(RIGHT_MARGIN_CENTER, 67.f));
-    down_button->describe("Scroll down");
+    down_button->describe("Page down");
     down_button->setHandler([this](bool c, bool s){
         page_down(c, s, true);
     });

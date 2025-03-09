@@ -15,6 +15,9 @@ enum class ChemId : uint8_t {
     Convo,
     Jack,
     Play,
+    Sustain,
+    Sostenuto,
+    Sostenuto2,
     Preset,
     Blank
 };

@@ -19,6 +19,9 @@ extern Model* modelFx;
 extern Model* modelPost;
 extern Model* modelConvo;
 extern Model* modelJack;
+extern Model* modelSustain;
+extern Model* modelSostenuto;
+extern Model* modelSostenuto2;
 extern Model* modelPreset;
 
 // Theming

@@ -21,6 +21,23 @@ const PackedColor NoColor = 0;
 bool isVisibleColor(PackedColor co);
 PackedColor applyOpacity(PackedColor color, float alpha);
 std::string hex_string(PackedColor co);
+inline PackedColor PackRGB(unsigned int r, unsigned int g, unsigned int b) {
+    return r | (g << 8) | (b << 16) | (255 << 24);
+}
+inline PackedColor PackRGBA(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
+    return r | (g << 8) | (b << 16) | (a << 24);
+}
+PackedColor PackedFromHSLA(float h, float s, float l, float a);
+
+// rgb(r,b,g)
+PackedColor parseRgbColor(const std::string& text);
+
+// hsla(hue[deg], s%, l%, a%)
+PackedColor parseHslaColor(const std::string& text);
+
+// #rrggbbaa #rgb #rrggbb
+PackedColor parseHexColor(const std::string& text);
+
 constexpr const PackedColor OPAQUE_BLACK = 255 << 24; // returned for errors (maybe this should be NoColor, or just something obnoxious)
 
 enum Severity { Info, Warn, Error, Critical };

@@ -93,6 +93,33 @@
         "Expander"
       ]
     },
+    {
+      "slug": "chem-sus",
+      "name": "CHEM Sustain",
+      "description": "CHEM Sustain for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
+      "slug": "chem-sos",
+      "name": "CHEM Sostenuto",
+      "description": "CHEM Sostenuto for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
+    {
+      "slug": "chem-sos2",
+      "name": "CHEM Sostenuto2",
+      "description": "CHEM Sostenuto2 for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
    {
       "slug": "chem-preset",
       "name": "CHEM Preset",

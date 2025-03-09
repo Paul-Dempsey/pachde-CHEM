@@ -106,7 +106,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     style.height = 10.f;
     style.bold = false;
 
-    y = 174.f;
+    y = 165.f;
     addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
         Vec(CENTER, y), box.size.x - 15.f, "", theme_engine, theme, style));
 

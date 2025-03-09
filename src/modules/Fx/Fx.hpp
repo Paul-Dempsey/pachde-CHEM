@@ -26,13 +26,15 @@ struct FxModule : ChemModule, IChemClient, IDoMidi
         P_R5,
         P_R6,
         P_MIX,
-        P_MOD_AMOUNT, NUM_MOD_PARAMS = P_MOD_AMOUNT,
+        P_MOD_AMOUNT,
 
         // Switches
-        P_DISABLE, NUM_KNOBS = P_DISABLE,
+        P_DISABLE, 
         P_EFFECT,
 
-        NUM_PARAMS
+        NUM_PARAMS,
+        NUM_KNOBS = P_DISABLE,
+        NUM_MOD_PARAMS = P_MOD_AMOUNT
     };
     enum Inputs {
         IN_R1,
