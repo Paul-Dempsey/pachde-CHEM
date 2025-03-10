@@ -19,6 +19,9 @@ Every other module must be connected to a **Core** module, using the link button
 | [**Post**](./post.md)  | The post- master section controls, including a global Mute, post level (Volume), and EQ. Post-section convolution controls are in the Convolution module.|
 | [**Convo**](./convo.md) | Controls for pre- and post- convolutions. |
 | [**Jack**](./jack.md)  | Pedal assignment, min/max settings and jack output CV. |
+| [**Sustain**](./sus.md)  | On-screen Sustain |
+| [**Sostenuto**](./sus.md)  | On-screen Sostenuto |
+| [**Sostenuto 2**](./sus.md)  | On-screen Sostenuto 2 |
 
 More modules are planned to cover other important controls, such as rounding and polyphony,
 and a means to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
