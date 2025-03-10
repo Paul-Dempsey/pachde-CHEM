@@ -9,17 +9,6 @@ FxModule::FxModule() :
     glow_knobs(false),
     in_mat_poke(false)
 {
-    EmccPortConfig cfg[] =         {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci1, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci2, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci3, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci4, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci5, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci6, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReciMix, true),
-    };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_R1, Inputs::IN_R1, Lights::L_R1_MOD, NUM_MOD_PARAMS, cfg);
-
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     dp4(configParam(Params::P_R1,  0.f, 10.f, 5.f, "R1"));
@@ -59,6 +48,18 @@ FxModule::FxModule() :
     configLight(L_MIX_MOD, "Modulation amount on Mix");
 
     configLight(L_MIX, "Effects Mix");
+
+    EmccPortConfig cfg[] =         {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci1, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci2, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci3, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci4, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci5, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReci6, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccReciMix, true),
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_R1, Inputs::IN_R1, Lights::L_R1_MOD, NUM_MOD_PARAMS, cfg);
+
 }
 
 void FxModule::dataFromJson(json_t* root)

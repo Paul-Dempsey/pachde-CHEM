@@ -8,15 +8,6 @@ PreModule::PreModule() :
     last_select(-1),
     glow_knobs(false)
 {
-    EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccPre, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccCoThMix, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccThrDrv, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccAtkCut, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccRatMkp, true)
-    };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_LEVEL, Inputs::IN_PRE_LEVEL, Lights::L_PRE_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
-
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     dp4(configParam(Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level"));
@@ -41,6 +32,15 @@ PreModule::PreModule() :
     configLight(L_ATTACK_MOD,           "Modulation amount on Attack/-");
     configLight(L_RATIO_MAKEUP_MOD,     "Modulation amount on Ratio/Makeup");
     configLight(L_MIX, "Mix");
+
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccPre, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccCoThMix, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccThrDrv, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccAtkCut, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccRatMkp, true)
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_LEVEL, Inputs::IN_PRE_LEVEL, Lights::L_PRE_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
 }
 
 bool PreModule::connected()
@@ -165,12 +165,12 @@ void PreModule::process(const ProcessArgs &args)
 
     if (!connected() || chem_host->host_busy()) return;
 
-    if (modulation.sync_params_ready(args)) {
-        modulation.sync_send();
-    }
-
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
+    }
+
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
     }
 
     if (((args.frame + id) % 61) == 0) {

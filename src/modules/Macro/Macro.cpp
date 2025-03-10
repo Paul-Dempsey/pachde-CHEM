@@ -7,16 +7,6 @@ MacroModule::MacroModule() :
     modulation(this, ChemId::Macro),
     glow_knobs(false)
 {
-    EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccI),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccII),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccIII),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccIV),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccV),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccVI)
-    };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_M1, Inputs::IN_M1, Lights::L_M1a, NUM_MOD_PARAMS, cfg);
-
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configInput(IN_M1, "Macro 1 (i)");
     configInput(IN_M2, "Macro 2 (ii)");
@@ -40,6 +30,16 @@ MacroModule::MacroModule() :
     configLight(L_M4a, "Modulation amount on M4");
     configLight(L_M5a, "Modulation amount on M5");
     configLight(L_M6a, "Modulation amount on M6");
+
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccI),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccII),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccIII),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccIV),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccV),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccVI)
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_M1, Inputs::IN_M1, Lights::L_M1a, NUM_MOD_PARAMS, cfg);
 }
 
 void MacroModule::dataFromJson(json_t* root)

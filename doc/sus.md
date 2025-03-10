@@ -1,6 +1,7 @@
 # CHEM Sustain, Sostenuto, and Sostenuto 2
 
 The **Sustain**, **Sostenuto**, and **Sostenuto 2** modules provide 1U on-screen "pedals" for these functions.
+These modules are unaffected by pedal assignments. They are always Sustain and Sostenutos.
 
 Click the round button on either end of the slider to jump directly to the maximum or minimum value.
 

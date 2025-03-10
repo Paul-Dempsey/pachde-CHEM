@@ -114,7 +114,8 @@ BasicSlider::BasicSlider() :
     thumb_size(8.f, 4.5f),
     wire(false),
     stem("slide-stem", "hsl(200, 50%, 50.00%)", 2.5f),
-    thumb("slide-thumb", "hsl(120, 50%, 50%)", .25f)
+    thumb("slide-thumb", "hsl(120, 50%, 50%)", .25f),
+    mod("slide-mod", "hsl(41, 50%, 50%)", "hsl(41, 50%, 50%)", .25f)
 {
     box.size = {10.f, 120.f};
 }
@@ -124,6 +125,7 @@ bool BasicSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTh
     wire = theme->name == "Wire";
     stem.apply_theme(theme);
     thumb.apply_theme(theme);
+    mod.apply_theme(theme);
     return true;
 }
 
@@ -159,9 +161,24 @@ void BasicSlider::draw_thumb(const DrawArgs &args)
     }
 }
 
+void BasicSlider::draw_mod(const DrawArgs &args)
+{
+    if (isnanf(mod_value)) return;
+
+    float range = box.size.y - thumb_size.y;
+    auto pq = getParamQuantity();
+    auto pos = rescale(mod_value, pq ? pq->getMinValue() : 0.f, pq ? pq->getMaxValue() :10.f, 0.f, range);
+    if (wire) {
+        OpenCircle(args.vg, box.size.x * .5f, box.size.y - pos - thumb_size.y *.5f, 2.5f, mod.nvg_stroke_color(), mod.width());
+    } else {
+        Circle(args.vg, box.size.x * .5f, box.size.y - pos - thumb_size.y *.5f, 2.5f, mod.nvg_color());
+    }
+}
+
 void BasicSlider::draw(const DrawArgs &args)
 {
     draw_stem(args);
+    draw_mod(args);
     draw_thumb(args);
 }
 
@@ -178,6 +195,7 @@ void FillSlider::draw(const DrawArgs &args)
 {
     draw_stem(args);
     draw_fill(args);
+    draw_mod(args);
     draw_thumb(args);
 }
 

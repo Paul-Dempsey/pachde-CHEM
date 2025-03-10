@@ -35,13 +35,18 @@ struct BasicSlider : SliderBase, IApplyTheme
     bool wire;
     ElementStyle stem;
     ElementStyle thumb;
+    ElementStyle mod;
+    float mod_value{std::nanf("")};
 
     BasicSlider();
 
+    void unmodulate() { mod_value = std::nanf(""); }
+    void set_modulation(float mod) { mod_value = mod; }
     float thumb_pos();
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
     void draw_stem(const DrawArgs& args);
     void draw_thumb(const DrawArgs& args);
+    void draw_mod(const DrawArgs& args);
     void draw(const DrawArgs& args) override;
 };
 

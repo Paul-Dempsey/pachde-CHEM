@@ -4,12 +4,12 @@
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/knob-track-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/selector-widget.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 

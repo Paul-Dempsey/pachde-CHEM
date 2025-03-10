@@ -1,12 +1,11 @@
 #include "Sustain.hpp"
 #include "../../services/colors.hpp"
 #include "../../widgets/uniform-style.hpp"
-#include "../../widgets/slider-widget.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
-using SM = SustainModule;
+using SM = SusModule;
 
 // -- Sustain UI -----------------------------------
 
@@ -15,16 +14,21 @@ constexpr const float HALFU = 7.5f;
 constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float CENTER = 7.5f;
 
-bool SustainUi::connected() {
+bool SusUi::connected()
+{
     if (!my_module) return false;
     if (!chem_host) return false;
     return true;
 }
 
-SustainUi::SustainUi(SustainModule *module) :
+SusUi::SusUi(SusModule *module) :
     my_module(module)
 {
     setModule(module);
+}
+
+void SusUi::create_ui()
+{
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
@@ -32,12 +36,20 @@ SustainUi::SustainUi(SustainModule *module) :
     setPanel(panel);
     float x, y;
     x = CENTER;
-    y = 200.f;
-    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MAX_SUS, theme_engine, theme)));
-    y = 340.f;
-    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MIN_SUS, theme_engine, theme)));
-    y = 207.f;
-    addChild(createSlider<FillSlider>(Vec(x,y + 64.f), 128.f, my_module, SM::P_SUSTAIN, theme_engine, theme));
+    y = 131.f;
+    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MAX, theme_engine, theme)));
+    y = 135.f;
+    addChild(slider = createSlider<FillSlider>(Vec(x,y + 64.f), 128.f, my_module, SM::P_VALUE, theme_engine, theme));
+    y = 268.f;
+    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MIN, theme_engine, theme)));
+
+    auto co_port = PORT_CORN;
+    y = S::PORT_TOP;
+    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), module, SM::P_MOD_AMOUNT, theme_engine, theme));
+
+    y += S::PORT_DY;
+    addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_MOD, S::InputColorKey, co_port, theme_engine, theme)));
+    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme_engine, theme, S::in_port_label));
 
     // footer
     // addChild(warning_label = createStaticTextLabel<TipLabel>(
@@ -68,7 +80,7 @@ SustainUi::SustainUi(SustainModule *module) :
     }
 }
 
-void SustainUi::onConnectHost(IChemHost* host)
+void SusUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
     if (chem_host) {
@@ -79,21 +91,35 @@ void SustainUi::onConnectHost(IChemHost* host)
     }
 }
 
-void SustainUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
+void SusUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
     //haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
     //haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
 }
 
-void SustainUi::step()
+void SusUi::step()
 {
     Base::step();
     if (!my_module) return;
+    mod_knob->enable(my_module->getInput(0).isConnected());
+    if (my_module->getInput(SM::IN_MOD).isConnected()) {
+        slider->set_modulation(my_module->modulation.get_port(SM::IN_MOD).modulated());
+    } else {
+        slider->unmodulate();
+    }
 }
 
-void SustainUi::appendContextMenu(Menu *menu)
+void SusUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+        [this](){ return my_module->glow_knobs; },
+        [this](){
+            my_module->glow_knobs = !my_module->glow_knobs; 
+            mod_knob->glowing(my_module->glow_knobs);
+        }
+    ));
     Base::appendContextMenu(menu);
 }

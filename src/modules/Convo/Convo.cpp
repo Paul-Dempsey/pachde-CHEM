@@ -10,20 +10,6 @@ ConvoModule::ConvoModule() :
     last_conv(-1),
     extend(false)
 {
-    EmccPortConfig cfg[] = {
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix1), // P_PRE_MIX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx1), // P_PRE_INDEX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix2), // P_POST_MIX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx2), // P_POST_INDEX
-        // EmccPortConfig::no_send(0, 0, true), // P_TYPE
-        // EmccPortConfig::no_send(0, 0, true), // P_LENGTH
-        // EmccPortConfig::no_send(0, 0, true), // P_TUNING
-        // EmccPortConfig::no_send(0, 0, true), // P_WIDTH
-        // EmccPortConfig::no_send(0, 0, true), // P_LEFT
-        // EmccPortConfig::no_send(0, 0, true)  // P_RIGHT
-    };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_MIX, Inputs::IN_PRE_MIX, Lights::L_PRE_MIX_MOD, NUM_MOD_PARAMS, cfg);
-
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     configSwitch(P_TYPE, 0.f, 18.f, 6.f, "Convolution type", {
@@ -73,6 +59,20 @@ ConvoModule::ConvoModule() :
     configLight(L_POST_MIX_MOD,  "Modulation control on Post mix");
     configLight(L_POST_INDEX_MOD,"Modulation control on Post index");
     // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for button lights 
+
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix1), // P_PRE_MIX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx1), // P_PRE_INDEX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix2), // P_POST_MIX
+        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx2), // P_POST_INDEX
+        // EmccPortConfig::no_send(0, 0, true), // P_TYPE
+        // EmccPortConfig::no_send(0, 0, true), // P_LENGTH
+        // EmccPortConfig::no_send(0, 0, true), // P_TUNING
+        // EmccPortConfig::no_send(0, 0, true), // P_WIDTH
+        // EmccPortConfig::no_send(0, 0, true), // P_LEFT
+        // EmccPortConfig::no_send(0, 0, true)  // P_RIGHT
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_MIX, Inputs::IN_PRE_MIX, Lights::L_PRE_MIX_MOD, NUM_MOD_PARAMS, cfg);
 
 }
 

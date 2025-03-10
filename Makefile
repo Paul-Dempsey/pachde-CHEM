@@ -79,11 +79,11 @@ SOURCES += src/modules/Jack/Jack-ui.cpp
 SOURCES += src/modules/Sustain/Sustain.cpp
 SOURCES += src/modules/Sustain/Sustain-ui.cpp
 
-SOURCES += src/modules/Sostenuto/Sostenuto.cpp
-SOURCES += src/modules/Sostenuto/Sostenuto-ui.cpp
+# SOURCES += src/modules/Sostenuto/Sostenuto.cpp
+# SOURCES += src/modules/Sostenuto/Sostenuto-ui.cpp
 
-SOURCES += src/modules/Sostenuto2/Sostenuto2.cpp
-SOURCES += src/modules/Sostenuto2/Sostenuto2-ui.cpp
+# SOURCES += src/modules/Sostenuto2/Sostenuto2.cpp
+# SOURCES += src/modules/Sostenuto2/Sostenuto2-ui.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp

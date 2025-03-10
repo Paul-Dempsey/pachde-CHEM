@@ -8,14 +8,6 @@ PostModule::PostModule() :
     glow_knobs(false),
     muted(false)
 {
-    EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccPost, false),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqMix, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqTilt, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqFreq, true),
-    };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_POST_LEVEL, Inputs::IN_POST_LEVEL, Lights::L_POST_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
-
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     dp4(configParam(Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level"));
@@ -39,6 +31,14 @@ PostModule::PostModule() :
     configLight(L_FREQUENCY_MOD,  "Modulation amount on EQ Frequency");
     configLight(L_MIX, "EQ active");
     configLight(L_MUTE, "Mute");
+
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(Haken::ch1, Haken::ccPost, false),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqMix, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqTilt, true),
+        EmccPortConfig::cc(Haken::ch1, Haken::ccEqFreq, true),
+    };
+    modulation.configure(Params::P_MOD_AMOUNT, Params::P_POST_LEVEL, Inputs::IN_POST_LEVEL, Lights::L_POST_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
 }
 
 void PostModule::dataFromJson(json_t* root)
