@@ -71,7 +71,7 @@
        id="guide16"
        inkscape:locked="false" />
   </sodipodi:namedview>
-   <linearGradient id="panel-gradient" x1="0" y1="60" x2="0" y2="350" gradientUnits="userSpaceOnUse">
+   <linearGradient id="panel-gradient" x1="0" y1="0" x2="0" y2="350" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#282828" />
       <stop offset="1" stop-color="#181818" />
    </linearGradient>

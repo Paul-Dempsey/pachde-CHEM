@@ -17,7 +17,7 @@ void SusModule::init()
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
     configButton(P_MIN, this->min_param_name());
     configButton(P_MAX, this->max_param_name());
-
+    configInput(IN_MOD, this->param_name());
     EmccPortConfig cfg[] = {
         EmccPortConfig::cc(Haken::ch1, my_cc, true)
     };

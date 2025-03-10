@@ -36,11 +36,11 @@ void SusUi::create_ui()
     setPanel(panel);
     float x, y;
     x = CENTER;
-    y = 131.f;
+    const float MIDDLE = 160.f;
+    y = MIDDLE - 64.f - 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MAX, theme_engine, theme)));
-    y = 135.f;
-    addChild(slider = createSlider<FillSlider>(Vec(x,y + 64.f), 128.f, my_module, SM::P_VALUE, theme_engine, theme));
-    y = 268.f;
+    addChild(slider = createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme_engine, theme));
+    y = MIDDLE + 64.f + 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MIN, theme_engine, theme)));
 
     auto co_port = PORT_CORN;

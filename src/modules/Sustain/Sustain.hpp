@@ -135,7 +135,7 @@ struct Sostenuto2Module : SusModule
     explicit Sostenuto2Module() : SusModule(ChemId::Sostenuto2, Haken::ccSos2) {
         init();
     }
-    const char * param_name() override { return "Sostenuto"; }
+    const char * param_name() override { return "Sostenuto 2"; }
     const char * min_param_name() override { return "No sostenuto"; }
     const char * max_param_name() override { return "Max sostenuto"; }
     uint8_t from_em() override { return chem_host->host_matrix()->get_sos2(); }
