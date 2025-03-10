@@ -15,13 +15,9 @@ void SliderBase::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e)
             // bool ctrl = e.mods & GLFW_MOD_CONTROL;
             switch (e.key)
             {
-            case GLFW_KEY_0:
-                pq->setValue(pq->getMinValue());
-                e.consume(this);
-                break;
-            case GLFW_KEY_1: case GLFW_KEY_2: case GLFW_KEY_3: case GLFW_KEY_4:
+            case GLFW_KEY_0: case GLFW_KEY_1: case GLFW_KEY_2: case GLFW_KEY_3: case GLFW_KEY_4:
             case GLFW_KEY_5: case GLFW_KEY_6: case GLFW_KEY_7: case GLFW_KEY_8: case GLFW_KEY_9:
-                pq->setValue(pq->getMinValue() + (increment * (e.key - GLFW_KEY_1)));
+                pq->setValue(rescale((e.key - GLFW_KEY_0), 0.f, 9.f, pq->getMinValue(), pq->getMaxValue()));
                 e.consume(this);
                 break;
 
@@ -134,7 +130,7 @@ bool BasicSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTh
 void BasicSlider::draw_stem(const DrawArgs &args)
 {
     float CENTER = box.size.x * .5f;
-    Line(args.vg, CENTER, 0.f, CENTER, box.size.y, stem.nvg_color(), stem.width());
+    Line(args.vg, CENTER, 0.f, CENTER, box.size.y, stem.nvg_stroke_color(), stem.width());
 }
 
 float BasicSlider::thumb_pos()
@@ -154,7 +150,10 @@ void BasicSlider::draw_thumb(const DrawArgs &args)
     float thumb_cy = thumb_size.y *.5f;
     float pos = box.size.y - thumb_cy - thumb_pos();
     if (wire) {
-        BoxRect(vg, CENTER - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_color(), thumb.dx);
+        BoxRect(vg, CENTER - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_stroke_color(), thumb.dx);
+        if (Alpha(thumb.fill_color) < 1.0) {
+            FillRect(vg, CENTER - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_color());
+        }
     } else {
         FillRect(vg, CENTER - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_color());
     }
@@ -168,12 +167,17 @@ void BasicSlider::draw(const DrawArgs &args)
 
 // ----  FillSlider  ---------------------------
 
+void FillSlider::draw_fill(const DrawArgs &args)
+{
+    float CENTER = box.size.x * .5f;
+    auto pos = thumb_pos();
+    Line(args.vg, CENTER, box.size.y - pos, CENTER, box.size.y, fill.nvg_stroke_color(), fill.width());
+}
+
 void FillSlider::draw(const DrawArgs &args)
 {
     draw_stem(args);
-    float CENTER = box.size.x * .5f;
-    auto pos = thumb_pos();
-    Line(args.vg, CENTER, box.size.y - pos, CENTER, box.size.y, fill.nvg_color(), fill.width());
+    draw_fill(args);
     draw_thumb(args);
 }
 

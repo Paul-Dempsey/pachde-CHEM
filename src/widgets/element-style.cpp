@@ -7,9 +7,9 @@ ElementStyle::ElementStyle(const char* key, const char * text_color, float dx) :
     dx(dx)
 {
     switch (*text_color) {
-        case '#': color = parseHexColor(text_color); break;
-        case 'r': color = parseRgbColor(text_color); break;
-        case 'h': color = parseHslaColor(text_color); break;
+        case '#': fill_color = parseHexColor(text_color); break;
+        case 'r': fill_color = parseRgbColor(text_color); break;
+        case 'h': fill_color = parseHslaColor(text_color); break;
         default: break;
     }
 }    
@@ -20,12 +20,15 @@ void ElementStyle::apply_theme(std::shared_ptr<SvgTheme> theme)
     auto style = theme->getStyle(key);
     if (style) {
         if (style->isApplyStroke()) {
-            color = style->stroke_color();
+            stroke_color = style->stroke_color();
             dx = style->stroke_width;
         }
         if (style->isApplyFill()) {
-            color = style->fill_color();
+            fill_color = style->fill_color();
         }
+    }
+    if (!isVisibleColor(fill_color) && isVisibleColor(stroke_color)) {
+        fill_color = stroke_color;
     }
 }
 

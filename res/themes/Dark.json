@@ -106,6 +106,13 @@
             "lrbtn-dn-face": { "fill": { "gradient": [{ "index":0, "color":"#a7a7a7"}, { "index":1, "color":"#595959"}]}},
             "lrbtn-wire": { "stroke": {"color": "white", "width": 0.5}},
 
+            "dot-ring": { "stroke":"#202020" },
+            "dot-face-up": { "gradient": [{"index":0, "color": "#dfdfdf"}, {"index":1, "color": "#404040"}]},
+            "dot-face-dn": { "gradient": [{"index":0, "color": "#404040"}, {"index":1, "color": "#d0d0d0"}]},
+            "slide-fill":  { "stroke": " #f9a54b"},
+            "slide-stem":  { "stroke": "hsl(200, 50%, 50.00%)" },
+            "slide-thumb": { "fill": "hsl(120, 50%, 50%)" },
+
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#303030" }, { "index":1, "offset":1, "color": "#222222" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#636363" }, { "index":1, "offset":1, "color": "#2B2B2B" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#4C4C4C" }, { "index":1, "offset":1, "color": "#3B3B3B" }]}},

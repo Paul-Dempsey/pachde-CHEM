@@ -24,7 +24,7 @@
             "k-disabled": {"fill": "hsl(41, 40%, 35%)", "opacity": 0.6 },
             "k-track": { "fill": " #f9a54b", "stroke": {"color": " #f9a54b", "width": 1 }},
 
-            "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
+            "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":" #fff171" }, { "index":1, "color":" #803c04" }]}},
             "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
             "kb-rim":  { "stroke" : "#204a60" },
 
@@ -96,7 +96,14 @@
             "port-jack":      { "fill": "#c0c0c0" },
             "port-jack-edge": { "fill": { "gradient": [{ "index":0, "offset":0, "color":"#e5e5e5"}, { "index":1, "offset":1, "color":"#a6a6a6"}]}},
             "cop-bezel": { "opacity": 0.1 },
-            
+
+            "dot-ring": { "stroke":"#202020" },
+            "dot-face-up": { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 65.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 30%)"}]}},
+            "dot-face-dn": { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 35.30%, 60.00%)"}, { "index":1, "color":"hsl(41, 38.20%, 20%)"}]}},
+            "slide-fill":  { "stroke": "#f9a54b"},
+            "slide-stem":  { "stroke": "#62512c" },
+            "slide-thumb": { "fill": "hsl(54, 80%, 50%)" },
+
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#947d4b" }, { "index":1, "offset":1, "color": "#675632" } ] } },
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#ac9461" }, { "index":1, "offset":1, "color": "#76633b" } ] } },
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#a39066" }, { "index":1, "offset":1, "color": "#78643a" } ] } },

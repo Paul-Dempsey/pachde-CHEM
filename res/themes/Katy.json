@@ -119,6 +119,13 @@
             "patty": { "stroke": " #810047"},
             "patty-hover": { "stroke": "#8c72f5"},
 
+            "dot-ring": { "stroke":"#810047" },
+            "dot-face-up": { "fill": { "gradient": [{"index":0, "color": "hsl(327, 85.00%, 85%)"}, {"index":1, "color": "hsl(327, 85.00%, 42.5%)"}]}},
+            "dot-face-dn": { "fill": { "gradient": [{"index":0, "color": "hsl(327, 85.00%, 38%)"}, {"index":1, "color": "hsl(327, 85.00%, 75%)"}]}},
+            "slide-fill":  { "stroke": " #f9a54b"},
+            "slide-stem":  { "stroke": "hsl(216, 50%, 50%)" },
+            "slide-thumb": { "fill": "hsl(120, 40%, 50%)" },
+
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e38dbc" }, { "index":1, "offset":1, "color": "#a14b7a" }]}},
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#e389ba" }, { "index":1, "offset":1, "color": "#8a3b67" }]}},
             "screw-face":  { "fill": { "gradient": [ { "index":0, "offset":0, "color": "#f7c8e2" }, { "index":1, "offset":1, "color": "#c55693" }]}},

@@ -94,6 +94,13 @@
             "lrbtn-dn-face": { "fill": { "gradient": [{ "index":0, "color":"hsl(200, 60%, 65.50%)"}, { "index":1, "color":"hsl(200, 60%, 34.90%)"}]}},
             "lrbtn-wire": { "stroke": {"color": "white", "width": 0.5}},
 
+            "dot-ring": { "stroke":"#202020" },
+            "dot-face-up": { "fill": { "gradient": [{ "index":0, "color":"hsl(200, 70%, 80%)"}, { "index":1, "color":"hsl(200, 58.20%, 17.80%)"}]}},
+            "dot-face-dn": { "fill": { "gradient": [{ "index":0, "color":"hsl(200, 60%, 65.50%)"}, { "index":1, "color":"hsl(200, 60%, 34.90%)"}]}},
+            "slide-fill":  { "stroke": "#f9a54b"},
+            "slide-stem":  { "stroke": "hsl(200, 40%, 50.00%)" },
+            "slide-thumb": { "fill": "hsl(157, 80%, 40%)" },
+
             "screw-rim":   { "fill": { "gradient": [ { "index":0, "color": "#4f798f" }, { "index":1, "color": "#233d4a" } ] } },
             "screw-bevel": { "fill": { "gradient": [ { "index":0, "color": "#658fa4" }, { "index":1, "color": "#2c4b5a" } ] } },
             "screw-face":  { "fill": { "gradient": [ { "index":0, "color": "#528097" }, { "index":1, "color": "#33596b" } ] } },

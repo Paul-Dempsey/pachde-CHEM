@@ -132,6 +132,13 @@
             "patty": { "stroke": { "color":"g80", "width": 0.5}},
             "patty-hover": { "stroke": "brand" },
 
+            "dot-ring": { "stroke":"#fdfdfd" },
+            "dot-face-up": { "opacity": 0 },
+            "dot-face-dn": { "opacity": 0 },
+            "slide-fill":  { "stroke":{ "color": "#f9a54b", "width":0.45 }},
+            "slide-stem":  { "stroke":{ "color":"hsl(200, 50%, 50.00%)", "width":0.35 }},
+            "slide-thumb": { "fill": "hsla(120, 50%, 50%, 30%)", "stroke":{ "color":"hsl(120, 50%, 50%)", "width":0.25 }},
+
             "screw-rim":   { "stroke":"none", "fill": "none"},
             "screw-bevel": { "stroke":"g65",  "fill": "none"},
             "screw-face":  { "stroke":"none", "fill": "none"},

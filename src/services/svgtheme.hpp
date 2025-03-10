@@ -27,6 +27,9 @@ inline PackedColor PackRGB(unsigned int r, unsigned int g, unsigned int b) {
 inline PackedColor PackRGBA(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
     return r | (g << 8) | (b << 16) | (a << 24);
 }
+inline float Alpha(PackedColor co) {
+    return ((co >> 24) & 0xff) / 255.f;
+}
 PackedColor PackedFromHSLA(float h, float s, float l, float a);
 
 // rgb(r,b,g)
