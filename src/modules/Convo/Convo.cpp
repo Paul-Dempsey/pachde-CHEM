@@ -36,8 +36,8 @@ ConvoModule::ConvoModule() :
     dp4(configParam(P_LENGTH, 0.f, 10.f, 10.f, "Length"));
     dp4(configParam(P_TUNING, 0.f, 10.f,  5.f, "Tuning"));
     dp4(configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width"));
-    dp4(configParam(P_LEFT,   0.f, 10.f, 10.f, "Left attenuation"));
-    dp4(configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right attenuation"));
+    dp4(configParam(P_LEFT,   0.f, 10.f, 10.f, "Left"));
+    dp4(configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right"));
 
     dp4(configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix"));
     dp4(configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index"));
@@ -46,7 +46,7 @@ ConvoModule::ConvoModule() :
 
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
-    configSwitch(P_SELECT, 0.f, 3.f, 0.f, "Select convolution", { "Convolution #1", "Convolution #2", "Convolution #3", "Convolution #4"});
+    configSwitch(P_SELECT, 0.f, 3.f, 0.f, "Select convolution slot", { "Convolution #1", "Convolution #2", "Convolution #3", "Convolution #4"});
     configSwitch(P_EXTEND, 0.f, 1.f, 0.f, "Extend computation", {"off", "on"});
 
     configInput(IN_PRE_MIX,    "Pre mix");

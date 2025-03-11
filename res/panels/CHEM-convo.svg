@@ -17,7 +17,8 @@
 
   <path id="1--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,74 h 160" />
   <path id="v--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 82.5,18 v 53" />
-  <path id="m--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 30,236 h 103" />
+  <path id="m1--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 40,117 h 103" />
+  <path id="m2--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 30,236 h 113" />
   <path id="b--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,278 h 160" />
 
 </svg>
