@@ -38,7 +38,6 @@ const NVGcolor purple_light       = nvgHSL(270.f/360.f, 0.85f, 0.5f);
 const NVGcolor blue_green_light   = nvgHSL(180.f/360.f, 100.f, .5f);
 const NVGcolor gray_light         = GRAY50;
 const NVGcolor no_light           = COLOR_NONE;
-const NVGcolor preset_name_color  = nvgRGB(0xe6, 0xa2, 0x1a);
 
 NamedColor stock_colors[] = {
     { "#d blue", PackRGB(0x45, 0x7a, 0xa6) },
@@ -208,88 +207,6 @@ NamedColor stock_colors[] = {
     { "Yellow green", PackRGB(154, 205, 50) },
     { nullptr, 0 }
 };
-
-Theme ParseTheme(const std::string& text) {
-    if (text.empty()) return DefaultTheme;
-    switch (*text.cbegin()) {
-        case 'l': case 'L': return Theme::Light;
-        case 'd': case 'D': return Theme::Dark;
-        case 'h': case 'H': return Theme::HighContrast;
-    }
-    return DefaultTheme;
-}
-
-std::string ToString(Theme t) {
-    switch (t) {
-        default:
-        case Theme::Light: return "light";
-        case Theme::Dark: return "dark";
-        case Theme::HighContrast: return "highcontrast";
-    }
-}
-
-Theme ThemeFromJson(json_t * root) {
-    json_t* j = json_object_get(root, "theme");
-    return j ? ParseTheme(json_string_value(j)) :DefaultTheme;
-}
-
-NVGcolor PanelBackground(Theme theme)
-{
-    switch (theme) {
-        default:
-        case Theme::Unset:
-        case Theme::Light: return GrayRamp[G_90];
-        case Theme::Dark: return GrayRamp[G_20];
-        case Theme::HighContrast: return GrayRamp[G_05];
-    }
-}
-
-NVGcolor ThemeTextColor(Theme theme)
-{
-    switch (theme)
-    {
-    default:
-    case Theme::Unset:
-    case Theme::Light:
-        return GrayRamp[G_20];
-        break;
-
-    case Theme::Dark:
-        return GrayRamp[G_65];
-
-    case Theme::HighContrast:
-        return GrayRamp[G_90];
-        break;
-    };
-}
-
-NVGcolor OutputBackground(Theme theme)
-{
-    switch (theme) {
-        default:
-        case Theme::Unset:
-        case Theme::Light:
-            return GrayRamp[G_40];
-        case Theme::Dark:
-            return GrayRamp[G_10];
-        case Theme::HighContrast:
-            return GrayRamp[G_BLACK];
-    }
-}
-
-NVGcolor LogoColor(Theme theme)
-{
-    switch (theme) {
-        default: 
-        case Theme::Unset:
-        case Theme::Light:
-            return GrayRamp[G_BLACK];
-        case Theme::Dark:
-            return GrayRamp[G_75];
-        case Theme::HighContrast:
-            return GrayRamp[G_95];
-    }
-}
 
 const NVGcolor GrayRamp[] = {
     BLACK,

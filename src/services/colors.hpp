@@ -88,10 +88,8 @@ extern const NVGcolor yellow_light;
 extern const NVGcolor red_light;
 extern const NVGcolor white_light;
 extern const NVGcolor purple_light;
-extern const NVGcolor preset_name_color;
 extern const NVGcolor gray_light;
 extern const NVGcolor no_light;
-extern const NVGcolor preset_name_color;
 
 #define IS_SAME_COLOR(p,q) (((p).r == (q).r) && ((p).g == (q).g) && ((p).b == (q).b) && ((p).a == (q).a))
 inline NVGcolor Overlay(NVGcolor color, float trans = 0.2f) { return nvgTransRGBAf(color, trans); }
@@ -320,21 +318,6 @@ inline NVGcolor GetStockColor(StockColor id)
     if (static_cast<int>(id) < 0 || id > StockColor::STOCK_COLOR_COUNT) return COLOR_NONE;
 	return fromPacked(stock_colors[static_cast<int>(id)].color);
 }
-enum class Theme {
-    Unset = 0,
-    Light = 1,
-    Dark = 2,
-    HighContrast = 3
-};
-inline bool IsDarker(Theme theme) { return theme > Theme::Light; }
-inline bool IsLighter(Theme theme) { return theme <= Theme::Light; }
-
-const Theme DefaultTheme = Theme::Light;
-inline Theme ConcreteTheme(Theme theme) { return Theme::Unset == theme ? DefaultTheme : theme; }
-NVGcolor PanelBackground(Theme theme);
-NVGcolor ThemeTextColor(Theme theme);
-NVGcolor OutputBackground(Theme theme);
-NVGcolor LogoColor(Theme theme);
 
 // https://en.wikipedia.org/wiki/HSL_and_HSV
 // https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
@@ -387,10 +370,6 @@ inline float Hue(const NVGcolor& color) {
 inline bool isColorTransparent(const NVGcolor& color) { return color.a < 0.001f; }
 inline bool isColorVisible(const NVGcolor& color) { return color.a > 0.001f; }
 
-std::string ToString(Theme theme);
-Theme ParseTheme(const std::string& text);
-Theme ThemeFromJson(json_t * root);
-
 void FillRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color);
 void GradientRect(NVGcontext * vg, float x, float y, float width, float height, const NVGcolor& top, const NVGcolor& bottom, float y1, float y2);
 void RoundRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color, float radius);
@@ -409,6 +388,7 @@ void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_rad
 // VEC_ARGS(knob->box.getCenter())  , knob->minAngle, knob->maxAngle
 void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 
+#ifdef IMPLEMENT_COLOR_MENU
 template <class TMenuItem = rack::ui::MenuEntry>
 rack::ui::MenuEntry* createColorMenuItem(
     PackedColor previewColor,
@@ -446,6 +426,6 @@ rack::ui::MenuEntry* createColorMenuItem(
    
 	return item;
 }
-
+#endif
 
 }

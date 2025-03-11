@@ -4,9 +4,7 @@
 - Global settings module(s) (poly/mpe, mono, routing, surface, ...)
 - Kinetic module
 - Overlay macro system modules
-- Reduce colors.cpp to minimum requirements
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
-- Ensure logging off completely silences logging and log-file creation.
 - Listen for new 10.50 Mahling start/end signals for busy detection
 - Decode category info for preset desciption tooltip
 
