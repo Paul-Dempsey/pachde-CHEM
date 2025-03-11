@@ -1,6 +1,6 @@
-![](./image/repo-banner.svg)
-
 # pachde CHEM
+
+![CHEM banner](./image/repo-banner.svg)
 
 **CHEM** is the successor to pachde (#d) **HC One**, for EaganMatrix devices running firmware 10.4x.
 
