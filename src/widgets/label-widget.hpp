@@ -85,14 +85,14 @@ struct BasicTextLabel: Widget, IApplyTheme
     void draw(const DrawArgs& args) override;
 };
 
-struct StaticTextLabel: Widget, IApplyTheme
+struct TextLabel: Widget, IApplyTheme
 {
     using Base = Widget;
 
     FramebufferWidget* _fb = nullptr;
     BasicTextLabel* _label = nullptr;
 
-    StaticTextLabel()
+    TextLabel()
     {
         _label = new BasicTextLabel();
         _fb = new widget::FramebufferWidget;
@@ -149,27 +149,7 @@ struct StaticTextLabel: Widget, IApplyTheme
     }
 };
 
-struct LazyDynamicLabel : StaticTextLabel
-{
-    std::function<std::string ()> _getText;
-    
-    LazyDynamicLabel(){}
-
-    void modified(bool modified = true) {
-        if (modified && _getText) {
-            text(_getText());
-        } else {
-            StaticTextLabel::modified(modified);
-        }
-    }
-
-    void setFetch(std::function<std::string ()> get, bool refreshable = false)
-    {
-        _getText = get;
-    }
-};
-
-template<typename TWidget = StaticTextLabel>
+template<typename TWidget = TextLabel>
 TWidget* createStaticTextLabel(
     math::Vec pos,
     float width,
@@ -189,8 +169,8 @@ TWidget* createStaticTextLabel(
     return w;
 }
 
-template<typename TWidget = StaticTextLabel>
-TWidget* createStaticTextLabel(
+template<typename TWidget = TextLabel>
+TWidget* createLabel(
     math::Vec pos,
     float width,
     std::string text,

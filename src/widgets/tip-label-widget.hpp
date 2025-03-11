@@ -4,9 +4,9 @@
 
 namespace pachde {
 
-struct TipLabel : StaticTextLabel
+struct TipLabel : TextLabel
 {
-    using Base = StaticTextLabel;
+    using Base = TextLabel;
 
     TipHolder* tip_holder;
 

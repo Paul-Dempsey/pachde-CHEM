@@ -97,7 +97,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     IChemHost* chem_host{nullptr};
     PreModule* my_module{nullptr};
 
-    StaticTextLabel* effect_label;
+    TextLabel* effect_label;
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
@@ -106,13 +106,13 @@ struct PreUi : ChemModuleWidget, IChemClient
     int comp_type;
 
     SelectorWidget* selector{nullptr};
-    StaticTextLabel* selector_label;
-    StaticTextLabel* top_knob_label;
-    StaticTextLabel* mid_knob_label;
-    StaticTextLabel* bot_knob_label;
-    StaticTextLabel* in_thresh_drive;
-    StaticTextLabel* in_attack_x;
-    StaticTextLabel* in_ratio_makeup;
+    TextLabel* selector_label;
+    TextLabel* top_knob_label;
+    TextLabel* mid_knob_label;
+    TextLabel* bot_knob_label;
+    TextLabel* in_thresh_drive;
+    TextLabel* in_attack_x;
+    TextLabel* in_ratio_makeup;
     SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PreModule::NUM_KNOBS];
     TrackWidget* tracks[PreModule::NUM_MOD_PARAMS];

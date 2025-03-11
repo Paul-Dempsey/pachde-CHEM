@@ -52,10 +52,10 @@ PostUi::PostUi(PostModule *module) :
     y = 68.f;
     addChild(Center(createThemedParamLightButton<LargeRoundParamButton, SmallLight<RedLight>>(
         Vec(x, y), my_module, PostModule::P_MUTE, PostModule::L_MUTE, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x,y + 14.f), 50.f, "Mute", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(x,y + 14.f), 50.f, "Mute", theme_engine, theme, knob_label_style));
     
     y = 104.f;
-    addChild(effect_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createLabel<TextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
     y += 34;
     addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), module, PostModule::P_MIX, theme_engine, theme));
     addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
@@ -68,11 +68,11 @@ PostUi::PostUi(PostModule *module) :
 
     addChild(knobs[K_TILT] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_TILT, theme_engine, theme));
     addChild(tracks[K_TILT] = createTrackWidget(knobs[K_TILT], theme_engine, theme));
-    addChild(top_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 50.f, "Tilt", theme_engine, theme, knob_label_style));
+    addChild(top_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 50.f, "Tilt", theme_engine, theme, knob_label_style));
     y += PARAM_DY;
     addChild(knobs[K_FREQUENCY] = createChemKnob<BasicKnob>(Vec(x, y), module, PostModule::P_FREQUENCY, theme_engine, theme));
     addChild(tracks[K_FREQUENCY] = createTrackWidget(knobs[K_FREQUENCY], theme_engine, theme));
-    addChild(mid_knob_label= createStaticTextLabel<StaticTextLabel>(Vec(x,y + label_offset), 80.f, "Frequency", theme_engine, theme, knob_label_style));
+    addChild(mid_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 80.f, "Frequency", theme_engine, theme, knob_label_style));
     y += PARAM_DY;
 
     // if (browsing) {
@@ -89,41 +89,41 @@ PostUi::PostUi(PostModule *module) :
     
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MUTE, S::InputColorKey, PORT_RED, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MUTE", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MUTE", theme_engine, theme, S::in_port_label));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_POST_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "LVL", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "LVL", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_POST_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_POST_LEVEL_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MIX", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "MIX", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_TILT, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "TLT", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "TLT", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_TILT, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_TILT_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_FREQUENCY, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "FRQ", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 36.f, "FRQ", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PostModule::IN_FREQUENCY, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PostModule::L_FREQUENCY_MOD));
 
     // footer
 
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
+    addChild(warning_label = createLabel<TipLabel>(
         Vec(S::CORE_LINK_TEXT, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
+    addChild(haken_device_label = createLabel<TipLabel>(
         Vec(S::CORE_LINK_TEXT, box.size.y - S::CORE_LINK_TEXT_DY), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");

@@ -133,16 +133,16 @@ PlayUi::PlayUi(PlayModule *module) :
         addChild(pw);
         y += 20;
     }
-    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
+    addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
+    addChild(warning_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
     LabelStyle style{"dytext", TextAlignment::Left, 16.f};
-    addChild(playlist_label = createStaticTextLabel<TipLabel>(
+    addChild(playlist_label = createLabel<TipLabel>(
         Vec(ONEU, 16), 148.f, "My Favorites", theme_engine, theme, style));
     playlist_label->glowing(true);
 
@@ -154,7 +154,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     style.height = 9.f;
     style.align = TextAlignment::Center;
-    addChild(page_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(page_label = createLabel<TextLabel>(
         Vec(RIGHT_MARGIN_CENTER, 35.f),  35.f, "1 of 1", theme_engine, theme, style));
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), theme_engine, theme, "Add to playlist");
@@ -166,7 +166,7 @@ PlayUi::PlayUi(PlayModule *module) :
     style.key = "curpreset";
     style.height = 14.f;
     style.bold = true;
-    addChild(live_preset_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(live_preset_label = createLabel<TextLabel>(
         Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
     live_preset_label->glowing(true);
 

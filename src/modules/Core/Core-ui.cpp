@@ -61,7 +61,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createIndicatorsCentered(CENTER, PICKER_TOP - 18.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
-    addChild(preset_label = createStaticTextLabel<TipLabel>(
+    addChild(preset_label = createLabel<TipLabel>(
         Vec(CENTER, 126.f), box.size.x, "[preset]", theme_engine, theme, style));
     preset_label->glowing(true);
 
@@ -93,13 +93,13 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     y = S::PORT_TOP + S::PORT_DY;
     x = RACK_GRID_WIDTH+2;
     addChild(Center(createThemedColorOutput(Vec(x, y), my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "OK", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "OK", theme_engine, theme, S::in_port_label));
     x = 125.f;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C1_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
     x += 25.f;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
 
     style.key = "brand";
     style.align = TextAlignment::Center;
@@ -107,7 +107,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     style.bold = false;
 
     y = 165.f;
-    addChild(em_status_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(em_status_label = createLabel<TextLabel>(
         Vec(CENTER, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
@@ -135,20 +135,20 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     float y = PICKER_TOP;
     haken_picker = createMidiPicker(S::UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
     LabelStyle style{"dytext", TextAlignment::Center, 10.f};
-    addChild(firmware_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(firmware_label = createLabel<TextLabel>(
         Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
         theme, style));
 
     LabelStyle midi_style{"midi-name", TextAlignment::Left, 14.f};
 
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
-    addChild(haken_device_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(haken_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, midi_style));
 
     y += PICKER_INTERVAL;
     controller1_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
-    addChild(controller1_device_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(controller1_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
@@ -158,7 +158,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     y += PICKER_INTERVAL;
     controller2_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
-    addChild(controller2_device_label = createStaticTextLabel<StaticTextLabel>(
+    addChild(controller2_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));

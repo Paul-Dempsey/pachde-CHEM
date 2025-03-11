@@ -119,8 +119,8 @@ struct FxUi : ChemModuleWidget, IChemClient
     TipLabel*   warn{nullptr};
 
     SelectorWidget* selector{nullptr};
-    StaticTextLabel* effect_label;
-    StaticTextLabel* r_labels[6];
+    TextLabel* effect_label;
+    TextLabel* r_labels[6];
     SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[FxModule::NUM_KNOBS];
     TrackWidget* tracks[FxModule::NUM_MOD_PARAMS];

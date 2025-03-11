@@ -104,9 +104,9 @@ struct PostUi : ChemModuleWidget, IChemClient
     IChemHost* chem_host{nullptr};
     PostModule* my_module{nullptr};
 
-    StaticTextLabel* effect_label;
-    StaticTextLabel* top_knob_label;
-    StaticTextLabel* mid_knob_label;
+    TextLabel* effect_label;
+    TextLabel* top_knob_label;
+    TextLabel* mid_knob_label;
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};

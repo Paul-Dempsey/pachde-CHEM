@@ -87,8 +87,8 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     PlayMenu*        play_menu{nullptr};
     TipLabel*        haken_device_label{nullptr};
     TipLabel*        playlist_label{nullptr};
-    StaticTextLabel* page_label{nullptr};
-    StaticTextLabel* live_preset_label{nullptr};
+    TextLabel* page_label{nullptr};
+    TextLabel* live_preset_label{nullptr};
     TipLabel*        warning_label{nullptr};
     Blip*            blip{nullptr};
 

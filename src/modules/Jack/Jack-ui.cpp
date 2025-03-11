@@ -56,14 +56,14 @@ JackUi::JackUi(JackModule *module) :
     y = 40.f;
     addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
     y += LABEL_DY;
-    addChild(assign_1_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
+    addChild(assign_1_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
     y += KNOBS_DY;
     addChild(createChemKnob<TrimPot>(Vec(12.f,y), my_module, JackModule::P_MIN_JACK_1, theme_engine, theme));
     addChild(createChemKnob<TrimPot>(Vec(32.f,y), my_module, JackModule::P_MAX_JACK_1, theme_engine, theme));
     y += LABEL_DY;
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
 
     y += PEDAL_DY;
     pedal_image_1 = new SymbolSetWidget(&symbols);
@@ -74,14 +74,14 @@ JackUi::JackUi(JackModule *module) :
     y = 150.f;
     addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
     y += LABEL_DY;
-    addChild(assign_2_label = createStaticTextLabel<StaticTextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
+    addChild(assign_2_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
     y += KNOBS_DY;
     addChild(createChemKnob<TrimPot>(Vec(12.f, y), my_module, JackModule::P_MIN_JACK_2, theme_engine, theme));
     addChild(createChemKnob<TrimPot>(Vec(32.f, y), my_module, JackModule::P_MAX_JACK_2, theme_engine, theme));
     y += LABEL_DY;
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
 
     y += PEDAL_DY;
     pedal_image_2 = new SymbolSetWidget(&symbols);
@@ -92,7 +92,7 @@ JackUi::JackUi(JackModule *module) :
     y += 34.f;
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
         Vec(x, y), my_module, JackModule::P_KEEP, JackModule::L_KEEP, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y+9.f), 80.f, "Keep", theme_engine, theme, S::control_label));
+    addChild(createLabel<TextLabel>(Vec(x, y+9.f), 80.f, "Keep", theme_engine, theme, S::control_label));
 
     // outputs
     auto co_port = PORT_ORANGE;
@@ -100,19 +100,19 @@ JackUi::JackUi(JackModule *module) :
     y = S::PORT_TOP;
 
     addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "1", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "1", theme_engine, theme, S::in_port_label));
 
     y += S::PORT_DY;
     addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "2", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "2", theme_engine, theme, S::in_port_label));
 
     // footer
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
+    addChild(warning_label = createLabel<TipLabel>(
         Vec(7.5f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
+    addChild(haken_device_label = createLabel<TipLabel>(
         Vec(20.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(5.f, box.size.y - S::U1), theme_engine, theme, "Core link");

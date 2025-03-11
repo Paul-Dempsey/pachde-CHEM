@@ -192,13 +192,13 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     MidiPicker* haken_picker = nullptr;
     MidiPicker* controller1_picker = nullptr;
     MidiPicker* controller2_picker = nullptr;
-    StaticTextLabel* haken_device_label = nullptr;
-    StaticTextLabel* controller1_device_label = nullptr;
-    StaticTextLabel* controller2_device_label = nullptr;
+    TextLabel* haken_device_label = nullptr;
+    TextLabel* controller1_device_label = nullptr;
+    TextLabel* controller2_device_label = nullptr;
     TipLabel* preset_label = nullptr;
-    StaticTextLabel* firmware_label = nullptr;
+    TextLabel* firmware_label = nullptr;
     //StaticTextLabel* task_status_label = nullptr;
-    StaticTextLabel* em_status_label = nullptr;
+    TextLabel* em_status_label = nullptr;
 
     Blip* blip = nullptr;
     IndicatorWidget* mididevice_indicator = nullptr;

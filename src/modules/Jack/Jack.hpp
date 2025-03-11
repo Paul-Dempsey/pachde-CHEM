@@ -90,8 +90,8 @@ struct JackUi : ChemModuleWidget, IChemClient
     TipLabel*     haken_device_label{nullptr};
     TipLabel*     warning_label{nullptr};
 
-    StaticTextLabel* assign_1_label;
-    StaticTextLabel* assign_2_label;
+    TextLabel* assign_1_label;
+    TextLabel* assign_2_label;
     SymbolProvider symbols;
     SymbolSetWidget* pedal_image_1;
     SymbolSetWidget* pedal_image_2;

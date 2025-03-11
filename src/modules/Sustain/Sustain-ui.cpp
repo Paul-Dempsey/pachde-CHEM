@@ -49,7 +49,7 @@ void SusUi::create_ui()
 
     y += S::PORT_DY;
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_MOD, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme_engine, theme, S::in_port_label));
 
     // footer
     // addChild(warning_label = createStaticTextLabel<TipLabel>(

@@ -65,7 +65,7 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme)); 
     addChild(tracks[M6] = createTrackWidget(knobs[M6], theme_engine, theme));
     
-    addChild(preset_label = createStaticTextLabel<TipLabel>(
+    addChild(preset_label = createLabel<TipLabel>(
         Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "", theme_engine, theme,
         LabelStyle{"curpreset", TextAlignment::Center, 12.f, false}));
 
@@ -75,21 +75,21 @@ MacroUi::MacroUi(MacroModule *module) :
     LabelStyle control_style{S::control_label};
     control_style.align = TextAlignment::Left;
 
-    addChild(m1_label = createStaticTextLabel(Vec(x,y), 75.f, "i",   theme_engine, theme, control_style)); y += MACRO_DY;
-    addChild(m2_label = createStaticTextLabel(Vec(x,y), 75.f, "ii",  theme_engine, theme, control_style)); y += MACRO_DY;
-    addChild(m3_label = createStaticTextLabel(Vec(x,y), 75.f, "iii", theme_engine, theme, control_style)); y += MACRO_DY;
-    addChild(m4_label = createStaticTextLabel(Vec(x,y), 75.f, "iv",  theme_engine, theme, control_style)); y += MACRO_DY;
-    addChild(m5_label = createStaticTextLabel(Vec(x,y), 75.f, "v",   theme_engine, theme, control_style)); y += MACRO_DY;
-    addChild(m6_label = createStaticTextLabel(Vec(x,y), 75.f, "vi",  theme_engine, theme, control_style));
+    addChild(m1_label = createLabel(Vec(x,y), 75.f, "i",   theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m2_label = createLabel(Vec(x,y), 75.f, "ii",  theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m3_label = createLabel(Vec(x,y), 75.f, "iii", theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m4_label = createLabel(Vec(x,y), 75.f, "iv",  theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m5_label = createLabel(Vec(x,y), 75.f, "v",   theme_engine, theme, control_style)); y += MACRO_DY;
+    addChild(m6_label = createLabel(Vec(x,y), 75.f, "vi",  theme_engine, theme, control_style));
 
     // knob pedal annotations
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m2_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m3_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m4_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m5_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m6_ped_label = createStaticTextLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label));
+    addChild(m1_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m2_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m3_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m4_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m5_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m6_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -110,7 +110,7 @@ MacroUi::MacroUi(MacroModule *module) :
         }
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createStaticTextLabel<StaticTextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         x += INPUT_DX;
         if (i == 2) {
             y += S::PORT_DY;
@@ -120,12 +120,12 @@ MacroUi::MacroUi(MacroModule *module) :
 
     // footer
 
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
+    addChild(warning_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    addChild(haken_device_label = createStaticTextLabel<TipLabel>(
+    addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, style::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
@@ -213,7 +213,7 @@ void MacroUi::onPresetChange()
     }
 }
 
-void set_pedal_text(StaticTextLabel* label, uint8_t item_cc, uint8_t a1, uint8_t a2)
+void set_pedal_text(TextLabel* label, uint8_t item_cc, uint8_t a1, uint8_t a2)
 {
     if (item_cc == a1 || item_cc == a2) {
         if (a1 == a2) {

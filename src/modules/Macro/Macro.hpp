@@ -96,18 +96,18 @@ struct MacroUi : ChemModuleWidget, IChemClient
     TipLabel*     warning_label{nullptr};
 
     TipLabel* preset_label;
-    StaticTextLabel* m1_label;
-    StaticTextLabel* m2_label;
-    StaticTextLabel* m3_label;
-    StaticTextLabel* m4_label;
-    StaticTextLabel* m5_label;
-    StaticTextLabel* m6_label;
-    StaticTextLabel* m1_ped_label;
-    StaticTextLabel* m2_ped_label;
-    StaticTextLabel* m3_ped_label;
-    StaticTextLabel* m4_ped_label;
-    StaticTextLabel* m5_ped_label;
-    StaticTextLabel* m6_ped_label;
+    TextLabel* m1_label;
+    TextLabel* m2_label;
+    TextLabel* m3_label;
+    TextLabel* m4_label;
+    TextLabel* m5_label;
+    TextLabel* m6_label;
+    TextLabel* m1_ped_label;
+    TextLabel* m2_ped_label;
+    TextLabel* m3_ped_label;
+    TextLabel* m4_ped_label;
+    TextLabel* m5_ped_label;
+    TextLabel* m6_ped_label;
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
     TrackWidget* tracks[MacroModule::NUM_KNOBS];

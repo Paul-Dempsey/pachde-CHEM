@@ -131,7 +131,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     IChemHost* chem_host{nullptr};
     ConvoModule* my_module{nullptr};
 
-    StaticTextLabel* conv_number_label;
+    TextLabel* conv_number_label;
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
@@ -140,8 +140,8 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     SmallRoundParamButton* extend_button;
     SelectorWidget* selector{nullptr};
 
-    StaticTextLabel* selector_label;
-    StaticTextLabel* type_label;
+    TextLabel* selector_label;
+    TextLabel* type_label;
     int last_convo;
     float last_type;
     float last_extend;
