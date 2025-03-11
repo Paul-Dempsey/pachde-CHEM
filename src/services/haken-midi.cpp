@@ -69,7 +69,7 @@ void HakenMidi::keep_midi(ChemId tag, bool keep)
 void HakenMidi::select_preset(ChemId tag, PresetId id)
 {
     if (log) {
-        log->logMessage(">>H", "---- Select Preset");
+        log->log_message(">>H", "---- Select Preset");
     }
     assert(id.valid());
     //send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42)); tick_tock = !tick_tock;
@@ -86,7 +86,7 @@ void HakenMidi::midi_rate(ChemId tag, HakenMidiRate rate)
 
 void HakenMidi::editor_present(ChemId tag) {
     if (log) {
-        log->logMessage(">>H", "---- EditorPresent");
+        log->log_message(">>H", "---- EditorPresent");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42), tag));
     tick_tock = !tick_tock;
@@ -94,15 +94,15 @@ void HakenMidi::editor_present(ChemId tag) {
 
 void HakenMidi::request_configuration(ChemId tag) {
     if (log) {
-        log->logMessage(">>H", "---- RequestConfiguration");
+        log->log_message(">>H", "---- RequestConfiguration");
     }
-    //doMessage(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
+    //do_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi), tag));
 }
 
 void HakenMidi::request_con_text(ChemId tag) {
     if (log) {
-        log->logMessage(">>H", "---- RequestConText");
+        log->log_message(">>H", "---- RequestConText");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi), tag));
 }
@@ -110,7 +110,7 @@ void HakenMidi::request_con_text(ChemId tag) {
 void HakenMidi::request_updates(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- RequestUpdates");
+        log->log_message(">>H", "---- RequestUpdates");
     }
     // send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42));
     // tick_tock = !tick_tock;
@@ -126,7 +126,7 @@ void HakenMidi::request_updates(ChemId tag)
 void HakenMidi::request_user(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Request User");
+        log->log_message(">>H", "---- Request User");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::userToMidi), tag));
 }
@@ -134,7 +134,7 @@ void HakenMidi::request_user(ChemId tag)
 void HakenMidi::request_system(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Request System");
+        log->log_message(">>H", "---- Request System");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::sysToMidi), tag));
 }
@@ -142,7 +142,7 @@ void HakenMidi::request_system(ChemId tag)
 void HakenMidi::remake_mahling(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Remake Mahling data");
+        log->log_message(">>H", "---- Remake Mahling data");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::remakeSRMahl), tag));
 }
@@ -150,7 +150,7 @@ void HakenMidi::remake_mahling(ChemId tag)
 void HakenMidi::previous_system_preset(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Previous sys preset");
+        log->log_message(">>H", "---- Previous sys preset");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::decPreset), tag));
 }
@@ -158,7 +158,7 @@ void HakenMidi::previous_system_preset(ChemId tag)
 void HakenMidi::next_system_preset(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Next sys preset");
+        log->log_message(">>H", "---- Next sys preset");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::incPreset),tag));
 }
@@ -166,7 +166,7 @@ void HakenMidi::next_system_preset(ChemId tag)
 void HakenMidi::reset_calibration(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Reset calibration");
+        log->log_message(">>H", "---- Reset calibration");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doResetCalib), tag));
 }
@@ -174,7 +174,7 @@ void HakenMidi::reset_calibration(ChemId tag)
 void HakenMidi::refine_calibration(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Refine calibration");
+        log->log_message(">>H", "---- Refine calibration");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doRefineCalib), tag));
 }
@@ -182,7 +182,7 @@ void HakenMidi::refine_calibration(ChemId tag)
 void HakenMidi::factory_calibration(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Factory calibration");
+        log->log_message(">>H", "---- Factory calibration");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::doFactCalib), tag));
 }
@@ -190,7 +190,7 @@ void HakenMidi::factory_calibration(ChemId tag)
 void HakenMidi::surface_alignment(ChemId tag)
 {
     if (log) {
-        log->logMessage(">>H", "---- Surface alignment");
+        log->log_message(">>H", "---- Surface alignment");
     }
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::surfAlign), tag));
 }

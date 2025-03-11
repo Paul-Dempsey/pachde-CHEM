@@ -35,11 +35,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     HakenMidi& get_haken_midi() { return haken_midi; }
 
     RelayMidi midi_relay;
-    MidiLog midi_log;
+    MidiLog* midi_log;
     
     EaganMatrix em;
     bool is_busy;
-    bool is_logging;
     bool in_reboot;
     bool heartbeat;
 
@@ -53,12 +52,13 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     CoreModule();
     virtual ~CoreModule();
 
+    bool is_logging() { return nullptr != midi_log; }
     void enable_logging(bool enable);
     void log_message(const char *prefix, const char *info) {
-        midi_log.logMessage(prefix, info);
+        if (midi_log) midi_log->log_message(prefix, info);
     }
-    void logMessage(const char *prefix, const std::string& info) {
-        midi_log.logMessage(prefix, info);
+    void log_message(const char *prefix, const std::string& info) {
+        if (midi_log) midi_log->log_message(prefix, info);
     }
 
     ChemDevice device_identifier(const MidiDeviceHolder* holder);

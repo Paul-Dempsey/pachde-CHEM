@@ -51,7 +51,7 @@ json_t* SusModule::dataToJson()
     return root;
 }
 
-void SusModule::doMessage(PackedMidiMessage message)
+void SusModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(chem_id) == midi_tag(message)) return;

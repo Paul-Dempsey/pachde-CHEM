@@ -315,7 +315,7 @@ void PlayUi::select_preset(PresetId id)
 
     auto haken = chem_host->host_haken();
     if (haken) {
-        haken->log->logMessage("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
+        haken->log->log_message("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
         haken->select_preset(ChemId::Play, id);
     }
 }
@@ -1019,7 +1019,7 @@ void PlayUi::onChoosePreset(PresetWidget* source)
 
     auto haken = chem_host->host_haken();
     if (haken) {
-        haken->log->logMessage("play", format_string("Selecting %s", current_preset->summary().c_str()));
+        haken->log->log_message("play", format_string("Selecting %s", current_preset->summary().c_str()));
         haken->select_preset(ChemId::Play, id);
     }
 }

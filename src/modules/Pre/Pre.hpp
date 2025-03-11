@@ -68,7 +68,7 @@ struct PreModule : ChemModule, IChemClient, IDoMidi
     }
 
     // IDoMidi
-    void doMessage(PackedMidiMessage message) override;
+    void do_message(PackedMidiMessage message) override;
     
     // IChemClient
     rack::engine::Module* client_module() override;

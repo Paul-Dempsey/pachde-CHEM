@@ -80,7 +80,7 @@ inline bool is_music_message(PackedMidiMessage msg)
     return true;
 }
     
-void MidiInput::setLogger(const std::string& source, MidiLog* logger) {
+void MidiInput::set_logger(const std::string& source, MidiLog* logger) {
     source_name = source;
     log = logger;
 }
@@ -97,7 +97,7 @@ void MidiInput::dispatch(float sampleTime)
             log->logMidi(IO_Direction::In, message);
         }
         ++message_count;
-        target->doMessage(message);
+        target->do_message(message);
     }
 }
 
@@ -107,7 +107,7 @@ void MidiInput::drop(int count)
     PackedMidiMessage trash[count];
     if (log) {
         format_buffer(buffer, 100, "!! Dropping %d messages out of %d queued", count, ring.size());
-        log->logMessage(printable(source_name), buffer);
+        log->log_message(printable(source_name), buffer);
     }
     ring.shiftBuffer(trash, count);
 }

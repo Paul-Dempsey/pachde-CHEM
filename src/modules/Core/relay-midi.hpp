@@ -22,9 +22,9 @@ struct RelayMidi : IDoMidi
         targets.erase(item);
     }
 
-    void doMessage(PackedMidiMessage message) override {
+    void do_message(PackedMidiMessage message) override {
         for (auto target: targets) {
-            target->doMessage(message);
+            target->do_message(message);
         }
         em->onMessage(message);
     }

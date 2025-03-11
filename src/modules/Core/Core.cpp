@@ -8,7 +8,6 @@ using EME = IHandleEmEvents::EventMask;
 
 CoreModule::CoreModule() :
     is_busy(false),
-    is_logging(false),
     in_reboot(false),
     heartbeat(false),
     restore_last_preset(false)
@@ -48,7 +47,7 @@ CoreModule::CoreModule() :
 
     em.subscribeEMEvents(this);
     tasks.setCoreModule(this);
-    haken_midi.init(&midi_log, &midi_relay);
+    haken_midi.set_handler(&midi_relay);
     haken_device.subscribe(this);
     controller1.subscribe(this);
     controller2.subscribe(this);
@@ -62,10 +61,7 @@ CoreModule::CoreModule() :
     broker->registerDeviceHolder(&controller1);
     broker->registerDeviceHolder(&controller2);
 
-    enable_logging(true);
     tasks.subscribeChange(this);
-    
-    midi_log.logMessage("Core", format_string("Starting CHEM Core [%p] %s", this, string::formatTimeISO(system::getUnixTime()).c_str()));
 }
 
 CoreModule::~CoreModule() {
@@ -85,18 +81,24 @@ CoreModule::~CoreModule() {
 
 void CoreModule::enable_logging(bool enable)
 {
-    is_logging = enable;
     if (enable){
-        haken_midi_out.setLogger(&midi_log);
-        haken_midi_in.setLogger("<<H", &midi_log);
-        controller1_midi_in.setLogger("<C1", &midi_log);
-        controller2_midi_in.setLogger("<C2", &midi_log);
+        midi_log = new MidiLog();
+        log_message("Core", format_string("Starting CHEM Core [%p] %s", this, string::formatTimeISO(system::getUnixTime()).c_str()));
+        haken_midi.set_logger(midi_log);
+        haken_midi_out.set_logger(midi_log);
+        haken_midi_in.set_logger("<<H", midi_log);
+        controller1_midi_in.set_logger("<C1", midi_log);
+        controller2_midi_in.set_logger("<C2", midi_log);
     } else {
-        haken_midi_out.setLogger(nullptr);
-        haken_midi_in.setLogger("", nullptr);
-        controller1_midi_in.setLogger("", nullptr);
-        controller2_midi_in.setLogger("", nullptr);
-        midi_log.close();
+        haken_midi.set_logger(nullptr);
+        haken_midi_out.set_logger(nullptr);
+        haken_midi_in.set_logger("", nullptr);
+        controller1_midi_in.set_logger("", nullptr);
+        controller2_midi_in.set_logger("", nullptr);
+        if (midi_log) {
+            midi_log->close();
+            delete midi_log;
+        }
     }
 }
 
@@ -184,7 +186,7 @@ void CoreModule::onPresetChanged()
     if (task->pending()) {
         task->complete();
     }
-    logMessage("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
+    log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     notify_preset_changed();
 }
 
@@ -278,7 +280,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi1:
         if (source->connection) {
-            logMessage("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            log_message("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             controller1_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
             getParam(P_C1_MUSIC_FILTER).setValue(controller1_midi_in.music_pass_filter);
         } else {
@@ -290,7 +292,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi2:
         if (source->connection) {
-            logMessage("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            log_message("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             controller2_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
             getParam(P_C2_MUSIC_FILTER).setValue(controller2_midi_in.music_pass_filter);
         } else {
@@ -307,7 +309,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
 void CoreModule::onReset(const ResetEvent &e)
 {
-    midi_log.logMessage("Core", "onReset");
+    log_message("Core", "onReset");
     haken_device.clear();
     controller1.clear();
     controller2.clear();
@@ -333,9 +335,10 @@ void CoreModule::dataFromJson(json_t *root)
     }
     j = json_object_get(root, "log-midi");
     if (j) {
-        is_logging = json_boolean_value(j);
+        enable_logging(json_boolean_value(j));
+    } else {
+        enable_logging(false);
     }
-    enable_logging(is_logging);
 
     j = json_object_get(root, "restore-preset");
     if (j) {
@@ -353,7 +356,7 @@ json_t* CoreModule::dataToJson()
     json_object_set_new(root, "haken-device", json_string(haken_device.getClaim().c_str()));
     json_object_set_new(root, "controller-1", json_string(controller1.getClaim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.getClaim().c_str()));
-    json_object_set_new(root, "log-midi", json_boolean(is_logging));
+    json_object_set_new(root, "log-midi", json_boolean(is_logging()));
     json_object_set_new(root, "restore-preset", json_boolean(restore_last_preset));
     if (!last_preset.empty()) {
         json_object_set_new(root, "last-preset", last_preset.toJson(true, true, false));

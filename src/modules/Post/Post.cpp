@@ -69,7 +69,7 @@ json_t* PostModule::dataToJson()
     return root;
 }
 
-void PostModule::doMessage(PackedMidiMessage message)
+void PostModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Post) == midi_tag(message)) return;

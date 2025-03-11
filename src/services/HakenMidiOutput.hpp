@@ -31,12 +31,12 @@ struct HakenMidiOutput : IDoMidi
     uint64_t count() { return message_count; }
     bool pending() { return ring.size() > 0; }
 
-    void setLogger(MidiLog* logger) {
+    void set_logger(MidiLog* logger) {
         log = logger;
     }
 
     // IDoMidi
-    void doMessage(PackedMidiMessage message) override;
+    void do_message(PackedMidiMessage message) override;
 };
 
 }

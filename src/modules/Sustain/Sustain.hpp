@@ -57,7 +57,7 @@ struct SusModule : ChemModule, IChemClient, IDoMidi
     bool connected();
 
     // IDoMidi
-    void doMessage(PackedMidiMessage message) override;
+    void do_message(PackedMidiMessage message) override;
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -120,6 +120,15 @@ struct SustainModule : SusModule
     uint8_t from_em() override { return chem_host->host_matrix()->get_sustain(); }
 
 };
+struct SustainUi : SusUi
+{
+    explicit SustainUi(SustainModule* module) : SusUi(module) {
+        create_ui();
+    }
+    const char * InputLabel() override { return "SU"; }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-sustain.svg"); }
+};
+
 struct SostenutoModule : SusModule
 {
     explicit SostenutoModule() : SusModule(ChemId::Sostenuto, Haken::ccSos) {
@@ -130,6 +139,16 @@ struct SostenutoModule : SusModule
     const char * max_param_name() override { return "Max sostenuto"; }
     uint8_t from_em() override { return chem_host->host_matrix()->get_sos(); }
 };
+
+struct SostenutoUi : SusUi
+{
+    explicit SostenutoUi(SostenutoModule* module) : SusUi(module) {
+        create_ui();
+    }
+    const char * InputLabel() override { return "SO"; }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-sostenuto.svg"); }
+};
+
 struct Sostenuto2Module : SusModule
 {
     explicit Sostenuto2Module() : SusModule(ChemId::Sostenuto2, Haken::ccSos2) {
@@ -141,22 +160,6 @@ struct Sostenuto2Module : SusModule
     uint8_t from_em() override { return chem_host->host_matrix()->get_sos2(); }
 };
 
-struct SustainUi : SusUi
-{
-    explicit SustainUi(SustainModule* module) : SusUi(module) {
-        create_ui();
-    }
-    const char * InputLabel() override { return "SU"; }
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-sustain.svg"); }
-};
-struct SostenutoUi : SusUi
-{
-    explicit SostenutoUi(SostenutoModule* module) : SusUi(module) {
-        create_ui();
-    }
-    const char * InputLabel() override { return "SO"; }
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-sostenuto.svg"); }
-};
 struct Sostenuto2Ui : SusUi
 {
     explicit Sostenuto2Ui(Sostenuto2Module* module) : SusUi(module) {

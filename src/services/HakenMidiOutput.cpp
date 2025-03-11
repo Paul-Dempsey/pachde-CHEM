@@ -30,7 +30,7 @@ void HakenMidiOutput::queueMessage(PackedMidiMessage msg)
     }
 }
 
-void HakenMidiOutput::doMessage(PackedMidiMessage message)
+void HakenMidiOutput::do_message(PackedMidiMessage message)
 {
     if (ChemId::Haken == as_chem_id(message.bytes.tag)) return;
     queueMessage(message);

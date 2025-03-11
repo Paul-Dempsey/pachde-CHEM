@@ -83,7 +83,7 @@ struct FxModule : ChemModule, IChemClient, IDoMidi
     }
 
     // IDoMidi
-    void doMessage(PackedMidiMessage msg) override;
+    void do_message(PackedMidiMessage msg) override;
 
     // IChemClient
     rack::engine::Module* client_module() override;

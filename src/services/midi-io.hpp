@@ -46,7 +46,7 @@ struct MidiInput : midi::Input
         this->channel = -1;
     }
     void setTarget(IDoMidi* out) { target = out; }
-    void setLogger(const std::string& source, MidiLog* logger);
+    void set_logger(const std::string& source, MidiLog* logger);
     void setMusicPassFilter(bool pass_music) { music_pass_filter = pass_music; }
     void enable(bool enabled = true) { mute = !enabled; }
     void onMessage(const midi::Message& message) override;

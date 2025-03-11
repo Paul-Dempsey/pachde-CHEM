@@ -528,15 +528,13 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
         menu->addChild(new MenuSeparator);
         menu->addChild(createCheckMenuItem(
             "Log MIDI", "",
-            [this]() { return my_module->is_logging; },
-            [this]() { my_module->enable_logging(!my_module->is_logging);
-        }));
+            [this]() { return my_module->is_logging(); },
+            [this]() { my_module->enable_logging(!my_module->is_logging()); }));
 
         menu->addChild(createCheckMenuItem(
             "Restore last preset", "",
             [this]() { return my_module->restore_last_preset; },
-            [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;
-        }));
+            [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;}));
 
         menu->addChild(createSubmenuItem("Themes", "", [=](Menu* menu) {
             ChemModuleWidget::appendContextMenu(menu);

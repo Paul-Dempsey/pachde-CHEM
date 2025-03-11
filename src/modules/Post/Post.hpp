@@ -72,7 +72,7 @@ struct PostModule : ChemModule, IChemClient, IDoMidi
         modulation.set_modulation_target(id);
     }
     // IDoMidi
-    void doMessage(PackedMidiMessage message) override;
+    void do_message(PackedMidiMessage message) override;
 
     // IChemClient
     rack::engine::Module* client_module() override;

@@ -95,7 +95,7 @@ void PreModule::update_from_em()
     getParam(P_SELECT).setValue(last_select);
 }
 
-void PreModule::doMessage(PackedMidiMessage message)
+void PreModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Pre) == message.bytes.tag) return;

@@ -22,13 +22,10 @@ struct HakenMidi
     HakenMidi(const HakenMidi&) = delete; // no copy constructor
     HakenMidi() : log(nullptr), doer(nullptr), tick_tock(true) {}
 
-    void init(MidiLog* log, IDoMidi* handler)
-    {
-        this->log = log;
-        doer = handler;
-    }
+    void set_handler(IDoMidi* handler) { doer = handler; }
+    void set_logger(MidiLog* logger) { log = logger; }
 
-    void send_message(PackedMidiMessage msg) { doer->doMessage(msg); }
+    void send_message(PackedMidiMessage msg) { doer->do_message(msg); }
 
     void control_change(ChemId tag, uint8_t channel, uint8_t cc, uint8_t value);
     void key_pressure(ChemId tag, uint8_t channel, uint8_t note, uint8_t pressure);

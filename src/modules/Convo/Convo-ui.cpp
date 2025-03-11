@@ -66,7 +66,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
 
     // knobs
     y = 52.f;
-    const float knob_dx = 34.f;
+    const float knob_dx = 38.f;
     const float center_dx = 22.f;
     addChild( knobs[K_PRE_MIX] = createChemKnob<BlueKnob>(Vec(CENTER-center_dx-knob_dx, y), my_module, CM::P_PRE_MIX, theme_engine, theme));
     addChild(tracks[K_PRE_MIX] = createTrackWidget(knobs[K_PRE_MIX], theme_engine, theme));

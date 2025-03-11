@@ -37,7 +37,7 @@ typedef union PackedMidiMessage {
 } PackedMidiMessage;
 
 struct IDoMidi {
-    virtual void doMessage(PackedMidiMessage message) {}
+    virtual void do_message(PackedMidiMessage message) {}
 };
 
 inline uint8_t midi_status(PackedMidiMessage msg) { return msg.bytes.status_byte & STATUS_MASK; }

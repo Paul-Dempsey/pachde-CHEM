@@ -88,7 +88,7 @@ void MidiLog::ensure_file()
     auto dir = system::getDirectory(path);
     system::createDirectories(dir);
     log = std::fopen(path.c_str(), "w");
-    logMessage("MidiLog", format_string("id = %x", id));
+    log_message("MidiLog", format_string("id = %x", id));
 }
 
 void MidiLog::close() {
@@ -196,7 +196,7 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
     }
 }
 
-void MidiLog::logMessage(const char *prefix, const char *info)
+void MidiLog::log_message(const char *prefix, const char *info)
 {
     ensure_file();
     if (!log) return;
@@ -212,9 +212,9 @@ void MidiLog::logMessage(const char *prefix, const char *info)
     }
 }
 
-void MidiLog::logMessage(const char *prefix, const std::string& str)
+void MidiLog::log_message(const char *prefix, const std::string& str)
 {
-    logMessage(prefix, printable(str));
+    log_message(prefix, printable(str));
 }
     
 

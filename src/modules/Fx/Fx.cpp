@@ -134,7 +134,7 @@ void FxModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-void FxModule::doMessage(PackedMidiMessage message)
+void FxModule::do_message(PackedMidiMessage message)
 {
     if (as_u8(ChemId::Fx) == midi_tag(message)) return;
 

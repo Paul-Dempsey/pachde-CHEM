@@ -115,7 +115,7 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-void MacroModule::doMessage(PackedMidiMessage message)
+void MacroModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Macro) == midi_tag(message)) return;

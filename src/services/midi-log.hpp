@@ -18,8 +18,8 @@ struct MidiLog
     void ensure_file();
     void close();
     void logMidi(IO_Direction dir, PackedMidiMessage message);
-    void logMessage(const char *prefix, const char *info);
-    void logMessage(const char *prefix, const std::string& str);
+    void log_message(const char *prefix, const char *info);
+    void log_message(const char *prefix, const std::string& str);
 };
 
 }

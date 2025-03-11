@@ -189,11 +189,11 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
         if ((task->budget > 0.f) && (task->time > task->budget)) {
             ++task->attempt;
             if (task->attempt > 3) {
-                chem->logMessage("CHEM", format_string("%s retries exhausted: rebooting", TaskName(task->id)));
+                chem->log_message("CHEM", format_string("%s retries exhausted: rebooting", TaskName(task->id)));
                 chem->reboot();
                 notifyChange(task->id);
             } else {
-                chem->logMessage("CHEM", format_string("throttling %s", TaskName(task->id)));
+                chem->log_message("CHEM", format_string("throttling %s", TaskName(task->id)));
                 back_off_midi_rate();
                 task->state = TaskState::Uninitialized;
                 return false;
@@ -213,7 +213,7 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
                 current = next_task(current);
             }
         } else {
-            chem->logMessage("CHEM", format_string("Task complete: %s", TaskName(task->id)));
+            chem->log_message("CHEM", format_string("Task complete: %s", TaskName(task->id)));
             if (task->post_delay > 0.f) {
                 if (task->periodic) {
                     task->time = 0.f;
@@ -255,7 +255,7 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
     } break;
 
     case TaskState::Broken: {
-        chem->logMessage("CHEM", format_string("Task broken: %s", TaskName(task->id)));
+        chem->log_message("CHEM", format_string("Task broken: %s", TaskName(task->id)));
         notifyChange(task->id);
         task->refresh();
         return true;
