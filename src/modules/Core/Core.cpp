@@ -7,6 +7,7 @@ using namespace pachde;
 using EME = IHandleEmEvents::EventMask;
 
 CoreModule::CoreModule() :
+    midi_log(nullptr),
     is_busy(false),
     in_reboot(false),
     heartbeat(false),

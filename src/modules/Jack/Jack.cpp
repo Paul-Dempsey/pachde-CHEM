@@ -182,7 +182,9 @@ void JackModule::process_params(const ProcessArgs &args)
     int assign_2 = getParamInt(getParam(P_ASSIGN_JACK_2));
     if ((assign_1 != last_assign_1) || (assign_2 != last_assign_2)) {
         auto haken = chem_host->host_haken();
-        haken->log->log_message("Jack", "Pedal assign");
+        if (haken->log) {
+            haken->log->log_message("Jack", "Pedal assign");
+        }
         haken->begin_stream(ChemId::Jack, Haken::s_Mat_Poke);
         if (assign_1 != last_assign_1) {
             haken->stream_data(ChemId::Jack, Haken::idPedal1, index_to_pedal_cc(assign_1));
