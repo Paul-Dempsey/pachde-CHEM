@@ -292,6 +292,10 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
             // zero mat?
         } break;
 
+        case Haken::s_Conv_Poke: {
+            set_checked_data_stream(value);
+        } break;
+
         case Haken::s_StreamEnd: {
             if (in_preset) {
                 switch (data_stream) {
@@ -304,6 +308,9 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
                 } break;
 
                 // case Haken::s_Mat_Poke: {
+                // } break;
+
+                // case Haken::s_Conv_Poke: {
                 // } break;
                 }
             }
@@ -430,26 +437,34 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
             }
             break;
 
-        case MidiStatus_PolyKeyPressure:
-            if (in_preset) {
-                // FW > 1009
-                switch(data_stream) {
-                case Haken::s_Name:
+        case MidiStatus_PolyKeyPressure: {
+            switch (data_stream) {
+            case Haken::s_Name:
+                if (in_preset) {
                     name_buffer.build(msg.bytes.data1);
                     name_buffer.build(msg.bytes.data2);
-                    break;
-
-                case Haken::s_ConText:
+                }
+                break;
+            case Haken::s_ConText:
+                if (in_preset) {
                     text_buffer.build(msg.bytes.data1);
                     text_buffer.build(msg.bytes.data2);
-                    break;
-
                 }
-            }
-            if (Haken::s_Mat_Poke == data_stream) {
+                break;
+
+            case Haken::s_Mat_Poke:
                 mat[msg.bytes.data1] = msg.bytes.data2;
+                break;
+
+            case Haken:: s_Conv_Poke:
+                conv[msg.bytes.data1] = msg.bytes.data2;
+                break;
+
+            case -1:
+            default: break;
             }
             break;
+        } break;
 
         case MidiStatus_ChannelPressure:
             if (in_preset) {

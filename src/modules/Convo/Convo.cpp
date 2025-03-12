@@ -38,7 +38,6 @@ ConvoModule::ConvoModule() :
     dp4(configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width"));
     dp4(configParam(P_LEFT,   0.f, 10.f, 10.f, "Left"));
     dp4(configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right"));
-
     dp4(configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix"));
     dp4(configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index"));
     dp4(configParam(P_POST_MIX,   0.f, 10.f, 0.f, "Post Mix"));
@@ -98,8 +97,30 @@ json_t* ConvoModule::dataToJson()
     return root;
 }
 
+void ConvoModule::params_from_internal()
+{
+    getParam(P_LENGTH).setValue(unipolar_7_to_rack(conv.get_ir_length(conv_number)));
+    getParam(P_PRE_MIX).setValue(unipolar_7_to_rack(conv.get_pre_mix()));
+    getParam(P_PRE_INDEX).setValue(unipolar_7_to_rack(conv.get_pre_index()));
+    getParam(P_POST_MIX).setValue(unipolar_7_to_rack(conv.get_post_mix()));
+    getParam(P_POST_INDEX).setValue(unipolar_7_to_rack(conv.get_post_index()));
+    getParam(P_TUNING).setValue(unipolar_7_to_rack(conv.get_ir_shift(conv_number)));
+    getParam(P_WIDTH).setValue(unipolar_7_to_rack(conv.get_ir_width(conv_number)));
+    getParam(P_LEFT).setValue(unipolar_7_to_rack(conv.get_ir_left(conv_number)));
+    getParam(P_RIGHT).setValue(unipolar_7_to_rack(conv.get_ir_right(conv_number)));
+}
+
 void ConvoModule::update_from_em()
 {
+    auto em = chem_host->host_matrix();
+    memcpy(conv.data, em->conv, 30);
+    params_from_internal();
+}
+
+void ConvoModule::do_message(PackedMidiMessage message)
+{
+    if (as_u8(ChemId::Convo) == message.bytes.tag) return;
+    conv.do_message(message);
 }
 
 // IChemClient
@@ -124,12 +145,61 @@ void ConvoModule::onConnectHost(IChemHost* host)
 void ConvoModule::onPresetChange()
 {
     update_from_em();
-    if (chem_ui) ui()->onPresetChange();
+    //if (chem_ui) ui()->onPresetChange();
 }
 
 void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (chem_ui) ui()->onConnectionChange(device, connection);
+}
+
+uint8_t get_u7_param(::rack::engine::Module* module, int param_id) {
+    return unipolar_rack_to_unipolar_7(module->getParam(param_id).getValue());
+}
+
+void ConvoModule::sync_from_params()
+{
+    assert(chem_host);
+
+    std::vector<PackedMidiMessage> updates(6);
+    auto v = get_u7_param(this, Params::P_TYPE);
+    if (v != conv.get_ir_type(conv_number)) {
+        conv.set_ir_type(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_dat0 + conv_number, v), ChemId::Convo));
+    }
+    v = get_u7_param(this, Params::P_TUNING);
+    if (v != conv.get_ir_length(conv_number)) {
+        conv.set_ir_length(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_lth0 + conv_number, v), ChemId::Convo));
+    }
+    v = get_u7_param(this, Params::P_WIDTH);
+    if (v != conv.get_ir_shift(conv_number)) {
+        conv.set_ir_shift(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_shf0 + conv_number, v), ChemId::Convo));
+    }
+    v = get_u7_param(this, Params::P_LEFT);
+    if (v != conv.get_ir_width(conv_number)) {
+        conv.set_ir_width(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_wid0 + conv_number, v), ChemId::Convo));
+    }
+    v = get_u7_param(this, Params::P_LENGTH);
+    if (v != conv.get_ir_left(conv_number)) {
+        conv.set_ir_left(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_atL0 + conv_number, v), ChemId::Convo));
+    }
+    v = get_u7_param(this, Params::P_RIGHT);
+    if (v != conv.get_ir_right(conv_number)) {
+        conv.set_ir_right(conv_number, v);
+        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_atR0 + conv_number, v), ChemId::Convo));
+    }
+    if (!updates.empty()) {
+        auto haken = chem_host->host_haken();
+        haken->begin_stream(ChemId::Convo, Haken::s_Conv_Poke);
+        for (auto mm : updates) {
+            haken->send_message(mm);
+        }
+        haken->end_stream(ChemId::Convo);
+    }
 }
 
 void ConvoModule::process_params(const ProcessArgs& args)
@@ -145,21 +215,8 @@ void ConvoModule::process_params(const ProcessArgs& args)
     if (last_conv != current) {
         last_conv = current;
         conv_number = current;
-        getParam(Params::P_TYPE).setValue(static_cast<float>(convs[conv_number].type));
-        getParam(Params::P_LENGTH).setValue(static_cast<float>(convs[conv_number].length));
-        getParam(Params::P_TUNING).setValue(static_cast<float>(convs[conv_number].tuning));
-        getParam(Params::P_WIDTH).setValue(static_cast<float>(convs[conv_number].width));
-        getParam(Params::P_LEFT).setValue(static_cast<float>(convs[conv_number].left));
-        getParam(Params::P_RIGHT).setValue(static_cast<float>(convs[conv_number].right));
-        return;
+        params_from_internal();
     }
-
-    convs[conv_number].type = getParamInt(getParam(Params::P_TYPE));
-    convs[conv_number].length = getParamInt(getParam(Params::P_LENGTH));
-    convs[conv_number].tuning = getParamInt(getParam(Params::P_TUNING));
-    convs[conv_number].width = getParamInt(getParam(Params::P_WIDTH));
-    convs[conv_number].left = getParamInt(getParam(Params::P_LEFT));
-    convs[conv_number].right = getParamInt(getParam(Params::P_RIGHT));
 }
 
 void ConvoModule::process(const ProcessArgs& args)
@@ -169,6 +226,7 @@ void ConvoModule::process(const ProcessArgs& args)
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
+        sync_from_params();
     }
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);

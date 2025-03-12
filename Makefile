@@ -72,6 +72,7 @@ SOURCES += src/modules/Post/Post-ui.cpp
 
 SOURCES += src/modules/Convo/Convo.cpp
 SOURCES += src/modules/Convo/Convo-ui.cpp
+SOURCES += src/modules/Convo/convolution.cpp
 
 SOURCES += src/modules/Jack/Jack.cpp
 SOURCES += src/modules/Jack/Jack-ui.cpp

@@ -10,26 +10,13 @@
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/knob-track-widget.hpp"
+#include "convolution.hpp"
 
 using namespace pachde;
 
-struct ConvolutionParams {
-    int id;
-    uint8_t type;
-    uint8_t length;
-    uint8_t tuning;
-    uint8_t width;
-    uint8_t left;
-    uint8_t right;
-
-    ConvolutionParams(int id, uint8_t type) : 
-        id(id), type(type), length(127), tuning(64), width(64), left(127), right(127)
-    {}
-};
-
 struct ConvoUi;
 
-struct ConvoModule : ChemModule, IChemClient
+struct ConvoModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
         P_PRE_MIX,
@@ -49,6 +36,7 @@ struct ConvoModule : ChemModule, IChemClient
         P_SELECT, 
         P_EXTEND,
         NUM_PARAMS,
+        
         NUM_MOD_PARAMS = P_TYPE,
         NUM_KNOBS = P_SELECT
     };
@@ -75,23 +63,11 @@ struct ConvoModule : ChemModule, IChemClient
     Modulation modulation;
     bool glow_knobs;
 
+    ConvolutionParams conv;
+
     int conv_number;
-    ConvolutionParams convs[4] = {
-        { 0, Haken::cd_Wood },
-        { 1, Haken::cd_MetalBright },
-        { 2, Haken::cd_Fiber },
-        { 3, Haken::cd_Wood },
-    };
     int last_conv;
     bool extend;
-
-    int current_conv() { return conv_number; }
-    uint8_t current_type() { return convs[conv_number].type; }
-    uint8_t current_length() { return convs[conv_number].length; }
-    uint8_t current_tuning() { return convs[conv_number].tuning; }
-    uint8_t current_width() { return convs[conv_number].width; }
-    uint8_t current_left() { return convs[conv_number].left; }
-    uint8_t current_right() { return convs[conv_number].right; }
 
     ConvoModule();
     ~ConvoModule() {
@@ -102,9 +78,13 @@ struct ConvoModule : ChemModule, IChemClient
     ConvoUi* ui() { return reinterpret_cast<ConvoUi*>(chem_ui); };
 
     void set_modulation_target(int id) {
-        //modulation.set_modulation_target(id);
+        modulation.set_modulation_target(id);
     }
+    void params_from_internal();
     void update_from_em();
+
+    // IDoMidi
+    void do_message(PackedMidiMessage message) override;
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -118,6 +98,7 @@ struct ConvoModule : ChemModule, IChemClient
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
+    void sync_from_params();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
