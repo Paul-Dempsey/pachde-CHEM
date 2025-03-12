@@ -4,8 +4,8 @@
         "theme": {
             "panel" :  { "fill": "#df62a7" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"hsl(327, 100.00%, 75.90%)"}, { "index":1, "color":"hsl(327, 53.40%, 48%)"}]}},
-            "panel-border": { "stroke": {"color":"#decc2f", "width": 0.5 }},
-            "th": {"stroke": { "color":"hsl(56, 100.00%, 48.60%)", "width": 0.5 }},
+            "panel-border": { "stroke": {"color":"hsl(327, 75%, 50%)", "width": 1.0 }},
+            "th": {"stroke": { "color":" hsl(327, 75%, 50%)", "width": 0.5 }},
             "jack-glyph": {"fill": " #052d68" },
 
             "grid-bg":   { "fill": " #f9eb6a" },
@@ -20,12 +20,12 @@
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":" #df62a6"}, { "index":1, "color":" #c84a90"}]}},
 
-            "div": { "stroke": "#f78ec8" },
+            "div": { "stroke": "hsl(327, 100.00%, 85%)" },
 
             "fswhi": { "stroke": { "color":" hsl(280, 90%, 85%)", "width":1.5 }},
             "fswlo": { "stroke": { "color":" hsl(280, 40%, 45%)", "width":1.25 }},
 
-            "k#": { "fill": "hsl(200, 65%, 75%)" },
+            "k#": { "fill": "#052d68" },
             "k-punch": {},
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #c2a6fa"}, { "index":1, "color":" #7f52d7"}]}},
             "k-rim": { "stroke": "#7a59be" },
@@ -33,7 +33,7 @@
             "k-taper": {  "fill": "#3b138b" },
             "k-pin": { "fill": "none", "stroke": {"color":" #4a1aaa", "width":1.5 }},
             "k-disabled": {"fill": "hsl(327, 40%, 50%)", "opacity": 0.6 },
-            "k-track": { "fill": " #f9a54b", "stroke": {"color": " #f9a54b", "width": 1 }},
+            "k-track": { "fill": "rgb(129, 67, 2)", "stroke": {"color": "rgb(195, 108, 15)", "width": 1 }},
 
             "ky-face": { "fill" : { "gradient" : [{ "index":0, "color":"#fff171" }, { "index":1, "color":"#803c04" }]}},
             "ky-rim":  { "stroke" : "hsl(32, 45%, 50%)" },
