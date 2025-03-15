@@ -33,12 +33,12 @@ PostModule::PostModule() :
     configLight(L_MUTE, "Mute");
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccPost, false),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqMix, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqTilt, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccEqFreq, true),
+        EmccPortConfig::cc(P_POST_LEVEL, IN_POST_LEVEL, L_POST_LEVEL_MOD, Haken::ch1, Haken::ccPost, false),
+        EmccPortConfig::cc(P_MIX,        IN_MIX,        L_MIX_MOD,        Haken::ch1, Haken::ccEqMix, true),
+        EmccPortConfig::cc(P_TILT,       IN_TILT,       L_TILT_MOD,       Haken::ch1, Haken::ccEqTilt, true),
+        EmccPortConfig::cc(P_FREQUENCY,  IN_FREQUENCY,  L_FREQUENCY_MOD,  Haken::ch1, Haken::ccEqFreq, true),
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_POST_LEVEL, Inputs::IN_POST_LEVEL, Lights::L_POST_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 }
 
 void PostModule::dataFromJson(json_t* root)

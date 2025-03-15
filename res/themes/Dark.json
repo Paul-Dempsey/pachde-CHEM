@@ -131,6 +131,8 @@
             "m1": { "fill": "#87c4c4" },
             "m2": { "fill": "g50" },
 
+            "p-link": {"stroke": "#2d6886" },
+            
             "debug" : { "fill": "#fc59a5"},
             "warning": { "fill": "#e7e745" },
 

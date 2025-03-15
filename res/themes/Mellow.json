@@ -15,7 +15,7 @@
             "sctn": { "fill": { "gradient": [{ "index":0, "color":" #8a7342"}, { "index":1, "color":" #69572f"}]}},
             "div": {"stroke": "#312307"},
 
-            "k#": { "fill": "hsl(90, 40%, 50.00%)" },
+            "k#": { "fill": "hsl(90, 40%, 65%)" },
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #ceaa5c"}, { "index":1, "color":" #564624"}]}},
             "k-rim": { "stroke": "#584623" },
             "k-gnomen": { "fill": " #bcc26d" },
@@ -83,13 +83,17 @@
             "ctl-disabled": { "fill": "hsl(41, 35%, 35%)", "stroke": "hsl(41, 35%, 35%)" },
             "ctl-hovered":  { "fill": "#ff8060" },
             "ctl-label":    { "fill": "hsl(42, 75%, 12%)" },
-            "ctl-label-hi": { "fill": " #e1c485" },
+            "ctl-label-hi": { "fill": "rgb(242, 200, 108)" },
 
             "ctl-bar": { "stroke": "#725619"},
             "menu": { "fill" : "#3a68ac" },
             "led": { "fill" : "rgb(157, 142, 30)", "stroke": " #80808080" },
             "fswhi": { "stroke": "hsl(41, 60%, 70%)"},
             "fswlo": { "stroke": "hsl(41, 60%, 50%)"},
+
+            "selector": { "fill": " #202020", "stroke": { "color": "hsl(41, 24%, 30%)", "width":1.25 }},
+            "selector-sel": { "fill": "hsl(144, 80%, 50%)" },
+            "selector-item": { "fill": "hsl(41, 24%, 30%)" },
 
             "port-bezel":     { "fill": "#595959" },
             "port-ring":      { "fill": "#808080" },
@@ -120,6 +124,8 @@
             "tsk-wait":  { "fill":"#3b6ab0" },
             "tsk-na":    { "fill":"#89aed3" },
             "tsk-broke": { "fill":"#fa0000" },
+
+            "p-link": {"stroke": "hsl(90, 40%, 50%)" },
 
             "m0": { "fill": " #87c587" },
             "m1": { "fill": " #87c4c4" },

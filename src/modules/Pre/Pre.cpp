@@ -34,13 +34,13 @@ PreModule::PreModule() :
     configLight(L_MIX, "Mix");
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccPre, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccCoThMix, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccThrDrv, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccAtkCut, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccRatMkp, true)
+        EmccPortConfig::cc(P_PRE_LEVEL,       IN_PRE_LEVEL,       L_PRE_LEVEL_MOD,       Haken::ch1, Haken::ccPre, true),
+        EmccPortConfig::cc(P_MIX,             IN_MIX,             L_MIX_MOD,             Haken::ch1, Haken::ccCoThMix, true),
+        EmccPortConfig::cc(P_THRESHOLD_DRIVE, IN_THRESHOLD_DRIVE, L_THRESHOLD_DRIVE_MOD, Haken::ch1, Haken::ccThrDrv, true),
+        EmccPortConfig::cc(P_ATTACK,          IN_ATTACK,          L_ATTACK_MOD,          Haken::ch1, Haken::ccAtkCut, true),
+        EmccPortConfig::cc(P_RATIO_MAKEUP,    IN_RATIO_MAKEUP,    L_RATIO_MAKEUP_MOD,    Haken::ch1, Haken::ccRatMkp, true)
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_LEVEL, Inputs::IN_PRE_LEVEL, Lights::L_PRE_LEVEL_MOD, NUM_MOD_PARAMS, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 }
 
 bool PreModule::connected()

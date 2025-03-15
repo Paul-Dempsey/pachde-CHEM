@@ -15,47 +15,58 @@
 using namespace pachde;
 
 struct ConvoUi;
+struct WidgetInfo { const char * name; int param; int input; int light; };
+extern WidgetInfo widget_info[];
+const int W_IDX_PP = 0;
+const int W_IDX_KR = 4;
 
 struct ConvoModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
-        P_PRE_MIX,
-        P_PRE_INDEX,
-        P_POST_MIX,
-        P_POST_INDEX,
+        P_PRE_MIX, P_PRE_INDEX,
+        P_POST_MIX, P_POST_INDEX,
 
-        P_TYPE,
-        P_LENGTH,
-        P_TUNING,
-        P_WIDTH,
-        P_LEFT, 
-        P_RIGHT,
+        P_1_TYPE,   P_2_TYPE,   P_3_TYPE,   P_4_TYPE,
+        P_1_LENGTH, P_2_LENGTH, P_3_LENGTH, P_4_LENGTH,
+        P_1_TUNING, P_2_TUNING, P_3_TUNING, P_4_TUNING,
+        P_1_WIDTH,  P_2_WIDTH,  P_3_WIDTH,  P_4_WIDTH,
+        P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT, 
+        P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
 
-        P_MOD_AMOUNT, 
+        P_MOD_AMOUNT,
 
-        P_SELECT, 
         P_EXTEND,
         NUM_PARAMS,
         
-        NUM_MOD_PARAMS = P_TYPE,
-        NUM_KNOBS = P_SELECT
+        NUM_KNOBS = P_EXTEND
     };
     enum Inputs {
-        IN_PRE_MIX,
-        IN_PRE_INDEX,
-        IN_POST_MIX,
-        IN_POST_INDEX,
+        IN_PRE_MIX,  IN_PRE_INDEX,
+        IN_POST_MIX, IN_POST_INDEX,
+        //IN_1_TYPE,   IN_2_TYPE,   IN_3_TYPE,   IN_4_TYPE,
+        IN_1_LENGTH, IN_2_LENGTH, IN_3_LENGTH, IN_4_LENGTH,
+        IN_1_TUNING, IN_2_TUNING, IN_3_TUNING, IN_4_TUNING,
+        IN_1_WIDTH,  IN_2_WIDTH,  IN_3_WIDTH,  IN_4_WIDTH,
+        IN_1_LEFT,   IN_2_LEFT,   IN_3_LEFT,   IN_4_LEFT, 
+        IN_1_RIGHT,  IN_2_RIGHT,  IN_3_RIGHT,  IN_4_RIGHT,
+
         NUM_INPUTS
     };
     enum Outputs {
         NUM_OUTPUTS
     };
     enum Lights {
-        L_PRE_MIX_MOD,
-        L_PRE_INDEX_MOD,
-        L_POST_MIX_MOD,
-        L_POST_INDEX_MOD,
+        L_PRE_MIX, L_PRE_INDEX,
+        L_POST_MIX, L_POST_INDEX,
+        //L_1_TYPE,   L_2_TYPE,   L_3_TYPE,   L_4_TYPE,
+        L_1_LENGTH, L_2_LENGTH, L_3_LENGTH, L_4_LENGTH,
+        L_1_TUNING, L_2_TUNING, L_3_TUNING, L_4_TUNING,
+        L_1_WIDTH,  L_2_WIDTH,  L_3_WIDTH,  L_4_WIDTH,
+        L_1_LEFT,   L_2_LEFT,   L_3_LEFT,   L_4_LEFT,
+        L_1_RIGHT,  L_2_RIGHT,  L_3_RIGHT,  L_4_RIGHT,
+
         L_EXTEND,
+
         NUM_LIGHTS
     };
 
@@ -64,10 +75,6 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
     bool glow_knobs;
 
     ConvolutionParams conv;
-
-    int conv_number;
-    int last_conv;
-    bool extend;
 
     ConvoModule();
     ~ConvoModule() {
@@ -98,12 +105,12 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
-    void sync_from_params();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
 // -- Convo UI -----------------------------------
+using CM = ConvoModule;
 
 struct ConvoUi : ChemModuleWidget, IChemClient
 {
@@ -114,25 +121,22 @@ struct ConvoUi : ChemModuleWidget, IChemClient
 
     TextLabel* conv_number_label;
 
-    LinkButton*   link_button{nullptr};
-    TipLabel*     haken_device_label{nullptr};
-    TipLabel*     warning_label{nullptr};
+    LinkButton* link_button{nullptr};
+    TipLabel* haken_device_label{nullptr};
+    TipLabel* warning_label{nullptr};
     
     SmallRoundParamButton* extend_button;
-    SelectorWidget* selector{nullptr};
 
-    TextLabel* selector_label;
-    TextLabel* type_label;
     int last_convo;
     float last_type;
     float last_extend;
 
     GlowKnob* knobs[ConvoModule::NUM_KNOBS];
-    TrackWidget* tracks[ConvoModule::NUM_MOD_PARAMS];
+    TrackWidget* tracks[ConvoModule::NUM_INPUTS];
+
 #ifdef LAYOUT_HELP
     bool layout_hinting{false};
 #endif
-
     ConvoUi(ConvoModule *module);
 
     bool connected();
@@ -149,11 +153,9 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-convo.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    void sync_select_label();
-    void sync_type_label();
-
     void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 
+const WidgetInfo& param_info(int param_id);

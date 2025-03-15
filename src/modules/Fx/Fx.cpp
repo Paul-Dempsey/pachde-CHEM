@@ -50,15 +50,15 @@ FxModule::FxModule() :
     configLight(L_MIX, "Effects Mix");
 
     EmccPortConfig cfg[] =         {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci1, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci2, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci3, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci4, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci5, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReci6, true),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccReciMix, true),
+        EmccPortConfig::cc(P_R1, IN_R1, L_R1_MOD, Haken::ch1, Haken::ccReci1, true),
+        EmccPortConfig::cc(P_R2, IN_R2, L_R2_MOD, Haken::ch1, Haken::ccReci2, true),
+        EmccPortConfig::cc(P_R3, IN_R3, L_R3_MOD, Haken::ch1, Haken::ccReci3, true),
+        EmccPortConfig::cc(P_R4, IN_R4, L_R4_MOD, Haken::ch1, Haken::ccReci4, true),
+        EmccPortConfig::cc(P_R5, IN_R5, L_R5_MOD, Haken::ch1, Haken::ccReci5, true),
+        EmccPortConfig::cc(P_R6, IN_R6, L_R6_MOD, Haken::ch1, Haken::ccReci6, true),
+        EmccPortConfig::cc(P_MIX, IN_MIX, L_MIX_MOD, Haken::ch1, Haken::ccReciMix, true),
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_R1, Inputs::IN_R1, Lights::L_R1_MOD, NUM_MOD_PARAMS, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 
 }
 

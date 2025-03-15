@@ -19,9 +19,9 @@ void SusModule::init()
     configButton(P_MAX, this->max_param_name());
     configInput(IN_MOD, this->param_name());
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, my_cc, true)
+        EmccPortConfig::cc(Params::P_VALUE, Inputs::IN_MOD, -1, Haken::ch1, my_cc, true)
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_VALUE, Inputs::IN_MOD, -1, 1, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, 1, cfg);
 }
 
 void SusModule::dataFromJson(json_t* root)

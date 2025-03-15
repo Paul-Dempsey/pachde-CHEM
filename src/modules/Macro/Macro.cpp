@@ -32,14 +32,14 @@ MacroModule::MacroModule() :
     configLight(L_M6a, "Modulation amount on M6");
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(Haken::ch1, Haken::ccI),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccII),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccIII),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccIV),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccV),
-        EmccPortConfig::cc(Haken::ch1, Haken::ccVI)
+        EmccPortConfig::cc(P_M1, IN_M1, L_M1a,  Haken::ch1, Haken::ccI),
+        EmccPortConfig::cc(P_M2, IN_M2, L_M2a,  Haken::ch1, Haken::ccII),
+        EmccPortConfig::cc(P_M3, IN_M3, L_M3a,  Haken::ch1, Haken::ccIII),
+        EmccPortConfig::cc(P_M4, IN_M4, L_M4a,  Haken::ch1, Haken::ccIV),
+        EmccPortConfig::cc(P_M5, IN_M5, L_M5a,  Haken::ch1, Haken::ccV),
+        EmccPortConfig::cc(P_M6, IN_M6, L_M6a,  Haken::ch1, Haken::ccVI)
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_M1, Inputs::IN_M1, Lights::L_M1a, NUM_MOD_PARAMS, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 }
 
 void MacroModule::dataFromJson(json_t* root)

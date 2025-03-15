@@ -118,6 +118,8 @@
             "tsk-na":    { "fill":"#89aed3" },
             "tsk-broke": { "fill":"#fa0000" },
            
+            "p-link": {"stroke": "#2d6886" },
+
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },
             "m2": { "fill": "g60" },

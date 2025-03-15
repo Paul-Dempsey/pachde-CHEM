@@ -3,76 +3,136 @@
 
 using namespace pachde;
 
+WidgetInfo widget_info[]
+{
+    /*0*/{ "Pre mix",    CM::P_PRE_MIX,    CM::IN_PRE_MIX,    CM::L_PRE_MIX },
+    /*1*/{ "Pre index",  CM::P_PRE_INDEX,  CM::IN_PRE_INDEX,  CM:: L_PRE_INDEX },
+    /*2*/{ "Post mix",   CM::P_POST_MIX,   CM::IN_POST_MIX,   CM:: L_POST_MIX },
+    /*3*/{ "Post index", CM::P_POST_INDEX, CM::IN_POST_INDEX, CM:: L_POST_INDEX },
+
+    /*4*/{ "IR 1 Length", CM::P_1_LENGTH, CM::IN_1_LENGTH, CM::L_1_LENGTH },
+    /*5*/{ "IR 1 Tuning", CM::P_1_TUNING, CM::IN_1_TUNING, CM::L_1_TUNING },
+    /*6*/{ "IR 1 Width",  CM::P_1_WIDTH,  CM::IN_1_WIDTH,  CM::L_1_WIDTH },
+    /*7*/{ "IR 1 Left",   CM::P_1_LEFT,   CM::IN_1_LEFT,   CM::L_1_LEFT },
+    /*8*/{ "IR 1 Right",  CM::P_1_RIGHT,  CM::IN_1_RIGHT,  CM::L_1_RIGHT },
+    /*9*/{ "Convolution IR 1", CM::P_1_TYPE, -1, -1 },
+
+    /*10*/{ "IR 2 Length", CM::P_2_LENGTH, CM::IN_2_LENGTH, CM::L_2_LENGTH },
+    /*11*/{ "IR 2 Tuning", CM::P_2_TUNING, CM::IN_2_TUNING, CM::L_2_TUNING },
+    /*12*/{ "IR 2 Width",  CM::P_2_WIDTH,  CM::IN_2_WIDTH,  CM::L_2_WIDTH },
+    /*13*/{ "IR 2 Left",   CM::P_2_LEFT,   CM::IN_2_LEFT,   CM::L_2_LEFT },
+    /*14*/{ "IR 2 Right",  CM::P_2_RIGHT,  CM::IN_2_RIGHT,  CM::L_2_RIGHT },
+    /*15*/{ "Convolution IR 2", CM::P_2_TYPE, -1, -1 },
+
+    /*16*/{ "IR 3 Length", CM::P_3_LENGTH, CM::IN_3_LENGTH, CM::L_3_LENGTH },
+    /*17*/{ "IR 3 Tuning", CM::P_3_TUNING, CM::IN_3_TUNING, CM::L_3_TUNING },
+    /*18*/{ "IR 3 Width",  CM::P_3_WIDTH,  CM::IN_3_WIDTH,  CM::L_3_WIDTH },
+    /*19*/{ "IR 3 Left",   CM::P_3_LEFT,   CM::IN_3_LEFT,   CM::L_3_LEFT },
+    /*20*/{ "IR 3 Right",  CM::P_3_RIGHT,  CM::IN_3_RIGHT,  CM::L_3_RIGHT },
+    /*21*/{ "Convolution IR 3", CM::P_3_TYPE, -1, -1 },
+
+    /*22*/{ "IR 4 Length", CM::P_4_LENGTH, CM::IN_4_LENGTH, CM::L_4_LENGTH },
+    /*23*/{ "IR 4 Tuning", CM::P_4_TUNING, CM::IN_4_TUNING, CM::L_4_TUNING },
+    /*24*/{ "IR 4 Width",  CM::P_4_WIDTH,  CM::IN_4_WIDTH,  CM::L_4_WIDTH },
+    /*25*/{ "IR 4 Left",   CM::P_4_LEFT,   CM::IN_4_LEFT,   CM::L_4_LEFT },
+    /*26*/{ "IR 4 Right",  CM::P_4_RIGHT,  CM::IN_4_RIGHT,  CM::L_4_RIGHT },
+    /*27*/{ "Convolution IR 4", CM::P_4_TYPE, -1, -1 },
+
+    /*28*/{ "Extend", CM::P_EXTEND, -1, CM::L_EXTEND },
+    /*29*/{ "Modulation amount", CM::P_MOD_AMOUNT, -1, -1 }
+};
+int info_index[] {
+    0, 1, 2, 3, // P_PRE_MIX, P_PRE_INDEX, P_POST_MIX, P_POST_INDEX    
+    9, 15, 21, 27,  // P_1_TYPE, P_2_TYPE, P_3_TYPE, P_4_TYPE,
+    4, 10, 16, 22, // P_1_LENGTH, P_2_LENGTH, P_3_LENGTH, P_4_LENGTH,
+    5, 11, 17, 23, // P_1_TUNING, P_2_TUNING, P_3_TUNING, P_4_TUNING,
+    6, 12, 18, 24, // P_1_WIDTH,  P_2_WIDTH,  P_3_WIDTH,  P_4_WIDTH,
+    7, 13, 19, 25, // P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT, 
+    8, 14, 20, 26, // P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
+    29, // P_MOD_AMOUNT,
+    28, // P_EXTEND,
+};
+const WidgetInfo& param_info(int param_id) { return widget_info[info_index[param_id]]; }
+
 ConvoModule::ConvoModule() :
     modulation(this, ChemId::Convo),
-    glow_knobs(false),
-    conv_number(0),
-    last_conv(-1),
-    extend(false)
+    glow_knobs(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configSwitch(P_TYPE, 0.f, 18.f, 6.f, "Convolution type", {
-		"Waterphone 1",
-        "Waterphone 2",
-        "Autoharp 1",
-        "Autoharp 2",
-		"Dark Guitar",
-        "Finger Snap",
-        "Wood",
-        "Bright Metal",
-		"Fiber",
-        "Leather",
-        "Damped Metal",
-        "Nylon",
-		"Cloth",
-        "Eowave Gong",
-        "LVDL Pyramide",
-        "LVDL Gong",
-        "LVDL Onde",
-        "White",
-        "Grey"
-    });
-    dp4(configParam(P_LENGTH, 0.f, 10.f, 10.f, "Length"));
-    dp4(configParam(P_TUNING, 0.f, 10.f,  5.f, "Tuning"));
-    dp4(configParam(P_WIDTH,  0.f, 10.f,  5.f, "Width"));
-    dp4(configParam(P_LEFT,   0.f, 10.f, 10.f, "Left"));
-    dp4(configParam(P_RIGHT,  0.f, 10.f, 10.f, "Right"));
-    dp4(configParam(P_PRE_MIX,    0.f, 10.f, 0.f, "Pre Mix"));
-    dp4(configParam(P_PRE_INDEX,  0.f, 10.f, 0.f, "Pre Index"));
-    dp4(configParam(P_POST_MIX,   0.f, 10.f, 0.f, "Post Mix"));
-    dp4(configParam(P_POST_INDEX, 0.f, 10.f, 0.f, "Post Index"));
+    for (int i = P_PRE_MIX; i <= P_POST_INDEX; ++i) {
+        dp4(configParam(i, 0.f, 10.f, 0.f, widget_info[i].name));
+    }
+    
+    std::vector<std::string> types {
+        "Waterphone 1", "Waterphone 2", "Autoharp 1", "Autoharp 2",
+        "Dark Guitar", "Finger Snap", "Wood", "Bright Metal",
+        "Fiber", "Leather", "Damped Metal", "Nylon", "Cloth",
+        "Eowave Gong", "LVDL Pyramide", "LVDL Gong", "LVDL Onde",
+        "White", "Grey"
+    };
+    for (int i = P_1_TYPE; i <= P_4_TYPE; ++i) {
+        configSwitch(i, 0.f, 18.f, 6.f, param_info(i).name, types);
+    }    
 
-    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
+    WidgetInfo* info = widget_info + 4;
+    for (int i = 0; i < 4; ++i) {
+        dp4(configParam(info->param, 0.f, 10.f, 10.f, info->name)); ++info;
+        dp4(configParam(info->param, 0.f, 10.f,  5.f, info->name)); ++info;
+        dp4(configParam(info->param, 0.f, 10.f,  5.f, info->name)); ++info;
+        dp4(configParam(info->param, 0.f, 10.f, 10.f, info->name)); ++info;
+        dp4(configParam(info->param, 0.f, 10.f, 10.f, info->name)); ++info;
+        ++info; // skip type
+    }
+    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, param_info(P_MOD_AMOUNT).name, "%"));
+    configSwitch(P_EXTEND, 0.f, 1.f, 0.f, param_info(P_EXTEND).name, {"off", "on"});
 
-    configSwitch(P_SELECT, 0.f, 3.f, 0.f, "Select convolution slot", { "Convolution #1", "Convolution #2", "Convolution #3", "Convolution #4"});
-    configSwitch(P_EXTEND, 0.f, 1.f, 0.f, "Extend computation", {"off", "on"});
+    for (int i = 0; i < NUM_PARAMS; ++i) {
+        auto wi = widget_info[i];
+        if (wi.input >= 0) {
+            configInput(wi.input, wi.name);
+        }
+        if (wi.light >= 0 && CM::L_EXTEND != wi.light) {
+            std::string name{"Modulation amount on "};
+            name.append(wi.name);
+            configLight(wi.light, name);
+        }
+    }
 
-    configInput(IN_PRE_MIX,    "Pre mix");
-    configInput(IN_PRE_INDEX,  "Pre index");
-    configInput(IN_POST_MIX,   "Post mix");
-    configInput(IN_POST_INDEX, "Post index");
-
-    configLight(L_PRE_MIX_MOD,   "Modulation control on Pre mix");
-    configLight(L_PRE_INDEX_MOD, "Modulation control on Pre index");
-    configLight(L_POST_MIX_MOD,  "Modulation control on Post mix");
-    configLight(L_POST_INDEX_MOD,"Modulation control on Post index");
     // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for button lights 
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix1), // P_PRE_MIX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx1), // P_PRE_INDEX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_mix2), // P_POST_MIX
-        EmccPortConfig::stream_poke(Haken::s_Conv_Poke, Haken::id_c_idx2), // P_POST_INDEX
-        // EmccPortConfig::no_send(0, 0, true), // P_TYPE
-        // EmccPortConfig::no_send(0, 0, true), // P_LENGTH
-        // EmccPortConfig::no_send(0, 0, true), // P_TUNING
-        // EmccPortConfig::no_send(0, 0, true), // P_WIDTH
-        // EmccPortConfig::no_send(0, 0, true), // P_LEFT
-        // EmccPortConfig::no_send(0, 0, true)  // P_RIGHT
+        EmccPortConfig::stream_poke(P_PRE_MIX, IN_PRE_MIX, L_PRE_MIX, Haken::s_Conv_Poke, Haken::id_c_mix1),
+        EmccPortConfig::stream_poke(P_PRE_INDEX, IN_PRE_INDEX, L_PRE_INDEX, Haken::s_Conv_Poke, Haken::id_c_idx1),
+        EmccPortConfig::stream_poke(P_POST_MIX, IN_POST_MIX, L_POST_MIX, Haken::s_Conv_Poke, Haken::id_c_mix2),
+        EmccPortConfig::stream_poke(P_POST_INDEX, IN_POST_INDEX, L_POST_INDEX, Haken::s_Conv_Poke, Haken::id_c_idx2),
+        EmccPortConfig::stream_poke(P_1_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat0),
+        EmccPortConfig::stream_poke(P_2_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat1),
+        EmccPortConfig::stream_poke(P_3_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat2),
+        EmccPortConfig::stream_poke(P_4_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat3),
+        EmccPortConfig::stream_poke(P_1_LENGTH, IN_1_LENGTH, L_1_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth0),
+        EmccPortConfig::stream_poke(P_2_LENGTH, IN_2_LENGTH, L_2_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth1),
+        EmccPortConfig::stream_poke(P_3_LENGTH, IN_3_LENGTH, L_3_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth2),
+        EmccPortConfig::stream_poke(P_4_LENGTH, IN_4_LENGTH, L_4_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth3),
+        EmccPortConfig::stream_poke(P_1_TUNING, IN_1_TUNING, L_1_TUNING, Haken::s_Conv_Poke, Haken::id_c_shf0),
+        EmccPortConfig::stream_poke(P_2_TUNING, IN_2_TUNING, L_2_TUNING, Haken::s_Conv_Poke, Haken::id_c_shf1),
+        EmccPortConfig::stream_poke(P_3_TUNING, IN_3_TUNING, L_3_TUNING, Haken::s_Conv_Poke, Haken::id_c_shf2),
+        EmccPortConfig::stream_poke(P_4_TUNING, IN_4_TUNING, L_4_TUNING, Haken::s_Conv_Poke, Haken::id_c_shf3),
+        EmccPortConfig::stream_poke(P_1_WIDTH, IN_1_WIDTH, L_1_WIDTH, Haken::s_Conv_Poke, Haken::id_c_wid0),
+        EmccPortConfig::stream_poke(P_2_WIDTH, IN_2_WIDTH, L_2_WIDTH, Haken::s_Conv_Poke, Haken::id_c_wid1),
+        EmccPortConfig::stream_poke(P_3_WIDTH, IN_3_WIDTH, L_3_WIDTH, Haken::s_Conv_Poke, Haken::id_c_wid2),
+        EmccPortConfig::stream_poke(P_4_WIDTH, IN_4_WIDTH, L_4_WIDTH, Haken::s_Conv_Poke, Haken::id_c_wid3),
+        EmccPortConfig::stream_poke(P_1_LEFT, IN_1_LEFT, L_1_LEFT, Haken::s_Conv_Poke, Haken::id_c_atL0),
+        EmccPortConfig::stream_poke(P_2_LEFT, IN_2_LEFT, L_2_LEFT, Haken::s_Conv_Poke, Haken::id_c_atL1),
+        EmccPortConfig::stream_poke(P_3_LEFT, IN_3_LEFT, L_3_LEFT, Haken::s_Conv_Poke, Haken::id_c_atL2),
+        EmccPortConfig::stream_poke(P_4_LEFT, IN_4_LEFT, L_4_LEFT, Haken::s_Conv_Poke, Haken::id_c_atL3),
+        EmccPortConfig::stream_poke(P_1_RIGHT, IN_1_RIGHT, L_1_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR0),
+        EmccPortConfig::stream_poke(P_2_RIGHT, IN_2_RIGHT, L_2_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR1),
+        EmccPortConfig::stream_poke(P_3_RIGHT, IN_3_RIGHT, L_3_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR2),
+        EmccPortConfig::stream_poke(P_4_RIGHT, IN_4_RIGHT, L_4_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR3),
+        EmccPortConfig::stream_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc),
     };
-    modulation.configure(Params::P_MOD_AMOUNT, Params::P_PRE_MIX, Inputs::IN_PRE_MIX, Lights::L_PRE_MIX_MOD, NUM_MOD_PARAMS, cfg);
-
+    modulation.configure(Params::P_MOD_AMOUNT, NUM_PARAMS, cfg);
 }
 
 void ConvoModule::dataFromJson(json_t* root)
@@ -81,6 +141,9 @@ void ConvoModule::dataFromJson(json_t* root)
     json_t* j = json_object_get(root, "haken-device");
     if (j) {
         device_claim = json_string_value(j);
+    }
+    if (!device_claim.empty()) {
+        modulation.mod_from_json(root);
     }
     j = json_object_get(root, "glow-knobs");
     if (j) {
@@ -93,21 +156,24 @@ json_t* ConvoModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    if (!device_claim.empty()) {
+        modulation.mod_to_json(root);
+    }
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
 }
 
 void ConvoModule::params_from_internal()
 {
-    getParam(P_LENGTH).setValue(unipolar_7_to_rack(conv.get_ir_length(conv_number)));
-    getParam(P_PRE_MIX).setValue(unipolar_7_to_rack(conv.get_pre_mix()));
-    getParam(P_PRE_INDEX).setValue(unipolar_7_to_rack(conv.get_pre_index()));
-    getParam(P_POST_MIX).setValue(unipolar_7_to_rack(conv.get_post_mix()));
-    getParam(P_POST_INDEX).setValue(unipolar_7_to_rack(conv.get_post_index()));
-    getParam(P_TUNING).setValue(unipolar_7_to_rack(conv.get_ir_shift(conv_number)));
-    getParam(P_WIDTH).setValue(unipolar_7_to_rack(conv.get_ir_width(conv_number)));
-    getParam(P_LEFT).setValue(unipolar_7_to_rack(conv.get_ir_left(conv_number)));
-    getParam(P_RIGHT).setValue(unipolar_7_to_rack(conv.get_ir_right(conv_number)));
+    // getParam(P_LENGTH).setValue(unipolar_7_to_rack(conv.get_ir_length(conv_number)));
+    // getParam(P_PRE_MIX).setValue(unipolar_7_to_rack(conv.get_pre_mix()));
+    // getParam(P_PRE_INDEX).setValue(unipolar_7_to_rack(conv.get_pre_index()));
+    // getParam(P_POST_MIX).setValue(unipolar_7_to_rack(conv.get_post_mix()));
+    // getParam(P_POST_INDEX).setValue(unipolar_7_to_rack(conv.get_post_index()));
+    // getParam(P_TUNING).setValue(unipolar_7_to_rack(conv.get_ir_shift(conv_number)));
+    // getParam(P_WIDTH).setValue(unipolar_7_to_rack(conv.get_ir_width(conv_number)));
+    // getParam(P_LEFT).setValue(unipolar_7_to_rack(conv.get_ir_left(conv_number)));
+    // getParam(P_RIGHT).setValue(unipolar_7_to_rack(conv.get_ir_right(conv_number)));
 }
 
 void ConvoModule::update_from_em()
@@ -157,66 +223,13 @@ uint8_t get_u7_param(::rack::engine::Module* module, int param_id) {
     return unipolar_rack_to_unipolar_7(module->getParam(param_id).getValue());
 }
 
-void ConvoModule::sync_from_params()
-{
-    assert(chem_host);
-
-    std::vector<PackedMidiMessage> updates(6);
-    auto v = get_u7_param(this, Params::P_TYPE);
-    if (v != conv.get_ir_type(conv_number)) {
-        conv.set_ir_type(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_dat0 + conv_number, v), ChemId::Convo));
-    }
-    v = get_u7_param(this, Params::P_TUNING);
-    if (v != conv.get_ir_length(conv_number)) {
-        conv.set_ir_length(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_lth0 + conv_number, v), ChemId::Convo));
-    }
-    v = get_u7_param(this, Params::P_WIDTH);
-    if (v != conv.get_ir_shift(conv_number)) {
-        conv.set_ir_shift(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_shf0 + conv_number, v), ChemId::Convo));
-    }
-    v = get_u7_param(this, Params::P_LEFT);
-    if (v != conv.get_ir_width(conv_number)) {
-        conv.set_ir_width(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_wid0 + conv_number, v), ChemId::Convo));
-    }
-    v = get_u7_param(this, Params::P_LENGTH);
-    if (v != conv.get_ir_left(conv_number)) {
-        conv.set_ir_left(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_atL0 + conv_number, v), ChemId::Convo));
-    }
-    v = get_u7_param(this, Params::P_RIGHT);
-    if (v != conv.get_ir_right(conv_number)) {
-        conv.set_ir_right(conv_number, v);
-        updates.push_back(Tag(MakeRawBase(PKP16, Haken::id_c_atR0 + conv_number, v), ChemId::Convo));
-    }
-    if (!updates.empty()) {
-        auto haken = chem_host->host_haken();
-        haken->begin_stream(ChemId::Convo, Haken::s_Conv_Poke);
-        for (auto mm : updates) {
-            haken->send_message(mm);
-        }
-        haken->end_stream(ChemId::Convo);
-    }
-}
-
 void ConvoModule::process_params(const ProcessArgs& args)
 {
     modulation.pull_mod_amount();
-
     {
         auto v = getParamInt(getParam(Params::P_EXTEND));
         getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
     }    
-
-    int current = getParamInt(getParam(Params::P_SELECT));
-    if (last_conv != current) {
-        last_conv = current;
-        conv_number = current;
-        params_from_internal();
-    }
 }
 
 void ConvoModule::process(const ProcessArgs& args)
@@ -226,12 +239,11 @@ void ConvoModule::process(const ProcessArgs& args)
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
-        sync_from_params();
     }
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
+        modulation.update_lights();
     }
-
 }
 
 Model *modelConvo = createModel<ConvoModule, ConvoUi>("chem-convo");

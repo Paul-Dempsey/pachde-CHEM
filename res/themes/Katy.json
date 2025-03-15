@@ -86,9 +86,9 @@
             "menu": { "fill" : "black" },
             "led": { "fill" : " #6f9de3", "stroke": " #80808080" },
 
-            "selector": { "fill": " #202020", "stroke": { "color": "hsl(276, 23.60%, 39.00%)", "width":1 }},
+            "selector": { "fill": " #202020", "stroke": { "color": "hsl(276, 24%, 40%)", "width":1 }},
             "selector-sel": { "fill": "hsl(144, 94.50%, 50.20%)" },
-            "selector-item": { "fill": "hsl(0, 0.00%, 38.00%)" },
+            "selector-item": { "fill": "hsl(276, 24%, 40%)" },
 
             "rbtn-punch": { "fill": "none" },
             "rbtn-bezel": { "fill":"hsl(327, 53.40%, 48%)"},
@@ -139,6 +139,8 @@
             "tsk-wait":  { "fill":"#3b6ab0" },
             "tsk-na":    { "fill":"#89aed3" },
             "tsk-broke": { "fill":"#fa0000" },
+
+            "p-link": {"stroke": "hsl(90, 40%, 50%)" },
 
             "m0": { "fill": "#87c587" },
             "m1": { "fill": "#87c4c4" },

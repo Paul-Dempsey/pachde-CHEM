@@ -14,7 +14,7 @@ constexpr const uint8_t NO_SEND = 0x80;
 
 // High bit on `channel` = no-send config
 // No-send allows for the same knob/param/em sync, but leave sending
-// data to the device up to the consuming code for scenarios like Convo
+// data to the device up to the consuming code for scenarios
 // where we require a more complex data stream.
 //
 // It also allows for 2 bytes of data to be used at will.
@@ -23,35 +23,48 @@ constexpr const uint8_t NO_SEND = 0x80;
 //
 struct EmccPortConfig
 {
-    uint8_t channel;
-    uint8_t cc_id;
-    uint8_t stream;
-    bool low_resolution;
+    uint8_t channel{UNSET_8};
+    uint8_t cc_id{UNSET_8};
+    uint8_t stream{UNSET_8};
+    bool low_resolution{false};
+    int param_id{-1};
+    int input_id{-1};
+    int light_id{-1};
 
-    static EmccPortConfig no_send(uint8_t d1, uint8_t d2, bool low_res = false)
+    EmccPortConfig(uint8_t channel, uint8_t cc, uint8_t stream, bool low_res, int param, int input, int light) :
+        channel(channel),
+        cc_id(cc),
+        stream(stream),
+        low_resolution(low_res),
+        param_id(param),
+        input_id(input),
+        light_id(light)
+    {}
+
+    static EmccPortConfig no_send(int param_id, int input_id, int light_id, uint8_t d1, uint8_t d2, bool low_res = false)
     {
-        return EmccPortConfig{NO_SEND, d1, d2, low_res};
+        return EmccPortConfig{NO_SEND, d1, d2, low_res, param_id, input_id, light_id};
     }
 
-    static EmccPortConfig cc(uint8_t chan, uint8_t cc, bool low_res = false)
+    static EmccPortConfig cc(int param_id, int input_id, int light_id, uint8_t chan, uint8_t cc, bool low_res = false)
     {
         assert(in_range((int)chan, (int)Haken::ch1, (int)Haken::ch16));
-        return EmccPortConfig{chan, cc, INVALID_STREAM, low_res};
+        return EmccPortConfig{chan, cc, INVALID_STREAM, low_res, param_id, input_id, light_id};
     }
 
-    static EmccPortConfig stream_poke(uint8_t stream_id, uint8_t poke_id)
+    static EmccPortConfig stream_poke(int param_id, int input_id, int light_id, uint8_t stream_id, uint8_t poke_id)
     {
-        return EmccPortConfig{Haken::ch16, poke_id, stream_id, true};
+        return EmccPortConfig{Haken::ch16, poke_id, stream_id, true, param_id, input_id, light_id};
     }
 
 };
 
 struct EmControlPort
 {
-    float param_value{0};
-    float cv{0};
-    float mod_amount{0};
-    float mod_value{0};
+    float param_value{0.f};
+    float cv{0.f};
+    float mod_amount{0.f};
+    float mod_value{0.f};
 
     uint16_t em_value{UNSET_16};
     uint16_t last_em_value{UNSET_16};
@@ -59,12 +72,33 @@ struct EmControlPort
     uint8_t cc_id{UNSET_8};
     uint8_t stream{UNSET_8};
     bool low_resolution{false};
+    int param_id{-1};
+    int input_id{-1};
+    int light_id{-1};
+    int index{-1};
 
-    void config (const EmccPortConfig& conf) {
-        cc_id = conf.cc_id;
+    EmControlPort() {}
+
+    EmControlPort(int index, const EmccPortConfig& conf) :
+        channel(conf.channel),
+        cc_id(conf.cc_id),
+        stream(conf.stream),
+        low_resolution(conf.low_resolution),
+        param_id(conf.param_id),
+        input_id(conf.input_id),
+        light_id(conf.light_id),
+        index(index)
+    {}
+
+    void config (int index, const EmccPortConfig& conf) {
         channel = conf.channel;
+        cc_id = conf.cc_id;
         stream = conf.stream;
         low_resolution = conf.low_resolution;
+        param_id = conf.param_id;
+        input_id = conf.input_id;
+        light_id = conf.light_id;
+        this->index = index;
     }
 
     bool no_send() { return (channel & NO_SEND) != 0; }
@@ -83,7 +117,7 @@ struct EmControlPort
     float modulated() { return mod_value; }
     float amount() { return mod_amount; }
     
-    void pull_param_cv(Module* module, int param_id, int input_id);
+    void pull_param_cv(Module* module);
     void set_mod_amount(float amount);
     void set_param_and_em(float value);
     void set_em_and_param(uint16_t u14);
@@ -109,9 +143,6 @@ struct Modulation
     int last_mod_target;
     int mod_param;
     int count;
-    int first_param;
-    int first_input;
-    int first_light;
     bool have_stream;
     ChemId client_tag;
 
@@ -123,9 +154,18 @@ struct Modulation
     EmControlPort& get_port(int index) {
         return ports[index];
     }
+    EmControlPort* get_port_for_input(int input_id) {
+        auto it = std::find_if(ports.begin(), ports.end(), [=](EmControlPort& port){ return port.input_id == input_id; });
+        return (it == ports.end()) ? nullptr : &*it;
+    }
+    EmControlPort* get_port_for_light(int light_id) {
+        auto it = std::find_if(ports.begin(), ports.end(), [=](EmControlPort& port){ return port.light_id == light_id; });
+        return (it == ports.end()) ? nullptr : &*it;
+    }
+
     Modulation(ChemModule* module, ChemId client_tag);
 
-    void configure(int mod_param_id, int first_param, int first_input, int first_light, int data_length, const EmccPortConfig* data);
+    void configure(int mod_param_id, int data_length, const EmccPortConfig* data);
     bool has_target() { return mod_target >= 0; }
     void mod_to_json(json_t* root);
     void mod_from_json(json_t* root);

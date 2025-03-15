@@ -31,10 +31,10 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
     }
 }
 
-void EmControlPort::pull_param_cv(Module* module, int param_id, int input_id)
+void EmControlPort::pull_param_cv(Module* module)
 {
     if (!module) return;
-    cv = module->getInput(input_id).getVoltage();
+    cv = (input_id < 0) ? 0.f : module->getInput(input_id).getVoltage();
     set_param_and_em(module->getParam(param_id).getValue());
 }
 
@@ -80,26 +80,20 @@ Modulation::Modulation(ChemModule *module, ChemId client_tag) :
     last_mod_target(-1),
     mod_param(-1),
     count(-1),
-    first_param(-1),
-    first_input(-1),
-    first_light(-1),
     have_stream(false),
     client_tag(client_tag)
 {
+    assert(module);
     midi_timer.time = (random::uniform() * MIDI_RATE); // jitter
 }
 
-void Modulation::configure(int mod_param_id, int first_param_id, int first_input_id, int first_light_id, int data_length, const EmccPortConfig *data)
+void Modulation::configure(int mod_param_id, int data_length, const EmccPortConfig *data)
 {
     mod_param = mod_param_id;
-    first_param = first_param_id;
-    first_input = first_input_id;
-    first_light = first_light_id;
     count = data_length;
     ports.reserve(data_length);
     for (int i = 0; i < data_length; ++i) {
-        EmControlPort port;
-        port.config(*data);
+        EmControlPort port(i, *data++);
         if (port.is_stream_poke()) { have_stream = true; }
         ports.push_back(port);
     }
@@ -110,7 +104,7 @@ void Modulation::set_em_and_param(int index, uint16_t em_value, bool with_module
     EmControlPort& port = ports[index];
     port.set_em_and_param(em_value);
     if (with_module) {
-        module->getParam(first_param + index).setValue(port.param());
+        module->getParam(port.param_id).setValue(port.param());
     }
 }
 
@@ -119,7 +113,7 @@ void Modulation::set_em_and_param_low(int index, uint8_t em_value, bool with_mod
     EmControlPort& port = ports[index];
     port.set_em_and_param_low(em_value);
     if (with_module) {
-        module->getParam(first_param + index).setValue(port.param());
+        module->getParam(port.param_id).setValue(port.param());
     }
 }
 
@@ -127,22 +121,26 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
 {
     if (e.type == Port::OUTPUT) return;
     if (e.connecting) {
-        mod_target = e.portId;
+        auto port = get_port_for_input(e.portId);
+        mod_target = port->index;
         auto pq = module->getParamQuantity(mod_param);
         if (pq) {
             pq->setImmediateValue(ports[mod_target].amount());
         }
     } else {
         ports[e.portId].set_mod_amount(0.f);
-        for (int i = first_input; i < first_input + count; ++i) {
-            if (module->getInput(i).isConnected()) {
+
+        int i = 0;
+        for (auto port: ports) {
+            if (port.input_id >= 0 && module->getInput(port.input_id).isConnected()) {
                 mod_target = i;
                 auto pq = module->getParamQuantity(mod_param);
                 if (pq) {
-                    pq->setImmediateValue(ports[i].amount());
+                    pq->setImmediateValue(port.amount());
                 }
                 return;
             }
+            ++i;
         }
         mod_target = -1;
         auto pq = module->getParamQuantity(mod_param);
@@ -154,12 +152,13 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
 
 void Modulation::set_modulation_target(int target)
 {
-    if (!module->getInput(target).isConnected()) return;
+    EmControlPort& port = ports[target];
+    if (port.input_id < 0 || !module->getInput(port.input_id).isConnected()) return;
 
     mod_target = target;
     auto pq = module->getParamQuantity(mod_param);
     if (pq) {
-        pq->setImmediateValue(ports[mod_target].amount());
+        pq->setImmediateValue(port.amount());
     }        
 }
 
@@ -171,7 +170,7 @@ void Modulation::sync_send()
 //    } else {
         auto pit = ports.begin();
         for (int i = 0; i < count; ++i) {
-            pit->pull_param_cv(module, first_param + i, first_input + i );
+            pit->pull_param_cv(module);
             if (pit->pending()) {
                 pit->send(module->chem_host, client_tag);
             }
@@ -190,15 +189,18 @@ void Modulation::pull_mod_amount()
     }
 }
 
-void Modulation::update_lights() {
+void Modulation::update_lights()
+{
     if (last_mod_target != mod_target) {
-        if (first_light >= 0) {
-            for (int i = first_light; i < first_light+count; ++i) {
-                module->getLight(i).setSmoothBrightness((i - first_light) == mod_target ? .6f : 0.f, 90);
+        int i = 0;
+        for (auto port: ports) {
+            if (port.light_id >= 0) {
+                module->getLight(port.light_id).setSmoothBrightness((i == mod_target) ? .6f : 0.f, 90);
             }
+            ++i;
         }
+        last_mod_target = mod_target;
     }
-    last_mod_target = mod_target;
 }
 
 void Modulation::mod_to_json(json_t *root)
