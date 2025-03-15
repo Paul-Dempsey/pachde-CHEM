@@ -154,7 +154,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void step() override;
-    void draw(const DrawArgs& args) override;
+    void onHoverKey(const HoverKeyEvent &e) override;
     void appendContextMenu(Menu *menu) override;
 };
 

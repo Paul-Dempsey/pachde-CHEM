@@ -121,6 +121,7 @@ struct PostUi : ChemModuleWidget, IChemClient
 
     bool connected();
     void glowing_knobs(bool glow);
+    void center_knobs();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -134,7 +135,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void step() override;
-    void draw(const DrawArgs& args) override;
+    void onHoverKey(const HoverKeyEvent &e) override;
     void appendContextMenu(Menu *menu) override;
 };
 

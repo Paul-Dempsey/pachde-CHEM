@@ -125,12 +125,13 @@ struct PreUi : ChemModuleWidget, IChemClient
 
     bool connected();
     void glowing_knobs(bool glow);
+    void center_knobs();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
+    void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
@@ -138,8 +139,8 @@ struct PreUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void sync_labels();
+    void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
-    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

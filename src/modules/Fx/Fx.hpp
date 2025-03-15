@@ -134,6 +134,7 @@ struct FxUi : ChemModuleWidget, IChemClient
 
     bool connected();
     void glowing_knobs(bool glow);
+    void center_knobs();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -147,6 +148,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void sync_labels();
+    void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
     void appendContextMenu(Menu *menu) override;
 };

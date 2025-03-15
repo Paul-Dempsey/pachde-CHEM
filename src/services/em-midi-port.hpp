@@ -101,6 +101,10 @@ struct EmControlPort
         this->index = index;
     }
 
+    bool has_input() { return input_id >= 0; }
+    bool has_light() { return light_id >= 0; }
+    bool has_param() { return param_id >= 0; }
+
     bool no_send() { return (channel & NO_SEND) != 0; }
     uint8_t data_a() { assert(channel & NO_SEND); return cc_id; }
     uint8_t data_b() { assert(channel & NO_SEND); return stream; }
@@ -180,6 +184,8 @@ struct Modulation
     void sync_send();
     void pull_mod_amount();
     void update_lights();
+
+    void zero_modulation();
 };
 
 }

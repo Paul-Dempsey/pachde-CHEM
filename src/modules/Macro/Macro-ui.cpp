@@ -172,6 +172,14 @@ void MacroUi::glowing_knobs(bool glow) {
     }
 }
 
+void MacroUi::center_knobs()
+{
+    if (!my_module) return;
+    for (int i = 0; i < 6; ++i) {
+        my_module->getParam(i).setValue(5.0f);
+    }
+}
+
 void MacroUi::setThemeName(const std::string& name, void * context)
 {
 //    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
@@ -229,6 +237,25 @@ void set_pedal_text(TextLabel* label, uint8_t item_cc, uint8_t a1, uint8_t a2)
 
 }
 
+void MacroUi::onHoverKey(const HoverKeyEvent &e)
+{
+    if (my_module) {
+        if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
+            switch (e.key) {
+            case GLFW_KEY_0:
+                e.consume(this);
+                my_module->modulation.zero_modulation();
+                return;
+            case GLFW_KEY_5:
+                center_knobs();
+                e.consume(this);
+                return;
+            }
+        }
+    }
+    Base::onHoverKey(e);
+}
+
 void MacroUi::step()
 {
     Base::step();
@@ -262,16 +289,18 @@ void MacroUi::step()
     set_pedal_text(m6_ped_label, Haken::ccVI, a1, a2);
 }
 
-// void MacroUi::draw(const DrawArgs& args)
-// {
-//     Base::draw(args);
-//     if (!my_module) return;
-// }
-
 void MacroUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
+
+    bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
+    menu->addChild(createMenuItem("Zero modulation", "0", [this](){
+        my_module->modulation.zero_modulation();
+    }, unconnected));
+
+    menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
+
     menu->addChild(createCheckMenuItem("Glowing knobs", "", 
         [this](){ return my_module->glow_knobs; },
         [this](){

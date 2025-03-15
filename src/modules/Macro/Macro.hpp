@@ -119,6 +119,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
 
     bool connected();
     void glowing_knobs(bool glow);
+    void center_knobs();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -131,8 +132,8 @@ struct MacroUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-macro.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
+    void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;
-    //void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

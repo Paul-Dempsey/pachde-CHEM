@@ -42,6 +42,7 @@ void EmControlPort::set_mod_amount(float amount)
 {
     assert(in_range(amount, -100.f, 100.f));
     mod_amount = amount;
+    mod_value = modulated_value(param_value, cv, mod_amount); 
 }
 
 void EmControlPort::set_param_and_em(float value)
@@ -200,6 +201,18 @@ void Modulation::update_lights()
             ++i;
         }
         last_mod_target = mod_target;
+    }
+}
+
+void Modulation::zero_modulation()
+{
+    if (mod_param >= 0) {
+        module->getParam(mod_param).setValue(0.f);
+    }
+    for (auto pit = ports.begin(); pit != ports.end(); pit++) {
+        if (pit->has_input()) {
+            pit->set_mod_amount(0.f);
+        }
     }
 }
 
