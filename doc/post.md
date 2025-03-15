@@ -7,6 +7,9 @@ Below the level knob is a global Mute button that immediately silences all audio
 
 The Blue knob controls the mix of straight signal with equalization (EQ).
 
+The modulation inputs and **Modulation amount** knob work the same across all CHEM modules.
+See [CHEM Modulation](./modulation.md) for details.
+
 ---
 
 // Copyright © Paul Chase Dempsey\

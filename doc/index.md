@@ -29,6 +29,11 @@ and a means to address macros 7-90 (which has interesting challenges in the cont
 We take requests! Open an issue on the GitHub repository,
  or get in touch with me on the VCV Rack Community forum or on Discord — where I go by "pachde" — or on Facebook — where I am Paul Dempsey.
 
+## Modulation (voltage control)
+
+The user interface for modulation using voltage control works the same across all the CHEM modules.
+See [CHEM Modulation](./modulation.md) for details on how the common **Modulation amount** knob works.
+
 ## Themes
 
 **CHEM** is thoroughly themeable, and comes with the following themes, selectable by right click in the module menu.

@@ -68,8 +68,8 @@
     },
     {
       "slug": "chem-convo",
-      "name": "CHEM Convo",
-      "description": "CHEM Convo(lutions) for Haken Eagan Matrix",
+      "name": "CHEM Convolution",
+      "description": "CHEM Convolution for Haken Eagan Matrix",
       "tags": [
         "Controller",
         "Expander"
