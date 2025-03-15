@@ -349,6 +349,10 @@ void CoreModule::dataFromJson(json_t *root)
     if (j) {
         last_preset.fromJson(j);
     }
+
+    if (!restore_last_preset) {
+        this->tasks.get_task(HakenTask::LastPreset)->not_applicable();
+    }
 }
 
 json_t* CoreModule::dataToJson()
@@ -477,7 +481,6 @@ void CoreModule::process(const ProcessArgs &args)
         haken_midi_out.dispatch(sample_time);
     }
 
-    // todo: after a reset, need to have a ~20sec pause before rescanning
     if (!haken_midi_out.pending()) {
         tasks.process(args);
     }

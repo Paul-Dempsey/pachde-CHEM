@@ -114,11 +114,11 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
         my_module->set_chem_ui(this);
         my_module->register_chem_client(this);
         my_module->em.subscribeEMEvents(this);
+        my_module->tasks.subscribeChange(this);
         // sync task updates that occurred before now
         for (HakenTask id = HakenTask::First; id < HakenTask::End; id = next_task(id)) {
             onHakenTaskChange(id);
         }
-        my_module->tasks.subscribeChange(this);
     }
 }
 
@@ -437,7 +437,7 @@ void CoreModuleWidget::onHakenTaskChange(HakenTask id)
         if (task) {
             auto widget = widget_for_task(task->id);
             if (id == HakenTask::SyncDevices && !ModuleBroker::get()->is_primary(my_module)) {
-                widget->describe("Sync: Not primary");
+                widget->describe("Sync: Only the primary Core can sync");
                 widget->setColor(RampGray(G_40));
                 widget->setFill(false);
             } else {

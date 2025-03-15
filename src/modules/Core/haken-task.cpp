@@ -95,8 +95,7 @@ HakenTasks::HakenTasks()
 
 void HakenTasks::subscribeChange(IHakenTaskEvents* client)
 {
-    auto cit = std::find(clients.cbegin(), clients.cend(), client);
-    if (cit != clients.cend()) {
+    if (clients.cend() == std::find(clients.cbegin(), clients.cend(), client)) {
         clients.push_back(client);
     }
 }
@@ -226,6 +225,7 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
                 }
             } else {
                 task->done();
+                notifyChange(task->id);
                 current = next_task(current);
             }
         }
@@ -243,12 +243,7 @@ bool HakenTasks::process_task_timing(const rack::Module::ProcessArgs& args, Hake
         return true;
     } break;
 
-    case TaskState::Done: {
-        notifyChange(task->id);
-        current = next_task(current);
-        return true;
-    } break;
-
+    case TaskState::Done:
     case TaskState::NotApplicable: {
         current = next_task(current);
         return true;
@@ -395,7 +390,6 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
             } else {
                 task->not_applicable();
                 notifyChange(current);
-                current = next_task(current);
             }
             current = next_task(current);
        } break;
