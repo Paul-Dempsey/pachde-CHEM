@@ -72,6 +72,10 @@ typedef std::function<void(Severity severity, ErrorCode code, std::string info)>
 
 const float NoOffset = std::nanf("");
 
+#if defined ARCH_MAC
+#define insanf isnan
+#endif
+
 struct GradientStop {
     int index;
     float offset;
