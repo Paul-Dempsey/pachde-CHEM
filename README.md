@@ -43,7 +43,7 @@ Even though the license does not create a legal obligation to do so, it's just t
 
 All graphics and documentation are Copyright (c) Paul Chase Dempsey.
 
-This software uses the Haken Audio Midi Protocol by Lippold Haken, (C) Copyright 1999-2024.
+This software uses the Haken Audio Midi Protocol Copyright (C) by Lippold Haken.
 
 ---
 
