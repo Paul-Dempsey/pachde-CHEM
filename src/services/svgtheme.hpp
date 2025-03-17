@@ -73,7 +73,9 @@ typedef std::function<void(Severity severity, ErrorCode code, std::string info)>
 const float NoOffset = std::nanf("");
 
 #if defined ARCH_MAC
-#define insanf isnan
+#define is_nan_f isnan
+#else
+#define is_nan_f isnanf
 #endif
 
 struct GradientStop {
@@ -84,7 +86,7 @@ struct GradientStop {
     GradientStop()  : index(-1), offset(NoOffset), color(OPAQUE_BLACK) {}
     //GradientStop(int index, float offset, PackedColor color) : index(index), offset(offset), color(color) {}
     bool hasIndex() const { return index >= 0; }
-    bool hasOffset() const { return !isnanf(offset); }
+    bool hasOffset() const { return !is_nan_f(offset); }
 };
 
 struct Gradient {
