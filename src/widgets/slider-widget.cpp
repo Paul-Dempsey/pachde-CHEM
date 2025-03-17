@@ -171,7 +171,7 @@ void BasicSlider::draw_thumb(const DrawArgs &args)
 
 void BasicSlider::draw_mod(const DrawArgs &args)
 {
-    if (isnanf(mod_value)) return;
+    if (is_nan_f(mod_value)) return;
 
     float range = box.size.y - thumb_size.y;
     auto pq = getParamQuantity();
