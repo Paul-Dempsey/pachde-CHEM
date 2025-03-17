@@ -10,10 +10,10 @@ Read the [Documentation](./doc/index.md) for information on **#d CHEM**.
 
 [![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
 
-To download the latest build, see the ["Nightly" release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly).
+To download the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
 > **Note** –
-> Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio or Expressive E.
+> Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
 
 ## Acknowledgements
 
@@ -21,6 +21,7 @@ Special thanks to Lippold Haken (and the Haken Audio team), for creating the Con
 Lippold personally has provided generous support by sharing internal technical details that make this software possible.
 
 Special thanks to Richard Kram for encouragement, stellar docs, and testing.
+And thanks everyone (you know who you are) for all the support and encouragement on the forums.
 
 ## Appreciation
 
