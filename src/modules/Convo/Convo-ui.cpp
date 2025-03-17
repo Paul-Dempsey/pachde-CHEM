@@ -17,8 +17,6 @@ bool ConvoUi::connected() {
 
 constexpr const float PANEL_WIDTH = 285.f;
 constexpr const float CENTER = PANEL_WIDTH * .5f;
-constexpr const float KNOB_LABEL_DX = 20.f;
-constexpr const float KNOB_LABEL_DY = -7.f;
 constexpr const float PORT_DX = 26.f;
 
 ConvoUi::ConvoUi(ConvoModule *module) :

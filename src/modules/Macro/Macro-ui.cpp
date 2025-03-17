@@ -32,9 +32,6 @@ constexpr const float LABEL_TOP = KNOB_CY;
 constexpr const float INPUT_DX = PANEL_WIDTH*.25f;
 constexpr const float INPUT_LEFT = CENTER - (1.5f*INPUT_DX);
 
-constexpr const float ATT_CONNECTOR_X = INPUT_LEFT + 10.f;
-constexpr const float ATT_CONNECTOR_Y = S::PORT_TOP + S::PORT_DY*.5f + 10.f;
-
 enum M { M1, M2, M3, M4, M5, M6, K_MODULATION };
 
 MacroUi::MacroUi(MacroModule *module) :

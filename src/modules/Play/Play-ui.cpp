@@ -845,7 +845,7 @@ void PlayUi::onPresetChange()
         auto preset = chem_host->host_preset();
         if (preset) {
             if (preset->empty()) return;
-            auto it = std::find_if(presets.cbegin(), presets.cend(), [this, preset](std::shared_ptr<pachde::PresetDescription> p){
+            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<pachde::PresetDescription> p){
                 return preset->id.key() == p->id.key();
             });
             if (it == presets.cend()) {

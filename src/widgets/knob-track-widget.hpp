@@ -14,7 +14,7 @@ namespace track_constant {
     static constexpr const float default_dot_radius{2.25f};
     static const NVGcolor default_track_color {nvgRGB(0x99, 0x69, 0x33)};
     static const NVGcolor default_dot_color {nvgRGB(0xf9, 0xa5, 0x4b)};
-    static const NVGcolor default_inactive_color {0,0,0,0};
+    static const NVGcolor default_inactive_color {nvgRGBA(0,0,0,0)};
     static const char * default_track_key {"k-track"};
     static const char * default_inactive_track_key {"k-track-na"};
 }

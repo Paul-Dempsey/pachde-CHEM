@@ -11,7 +11,7 @@ namespace pachde {
 
 constexpr const float GRIP_WIDTH = 10.f;
 constexpr const float GRIP_HIT   = 15.f;
-struct PresetWidget;
+class PresetWidget;
 
 struct IPresetAction {
     virtual void onClearSelection() = 0;

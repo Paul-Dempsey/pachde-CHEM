@@ -39,7 +39,6 @@ struct BlankModule : ChemModule
 };
 
 constexpr const float PANEL_WIDTH = 105;
-constexpr const float CENTER = PANEL_WIDTH*.5;
 
 struct BlankModuleWidget : ChemModuleWidget
 {
