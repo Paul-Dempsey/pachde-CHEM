@@ -8,6 +8,10 @@ The changes are big enough to warrant a redesign of the modularization and user 
 
 Read the [Documentation](./doc/index.md) for information on **#d CHEM**.
 
+[![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
+
+To download the latest build, see the ["Nightly" release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly).
+
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio or Expressive E.
 
