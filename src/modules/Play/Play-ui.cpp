@@ -94,7 +94,6 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
 // -- Play UI -----------------------------------
 
 constexpr const float ONEU = 15.f;
-constexpr const float HALFU = 7.5f;
 constexpr const float RIGHT_MARGIN_CENTER = 186.f;
 constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float PRESETS_TOP = 32.f;

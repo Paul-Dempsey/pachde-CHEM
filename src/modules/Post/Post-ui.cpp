@@ -12,8 +12,6 @@ using namespace pachde;
 // -- Post UI -----------------------------------
 
 constexpr const float ONEU = 15.f;
-constexpr const float HALFU = 7.5f;
-constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float CENTER = 45.f;
 
 bool PostUi::connected() {
