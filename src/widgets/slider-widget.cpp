@@ -1,14 +1,6 @@
 #include "slider-widget.hpp"
 using namespace ::rack;
 
-#ifndef is_nan_f
-#if defined ARCH_MAC
-#define is_nan_f isnan
-#else
-#define is_nan_f isnanf
-#endif
-#endif
-
 namespace pachde {
 
 void SliderBase::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e)
@@ -171,7 +163,7 @@ void BasicSlider::draw_thumb(const DrawArgs &args)
 
 void BasicSlider::draw_mod(const DrawArgs &args)
 {
-    if (is_nan_f(mod_value)) return;
+    if (std::isnan(mod_value)) return;
 
     float range = box.size.y - thumb_size.y;
     auto pq = getParamQuantity();
