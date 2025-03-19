@@ -10,53 +10,45 @@ namespace pachde {
 constexpr const uint16_t UNSET_16 = 0xffff;
 constexpr const uint8_t UNSET_8 = 0xff;
 constexpr const uint8_t INVALID_STREAM = UNSET_8;
-constexpr const uint8_t NO_SEND = 0x80;
+enum PortKind { NoSend, CC, Stream };
 
-// High bit on `channel` = no-send config
-// No-send allows for the same knob/param/em sync, but leave sending
-// data to the device up to the consuming code for scenarios
-// where we require a more complex data stream.
-//
-// It also allows for 2 bytes of data to be used at will.
-//
-// Calling send on a no-send port is a transparent no-op/don't care.
-//
 struct EmccPortConfig
 {
-    uint8_t channel{UNSET_8};
-    uint8_t cc_id{UNSET_8};
-    uint8_t stream{UNSET_8};
-    bool low_resolution{false};
-    int param_id{-1};
-    int input_id{-1};
-    int light_id{-1};
+    PortKind kind;
+    uint8_t channel_stream;
+    uint8_t cc_id;
+    bool low_resolution;
+    int param_id;
+    int input_id;
+    int light_id;
 
-    EmccPortConfig(uint8_t channel, uint8_t cc, uint8_t stream, bool low_res, int param, int input, int light) :
-        channel(channel),
-        cc_id(cc),
-        stream(stream),
+    EmccPortConfig(PortKind kind, uint8_t channel_stream, uint8_t cc_id, bool low_res = false, int param = -1, int input = -1, int light = -1) :
+        kind(kind),
+        channel_stream(channel_stream),
+        cc_id(cc_id),
         low_resolution(low_res),
         param_id(param),
         input_id(input),
         light_id(light)
-    {}
+    {
+        assert(in_range((int)kind, (int)PortKind::NoSend, (int) PortKind::Stream));
+    }
 
     static EmccPortConfig no_send(int param_id, int input_id, int light_id, uint8_t d1, uint8_t d2, bool low_res = false)
     {
-        return EmccPortConfig{NO_SEND, d1, d2, low_res, param_id, input_id, light_id};
+        return EmccPortConfig{PortKind::NoSend, d1, d2, low_res, param_id, input_id, light_id};
     }
 
     static EmccPortConfig cc(int param_id, int input_id, int light_id, uint8_t chan, uint8_t cc, bool low_res = false)
     {
         assert(in_range((int)chan, (int)Haken::ch1, (int)Haken::ch16));
-        return EmccPortConfig{chan, cc, INVALID_STREAM, low_res, param_id, input_id, light_id};
+        return EmccPortConfig{PortKind::CC, chan, cc, low_res, param_id, input_id, light_id};
     }
 
     static EmccPortConfig stream_poke(int param_id, int input_id, int light_id, uint8_t stream_id, uint8_t poke_id)
     {
-        return EmccPortConfig{Haken::ch16, poke_id, stream_id, true, param_id, input_id, light_id};
+        return EmccPortConfig{PortKind::Stream, stream_id, poke_id, true, param_id, input_id, light_id};
     }
-
 };
 
 struct EmControlPort
@@ -66,11 +58,11 @@ struct EmControlPort
     float mod_amount{0.f};
     float mod_value{0.f};
 
+    PortKind kind;
     uint16_t em_value{UNSET_16};
     uint16_t last_em_value{UNSET_16};
-    uint8_t channel{UNSET_8};
+    uint8_t channel_stream{UNSET_8};
     uint8_t cc_id{UNSET_8};
-    uint8_t stream{UNSET_8};
     bool low_resolution{false};
     int param_id{-1};
     int input_id{-1};
@@ -79,38 +71,38 @@ struct EmControlPort
 
     EmControlPort() {}
 
-    EmControlPort(int index, const EmccPortConfig& conf) :
-        channel(conf.channel),
-        cc_id(conf.cc_id),
-        stream(conf.stream),
-        low_resolution(conf.low_resolution),
-        param_id(conf.param_id),
-        input_id(conf.input_id),
-        light_id(conf.light_id),
+    EmControlPort(int index, const EmccPortConfig* conf) :
+        kind(conf->kind),
+        channel_stream(conf->channel_stream),
+        cc_id(conf->cc_id),
+        low_resolution(conf->low_resolution),
+        param_id(conf->param_id),
+        input_id(conf->input_id),
+        light_id(conf->light_id),
         index(index)
     {}
 
-    void config (int index, const EmccPortConfig& conf) {
-        channel = conf.channel;
-        cc_id = conf.cc_id;
-        stream = conf.stream;
-        low_resolution = conf.low_resolution;
-        param_id = conf.param_id;
-        input_id = conf.input_id;
-        light_id = conf.light_id;
-        this->index = index;
-    }
+    // void config (int index, const EmccPortConfig& conf) {
+    //     kind = conf.kind;
+    //     channel_stream = conf.channel_stream;
+    //     cc_id = conf.cc_id;
+    //     low_resolution = conf.low_resolution;
+    //     param_id = conf.param_id;
+    //     input_id = conf.input_id;
+    //     light_id = conf.light_id;
+    //     this->index = index;
+    // }
 
     bool has_input() { return input_id >= 0; }
     bool has_light() { return light_id >= 0; }
     bool has_param() { return param_id >= 0; }
 
-    bool no_send() { return (channel & NO_SEND) != 0; }
-    uint8_t data_a() { assert(channel & NO_SEND); return cc_id; }
-    uint8_t data_b() { assert(channel & NO_SEND); return stream; }
-
-    bool is_stream_poke() { return stream != INVALID_STREAM; }
-    bool is_cc() { return stream == INVALID_STREAM; }
+    uint8_t data_a() { assert(no_send()); return channel_stream; }
+    uint8_t data_b() { assert(no_send()); return cc_id; }
+    
+    bool no_send() { return PortKind::NoSend == kind; }
+    bool is_stream_poke() { return PortKind::Stream == kind; }
+    bool is_cc() { return PortKind::CC == kind; }
 
     bool pending() { return em_value != last_em_value; }
     void un_pend() { last_em_value = em_value; }

@@ -130,9 +130,9 @@ ConvoModule::ConvoModule() :
         EmccPortConfig::stream_poke(P_2_RIGHT, IN_2_RIGHT, L_2_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR1),
         EmccPortConfig::stream_poke(P_3_RIGHT, IN_3_RIGHT, L_3_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR2),
         EmccPortConfig::stream_poke(P_4_RIGHT, IN_4_RIGHT, L_4_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR3),
-        EmccPortConfig::stream_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc),
+        EmccPortConfig::stream_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc)
     };
-    modulation.configure(Params::P_MOD_AMOUNT, NUM_PARAMS, cfg);
+    modulation.configure(Params::P_MOD_AMOUNT, Params::NUM_MODS, cfg);
 }
 
 void ConvoModule::dataFromJson(json_t* root)

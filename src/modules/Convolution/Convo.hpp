@@ -34,11 +34,11 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
         P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
 
         P_MOD_AMOUNT,
-
         P_EXTEND,
+
         NUM_PARAMS,
-        
-        NUM_KNOBS = P_EXTEND
+        NUM_KNOBS = P_EXTEND,
+        NUM_MODS = P_EXTEND
     };
     enum Inputs {
         IN_PRE_MIX,  IN_PRE_INDEX,
@@ -124,7 +124,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
     TipLabel* warning_label{nullptr};
-    
+
     SmallRoundParamButton* extend_button;
 
     int last_convo;

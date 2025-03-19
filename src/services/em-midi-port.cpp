@@ -6,7 +6,6 @@ namespace pachde {
 void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
 {
     if (!chem) return;
-    if (no_send()) return;
     if (!pending() && !force) return;
     if (!chem->host_matrix()->is_ready()) return;
     assert (em_value <= Haken::max14);
@@ -15,19 +14,30 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
     assert(haken);
 
     un_pend();
-    if (is_cc()) {
+
+    switch (kind) {
+    case PortKind::NoSend:
+        return;
+
+    case PortKind::CC:
         if (!low_resolution) {
             uint8_t lo = em_value & 0x7f;
             if (lo) {
-                haken->control_change(tag, channel, Haken::ccFracPed, lo);
+                haken->control_change(tag, channel_stream, Haken::ccFracPed, lo);
             }
         }
-        haken->control_change(tag, channel, cc_id, em_value >> 7);
-    } else {
-        assert(is_stream_poke());
-        haken->begin_stream(tag, stream);
+        haken->control_change(tag, channel_stream, cc_id, em_value >> 7);
+        break;
+
+    case PortKind::Stream:
+        haken->begin_stream(tag, channel_stream);
         haken->stream_data(tag, cc_id, em_value >> 7);
         //haken->end_stream(tag); // supposedly optional
+        break;
+
+    default:
+        assert(false);
+        break;
     }
 }
 
@@ -94,7 +104,7 @@ void Modulation::configure(int mod_param_id, int data_length, const EmccPortConf
     count = data_length;
     ports.reserve(data_length);
     for (int i = 0; i < data_length; ++i) {
-        EmControlPort port(i, *data++);
+        EmControlPort port(i, data++);
         if (port.is_stream_poke()) { have_stream = true; }
         ports.push_back(port);
     }
@@ -165,19 +175,55 @@ void Modulation::set_modulation_target(int target)
 
 void Modulation::sync_send()
 {
-//   if (have_stream) {
-// todo: consolidate multiple pending items in the same stream
+    if (!module->chem_host) return;
+    if (have_stream) {
+        uint8_t stream = INVALID_STREAM;
+        auto haken = module->chem_host->host_haken();
+        assert(haken);
+        // pass 1: send all plain CCs and capture stream
+        for (auto pit = ports.begin(); pit != ports.end(); pit++) {
+            switch (pit->kind) {
+            case PortKind::NoSend:
+                continue;
 
-//    } else {
-        auto pit = ports.begin();
-        for (int i = 0; i < count; ++i) {
+            case PortKind::CC:
+                pit->pull_param_cv(module);
+                if (pit->pending() && pit->is_cc()) {
+                    pit->send(module->chem_host, client_tag);
+                }
+                break;
+
+            case PortKind::Stream:
+                if (stream == INVALID_STREAM) {
+                    stream = pit->channel_stream;
+                } else {
+                    assert(stream == pit->channel_stream); // multiple streams in one modulation not implemented
+                }
+                break;
+
+            default:
+                assert(false);
+            }
+        }
+        // pass 2: send pending data in stream
+        assert (stream != INVALID_STREAM);
+        haken->begin_stream(client_tag, stream);
+        for (auto pit = ports.begin(); pit != ports.end(); pit++) {
+            if (!pit->is_stream_poke()) continue;
+            pit->pull_param_cv(module);
+            if (pit->pending()) {
+                haken->stream_data(client_tag, pit->cc_id, pit->em_value >> 7);
+                pit->un_pend();
+            }
+        }
+    } else {
+        for (auto pit = ports.begin();pit != ports.end(); pit++) {
             pit->pull_param_cv(module);
             if (pit->pending()) {
                 pit->send(module->chem_host, client_tag);
             }
-            pit++;
         }
-//    }
+    }
 }
 
 void Modulation::pull_mod_amount()
