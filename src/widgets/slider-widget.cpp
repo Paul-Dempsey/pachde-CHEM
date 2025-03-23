@@ -3,109 +3,24 @@ using namespace ::rack;
 
 namespace pachde {
 
-void SliderBase::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e)
-{
-    if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT)
-    {
-        auto pq = getParamQuantity();
-        if (pq)
-        {
-            bool plain = (e.action != GLFW_REPEAT) && ((e.mods & RACK_MOD_MASK) == 0);
-            bool shift = e.mods & GLFW_MOD_SHIFT;
-            // bool ctrl = e.mods & GLFW_MOD_CONTROL;
-            switch (e.key)
-            {
-            case GLFW_KEY_0: case GLFW_KEY_1: case GLFW_KEY_2: case GLFW_KEY_3: case GLFW_KEY_4:
-            case GLFW_KEY_5: case GLFW_KEY_6: case GLFW_KEY_7: case GLFW_KEY_8: case GLFW_KEY_9:
-                pq->setValue(rescale((e.key - GLFW_KEY_0), 0.f, 9.f, pq->getMinValue(), pq->getMaxValue()));
-                e.consume(this);
-                break;
-
-            case GLFW_KEY_HOME:
-                if (plain) {
-                    pq->setValue(pq->getMaxValue());
-                    e.consume(this);
-                }
-                break;
-            case GLFW_KEY_END:
-                if (plain) {
-                    pq->setValue(pq->getMinValue());
-                    e.consume(this);
-                }
-                break;
-            case GLFW_KEY_UP:
-                pq->setValue(pq->getValue() + increment * (shift ? 10.f : 1.f));
-                e.consume(this);
-                break;
-            case GLFW_KEY_DOWN:
-                pq->setValue(pq->getValue() - increment * (shift ? 10.f : 1.f));
-                e.consume(this);
-                break;
-            case GLFW_KEY_PAGE_UP:
-                pq->setValue(pq->getValue() + increment * 10.f);
-                e.consume(this);
-                break;
-            case GLFW_KEY_PAGE_DOWN:
-                pq->setValue(pq->getValue() - increment * 10.f);
-                e.consume(this);
-                break;
-            }
-        }
-    }
-    if (e.isConsumed())
-        return;
-    Base::onSelectKey(e);
+// v-slider boilerplate
+void SliderBase::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e) {
+    slider_impl::onSelectKey<SliderBase, Base>(this, e);
 }
-
-void SliderBase::onHoverScroll(const rack::widget::Widget::HoverScrollEvent & e)
-{
-    auto pq = getParamQuantity();
-    if (pq) {
-        auto dx = e.scrollDelta;
-        auto mods = APP->window->getMods();
-        if (dx.y < 0.f) {
-            pq->setValue(pq->getValue() - increment * ((mods & GLFW_MOD_SHIFT) ? 10.f : 1.f));
-        } else if (dx.y > 0.f) {
-            pq->setValue(pq->getValue() + increment * ((mods & GLFW_MOD_SHIFT) ? 10.f : 1.f));
-        }
-        e.consume(this);
-    } else {
-        Base::onHoverScroll(e);
-    }
+void SliderBase::onHoverScroll(const rack::widget::Widget::HoverScrollEvent & e) {
+    slider_impl::onHoverScroll<SliderBase, Base>(this, e);
 }
-
-void SliderBase::onButton(const rack::widget::Widget::ButtonEvent &e)
-{
-    if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-        e.consume(this);
-        auto pq = getParamQuantity();
-        if (pq) {
-            float v = box.size.y - shrinky - e.pos.y;
-            v = rescale(v, 0.f, box.size.y, pq->getMinValue(), pq->getMaxValue());
-            pq->setValue(v);
-        }
-    } else {
-        Base::onButton(e);
-    }
+void SliderBase::onButton(const rack::widget::Widget::ButtonEvent &e) {
+    slider_impl::onButton<SliderBase, Base>(this, e);
 }
-
-void SliderBase::onHover(const HoverEvent &e)
-{
-    Base::onHover(e);
-    e.consume(this);
+void SliderBase::onHover(const HoverEvent &e) {
+    slider_impl::onHover<SliderBase, Base>(this, e);
 }
-
-void SliderBase::onEnter(const EnterEvent& e)
-{
-    APP->event->setSelectedWidget(this);
-    e.consume(this);
-    Base::onEnter(e);
+void SliderBase::onEnter(const EnterEvent& e) {
+    slider_impl::onEnter<SliderBase, Base>(this, e);
 }
-
-void SliderBase::onLeave(const LeaveEvent& e)
-{
-    APP->event->setSelectedWidget(nullptr);
-    Base::onLeave(e);
+void SliderBase::onLeave(const LeaveEvent& e) {
+    slider_impl::onLeave<SliderBase, Base>(this, e);
 }
 
 // ----  BasicSlider  ---------------------------

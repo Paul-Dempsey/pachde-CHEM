@@ -12,7 +12,10 @@
             "title": {"fill": "brand" },
             "th": {"stroke": "brand" },
 
+            "setting": { "fill": " hsl(60, 50%, 60%)" },
             "div": {"stroke": " #606060"},
+
+            "fb-dir": { "fill": "#cf7917" },
 
             "k#": { "fill": "#4095bf" },
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #bfbfbf"}, { "index":1, "color":" #202020"}]}},

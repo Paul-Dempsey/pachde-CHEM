@@ -24,20 +24,20 @@ MacroModule::MacroModule() :
 
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
-    configLight(L_M1a, "Modulation amount on M1");
-    configLight(L_M2a, "Modulation amount on M2");
-    configLight(L_M3a, "Modulation amount on M3");
-    configLight(L_M4a, "Modulation amount on M4");
-    configLight(L_M5a, "Modulation amount on M5");
-    configLight(L_M6a, "Modulation amount on M6");
+    configLight(L_M1, "Modulation amount on M1");
+    configLight(L_M2, "Modulation amount on M2");
+    configLight(L_M3, "Modulation amount on M3");
+    configLight(L_M4, "Modulation amount on M4");
+    configLight(L_M5, "Modulation amount on M5");
+    configLight(L_M6, "Modulation amount on M6");
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(P_M1, IN_M1, L_M1a,  Haken::ch1, Haken::ccI),
-        EmccPortConfig::cc(P_M2, IN_M2, L_M2a,  Haken::ch1, Haken::ccII),
-        EmccPortConfig::cc(P_M3, IN_M3, L_M3a,  Haken::ch1, Haken::ccIII),
-        EmccPortConfig::cc(P_M4, IN_M4, L_M4a,  Haken::ch1, Haken::ccIV),
-        EmccPortConfig::cc(P_M5, IN_M5, L_M5a,  Haken::ch1, Haken::ccV),
-        EmccPortConfig::cc(P_M6, IN_M6, L_M6a,  Haken::ch1, Haken::ccVI)
+        EmccPortConfig::cc(P_M1, IN_M1, L_M1,  Haken::ch1, Haken::ccI),
+        EmccPortConfig::cc(P_M2, IN_M2, L_M2,  Haken::ch1, Haken::ccII),
+        EmccPortConfig::cc(P_M3, IN_M3, L_M3,  Haken::ch1, Haken::ccIII),
+        EmccPortConfig::cc(P_M4, IN_M4, L_M4,  Haken::ch1, Haken::ccIV),
+        EmccPortConfig::cc(P_M5, IN_M5, L_M5,  Haken::ch1, Haken::ccV),
+        EmccPortConfig::cc(P_M6, IN_M6, L_M6,  Haken::ch1, Haken::ccVI)
     };
     modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 }
@@ -83,23 +83,12 @@ std::string MacroModule::client_claim() { return device_claim; }
 
 void MacroModule::onConnectHost(IChemHost* host)
 {
-    chem_host = host;
-    if (!host) {
-        device_claim = "";
-        if (chem_ui) ui()->onConnectHost(nullptr);
-        return;
-    }
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    if (conn) {
-        device_claim = conn->info.claim();
-    }
-    if (chem_ui) ui()->onConnectHost(host);
+    onConnectHostModuleImpl(this, host);
 }
 
 void MacroModule::onPresetChange()
 {
     if (chem_host) {
-        if (chem_host->host_busy()) return;
         auto preset = chem_host->host_preset();
         if (preset) {
             macro_names.fill_macro_names();
@@ -123,7 +112,7 @@ void MacroModule::do_message(PackedMidiMessage message)
     auto cc = midi_cc(message);
     switch (cc) {
 
-    case Haken::ccFracPed:
+    case Haken::ccFracIM48:
         macro_lsb = midi_cc_value(message);
         break;
 

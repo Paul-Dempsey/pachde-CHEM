@@ -1,12 +1,13 @@
 # CHEM To-Do
 
 - Global settings module(s) (poly/mpe, mono, routing, surface, ...)
-- Kinetic module
 - Overlay macro system modules
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
-- Listen for new 10.50 Mahling start/end signals for busy detection
-- Decode category info for preset desciption tooltip
+- Decode category info for preset desciption tooltip (started)
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)
+- **Play**: sorting: alpha, id, category
+- Allow shared controllers
+- Cleanup unused warning labels
 
 ## Before release
 
@@ -23,6 +24,7 @@
 
 ## Consider
 
+- Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)
 - Blinking or highlighted link button when not connected
 - Play: Plugin scope for history (at least for last folder)
 - Setting files (surface, rounding, polyphony)

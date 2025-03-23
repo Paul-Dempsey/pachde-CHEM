@@ -10,6 +10,7 @@
             "CHEM": {"fill": "brand"},
             "pachde": {"fill": "brand"},
             "title": {"fill": "brand" },
+            "setting": { "fill": " hsl(60, 50%, 60%)" },
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
             "div": { "stroke": "#387390" },

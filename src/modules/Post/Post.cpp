@@ -76,7 +76,7 @@ void PostModule::do_message(PackedMidiMessage message)
 
     int param = -1;
     switch (midi_cc(message)) {
-    case Haken::ccFracPed:
+    case Haken::ccFracIM48:
         cc_lsb = midi_cc_value(message);
         return;
 
@@ -103,17 +103,7 @@ std::string PostModule::client_claim() { return device_claim; }
 
 void PostModule::onConnectHost(IChemHost* host)
 {
-    chem_host = host;
-    if (!host) {
-        device_claim = "";
-        if (chem_ui) ui()->onConnectHost(nullptr);
-        return;
-    }
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    if (conn) {
-        device_claim = conn->info.claim();
-    }
-    if (chem_ui) ui()->onConnectHost(host);
+    onConnectHostModuleImpl(this, host);
 }
 
 void PostModule::onPresetChange()
@@ -124,7 +114,7 @@ void PostModule::onPresetChange()
 }
 
 void PostModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
+{ 
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
@@ -153,7 +143,7 @@ void PostModule::sync_mute()
         muted = new_mute;
         auto haken = chem_host->host_haken();
         if (muted) {
-            haken->control_change(ChemId::Post, Haken::ch1, Haken::ccFracPed, 0);
+            haken->control_change(ChemId::Post, Haken::ch1, Haken::ccFracIM48, 0);
             haken->control_change(ChemId::Post, Haken::ch1, Haken::ccPost, 0);
         } else {
             modulation.get_port(P_POST_LEVEL).send(chem_host, ChemId::Post, true);

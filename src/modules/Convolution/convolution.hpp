@@ -15,7 +15,9 @@ struct ConvolutionParams
 
     ConvolutionParams();
 
-    uint8_t get_pre_index() { return data[Haken::id_c_idx1]; }
+	void set_default();
+
+	uint8_t get_pre_index() { return data[Haken::id_c_idx1]; }
     uint8_t get_pre_mix() { return data[Haken::id_c_mix1]; }
     uint8_t get_post_index() { return data[Haken::id_c_idx2]; }
     uint8_t get_post_mix() { return data[Haken::id_c_mix2]; }
@@ -100,6 +102,7 @@ struct ConvolutionParams
     uint8_t get_phase_cancellation () { return data[Haken::id_c_phc]; }
     void set_phase_cancellation (uint8_t value) { data[Haken::id_c_phc] = value; }
 
+	// Same signature as IDoMidi, but no need for a virtual fn here
     void do_message(PackedMidiMessage message);
 };
 

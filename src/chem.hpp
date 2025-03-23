@@ -85,3 +85,26 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback);
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback);
+
+template <typename TModule>
+void onConnectHostModuleImpl(TModule* self, IChemHost* host)
+{
+    self->chem_host = host;
+    if (host) {
+        auto conn = host->host_connection(ChemDevice::Haken);
+        if (conn) {
+            self->device_claim = conn->info.claim();
+        }
+    } else {
+        self->device_claim = "";
+    }
+    if (self->chem_ui) self->ui()->onConnectHost(host);
+}
+
+template <typename TModuleWidget>
+void onConnectionChangeUiImpl(TModuleWidget* self, ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
+{
+    if (device != ChemDevice::Haken) return;
+    self->haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : "[not connected]");
+    self->haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : "[not connected]");
+}

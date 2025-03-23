@@ -11,6 +11,7 @@ EaganMatrix::EaganMatrix()
     in_preset(false),
     in_user(false),
     in_system(false),
+    in_mahling(false),
     pending_EditorReply(false),
     pending_config(false),
     frac_hi(false),
@@ -143,6 +144,25 @@ void EaganMatrix::notifySystemComplete()
         }
     }
 }
+
+void EaganMatrix::notifyMahlingBegin()
+{
+    for (auto client : clients) {
+        if (client->em_event_mask & IHandleEmEvents::MahlingBegin) {
+            client->onMahlingBegin();
+        }
+    }
+}
+
+void EaganMatrix::notifyMahlingComplete()
+{
+    for (auto client : clients) {
+        if (client->em_event_mask & IHandleEmEvents::MahlingComplete) {
+            client->onMahlingComplete();
+        }
+    }
+}
+
 void EaganMatrix::notifyTaskMessage(uint8_t code)
 {
     for (auto client : clients) {
@@ -220,28 +240,28 @@ bool EaganMatrix::handle_macro_cc(uint8_t cc, uint8_t value)
 
 void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
 {
-    if (Haken::ccFracPedEx == cc) {
+    if (Haken::ccFracM49M90 == cc) {
         frac_hi = true;
         frac_lsb = value;
         return;
     }
-    if (Haken::ccFracPed == cc) {
+    if (Haken::ccFracIM48 == cc) {
         frac_hi = false;
         frac_lsb = value;
         return;
     }
     if (get_jack_1_assign() == cc) {
-        jack_1 = (value << 7) + ch1.pedal_fraction();
+        jack_1 = (value << 7) + ch1.macro_fraction_lo();
     }
     if (get_jack_2_assign() == cc) {
-        jack_2 = (value << 7) + ch1.pedal_fraction();
+        jack_2 = (value << 7) + ch1.macro_fraction_lo();
     }
 
     if (handle_macro_cc(cc, value)) {
         return;
     }
     if (Haken::ccPost == cc) {
-        this->post = (value << 7) + ch1.pedal_fraction();
+        this->post = (value << 7) + ch1.macro_fraction_lo();
     }
 }
 
@@ -253,10 +273,10 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     // Other assigned ccs come to channel 1.
 
     if (get_jack_1_assign() == cc) {
-        jack_1 = (value << 7) + ch16.pedal_fraction();
+        jack_1 = (value << 7) + ch16.macro_fraction_lo();
     }
     if (get_jack_2_assign() == cc) {
-        jack_2 = (value << 7) + ch16.pedal_fraction();
+        jack_2 = (value << 7) + ch16.macro_fraction_lo();
     }
 
     switch (cc) {
@@ -359,6 +379,19 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         case Haken::beginSysNames:
             in_system = true;
             notifySystemBegin();
+            break;
+        case Haken::remakeSRMahl:
+            if (in_mahling) { // pre-10.50
+                in_mahling = false;
+                notifyMahlingComplete();
+            } else {
+                in_mahling = true;
+                notifyMahlingBegin();
+            }
+            break;
+        case Haken::doneSRMahl:
+            in_mahling = false;
+            notifyMahlingComplete();
             break;
         }
         break;

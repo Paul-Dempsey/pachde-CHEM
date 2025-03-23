@@ -3,10 +3,11 @@
 #include <rack.hpp>
 #include <string>
 #include "misc.hpp"
+#include "../chem-id.hpp"
+
 namespace pachde {
 
 const char CLAIM_SEPARATOR = '~';
-struct MidiDeviceHolder; // forward reference
 
 enum class TextFormatLength { Short, Long, Compact, Abbreviated };
 bool ExcludeDriver(const std::string & name);
@@ -69,26 +70,16 @@ struct MidiDeviceConnection
     : driver_id(-1), input_device_id(-1), output_device_id(-1)
     {}
 
-    void clear_ids() {
-        driver_id = input_device_id = output_device_id = -1;
-    }
-
     bool identified() const {
         return driver_id >= 0
             && input_device_id >= 0
             && output_device_id >= 0;
     }
-
-    bool is_same_connection(std::shared_ptr<MidiDeviceConnection> other) const {
-        return 0 == info.claim().compare(other->info.claim());
-    }
 };
 
 std::vector<std::shared_ptr<MidiDeviceConnection>> EnumerateMidiConnections(bool emOnly);
 
-struct IMidiDeviceNotify {
-    virtual void onMidiDeviceChange(const MidiDeviceHolder* source) = 0;
-};
+struct IMidiDeviceNotify;
 
 struct MidiDeviceHolder
 {
@@ -97,16 +88,23 @@ struct MidiDeviceHolder
 
     std::shared_ptr<MidiDeviceConnection> connection;
     std::string device_claim;
+    ChemDevice device_role;
     IMidiDeviceNotify * client;
 
-    MidiDeviceHolder() : connection(nullptr), client(nullptr) {}
-    const std::string & getClaim() { return device_claim; }
+    MidiDeviceHolder() : connection(nullptr), device_role(ChemDevice::Unknown), client(nullptr) {}
+    void init(ChemDevice role, IMidiDeviceNotify *client) { device_role = role; subscribe(client); }
+    ChemDevice role() const { return device_role; }
+    const std::string & getClaim() const { return device_claim; }
     void setClaim(const std::string &claim) { device_claim = claim; }
     void notifyChanged();
     void clear();
     void connect(std::shared_ptr<MidiDeviceConnection> connection);
     void subscribe(IMidiDeviceNotify *client);
     void unsubscribe(IMidiDeviceNotify *client);
+};
+
+struct IMidiDeviceNotify {
+    virtual void onMidiDeviceChange(const MidiDeviceHolder* source) = 0;
 };
 
 struct MidiDeviceBroker

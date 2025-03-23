@@ -20,9 +20,16 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
     MacroUi* ui() { return reinterpret_cast<MacroUi*>(chem_ui); }
 
     enum Params {
-        P_M1, P_M2, P_M3, P_M4, P_M5, P_M6,
-        P_MOD_AMOUNT, NUM_MOD_PARAMS = P_MOD_AMOUNT,
-        NUM_PARAMS, NUM_KNOBS = NUM_PARAMS
+        P_M1,
+        P_M2,
+        P_M3,
+        P_M4,
+        P_M5,
+        P_M6,
+        P_MOD_AMOUNT, 
+        NUM_PARAMS, 
+        NUM_MOD_PARAMS = P_MOD_AMOUNT,
+        NUM_KNOBS = NUM_PARAMS
     };
     enum Inputs {
         IN_INVALID = -1,
@@ -35,7 +42,14 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
         NUM_INPUTS
     };
     enum Outputs { NUM_OUTPUTS };
-    enum Lights { L_M1a, L_M2a, L_M3a, L_M4a, L_M5a, L_M6a, NUM_LIGHTS };
+    enum Lights {
+        L_M1,
+        L_M2,
+        L_M3,
+        L_M4,
+        L_M5,
+        L_M6,
+        NUM_LIGHTS };
 
     std::string device_claim;
     PresetMacro macro_names;
@@ -82,7 +96,6 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
 // -- Macro UI -----------------------------------
 
 struct MacroMenu;
-constexpr const int PLAYLIST_LENGTH = 15;
 
 struct MacroUi : ChemModuleWidget, IChemClient
 {
@@ -111,9 +124,6 @@ struct MacroUi : ChemModuleWidget, IChemClient
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
     TrackWidget* tracks[MacroModule::NUM_KNOBS];
-#ifdef LAYOUT_HELP
-    bool layout_hinting{false};
-#endif
 
     MacroUi(MacroModule *module);
 
@@ -121,6 +131,8 @@ struct MacroUi : ChemModuleWidget, IChemClient
     void glowing_knobs(bool glow);
     void center_knobs();
 
+    void unconnected_ui();
+    
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }

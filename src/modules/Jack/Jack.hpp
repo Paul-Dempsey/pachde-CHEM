@@ -3,6 +3,7 @@
 #include "../../chem.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/selector-widget.hpp"
 #include "../../widgets/symbol-set.hpp"
@@ -87,8 +88,7 @@ struct JackUi : ChemModuleWidget, IChemClient
     JackModule* my_module{nullptr};
 
     LinkButton*   link_button{nullptr};
-    TipLabel*     haken_device_label{nullptr};
-    TipLabel*     warning_label{nullptr};
+    IndicatorWidget* link{nullptr};
 
     TextLabel* assign_1_label;
     TextLabel* assign_2_label;

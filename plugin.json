@@ -120,6 +120,15 @@
         "Expander"
       ]
     },
+    {
+      "slug": "chem-settings",
+      "name": "CHEM Settings",
+      "description": "CHEM Settings for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
+    },
    {
       "slug": "chem-preset",
       "name": "CHEM Preset",

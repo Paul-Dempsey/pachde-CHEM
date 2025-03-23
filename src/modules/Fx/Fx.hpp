@@ -105,7 +105,6 @@ struct FxModule : ChemModule, IChemClient, IDoMidi
 // -- Fx UI -----------------------------------
 
 struct FxMenu;
-constexpr const int PLAYLIST_LENGTH = 15;
 
 struct FxUi : ChemModuleWidget, IChemClient
 {
@@ -115,7 +114,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     FxModule*   my_module{nullptr};
 
     LinkButton* link_button{nullptr};
-    TipLabel*   haken{nullptr};
+    TipLabel*   haken_device_label{nullptr};
     TipLabel*   warn{nullptr};
 
     SelectorWidget* selector{nullptr};

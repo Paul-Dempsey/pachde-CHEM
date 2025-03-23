@@ -23,15 +23,15 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
         if (!low_resolution) {
             uint8_t lo = em_value & 0x7f;
             if (lo) {
-                haken->control_change(tag, channel_stream, Haken::ccFracPed, lo);
+                haken->control_change(tag, channel_stream, Haken::ccFracIM48, lo);
             }
         }
-        haken->control_change(tag, channel_stream, cc_id, em_value >> 7);
+        haken->control_change(tag, channel_stream, cc_id, em_low());
         break;
 
     case PortKind::Stream:
         haken->begin_stream(tag, channel_stream);
-        haken->stream_data(tag, cc_id, em_value >> 7);
+        haken->stream_data(tag, cc_id, em_low());
         //haken->end_stream(tag); // supposedly optional
         break;
 
@@ -177,9 +177,9 @@ void Modulation::sync_send()
 {
     if (!module->chem_host) return;
     if (have_stream) {
-        uint8_t stream = INVALID_STREAM;
-        auto haken = module->chem_host->host_haken();
-        assert(haken);
+        uint8_t stream{INVALID_STREAM};
+        std::vector<PackedMidiMessage> stream_data;
+
         // pass 1: send all plain CCs and capture stream
         for (auto pit = ports.begin(); pit != ports.end(); pit++) {
             switch (pit->kind) {
@@ -196,8 +196,14 @@ void Modulation::sync_send()
             case PortKind::Stream:
                 if (stream == INVALID_STREAM) {
                     stream = pit->channel_stream;
+                    stream_data.push_back(Tag(MakeCC(Haken::ch16, Haken::ccStream, stream), client_tag));
                 } else {
                     assert(stream == pit->channel_stream); // multiple streams in one modulation not implemented
+                }
+                pit->pull_param_cv(module);
+                if (pit->pending()) {
+                    stream_data.push_back(Tag(MakePolyKeyPressure(Haken::ch16, pit->cc_id, pit->em_low()), client_tag));
+                    pit->un_pend();
                 }
                 break;
 
@@ -205,15 +211,13 @@ void Modulation::sync_send()
                 assert(false);
             }
         }
-        // pass 2: send pending data in stream
+        // pass 2: send pending data stream
         assert (stream != INVALID_STREAM);
-        haken->begin_stream(client_tag, stream);
-        for (auto pit = ports.begin(); pit != ports.end(); pit++) {
-            if (!pit->is_stream_poke()) continue;
-            pit->pull_param_cv(module);
-            if (pit->pending()) {
-                haken->stream_data(client_tag, pit->cc_id, pit->em_value >> 7);
-                pit->un_pend();
+        if (stream_data.size() > 1) { // always have the stream start
+            auto haken{module->chem_host->host_haken()};
+            assert(haken);
+            for (auto msg : stream_data) {
+                haken->send_message(msg);
             }
         }
     } else {

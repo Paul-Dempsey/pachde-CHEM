@@ -56,6 +56,7 @@ const WidgetInfo& param_info(int param_id) { return widget_info[info_index[param
 
 ConvoModule::ConvoModule() :
     modulation(this, ChemId::Convo),
+    init_from_em(false),
     glow_knobs(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
@@ -165,28 +166,31 @@ json_t* ConvoModule::dataToJson()
 
 void ConvoModule::params_from_internal()
 {
-    // getParam(P_LENGTH).setValue(unipolar_7_to_rack(conv.get_ir_length(conv_number)));
-    // getParam(P_PRE_MIX).setValue(unipolar_7_to_rack(conv.get_pre_mix()));
-    // getParam(P_PRE_INDEX).setValue(unipolar_7_to_rack(conv.get_pre_index()));
-    // getParam(P_POST_MIX).setValue(unipolar_7_to_rack(conv.get_post_mix()));
-    // getParam(P_POST_INDEX).setValue(unipolar_7_to_rack(conv.get_post_index()));
-    // getParam(P_TUNING).setValue(unipolar_7_to_rack(conv.get_ir_shift(conv_number)));
-    // getParam(P_WIDTH).setValue(unipolar_7_to_rack(conv.get_ir_width(conv_number)));
-    // getParam(P_LEFT).setValue(unipolar_7_to_rack(conv.get_ir_left(conv_number)));
-    // getParam(P_RIGHT).setValue(unipolar_7_to_rack(conv.get_ir_right(conv_number)));
+    for (auto pit = modulation.ports.begin(); pit != modulation.ports.end(); pit++) {
+        pit->set_em_and_param_low(conv.data[pit->cc_id]);
+    }
 }
 
 void ConvoModule::update_from_em()
 {
-    auto em = chem_host->host_matrix();
-    memcpy(conv.data, em->conv, 30);
-    params_from_internal();
+    if (chem_host && chem_host->host_preset()) {
+        auto em = chem_host->host_matrix();
+        memcpy(conv.data, em->conv, 30);
+        params_from_internal();
+        init_from_em = true;
+    } else {
+        conv.set_default();
+        params_from_internal();
+        init_from_em = false;
+    }
 }
 
 void ConvoModule::do_message(PackedMidiMessage message)
 {
     if (as_u8(ChemId::Convo) == message.bytes.tag) return;
-    conv.do_message(message);
+    if (init_from_em) {
+        conv.do_message(message);
+    }
 }
 
 // IChemClient
@@ -195,17 +199,11 @@ std::string ConvoModule::client_claim() { return device_claim; }
 
 void ConvoModule::onConnectHost(IChemHost* host)
 {
-    chem_host = host;
-    if (!host) {
-        device_claim = "";
-        if (chem_ui) ui()->onConnectHost(nullptr);
-        return;
+    init_from_em = false;
+    onConnectHostModuleImpl(this, host);
+    if (!chem_host) {
+        conv.set_default();
     }
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    if (conn) {
-        device_claim = conn->info.claim();
-    }
-    if (chem_ui) ui()->onConnectHost(host);
 }
 
 void ConvoModule::onPresetChange()
@@ -216,6 +214,10 @@ void ConvoModule::onPresetChange()
 
 void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
+    if (ChemDevice::Haken == device) {
+        init_from_em = false;
+        onPresetChange();
+    }
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
@@ -237,7 +239,7 @@ void ConvoModule::process(const ProcessArgs& args)
     find_and_bind_host(this, args);
     if (!chem_host || chem_host->host_busy()) return;
 
-    if (modulation.sync_params_ready(args)) {
+    if (init_from_em && modulation.sync_params_ready(args)) {
         modulation.sync_send();
     }
     if (0 == ((args.frame + id) % 45)) {

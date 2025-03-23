@@ -72,6 +72,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
 
     std::string device_claim;
     Modulation modulation;
+    bool init_from_em;
     bool glow_knobs;
 
     ConvolutionParams conv;
@@ -155,6 +156,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
 
     void step() override;
     void onHoverKey(const HoverKeyEvent &e) override;
+    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

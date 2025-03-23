@@ -203,18 +203,12 @@ void ConvoUi::setThemeName(const std::string& name, void * context)
 void ConvoUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-    } else {
-        haken_device_label->text(S::NotConnected);
-    }
+    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
 }
 
 void ConvoUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    onConnectionChangeUiImpl(this, device, connection);
 }
 
 void ConvoUi::step()
@@ -260,6 +254,18 @@ void ConvoUi::onHoverKey(const HoverKeyEvent &e)
         }
     }
     Base::onHoverKey(e);
+}
+
+void ConvoUi::draw(const DrawArgs &args)
+{
+    Base::draw(args);
+    if (!my_module) return;
+    Vec pos{15.f,18.f};
+    if (my_module->init_from_em) {
+        Circle(args.vg, VEC_ARGS(pos), 2, PORT_GREEN);
+    } else {
+        OpenCircle(args.vg, VEC_ARGS(pos), 2, RampGray(Ramp::G_45));
+    }
 }
 
 void ConvoUi::appendContextMenu(Menu *menu)

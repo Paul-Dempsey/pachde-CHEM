@@ -165,7 +165,7 @@ PlayUi::PlayUi(PlayModule *module) :
     style.key = "curpreset";
     style.height = 14.f;
     style.bold = true;
-    addChild(live_preset_label = createLabel<TextLabel>(
+    addChild(live_preset_label = createLabel<TipLabel>(
         Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
     live_preset_label->glowing(true);
 
@@ -547,10 +547,10 @@ void PlayUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
     if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
+        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
     } else {
-        haken_device_label->text(S::NotConnected);
+        onConnectionChange(ChemDevice::Haken, nullptr);
         live_preset_label->text("");
     }
 }
@@ -866,8 +866,10 @@ void PlayUi::onPresetChange()
             live_preset = nullptr;
         }
         live_preset_label->text(preset ? printable(preset->name) : "");
+        live_preset_label->describe(preset ? printable(preset->text) : "");
     } else {
         live_preset_label->text("");
+        live_preset_label->describe("(none)");
     }
 
     if (live_preset && my_module->track_live) {
@@ -948,9 +950,7 @@ void PlayUi::on_fill_complete()
 
 void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    onConnectionChangeUiImpl(this, device, connection);
     check_playlist_device();
 }
 
@@ -1113,6 +1113,20 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
             select_none();
         }
     } break;
+
+    case GLFW_KEY_HOME:
+        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
+            e.consume(this);
+            scroll_to(0, true);
+        }
+        break;
+
+    case GLFW_KEY_END:
+        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
+            e.consume(this);
+            page_down(true, false, true);
+        }
+        break;
 
     case GLFW_KEY_PAGE_UP: 
         if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {

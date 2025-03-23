@@ -22,6 +22,7 @@ extern Model* modelJack;
 extern Model* modelSustain;
 extern Model* modelSostenuto;
 extern Model* modelSostenuto2;
+extern Model* modelSettings;
 extern Model* modelPreset;
 
 // Theming

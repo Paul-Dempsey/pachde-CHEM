@@ -20,6 +20,8 @@ struct IHandleEmEvents {
         SystemComplete   = 1 << 7,
         TaskMessage      = 1 << 8,
         LED              = 1 << 9,
+        MahlingBegin     = 1 << 10,
+        MahlingComplete  = 1 << 11,
 
         All = LoopDetect
             + EditorReply
@@ -31,6 +33,8 @@ struct IHandleEmEvents {
             + SystemComplete
             + TaskMessage
             + LED
+            + MahlingBegin
+            + MahlingComplete
     };
     uint16_t em_event_mask{EventMask::All};
 
@@ -42,6 +46,8 @@ struct IHandleEmEvents {
     virtual void onUserComplete() {}
     virtual void onSystemBegin() {}
     virtual void onSystemComplete() {}
+    virtual void onMahlingBegin() {}
+    virtual void onMahlingComplete() {}
     virtual void onTaskMessage(uint8_t code) {}
     virtual void onLED(uint8_t led) {}
 };
@@ -49,8 +55,8 @@ struct IHandleEmEvents {
 struct ChannelData
 {
     uint8_t cc[128]{0};
-    uint8_t pedal_fraction() { return cc[Haken::ccFracPed]; }
-    uint8_t pedal_fraction_ex() { return cc[Haken::ccFracPedEx]; }
+    uint8_t macro_fraction_lo() { return cc[Haken::ccFracIM48]; }
+    uint8_t macro_fraction_hi() { return cc[Haken::ccFracM49M90]; }
     void clear() { std::memset(cc, 0, 128); }
 };
 
@@ -65,12 +71,22 @@ struct EaganMatrix
     bool in_preset;
     bool in_user;
     bool in_system;
+    bool in_mahling;
     bool pending_EditorReply;
     bool pending_config;
     bool frac_hi;
     uint8_t frac_lsb;
     int data_stream;
 
+    bool busy() {
+        return in_preset
+            || in_user
+            || in_system
+            || in_mahling
+            || pending_config
+            //|| data_stream != -1
+            ;
+    }
     // raw channel cc data
     ChannelData ch1;
     ChannelData ch2;
@@ -108,6 +124,7 @@ struct EaganMatrix
     uint8_t get_pedal_types() { return ch16.cc[Haken::ccPedType]; }
     uint8_t get_octave_shift() { return ch1.cc[Haken::ccOctShift]; }
     uint8_t get_mono_switch() { return ch1.cc[Haken::ccMonoSwitch]; }
+    uint8_t get_mono_on() { return ch1.cc[Haken::ccMonoOn]; }
     uint8_t get_fine_tune() { return ch1.cc[Haken::ccFineTune]; }
 
     uint8_t get_pre() { return ch1.cc[Haken::ccPre]; } // 14-bit?
@@ -283,6 +300,8 @@ struct EaganMatrix
     void notifyUserComplete();
     void notifySystemBegin();
     void notifySystemComplete();
+    void notifyMahlingBegin();
+    void notifyMahlingComplete();
     void notifyTaskMessage(uint8_t code);
     void notifyLED(uint8_t led);
 

@@ -53,7 +53,7 @@ inline bool is_note_cc(uint8_t cc)
     case Haken::ccVol:
     case Haken::ccExpres:
     case Haken::ccBrightness:
-    case Haken::ccFrac:
+    case Haken::ccFracXYZ:
         return true;
     default:
         return false;

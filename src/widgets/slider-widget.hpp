@@ -1,17 +1,12 @@
 #pragma once
-#include <rack.hpp>
-#include "../services/colors.hpp"
-#include "../services/svt_rack.hpp"
-#include "element-style.hpp"
-
-using namespace ::rack;
-using namespace ::svg_theme;
+#include "slider-common.hpp"
 
 namespace pachde {
-
+    
 struct SliderBase : Knob
 {
     using Base = Knob;
+    static const Axis axis{Axis::Y};
     float shrinky = 2.f;
     float increment = 10.f / 127.f;
 
@@ -36,11 +31,11 @@ struct BasicSlider : SliderBase, IApplyTheme
     ElementStyle stem;
     ElementStyle thumb;
     ElementStyle mod;
-    float mod_value{std::nanf("")};
+    float mod_value{NAN};
 
     BasicSlider();
 
-    void unmodulate() { mod_value = std::nanf(""); }
+    void unmodulate() { mod_value = NAN; }
     void set_modulation(float mod) { mod_value = mod; }
     float thumb_pos();
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;

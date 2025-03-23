@@ -79,18 +79,18 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 {
     using Base = ChemModuleWidget;
 
-    IChemHost*       chem_host{nullptr};
-    PlayModule*      my_module{nullptr};
-    LinkButton*      link_button{nullptr};
-    UpButton *       up_button{nullptr};
-    DownButton*      down_button{nullptr};
-    PlayMenu*        play_menu{nullptr};
-    TipLabel*        haken_device_label{nullptr};
-    TipLabel*        playlist_label{nullptr};
-    TextLabel* page_label{nullptr};
-    TextLabel* live_preset_label{nullptr};
-    TipLabel*        warning_label{nullptr};
-    Blip*            blip{nullptr};
+    IChemHost*  chem_host{nullptr};
+    PlayModule* my_module{nullptr};
+    LinkButton* link_button{nullptr};
+    UpButton *  up_button{nullptr};
+    DownButton* down_button{nullptr};
+    PlayMenu*   play_menu{nullptr};
+    TipLabel*   haken_device_label{nullptr};
+    TipLabel*   playlist_label{nullptr};
+    TextLabel*  page_label{nullptr};
+    TipLabel*   live_preset_label{nullptr};
+    TipLabel*   warning_label{nullptr};
+    Blip*       blip{nullptr};
 
     EmHandler* em_handler{nullptr};
     bool gather{false};

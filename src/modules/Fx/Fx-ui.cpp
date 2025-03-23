@@ -30,7 +30,7 @@ FxUi::FxUi(FxModule *module) :
     const float CENTER = PANEL_WIDTH*.5f;
 
     addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 28.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
-    addChild(effect_label = createLabel<TipLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs with labels
     const float DY_KNOB = 60.f;
@@ -72,21 +72,21 @@ FxUi::FxUi(FxModule *module) :
     // inputs
     const NVGcolor co_port = PORT_CORN;
     const float PORT_LEFT = CENTER - (1.5f*S::PORT_DX);
-
+    const float label_width = 20.f;
     y = S::PORT_TOP;
     x = PORT_LEFT;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_MOD_AMOUNT, theme_engine, theme));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "MIX", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, "MIX", theme_engine, theme, S::in_port_label));
     if (my_module){ addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, FxModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     for (int i = 0; i <= K_R6; ++i) {
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
         if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
 
@@ -105,7 +105,7 @@ FxUi::FxUi(FxModule *module) :
     warn->describe("[warning/status]");
     warn->glowing(true);
 
-    addChild(haken = createLabel<TipLabel>(
+    addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
@@ -159,19 +159,12 @@ void FxUi::setThemeName(const std::string& name, void * context)
 void FxUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        //onPresetChange();
-    } else {
-        haken->text(S::NotConnected);
-    }
+    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
 }
 
 void FxUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (device != ChemDevice::Haken) return;
-    haken->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    onConnectionChangeUiImpl(this, device, connection);
 }
 
 bool FxUi::connected() {

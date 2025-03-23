@@ -1,15 +1,13 @@
 // Copyright (C) Paul Chase Dempsey
 #include "label-widget.hpp"
 
-// $TODO: labels need to be cleaned up:
-// - reduce the number of label types
-
 namespace pachde {
 
-BasicTextLabel::BasicTextLabel()
-:   _color(RampGray(G_90)),
+BasicTextLabel::BasicTextLabel() :
+    _color(RampGray(G_90)),
     bright(false)
 {
+    layout_hint_color = Overlay(GetStockColor(StockColor::Yellow), .5f);
 }
 
 // IApplyTheme
@@ -61,6 +59,10 @@ void BasicTextLabel::drawLayer(const DrawArgs& args, int layer)
 void BasicTextLabel::draw(const DrawArgs& args)
 {
     Base::draw(args);
+
+    if (layout_hints) {
+        draw_widget_bounds(this, args);
+    }
 
     if (bright) return;
     render(args);

@@ -81,12 +81,12 @@ MacroUi::MacroUi(MacroModule *module) :
 
     // knob pedal annotations
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m2_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m3_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m4_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m5_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m6_ped_label = createLabel(Vec(x,y), 40.f, "", theme_engine, theme, S::pedal_label));
+    addChild(m1_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m2_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m3_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m4_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m5_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label)); y += MACRO_DY;
+    addChild(m6_ped_label = createLabel(Vec(x,y), 20.f, "", theme_engine, theme, S::pedal_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -107,7 +107,7 @@ MacroUi::MacroUi(MacroModule *module) :
         }
         addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         x += INPUT_DX;
         if (i == 2) {
             y += S::PORT_DY;
@@ -186,19 +186,32 @@ void MacroUi::setThemeName(const std::string& name, void * context)
 void MacroUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        //onPresetChange();
-    } else {
-        haken_device_label->text(S::NotConnected);
-    }
+    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
 }
 
 void MacroUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    onConnectionChangeUiImpl(this, device, connection);
+    if (connection) {
+        onPresetChange();
+    }
+    else {
+        unconnected_ui();
+    }
+}
+
+void MacroUi::unconnected_ui()
+{
+    center_knobs();
+    if (my_module) { my_module->modulation.zero_modulation(); }
+    preset_label->text("");
+    preset_label->describe("[no preset]");
+    m1_label->text("");
+    m2_label->text("");
+    m3_label->text("");
+    m4_label->text("");
+    m5_label->text("");
+    m6_label->text("");
 }
 
 void MacroUi::onPresetChange()
@@ -265,15 +278,6 @@ void MacroUi::step()
         tracks[i]->set_active(my_module->getInput(i).isConnected());
     }
 
-#ifdef LAYOUT_HELP
-    if (hints != layout_hinting) {
-        layout_hinting = hints;
-        for (auto child: children) {
-            auto tr = dynamic_cast<ClickRegion*>(child);
-            if (tr) tr->visible = layout_hinting;
-        }
-    }
-#endif
     if (!chem_host) return;
     auto em = chem_host->host_matrix();
     auto a1 = em->get_jack_1_assign();

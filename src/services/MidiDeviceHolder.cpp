@@ -18,6 +18,7 @@ void MidiDeviceHolder::notifyChanged()
 
 void MidiDeviceHolder::connect(std::shared_ptr<MidiDeviceConnection> connection)
 {
+    assert(ChemDevice::Unknown != device_role);
     this->connection = connection;
     if (connection) {
         // always override claim on connection
@@ -28,6 +29,7 @@ void MidiDeviceHolder::connect(std::shared_ptr<MidiDeviceConnection> connection)
 
 void MidiDeviceHolder::subscribe(IMidiDeviceNotify *client)
 {
+    assert(ChemDevice::Unknown != device_role);
     assert(nullptr == this->client);
     this->client = client;
 }

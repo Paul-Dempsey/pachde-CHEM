@@ -43,7 +43,7 @@ PreUi::PreUi(PreModule *module) :
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
     addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 66.f), my_module, PreModule::P_SELECT, theme_engine, theme));
-    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER + 3.5f, 58.f), 100.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER + 3.5f, 58.f), 90.f, "", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs
     x = CENTER;
@@ -64,17 +64,17 @@ PreUi::PreUi(PreModule *module) :
     y = PARAM_TOP;
     addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_THRESHOLD_DRIVE, theme_engine, theme));
     addChild(tracks[K_THRESH_DRIVE] = createTrackWidget(knobs[K_THRESH_DRIVE], theme_engine, theme));
-    addChild(top_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
+    addChild(top_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
     addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_ATTACK, theme_engine, theme));
     addChild(tracks[K_ATTACK_X] = createTrackWidget(knobs[K_ATTACK_X], theme_engine, theme));
-    addChild(mid_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
+    addChild(mid_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", theme_engine, theme, knob_label_style));
 
     y += PARAM_DY;
     addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), my_module, PreModule::P_RATIO_MAKEUP, theme_engine, theme));
     addChild(tracks[K_RATIO_MAKEUP] = createTrackWidget(knobs[K_RATIO_MAKEUP], theme_engine, theme));
-    addChild(bot_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 100.f, "", theme_engine, theme, knob_label_style));
+    addChild(bot_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", theme_engine, theme, knob_label_style));
 
     // inputs
     auto co_port = PORT_CORN;
@@ -84,20 +84,20 @@ PreUi::PreUi(PreModule *module) :
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35, "LVL", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "LVL", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_PRE_LEVEL_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(in_attack_x = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
+    addChild(in_attack_x = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_ATTACK_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PreModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "MIX", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "MIX", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_MIX_MOD));
 

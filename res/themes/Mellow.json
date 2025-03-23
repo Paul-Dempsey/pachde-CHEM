@@ -12,7 +12,14 @@
             "title": {"fill": "brand" },
             "th": {"stroke": " #e9e862" },
 
-            "sctn": { "fill": { "gradient": [{ "index":0, "color":" #8a7342"}, { "index":1, "color":" #69572f"}]}},
+            "setting": { "fill": " hsl(90, 80%, 10%)" },
+            "fb-dir": { "fill":"rgb(255, 140, 10)"},
+            "checked": { "fill": "#e9e862"},
+            "bracket": { "stroke": "hsl(220, 90%, 20%)" },
+            "sgl": { "stroke": " #cacf83" },
+            "rte": { "stroke": "hsl(220, 90%, 20%)"},
+            "rteh": { "fill": "hsl(220, 90%, 20%)" },
+
             "div": {"stroke": "#312307"},
 
             "k#": { "fill": "hsl(90, 40%, 65%)" },
@@ -78,7 +85,7 @@
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
 
             "in-label":    { "fill": " #a08858"},
-            "ctl-frame":    { "stroke": " #62512c" },
+            "ctl-frame":    { "stroke": "hsl(40, 60%, 20%)" },
             "ctl-glyph":    { "fill": "hsl(41, 75%, 70%)", "stroke": " #edc774" },
             "ctl-disabled": { "fill": "hsl(41, 35%, 35%)", "stroke": "hsl(41, 35%, 35%)" },
             "ctl-hovered":  { "fill": "#ff8060" },

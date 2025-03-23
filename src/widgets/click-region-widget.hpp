@@ -2,30 +2,22 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "../services/colors.hpp"
+#include "layout-help.hpp"
 
 namespace pachde {
 
-struct ClickRegion : Widget
+struct ClickRegion : Widget, ILayoutHelp
 {
     using Base = Widget;
     int identifier;
     int mods;
-#ifdef LAYOUT_HELP
-    bool visible;
-    NVGcolor color;
-    float border_width;
-#endif
     bool enabled;
+
     std::function<void(int, int)> handler;
 
     ClickRegion(int id) :
         identifier(id),
         mods(0),
-#ifdef LAYOUT_HELP
-        visible(false),
-        color(Overlay(GetStockColor(StockColor::Coral), .5f)),
-        border_width(.25f),
-#endif
         enabled(true)
     {
         box.size.x = 0;
@@ -64,13 +56,12 @@ struct ClickRegion : Widget
         }
     }
 
-    #ifdef LAYOUT_HELP
     void draw(const DrawArgs& args) override {
         Base::draw(args);
-        if (!visible) return;
-        FittedBoxRect(args.vg, 0, 0, box.size.x, box.size.y, color, Fit::Inside, border_width);
+        if (layout_hints) {
+            draw_widget_bounds(this, args);
+        }
     }
-    #endif
 };
 
 template <typename TR = ClickRegion>

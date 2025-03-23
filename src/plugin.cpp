@@ -17,6 +17,7 @@ void init(Plugin *p)
 	p->addModel(modelSustain);
 	p->addModel(modelSostenuto);
 	p->addModel(modelSostenuto2);
+	p->addModel(modelSettings);
 	p->addModel(modelPreset);
 }
 
@@ -38,6 +39,7 @@ bool isPeerModule(Module* me, Module* candidate)
 			|| (model == modelSustain)
 			|| (model == modelSostenuto)
 			|| (model == modelSostenuto2)
+			|| (model == modelSettings)
 			|| (model == modelPreset)
 			|| (model == modelBlank)
             // add new models here

@@ -1,5 +1,6 @@
 #include "chem.hpp"
 #include "widgets/logo-widget.hpp"
+#include "widgets/layout-help.hpp"
 
 void ChemModule::setThemeName(const std::string &name, void *)
 {
@@ -210,7 +211,10 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     menu->addChild(createCheckMenuItem(
         "Layout help", "",
         [this]() { return hints; },
-        [this]() { hints = !hints; }));
+        [this]() {
+            hints = !hints;
+            layout_help::enable_children(this, hints);
+        }));
 #endif
 }
 

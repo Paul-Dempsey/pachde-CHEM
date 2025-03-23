@@ -242,14 +242,27 @@ struct DotButtonSvg {
     static std::string down() { return "res/widgets/dot-button-down.svg"; }
 };
 
+struct SurfaceDirectionButtonSvg {
+    static std::string up() { return "res/widgets/surf-dir-up.svg"; }
+    static std::string down() { return "res/widgets/surf-dir-down.svg"; }
+};
+
+struct CheckButtonSvg {
+    static std::string up() { return "res/widgets/check-button-up.svg"; }
+    static std::string down() { return "res/widgets/check-button-down.svg"; }
+};
+
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
+using CheckButton = TButton<CheckButtonSvg>;
 
 using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
 using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
 using DotParamButton = TParamButton<DotButtonSvg>;
+using SurfaceDirectionParamButton = TParamButton<SurfaceDirectionButtonSvg>;
+using CheckParamButton = TParamButton<CheckButtonSvg>;
 
 }

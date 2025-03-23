@@ -80,8 +80,8 @@ JackUi::JackUi(JackModule *module) :
     addChild(createChemKnob<TrimPot>(Vec(12.f, y), my_module, JackModule::P_MIN_JACK_2, theme_engine, theme));
     addChild(createChemKnob<TrimPot>(Vec(32.f, y), my_module, JackModule::P_MAX_JACK_2, theme_engine, theme));
     y += LABEL_DY;
-    addChild(createLabel<TextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
-    addChild(createLabel<TextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(12, y), 15.f, "min", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(32, y), 15.f, "max", theme_engine, theme, knob_label_style));
 
     y += PEDAL_DY;
     pedal_image_2 = new SymbolSetWidget(&symbols);
@@ -92,7 +92,7 @@ JackUi::JackUi(JackModule *module) :
     y += 34.f;
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
         Vec(x, y), my_module, JackModule::P_KEEP, JackModule::L_KEEP, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y+9.f), 80.f, "Keep", theme_engine, theme, S::control_label));
+    addChild(createLabel<TextLabel>(Vec(x, y+9.f), 40.f, "Keep", theme_engine, theme, S::control_label));
 
     // outputs
     auto co_port = PORT_ORANGE;
@@ -100,22 +100,22 @@ JackUi::JackUi(JackModule *module) :
     y = S::PORT_TOP;
 
     addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "1", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", theme_engine, theme, S::in_port_label));
 
     y += S::PORT_DY;
     addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 16, "2", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", theme_engine, theme, S::in_port_label));
 
     // footer
-    addChild(warning_label = createLabel<TipLabel>(
-        Vec(7.5f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
-
-    addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(20.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+    // addChild(warning_label = createLabel<TipLabel>(
+    //     Vec(7.5f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
+    // warning_label->describe("[warning/status]");
+    // warning_label->glowing(true);
 
     link_button = createThemedButton<LinkButton>(Vec(5.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
+    link->setFill(false);
+
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ui::Menu* menu = createMenu();
@@ -143,26 +143,27 @@ JackUi::JackUi(JackModule *module) :
 
 void JackUi::setThemeName(const std::string& name, void * context)
 {
-//    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
     Base::setThemeName(name, context);
 }
 
 void JackUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        //onPresetChange();
-    } else {
-        haken_device_label->text(S::NotConnected);
-    }
+    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
 }
 
 void JackUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    if (connection) {
+        link->describe(connection->info.friendly(TextFormatLength::Long));
+        link->setFill(true);
+        link->setColor(PORT_BLUE);
+    } else {
+        link->describe("[not connected]");
+        link->setFill(false);
+        link->setColor(RampGray(G_50));
+    }
 }
 
 void JackUi::onPresetChange()

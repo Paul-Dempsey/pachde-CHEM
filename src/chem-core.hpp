@@ -11,8 +11,6 @@ namespace pachde {
 
 struct IChemClient;
 
-enum class ChemDevice : uint8_t { Unknown, Haken, Midi1, Midi2 };
-
 struct IChemHost
 {
     virtual void register_chem_client(IChemClient* client) = 0;
@@ -37,6 +35,5 @@ struct IChemClient
     virtual void onPresetChange() = 0;
     virtual void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) = 0;
 };
-
 
 }

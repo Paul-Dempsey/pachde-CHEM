@@ -10,7 +10,7 @@ using SM = SusModule;
 // -- Sustain UI -----------------------------------
 
 constexpr const float ONEU = 15.f;
-constexpr const float CENTER = 7.5f;
+constexpr const float CENTER = 15.f;
 
 bool SusUi::connected()
 {
@@ -58,7 +58,9 @@ void SusUi::create_ui()
     // addChild(haken_device_label = createStaticTextLabel<TipLabel>(
     //     Vec(S::CORE_LINK_TEXT, box.size.y - S::CORE_LINK_TEXT_DY), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(1.5f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
+    link->setFill(false);
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -81,19 +83,21 @@ void SusUi::create_ui()
 void SusUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        //onPresetChange();
-    } else {
-        //haken_device_label->text(S::NotConnected);
-    }
+    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
 }
 
 void SusUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    //haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    //haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    if (connection) {
+        link->describe(connection->info.friendly(TextFormatLength::Long));
+        link->setFill(true);
+        link->setColor(PORT_BLUE);
+    } else {
+        link->describe("[not connected]");
+        link->setFill(false);
+        link->setColor(RampGray(G_50));
+    }
 }
 
 void SusUi::step()

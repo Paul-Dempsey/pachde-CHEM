@@ -19,7 +19,9 @@ CoreModule::CoreModule() :
         + EME::UserBegin
         + EME::UserComplete
         + EME::SystemBegin
-        + EME::SystemComplete;
+        + EME::SystemComplete
+        + EME::MahlingBegin
+        + EME::MahlingComplete;
 
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
@@ -35,7 +37,7 @@ CoreModule::CoreModule() :
     configLight(L_ROUND_INITIAL, "Round initial");
     configLight(L_ROUND,         "Rounding");
     configLight(L_ROUND_RELEASE, "Round on release");
-    
+
     configLight(L_READY,         "Haken device ready");
     configLight(L_PULSE,         "Loopback pulse");
 
@@ -49,9 +51,10 @@ CoreModule::CoreModule() :
     em.subscribeEMEvents(this);
     tasks.setCoreModule(this);
     haken_midi.set_handler(&midi_relay);
-    haken_device.subscribe(this);
-    controller1.subscribe(this);
-    controller2.subscribe(this);
+
+    haken_device.init(ChemDevice::Haken, this);
+    controller1.init(ChemDevice::Midi1, this);
+    controller2.init(ChemDevice::Midi2, this);
 
     haken_midi_in.setTarget(&midi_relay);
     controller1_midi_in.setTarget(&midi_relay);
@@ -101,14 +104,6 @@ void CoreModule::enable_logging(bool enable)
             delete midi_log;
         }
     }
-}
-
-ChemDevice CoreModule::device_identifier(const MidiDeviceHolder* holder)
-{
-    if (holder == &haken_device) return ChemDevice::Haken;
-    if (holder == &controller1) return ChemDevice::Midi1;
-    if (holder == &controller2) return ChemDevice::Midi2;
-    return ChemDevice::Unknown;
 }
 
 std::string CoreModule::device_name(const MidiDeviceHolder& holder) {
@@ -211,6 +206,16 @@ void CoreModule::onSystemComplete()
     is_busy = false;
 }
 
+void CoreModule::onMahlingBegin()
+{
+    is_busy = true;
+}
+
+void CoreModule::onMahlingComplete()
+{
+    is_busy = false;
+}
+
 void CoreModule::onHakenTaskChange(HakenTask id)
 {
     if (id == HakenTask::HeartBeat) {
@@ -253,8 +258,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     getLight(L_PULSE).setBrightnessSmooth(0.f, 10 * sample_time);
     getLight(L_READY).setBrightnessSmooth(0.f, 20 * sample_time);
 
-    auto id = device_identifier(source);
-    switch (id) {
+    switch (source->role()) {
     case ChemDevice::Haken: {
         em.ready = false; // todo clear?
         haken_midi_in.ring.clear();
@@ -305,6 +309,13 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Unknown:
         break;
+    }
+}
+
+void CoreModule::onRemove(const RemoveEvent &e)
+{
+    for (auto client : chem_clients) {
+        client->onConnectHost(nullptr);
     }
 }
 
@@ -427,16 +438,16 @@ constexpr const uint64_t PROCESS_PARAM_INTERVAL = 47;
 
 void CoreModule::processLights(const ProcessArgs &args)
 {
-    getLight(L_READY).setBrightnessSmooth(em.ready ? 1.0f : 0.f, args.sampleTime * 20);
+    getLight(L_READY).setBrightnessSmooth(host_busy() ? 0.f : (em.ready ? 1.0f : 0.f), args.sampleTime * 20);
 
-    bool round = em.get_round_rate() > 0;
+    float rate   = em.get_round_rate() / 127.f;
     bool initial = em.is_round_initial();
-    bool on_y = em.get_round_mode() >= Haken::rViaY;
+    bool on_y    = em.get_round_mode() >= Haken::rViaY;
     bool release = em.get_round_mode() <= Haken::rRelease;
     getLight(Lights::L_ROUND_Y).setBrightness(1.0f * on_y);
     getLight(Lights::L_ROUND_INITIAL).setBrightness(1.0f * initial);
-    getLight(Lights::L_ROUND).setBrightness(1.0f * round);
-    getLight(Lights::L_ROUND_RELEASE).setBrightness(1.0f * (round && release));
+    getLight(Lights::L_ROUND).setBrightness(1.0f * rate);
+    getLight(Lights::L_ROUND_RELEASE).setBrightness(1.0f * ((rate> 0.f) && release));
 
     getLight(L_C1_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C1_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);

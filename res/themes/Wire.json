@@ -11,8 +11,11 @@
             "CHEM": {"fill": "brand" },
             "pachde": {"fill": "brand"},
             "title": { "fill": "brand" },
+            "setting": { "fill": " hsl(60, 50%, 60%)" },
+            "rte": { "stroke": {"color":"#337799", "width":0.5 }},
+            "rteh": { "fill":"#337799" },
 
-            "div": { "stroke": "#606060" },
+            "div": { "stroke": {"color":"#606060", "width":0.25 }},
 
             "k#": { "fill": "hsl(90, 40%, 45%)" },
             "midi-frame" : { "fill": "none", "stroke": "g65" },

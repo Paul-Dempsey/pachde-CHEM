@@ -2,10 +2,8 @@
 #pragma once
 #include "../services/text.hpp"
 #include "../services/svgtheme.hpp"
+#include "layout-help.hpp"
 using namespace svg_theme;
-
-// $TODO: labels need to be cleaned up:
-// - reduce the number of label types
 
 namespace pachde {
 
@@ -48,7 +46,7 @@ struct LabelStyle
     bool center() { return align == TextAlignment::Center; }
 };
 
-struct BasicTextLabel: Widget, IApplyTheme
+struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
 {
     using Base = Widget;
 
@@ -58,6 +56,7 @@ struct BasicTextLabel: Widget, IApplyTheme
     bool bright;
 
     BasicTextLabel();
+
     std::string getText() { return _text; }
     bool left() { return _style.left(); }
     bool right() { return _style.right(); }
@@ -76,7 +75,7 @@ struct BasicTextLabel: Widget, IApplyTheme
     void glowing(bool glow) {
         bright = glow;
     }
-
+    
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
 
@@ -85,21 +84,23 @@ struct BasicTextLabel: Widget, IApplyTheme
     void draw(const DrawArgs& args) override;
 };
 
-struct TextLabel: Widget, IApplyTheme
+struct TextLabel: Widget, IApplyTheme, ILayoutHelp
 {
     using Base = Widget;
 
-    FramebufferWidget* _fb = nullptr;
-    BasicTextLabel* _label = nullptr;
+    FramebufferWidget* _fb{nullptr};
+    BasicTextLabel* _label{nullptr};
 
     TextLabel()
     {
+        layout_hint_color = Overlay(GetStockColor(StockColor::Green), .5f);
         _label = new BasicTextLabel();
         _fb = new widget::FramebufferWidget;
         _fb->addChild(_label);
 	    addChild(_fb);
         dirty();
     }
+
     std::string getText() {
         return _label ? _label->_text : "";
     }
@@ -143,9 +144,9 @@ struct TextLabel: Widget, IApplyTheme
     void draw(const DrawArgs& args) override
     {
         Base::draw(args);
-#if defined VISIBLE_STATICTEXTLABEL_BOUNDS
-        FillRect(args.vg, _fb->box.pos.x, _fb->box.pos.y, _fb->box.size.x, _fb->box.size.y, Overlay(GetStockColor(StockColor::Yellow), .20f));
-#endif
+        if (layout_hints) {
+            draw_widget_bounds(this, args);
+        }
     }
 };
 
@@ -163,6 +164,8 @@ TWidget* createStaticTextLabel(
     w->color(RampGray(G_90));
     if (w->_label->centered()) {
         w->setPos(Vec(w->box.pos.x - width*.5f, w->box.pos.y));
+    } else if (w->_label->right()) {
+        w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
     w->applyTheme(engine, theme);
@@ -185,6 +188,8 @@ TWidget* createLabel(
     w->color(RampGray(G_90));
     if (w->_label->centered()) {
         w->setPos(Vec(w->box.pos.x - width*.5f, w->box.pos.y));
+    } else if (w->_label->right()) {
+        w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
     w->applyTheme(engine, theme);

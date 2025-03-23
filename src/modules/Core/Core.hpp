@@ -61,7 +61,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         if (midi_log) midi_log->log_message(prefix, info);
     }
 
-    ChemDevice device_identifier(const MidiDeviceHolder* holder);
     std::string device_name(const MidiDeviceHolder& holder);
     std::string device_name(ChemDevice which);
 
@@ -97,7 +96,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return &em;
     }
     bool host_busy() override {
-        return is_busy || in_reboot || !em.ready || em.pending_config || em.in_preset;
+        return is_busy || in_reboot || !em.ready || em.busy();
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
@@ -111,6 +110,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void onUserComplete() override;
     void onSystemBegin() override;
     void onSystemComplete() override;
+    void onMahlingBegin() override;
+    void onMahlingComplete() override;
+
     //void onTaskMessage(uint8_t code) override;
     //void onLED(uint8_t led) override;
 
@@ -150,7 +152,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     };
 
     //virtual void onAdd(const AddEvent& e) override;
-    //virtual void onRemove(const RemoveEvent& e) override;
+    virtual void onRemove(const RemoveEvent& e) override;
     //virtual void onBypass(const BypassEvent& e) override;
     //virtual void onUnBypass(const UnBypassEvent& e) override;
     //virtual void onPortChange(const PortChangeEvent& e) override;

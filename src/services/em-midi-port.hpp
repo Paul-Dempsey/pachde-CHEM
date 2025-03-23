@@ -104,7 +104,7 @@ struct EmControlPort
     bool is_stream_poke() { return PortKind::Stream == kind; }
     bool is_cc() { return PortKind::CC == kind; }
 
-    bool pending() { return em_value != last_em_value; }
+    bool pending() { return (em_value != last_em_value) && (UNSET_16 != last_em_value); }
     void un_pend() { last_em_value = em_value; }
 
     uint16_t em() { return em_value; }

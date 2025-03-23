@@ -3,6 +3,7 @@
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "../../widgets/theme-button.hpp"
+#include "../../em/preset-meta.hpp"
 
 CoreModuleWidget::~CoreModuleWidget()
 {
@@ -93,13 +94,13 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     y = S::PORT_TOP + S::PORT_DY;
     x = RACK_GRID_WIDTH+2;
     addChild(Center(createThemedColorOutput(Vec(x, y), my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "OK", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, "OK", theme_engine, theme, S::in_port_label));
     x = 125.f;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C1_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M1", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, "M1", theme_engine, theme, S::in_port_label));
     x += 25.f;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, "M2", theme_engine, theme, S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, "M2", theme_engine, theme, S::in_port_label));
 
     style.key = "brand";
     style.align = TextAlignment::Center;
@@ -143,13 +144,13 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
     addChild(haken_device_label = createLabel<TextLabel>(
-        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 160.f, text, theme_engine, theme, midi_style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
 
     y += PICKER_INTERVAL;
     controller1_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createLabel<TextLabel>(
-        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
@@ -159,7 +160,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     controller2_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createLabel<TextLabel>(
-        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), 120.f, text, theme_engine, theme, midi_style));
+        Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
@@ -327,7 +328,8 @@ void CoreModuleWidget::onPresetChanged()
         if (preset->text.empty()) {
             preset_label->describe(preset->summary());
         } else {
-            auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), preset->text.c_str());
+            auto meta = hakenCategoryCode.make_category_mulitline_text(preset->text);
+            auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), meta.c_str());
             preset_label->describe(text);
         }
     } else {

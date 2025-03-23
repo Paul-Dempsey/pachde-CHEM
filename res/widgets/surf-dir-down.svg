@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="136" height="10" viewBox="0 0 136 10" version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g>
+    <g id="fingerboard">
+      <rect id="fingerboard-bg" fill="#c32222" x="18" y="1.5" width="100" height="7" />
+      <rect id="b1--bk"  x="20.15724"  y="1.5" width="2.33" height="7" />
+      <rect id="b2--bk"  x="24.815239" y="1.5" width="2.33" height="7" />
+      <rect id="b3--bk"  x="29.472239" y="1.5" width="2.33" height="7" />
+      <rect id="b4--bk"  x="36.458241" y="1.5" width="2.33" height="7" />
+      <rect id="b5--bk"  x="41.116238" y="1.5" width="2.33" height="7" />
+      <rect id="b6--bk"  x="48.102238" y="1.5" width="2.33" height="7" />
+      <rect id="b7--bk"  x="52.759239" y="1.5" width="2.33" height="7" />
+      <rect id="b8--bk"  x="57.41824"  y="1.5" width="2.33" height="7" />
+      <rect id="b9--bk"  x="64.404236" y="1.5" width="2.33" height="7" />
+      <rect id="b10--bk" x="69.061241" y="1.5" width="2.33" height="7" />
+      <rect id="b11--bk" x="76.048241" y="1.5" width="2.33" height="7" />
+      <rect id="b12--bk" x="80.705238" y="1.5" width="2.33" height="7" />
+      <rect id="b13--bk" x="85.363243" y="1.5" width="2.33" height="7" />
+      <rect id="b14--bk" x="92.349243" y="1.5" width="2.33" height="7" />
+      <rect id="b15--bk" x="97.00724"  y="1.5" width="2.33" height="7" />
+      <rect id="b16--bk" x="103.99324" y="1.5" width="2.33" height="7" />
+      <rect id="b17--bk" x="108.65124" y="1.5" width="2.33" height="7" />
+      <rect id="b18--bk" x="113.30824" y="1.5" width="2.33" height="7" />
+    </g>
+    <path id="fb-dir"  fill="#cf7917" d="m 9.50972,0.38379 v 3.865234 h 21.33204 v 1.5 H 9.50972 V 9.616211 L 1.54879,4.999024 Z" />
+  </g>
+</svg>

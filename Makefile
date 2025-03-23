@@ -19,6 +19,7 @@ SOURCES += src/em/em-hardware.cpp
 SOURCES += src/em/midi-message.cpp
 SOURCES += src/em/preset.cpp
 SOURCES += src/em/preset-macro.cpp
+SOURCES += src/em/preset-meta.cpp
 
 # services
 SOURCES += src/services/colors.cpp
@@ -79,6 +80,10 @@ SOURCES += src/modules/Jack/Jack-ui.cpp
 
 SOURCES += src/modules/Sustain/Sustain.cpp
 SOURCES += src/modules/Sustain/Sustain-ui.cpp
+
+SOURCES += src/modules/Settings/Settings.cpp
+SOURCES += src/modules/Settings/Settings-ui.cpp
+SOURCES += src/modules/Settings/tuning.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp

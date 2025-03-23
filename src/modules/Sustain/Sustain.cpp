@@ -66,17 +66,7 @@ std::string SusModule::client_claim() { return device_claim; }
 
 void SusModule::onConnectHost(IChemHost* host)
 {
-    chem_host = host;
-    if (!host) {
-        device_claim = "";
-        if (chem_ui) ui()->onConnectHost(nullptr);
-        return;
-    }
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    if (conn) {
-        device_claim = conn->info.claim();
-    }
-    if (chem_ui) ui()->onConnectHost(host);
+    onConnectHostModuleImpl(this, host);
 }
 
 void SusModule::onPresetChange()

@@ -5,8 +5,11 @@
             "panel" :  { "fill": "#df62a7" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"hsl(327, 100.00%, 75.90%)"}, { "index":1, "color":"hsl(327, 53.40%, 48%)"}]}},
             "panel-border": { "stroke": {"color":"hsl(327, 75%, 50%)", "width": 1.0 }},
-            "th": {"stroke": { "color":" hsl(327, 75%, 50%)", "width": 0.5 }},
+            "th": {"stroke": { "color":" hsl(320, 75%, 50%)", "width": 0.5 }},
             "jack-glyph": {"fill": " #052d68" },
+
+            "setting": { "fill": " hsl(320, 80%, 30%)" },
+            "sgl" : {"stroke": { "color":" hsl(320, 75%, 90%)", "width": 0.25 }},
 
             "grid-bg":   { "fill": " #f9eb6a" },
             "grid-line": { "stroke": " #df62a6" },

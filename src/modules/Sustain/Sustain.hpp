@@ -4,6 +4,7 @@
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/slider-widget.hpp"
 #include "../../widgets/theme-button.hpp"
@@ -87,6 +88,7 @@ struct SusUi : ChemModuleWidget, IChemClient
     SusModule* my_module{nullptr};
 
     LinkButton* link_button{nullptr};
+    IndicatorWidget* link{nullptr};
     GlowKnob* mod_knob{nullptr};
     FillSlider* slider{nullptr};
 

@@ -20,7 +20,12 @@ const uint8_t default_convolution_parameters[] = {
 ConvolutionParams::ConvolutionParams() :
     in_conv_stream(false)
 {
-    memcpy(data, default_convolution_parameters, sizeof(data));
+    set_default();
+}
+
+void ConvolutionParams::set_default()
+{
+    std::memcpy(data, default_convolution_parameters, sizeof(data));
 }
 
 void ConvolutionParams::do_message(PackedMidiMessage msg)
