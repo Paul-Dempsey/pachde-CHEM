@@ -1,6 +1,7 @@
 #include "Settings.hpp"
 #include "../../services/rack-help.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
+#include "tuning.hpp"
 using namespace pachde;
 
 SettingsModule::SettingsModule() :
@@ -49,10 +50,10 @@ SettingsModule::SettingsModule() :
         "Retrigger high pressure",
         "Legato to touch",
         "Retrig touch",
-        "Retrig touch + lift",
+        "Retrig touch & lift",
         "Legato to touch, max Z",
         "Retrig touch, max Z",
-        "Retrig touch + lift, max Z"
+        "Retrig touch & lift, max Z"
     });
     configSwitch(P_MONO_INTERVAL, 0.f, 14.f, 0.f, "Mono interval", {
         "Off",
@@ -95,8 +96,8 @@ SettingsModule::SettingsModule() :
     });
     configSwitch(P_ROUND_INITIAL, 0.f, 1.f, 0.f, "Round initial", offon);
     configParam(P_ROUND_RATE, 0.f, 10.f, 0.f, "Round rate");
-    // todo: custom param ala hc1
-    configSwitch(P_TUNING, 0.f, 86.f, 0.f, "Tuning", {"Equal"});
+
+    configTuningParam(this, P_TUNING);
 
     configSwitch(P_MIDI_DSP,     0.f, 1.f, 1.f, "Route Midi to DSP",     offon);
     configSwitch(P_MIDI_CVC,     0.f, 1.f, 1.f, "Route Midi to CVC",     offon);

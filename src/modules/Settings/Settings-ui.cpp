@@ -4,6 +4,7 @@
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/uniform-style.hpp"
+#include "tuning.hpp"
 
 namespace S = pachde::style;
 using namespace pachde;
@@ -104,7 +105,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Range", theme_engine, theme, label_style));
     
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_TUNING));
+    addChild(createParamCentered<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING));
     addChild(tuning_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Tuning", theme_engine, theme, label_style));
 
