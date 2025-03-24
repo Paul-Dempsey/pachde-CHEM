@@ -112,8 +112,8 @@ JackUi::JackUi(JackModule *module) :
     // warning_label->describe("[warning/status]");
     // warning_label->glowing(true);
 
-    link_button = createThemedButton<LinkButton>(Vec(5.f, box.size.y - S::U1), theme_engine, theme, "Core link");
-    addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    addChild(link = createIndicatorCentered(30.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
 
     if (my_module) {
@@ -211,6 +211,8 @@ void JackUi::step()
 {
     Base::step();
     if (!my_module) return;
+    bind_host(my_module);
+
     sync_labels();
 }
 

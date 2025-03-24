@@ -104,6 +104,7 @@ void SusUi::step()
 {
     Base::step();
     if (!my_module) return;
+    bind_host(my_module);
     mod_knob->enable(my_module->getInput(0).isConnected());
     if (my_module->getInput(SM::IN_MOD).isConnected()) {
         slider->set_modulation(my_module->modulation.get_port(SM::IN_MOD).modulated());

@@ -151,7 +151,7 @@ void PreModule::process_params(const ProcessArgs &args)
 
 void PreModule::process(const ProcessArgs &args)
 {
-    find_and_bind_host(this, args);
+    ChemModule::process(args);
 
     if (!connected() || chem_host->host_busy()) return;
 

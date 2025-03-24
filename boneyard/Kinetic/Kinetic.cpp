@@ -122,7 +122,7 @@ void KineticModule::process_params(const ProcessArgs &args)
 
 void KineticModule::process(const ProcessArgs& args)
 {
-    find_and_bind_host(this, args);
+    check_bind_host_ready(this, args);
 
     if (!chem_host || chem_host->host_busy()) return;
 

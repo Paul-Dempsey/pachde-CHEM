@@ -18,6 +18,7 @@ struct ChemModule : Module, IThemeHolder
     bool follow_rack{false};
     IChemHost* chem_host{nullptr};
     ChemModuleWidget* chem_ui{nullptr};
+    bool seek_host{false};
 
     virtual IChemHost* get_host() { return chem_host; };
 
@@ -31,18 +32,24 @@ struct ChemModule : Module, IThemeHolder
     json_t* dataToJson() override;
 
     IChemHost* find_expander_host();
+
+    void process(const ProcessArgs& args) override;
 };
 
+
 template<typename TClientModule>
-void find_and_bind_host(TClientModule* self, const ::rack::engine::Module::ProcessArgs& args)
+void bind_host(TClientModule* client_module)
 {
-    if (!self->get_host() && ((args.frame + self->id) % 80) == 0) {
-        auto host = self->find_expander_host();
+    if (!client_module) return;
+    if (client_module->seek_host && !client_module->get_host()) {
+        auto host = client_module->find_expander_host();
         if (host) {
-            host->register_chem_client(self);
+            host->register_chem_client(client_module);
         }
-    }    
-}
+        client_module->seek_host = false;
+    }
+}    
+
 
 enum class LeftRight: uint8_t { Left, Right };
 inline bool left(LeftRight lr) { return LeftRight::Left == lr; }

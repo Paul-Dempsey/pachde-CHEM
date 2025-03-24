@@ -215,6 +215,7 @@ void ConvoUi::step()
 {
     Base::step();
     if (!my_module) return;
+    bind_host(my_module);
 
     knobs[CM::P_MOD_AMOUNT]->enable(my_module->modulation.has_target());
 

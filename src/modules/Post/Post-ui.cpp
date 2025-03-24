@@ -188,6 +188,7 @@ void PostUi::step()
 {
     Base::step();
     if (!my_module) return;
+    bind_host(my_module);
 
     knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 

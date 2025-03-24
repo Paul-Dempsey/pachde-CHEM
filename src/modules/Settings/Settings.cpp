@@ -205,7 +205,7 @@ void SettingsModule::process_params(const ProcessArgs &args)
 
 void SettingsModule::process(const ProcessArgs &args)
 {
-    find_and_bind_host(this, args);
+    ChemModule::process(args);
 
     if (!connected() || chem_host->host_busy()) return;
 

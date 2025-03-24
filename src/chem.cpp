@@ -52,6 +52,14 @@ IChemHost *ChemModule::find_expander_host()
     return nullptr;
 }
 
+void ChemModule::process(const ProcessArgs &args)
+{
+    //if (modelCore == this->model) return;
+    if (!get_host() && ((args.frame + id) % 80) == 0) {
+        seek_host = true;
+    }    
+}
+
 // ---------------------------------------------------------------------------
 // UI
 //

@@ -1155,6 +1155,8 @@ void PlayUi::onHoverKey(const HoverKeyEvent& e)
 void PlayUi::step()
 {
     Base::step();
+    bind_host(my_module);
+
     if (pending_device_check) {
         check_playlist_device();
     }

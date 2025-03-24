@@ -236,7 +236,7 @@ void ConvoModule::process_params(const ProcessArgs& args)
 
 void ConvoModule::process(const ProcessArgs& args)
 {
-    find_and_bind_host(this, args);
+    ChemModule::process(args);
     if (!chem_host || chem_host->host_busy()) return;
 
     if (init_from_em && modulation.sync_params_ready(args)) {

@@ -479,6 +479,8 @@ void CoreModule::process_params(const ProcessArgs &args)
 
 void CoreModule::process(const ProcessArgs &args)
 {
+    //ChemModule::process(args);
+
     auto sample_time = args.sampleTime;
     controller1_midi_in.dispatch(sample_time);
     controller2_midi_in.dispatch(sample_time);
