@@ -13,10 +13,10 @@ struct ElementStyle
     float dx;
 
     ElementStyle(const char* key) : key(key), fill_color(0), stroke_color(0), dx(1.0f) {}
-    ElementStyle(const char* key, const char * text_color, float dx = 1.f);
+    ElementStyle(const char* key, const char * color_spec, float dx = 1.f);
     ElementStyle(const char* key, PackedColor co, float dx = 1.f) :
         key(key), fill_color(co), stroke_color(0), dx(dx) {}
-    ElementStyle(const char* key, const char * text_color, const char * stroke_color, float dx = 1.f);
+    ElementStyle(const char* key, const char * color_spec, const char * stroke_spec, float dx = 1.f);
 
     NVGcolor nvg_color() { return fromPacked(fill_color); }
     NVGcolor nvg_stroke_color() { return fromPacked(stroke_color); }

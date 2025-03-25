@@ -9,6 +9,19 @@ using namespace ::svg_theme;
 namespace pachde {
 
 enum class Axis { X, Y };
+    
+template <typename TSlider>
+TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+{
+    TSlider* o = createParam<TSlider>(pos, module, param_id);
+    if (TSlider::axis == Axis::Y) {
+        o->box.size.y = length;
+    } else {
+        o->box.size.x = length;
+    }
+    o->applyTheme(engine, theme);
+    return o;
+}
 
 namespace slider_impl {
 
@@ -17,6 +30,13 @@ inline float coord(Axis axis, const Vec& pos) {
     case Axis::X: return pos.x;
     case Axis::Y: return pos.y;
     default: return pos.y;
+    }
+}
+inline float anti_coord(Axis axis, const Vec& pos) { 
+    switch (axis) {
+    case Axis::X: return pos.y;
+    case Axis::Y: return pos.x;
+    default: return pos.x;
     }
 }
     
@@ -41,13 +61,13 @@ void onSelectKey(TSelf* self, const rack::widget::Widget::SelectKeyEvent &e)
 
             case GLFW_KEY_HOME:
                 if (plain) {
-                    pq->setValue(pq->getMaxValue());
+                    pq->setValue(self->axis == Axis::Y ? pq->getMaxValue() : pq->getMinValue());
                     e.consume(self);
                 }
                 break;
             case GLFW_KEY_END:
                 if (plain) {
-                    pq->setValue(pq->getMinValue());
+                    pq->setValue(self->axis == Axis::X ? pq->getMaxValue() : pq->getMinValue());
                     e.consume(self);
                 }
                 break;
@@ -97,10 +117,10 @@ void onButton(TSelf* self, const ::rack::widget::Widget::ButtonEvent &e)
         e.consume(self);
         auto pq = self->getParamQuantity();
         if (pq) {
-            float extent = coord(TSelf::axis, self->box.size);
-            float v = extent - self->shrinky - coord(TSelf::axis, e.pos);
-            v = rescale(v, 0.f, extent, pq->getMinValue(), pq->getMaxValue());
-            pq->setValue(v);
+            float extent = coord(TSelf::axis, self->box.size) - self->shrinky;
+            float value = TSelf::axis == Axis::Y ? extent  - coord(TSelf::axis, e.pos) : coord(TSelf::axis, e.pos);
+            value = rescale(value, 0.f, extent, pq->getMinValue(), pq->getMaxValue());
+            pq->setValue(value);
         }
     } else {
         self->TBase::onButton(e);
@@ -112,7 +132,7 @@ void onHoverScroll(TSelf* self, const rack::widget::Widget::HoverScrollEvent & e
 {
     auto pq = self->getParamQuantity();
     if (pq) {
-        auto delta = coord(TSelf::axis, e.scrollDelta);
+        auto delta = e.scrollDelta.y;
         auto mods = APP->window->getMods();
         if (delta < 0.f) {
             pq->setValue(pq->getValue() - self->increment * ((mods & GLFW_MOD_SHIFT) ? 10.f : 1.f));

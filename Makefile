@@ -46,6 +46,7 @@ SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/slider-widget.cpp
+SOURCES += src/widgets/slider-h-widget.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 

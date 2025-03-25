@@ -37,7 +37,7 @@ void SusUi::create_ui()
     const float MIDDLE = 160.f;
     y = MIDDLE - 64.f - 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MAX, theme_engine, theme)));
-    addChild(slider = createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme_engine, theme));
+    addChild(slider = Center(createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme_engine, theme)));
     y = MIDDLE + 64.f + 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MIN, theme_engine, theme)));
 

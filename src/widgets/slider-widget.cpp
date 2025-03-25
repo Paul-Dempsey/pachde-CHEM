@@ -2,28 +2,7 @@
 using namespace ::rack;
 
 namespace pachde {
-
-// v-slider boilerplate
-void SliderBase::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e) {
-    slider_impl::onSelectKey<SliderBase, Base>(this, e);
-}
-void SliderBase::onHoverScroll(const rack::widget::Widget::HoverScrollEvent & e) {
-    slider_impl::onHoverScroll<SliderBase, Base>(this, e);
-}
-void SliderBase::onButton(const rack::widget::Widget::ButtonEvent &e) {
-    slider_impl::onButton<SliderBase, Base>(this, e);
-}
-void SliderBase::onHover(const HoverEvent &e) {
-    slider_impl::onHover<SliderBase, Base>(this, e);
-}
-void SliderBase::onEnter(const EnterEvent& e) {
-    slider_impl::onEnter<SliderBase, Base>(this, e);
-}
-void SliderBase::onLeave(const LeaveEvent& e) {
-    slider_impl::onLeave<SliderBase, Base>(this, e);
-}
-
-// ----  BasicSlider  ---------------------------
+using namespace slider_impl;
 
 BasicSlider::BasicSlider() :
     thumb_size(8.f, 4.5f),
@@ -33,6 +12,25 @@ BasicSlider::BasicSlider() :
     mod("slide-mod", "hsl(41, 50%, 50%)", "hsl(41, 50%, 50%)", .25f)
 {
     box.size = {10.f, 120.f};
+}
+
+void BasicSlider::onSelectKey(const rack::widget::Widget::SelectKeyEvent &e) {
+    slider_impl::onSelectKey<BasicSlider, Base>(this, e);
+}
+void BasicSlider::onHoverScroll(const rack::widget::Widget::HoverScrollEvent & e) {
+    slider_impl::onHoverScroll<BasicSlider, Base>(this, e);
+}
+void BasicSlider::onButton(const rack::widget::Widget::ButtonEvent &e) {
+    slider_impl::onButton<BasicSlider, Base>(this, e);
+}
+void BasicSlider::onHover(const HoverEvent &e) {
+    slider_impl::onHover<BasicSlider, Base>(this, e);
+}
+void BasicSlider::onEnter(const EnterEvent& e) {
+    slider_impl::onEnter<BasicSlider, Base>(this, e);
+}
+void BasicSlider::onLeave(const LeaveEvent& e) {
+    slider_impl::onLeave<BasicSlider, Base>(this, e);
 }
 
 bool BasicSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTheme> theme)
@@ -101,7 +99,7 @@ void BasicSlider::draw(const DrawArgs &args)
 
 void FillSlider::draw_fill(const DrawArgs &args)
 {
-    float CENTER = box.size.x * .5f;
+    float CENTER = coord(axis, box.size) * .5f;
     auto pos = thumb_pos();
     Line(args.vg, CENTER, box.size.y - pos, CENTER, box.size.y, fill.nvg_stroke_color(), fill.width());
 }

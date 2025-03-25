@@ -2,33 +2,33 @@
 
 namespace pachde {
 
-ElementStyle::ElementStyle(const char* key, const char * text_color, float dx) :
+ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
     key(key),
     dx(dx)
 {
-    switch (*text_color) {
-        case '#': fill_color = parseHexColor(text_color); break;
-        case 'r': fill_color = parseRgbColor(text_color); break;
-        case 'h': fill_color = parseHslaColor(text_color); break;
+    switch (*color_spec) {
+        case '#': fill_color = parseHexColor(color_spec); break;
+        case 'r': fill_color = parseRgbColor(color_spec); break;
+        case 'h': fill_color = parseHslaColor(color_spec); break;
         default: break;
     }
 }
 
-ElementStyle::ElementStyle(const char *key, const char *text_color, const char *stroke, float dx) :
+ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *stroke_spec, float dx) :
     key(key),
     dx(dx)
 {
-    switch (*text_color) {
-    case '#': fill_color = parseHexColor(text_color); break;
-    case 'r': fill_color = parseRgbColor(text_color); break;
-    case 'h': fill_color = parseHslaColor(text_color); break;
+    switch (*color_spec) {
+    case '#': fill_color = parseHexColor(color_spec); break;
+    case 'r': fill_color = parseRgbColor(color_spec); break;
+    case 'h': fill_color = parseHslaColor(color_spec); break;
     default: break;
     }
 
-    switch (*stroke) {
-    case '#': stroke_color = parseHexColor(stroke); break;
-    case 'r': stroke_color = parseRgbColor(stroke); break;
-    case 'h': stroke_color = parseHslaColor(stroke); break;
+    switch (*stroke_spec) {
+    case '#': stroke_color = parseHexColor(stroke_spec); break;
+    case 'r': stroke_color = parseRgbColor(stroke_spec); break;
+    case 'h': stroke_color = parseHslaColor(stroke_spec); break;
     default: break;
     }
 }

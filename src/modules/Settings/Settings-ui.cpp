@@ -121,6 +121,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round initial", theme_engine, theme, label_style));
 
     y += row_dy;
+    addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 127.f, my_module, SM::P_ROUND_RATE, theme_engine, theme));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round rate", theme_engine, theme, label_style));
 
     auto center_label_style = LabelStyle{"label", TextAlignment::Center, 10.f};

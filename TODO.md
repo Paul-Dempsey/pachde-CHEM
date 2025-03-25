@@ -27,5 +27,5 @@
 - Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)
 - Blinking or highlighted link button when not connected
 - Play: Plugin scope for history (at least for last folder)
-- Setting files (surface, rounding, polyphony)
+- Setting files (surface, rounding, polyphony) (Rack presets sufficient?)
 - Preset-associated settings (re settings files) i.e. Customize sys preset - parameters per-module

@@ -7,6 +7,7 @@
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/slider-h-widget.hpp"
 
 using namespace pachde;
 
@@ -148,7 +149,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     TextLabel* octave_range_value{nullptr};
     TextLabel* round_type_value{nullptr};
     TextLabel* tuning_value{nullptr};
-
+    FillHSlider* round_rate_slider{nullptr};
+    
     SettingsUi(SettingsModule *module);
 
     bool connected();
