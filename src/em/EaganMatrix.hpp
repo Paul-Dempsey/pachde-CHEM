@@ -125,6 +125,7 @@ struct EaganMatrix
     uint8_t get_octave_shift() { return ch1.cc[Haken::ccOctShift]; }
     uint8_t get_mono_switch() { return ch1.cc[Haken::ccMonoSwitch]; }
     uint8_t get_mono_on() { return ch1.cc[Haken::ccMonoOn]; }
+    bool is_mono() { return ch1.cc[Haken::ccMonoOn]; }
     uint8_t get_fine_tune() { return ch1.cc[Haken::ccFineTune]; }
 
     uint8_t get_pre() { return ch1.cc[Haken::ccPre]; } // 14-bit?
@@ -169,14 +170,14 @@ struct EaganMatrix
 
     uint8_t get_base_polyphony() { return mat[Haken::idPoly]; }
     bool is_extend_polyphony() { return mat[Haken::idOkExpPoly]; }
-    bool is_incresed_computation_rate() { return mat[Haken::idOkIncComp]; }
+    bool is_increase_computation_rate() { return mat[Haken::idOkIncComp]; }
     uint8_t get_bend_range() { return mat[Haken::idBendRange]; }
     uint8_t get_y_assign() { return mat[Haken::idFrontBack]; }
     uint8_t get_z_assign() { return mat[Haken::idPressure]; }
     uint8_t get_mono_func() { return mat[Haken::idMonoFunc]; }
     uint8_t get_mono_interval() { return mat[Haken::idMonoInt]; }
     uint8_t get_note_priority() { return mat[Haken::idPrio]; }
-    uint8_t get_note_Mode() { return mat[Haken::idNoteMode]; }
+    uint8_t get_note_mode() { return mat[Haken::idNoteMode]; }
     uint8_t get_touch_area() { return mat[Haken::idTArea]; }
     uint8_t get_split_mode() { return mat[Haken::idSplitMode]; }
     uint8_t get_split_point() { return mat[Haken::idSplitPoint]; }
@@ -243,7 +244,6 @@ struct EaganMatrix
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }
     bool is_transmit_updates() { return mat[Haken::idCfgOut]; }
 
-    //uint8_t get_xxx() { return mat[Haken::idxxxxx]; }
     uint8_t get_conv_pre_index() { return conv[Haken::id_c_idx1]; }
     uint8_t get_conv_pre_mix() { return conv[Haken::id_c_mix1]; }
     uint8_t get_conv_post_index() { return conv[Haken::id_c_idx2]; }

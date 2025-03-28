@@ -4,7 +4,6 @@
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/uniform-style.hpp"
-#include "tuning.hpp"
 
 namespace S = pachde::style;
 using namespace pachde;
@@ -37,28 +36,44 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     const float value_dy = 7.5f;
     const float label_dx = 9.f;
     const float row_dy = 14.f;
-    x = CENTER - 18.f;
+    const float menu_axis = CENTER - 18.f;
+    x = menu_axis;
     y = 18;
     addChild(Center(createThemedParamButton<SurfaceDirectionParamButton>(Vec(x+18.f,y), my_module, SM::P_SURFACE_DIRECTION, theme_engine, theme)));
 
     auto value_style = LabelStyle{"setting", TextAlignment::Left, 14.f};
-    auto label_style = LabelStyle{"label", TextAlignment::Right, 14.f};
+    auto label_style = LabelStyle{"ctl-label", TextAlignment::Right, 14.f};
 
     y += 15.f;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_X));
+    addChild(createParamCentered<BendMenu>(Vec(x,y), my_module, SM::P_X));
     addChild(x_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "X", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_Y));
+    addChild(createParamCentered<YMenu>(Vec(x,y), my_module, SM::P_Y));
     addChild(y_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Y", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_Z));
+    addChild(createParamCentered<ZMenu>(Vec(x,y), my_module, SM::P_Z));
     addChild(z_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Z", theme_engine, theme, label_style));
 
+    y += row_dy;
+    x -= 34.f;
+    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY));
+    addChild(base_polyphony_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 10.f, "", theme_engine, theme, value_style));
+    addChild(createLabel<TextLabel>(Vec(x- label_dx,y-value_dy), 80.f, "Polyphony", theme_engine, theme, label_style));
+
+    x += 84.f;
+    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_EXPAND_POLYPHONY, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Expand", theme_engine, theme, label_style));
+
+    x += 72.f;
+    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_DOUBLE_COMPUTATION, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "2x rate", theme_engine, theme, label_style));
+
+    x = menu_axis;
     y += row_dy;
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PROCESSING));
     addChild(note_processing_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", theme_engine, theme, value_style));
@@ -70,17 +85,6 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note priority", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY));
-    addChild(base_polyphony_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Base polyphony", theme_engine, theme, label_style));
-
-    // y += row_dy;
-    // addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_EXPAND_POLYPHONY));
-
-    // y += row_dy;
-    // addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_DOUBLE_COMPUTATION));
-
-    y += row_dy;
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE));
     addChild(mono_mode_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 140.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono mode", theme_engine, theme, label_style));
@@ -90,19 +94,20 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     y += row_dy;
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL));
     addChild(mono_interval_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Interval", theme_engine, theme, label_style));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono interval", theme_engine, theme, label_style));
 
     y += row_dy;
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_TYPE));
     addChild(octave_type_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave switch", theme_engine, theme, label_style));
 
-    addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module, SM::P_OCTAVE_SWITCH, SM::L_OCTAVE_SWITCH, theme_engine, theme)));
+    //addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module, SM::P_OCTAVE_SWITCH, SM::L_OCTAVE_SWITCH, theme_engine, theme)));
 
     y += row_dy;
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_RANGE));
     addChild(octave_range_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Range", theme_engine, theme, label_style));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave shift", theme_engine, theme, label_style));
+    create_octave_shift_leds(this, 24.f, y, 4.5f, my_module, SM::L_OCT_SHIFT_FIRST);
     
     y += row_dy;
     addChild(createParamCentered<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING));
@@ -115,7 +120,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Rounding", theme_engine, theme, label_style));
     
     y += row_dy;
-    create_rounding_leds(12.f, y, 6.f);
+    create_rounding_leds(this, 22.f, y, 6.f, my_module, SM::L_ROUND_Y);
 
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_ROUND_INITIAL, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round initial", theme_engine, theme, label_style));
@@ -130,6 +135,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_KEEP_MIDI, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x,y + 5.f), 50.f, "Keep", theme_engine, theme, center_label_style));
 
+    // routing
     x = 60.f;
     y = 228;
     addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, center_label_style));
@@ -160,7 +166,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     // inputs
     y = S::PORT_TOP;
     x = CENTER + S::PORT_DX - 5.f;
-    addChild(createChemKnob<TrimPot>(Vec(x, y), module, SM::P_MOD_AMOUNT, theme_engine, theme));
+    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), module, SM::P_MOD_AMOUNT, theme_engine, theme));
 
     x = CENTER;
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_ROUND_RATE, S::InputColorKey, PORT_CORN, theme_engine, theme)));
@@ -209,14 +215,6 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     }
 }
 
-void SettingsUi::create_rounding_leds(float x, float y, float spread)
-{
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, SM::L_ROUND_Y)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, SM::L_ROUND_INITIAL)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, SM::L_ROUND)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, SM::L_ROUND_RELEASE));
-}
-
 void SettingsUi::setThemeName(const std::string& name, void * context)
 {
     Base::setThemeName(name, context);
@@ -242,7 +240,12 @@ void SettingsUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevic
 void sync_switch_label(Module* module, int param_id, TextLabel* label)
 {
     auto pq = module->getParamQuantity(param_id);
-    label->text(pq->getDisplayValueString());
+    auto text = pq->getDisplayValueString();
+    if (text.empty()) {
+        label->text(format_string("?%f", pq->getValue()));
+    } else {
+        label->text(text);
+    }
 }
 
 void SettingsUi::sync_labels()
@@ -270,7 +273,7 @@ void SettingsUi::onHoverKey(const HoverKeyEvent &e)
             switch (e.key) {
             case GLFW_KEY_0:
                 e.consume(this);
-                my_module->modulation.zero_modulation();
+                my_module->zero_modulation();
                 return;
             // case GLFW_KEY_5:
             //     center_knobs();
@@ -287,6 +290,13 @@ void SettingsUi::step()
     Base::step();
     if (!my_module) return;
     bind_host(my_module);
+    if (my_module->getInput(my_module->rounding_port.input_id).isConnected()) {
+        round_rate_slider->set_modulation(my_module->rounding_port.modulated());
+        mod_knob->enable(true);
+    } else {
+        round_rate_slider->set_modulation(NAN);
+        mod_knob->enable(false);
+    }
     sync_labels();
 }
 
@@ -297,7 +307,7 @@ void SettingsUi::appendContextMenu(Menu *menu)
 
     bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
     menu->addChild(createMenuItem("Zero modulation", "0", [this](){
-        my_module->modulation.zero_modulation();
+        my_module->zero_modulation();
     }, unconnected));
 
     Base::appendContextMenu(menu);

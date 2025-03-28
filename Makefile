@@ -82,7 +82,7 @@ SOURCES += src/modules/Jack/Jack-ui.cpp
 SOURCES += src/modules/Sustain/Sustain.cpp
 SOURCES += src/modules/Sustain/Sustain-ui.cpp
 
-SOURCES += src/modules/Settings/Settings.cpp
+SOURCES += src/modules/Settings/SettingsModule.cpp
 SOURCES += src/modules/Settings/Settings-ui.cpp
 SOURCES += src/modules/Settings/tuning.cpp
 

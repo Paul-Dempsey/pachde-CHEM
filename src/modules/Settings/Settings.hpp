@@ -4,11 +4,16 @@
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/em-led-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/theme-button.hpp"
+#include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/slider-h-widget.hpp"
-
+#include "tuning.hpp"
+#include "x-param.hpp"
+#include "y-param.hpp"
+#include "z-param.hpp"
 using namespace pachde;
 
 struct SettingsUi;
@@ -37,7 +42,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         P_ROUND_TYPE,
         P_ROUND_INITIAL,
         P_ROUND_RATE,
-        P_TUNING,
+        P_TUNING, // stored in em_values as packed (same as param)
 
         P_MIDI_DSP,
         P_MIDI_CVC,
@@ -49,7 +54,8 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         P_KEEP_MIDI,
 
         P_MOD_AMOUNT,
-        NUM_PARAMS
+        NUM_PARAMS,
+        NUM_EM_VALUES = P_MOD_AMOUNT
     };
 
     enum Inputs {
@@ -64,13 +70,16 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
     enum Lights {
         L_MONO,
-        L_OCTAVE_SWITCH,
 
         // rounding
         L_ROUND_Y,
         L_ROUND_INITIAL,
         L_ROUND,
         L_ROUND_RELEASE,
+
+        // octave shift
+        L_OCT_SHIFT_FIRST,
+        L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
 
         // routing
         L_MIDI_DSP,
@@ -83,21 +92,29 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         NUM_LIGHTS
     };
 
-    Modulation modulation;
+    uint8_t em_values[NUM_EM_VALUES];
+    EmControlPort rounding_port;
+    rack::dsp::Timer midi_timer;
+
+    // passive leds that show current em status
+    OctaveShiftLeds octave;
+    RoundingLeds round_leds;
+
     std::string device_claim;
-    
+    bool in_mat_poke;
+
     SettingsModule();
     ~SettingsModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
     }
+    void update_from_em(int param_id, uint8_t value);
 
     SettingsUi* ui() { return reinterpret_cast<SettingsUi*>(chem_ui); }
     bool connected();
-    // void set_modulation_target(int id) {
-    //     modulation.set_modulation_target(id);
-    // }
+
+    void zero_modulation();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -112,9 +129,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-    void onPortChange(const PortChangeEvent& e) override {
-        modulation.onPortChange(e);
-    }
+    void onPortChange(const PortChangeEvent& e) override;
     void update_from_em();
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
@@ -152,9 +167,9 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     FillHSlider* round_rate_slider{nullptr};
     
     SettingsUi(SettingsModule *module);
+    GlowKnob* mod_knob;
 
     bool connected();
-    void create_rounding_leds(float x, float y, float spread);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -168,8 +183,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     void setThemeName(const std::string& name, void * context) override;
 
     void sync_labels();
-    void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
+    void onHoverKey(const HoverKeyEvent &e) override;
     void appendContextMenu(Menu *menu) override;
 };
 

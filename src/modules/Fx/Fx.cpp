@@ -142,17 +142,13 @@ void FxModule::do_message(PackedMidiMessage message)
         case Haken::ccReci5: param = P_R5; break;
         case Haken::ccReci6: param = P_R6; break;
 
-        case Haken::ccStream:
-            in_mat_poke = Haken::s_Mat_Poke == midi_cc_value(message);
-            return;
-    
         default: return;
         };
         assert(param != -1);
         modulation.set_em_and_param_low(param, midi_cc_value(message), true);
     } break;
 
-    case Haken::sData:
+    case Haken::sData: //(ch16 key pressure)
         if (in_mat_poke) {
             switch (message.bytes.data1) {
 
@@ -168,6 +164,11 @@ void FxModule::do_message(PackedMidiMessage message)
         }
         break;
 
+    case Haken::ccStat16:
+        if (Haken::ccStream == midi_cc(message)) {
+            in_mat_poke = Haken::s_Mat_Poke == midi_cc_value(message);
+        }
+        break;
     default:
         break;
     }
@@ -215,7 +216,7 @@ void FxModule::process(const ProcessArgs& args)
     }    
 
     if (0 == ((args.frame + id) % 47)) {
-        modulation.update_lights();
+        modulation.update_mod_lights();
     }
 }
 

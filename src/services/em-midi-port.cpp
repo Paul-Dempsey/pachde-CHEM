@@ -115,7 +115,7 @@ void Modulation::set_em_and_param(int index, uint16_t em_value, bool with_module
     EmControlPort& port = ports[index];
     port.set_em_and_param(em_value);
     if (with_module) {
-        module->getParam(port.param_id).setValue(port.param());
+        module->getParam(port.param_id).setValue(port.parameter());
     }
 }
 
@@ -124,7 +124,7 @@ void Modulation::set_em_and_param_low(int index, uint8_t em_value, bool with_mod
     EmControlPort& port = ports[index];
     port.set_em_and_param_low(em_value);
     if (with_module) {
-        module->getParam(port.param_id).setValue(port.param());
+        module->getParam(port.param_id).setValue(port.parameter());
     }
 }
 
@@ -136,7 +136,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
         mod_target = port->index;
         auto pq = module->getParamQuantity(mod_param);
         if (pq) {
-            pq->setImmediateValue(ports[mod_target].amount());
+            pq->setImmediateValue(ports[mod_target].modulation());
         }
     } else {
         ports[e.portId].set_mod_amount(0.f);
@@ -147,7 +147,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
                 mod_target = i;
                 auto pq = module->getParamQuantity(mod_param);
                 if (pq) {
-                    pq->setImmediateValue(port.amount());
+                    pq->setImmediateValue(port.modulation());
                 }
                 return;
             }
@@ -169,7 +169,7 @@ void Modulation::set_modulation_target(int target)
     mod_target = target;
     auto pq = module->getParamQuantity(mod_param);
     if (pq) {
-        pq->setImmediateValue(port.amount());
+        pq->setImmediateValue(port.modulation());
     }        
 }
 
@@ -213,7 +213,7 @@ void Modulation::sync_send()
         }
         // pass 2: send pending data stream
         assert (stream != INVALID_STREAM);
-        if (stream_data.size() > 1) { // always have the stream start
+        if (stream_data.size() > 1) { // send only if data (always have the stream start)
             auto haken{module->chem_host->host_haken()};
             assert(haken);
             for (auto msg : stream_data) {
@@ -240,13 +240,13 @@ void Modulation::pull_mod_amount()
     }
 }
 
-void Modulation::update_lights()
+void Modulation::update_mod_lights()
 {
     if (last_mod_target != mod_target) {
         int i = 0;
         for (auto port: ports) {
             if (port.light_id >= 0) {
-                module->getLight(port.light_id).setSmoothBrightness((i == mod_target) ? .6f : 0.f, 90);
+                module->getLight(port.light_id).setSmoothBrightness((i == mod_target) ? 1.f : 0.f, 90);
             }
             ++i;
         }
@@ -271,7 +271,7 @@ void Modulation::mod_to_json(json_t *root)
     auto port = ports.begin();
     auto jaru = json_array();
     for (int i = 0; i < count; ++i) {
-        json_array_append_new(jaru, json_real(port->amount()));
+        json_array_append_new(jaru, json_real(port->modulation()));
         port++;
     }
     json_object_set_new(root, "mod-amount", jaru);

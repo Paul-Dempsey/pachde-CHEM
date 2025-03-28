@@ -184,7 +184,7 @@ void PostModule::process(const ProcessArgs& args)
         }
     }
     if (((args.frame + id) % 61) == 0) {
-        modulation.update_lights();
+        modulation.update_mod_lights();
     }
 }
 

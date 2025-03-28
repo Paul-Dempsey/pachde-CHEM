@@ -82,17 +82,16 @@ struct EmControlPort
         index(index)
     {}
 
-    // void config (int index, const EmccPortConfig& conf) {
-    //     kind = conf.kind;
-    //     channel_stream = conf.channel_stream;
-    //     cc_id = conf.cc_id;
-    //     low_resolution = conf.low_resolution;
-    //     param_id = conf.param_id;
-    //     input_id = conf.input_id;
-    //     light_id = conf.light_id;
-    //     this->index = index;
-    // }
-
+    void init(int index, const EmccPortConfig& conf) {
+        this->index = index;
+        kind = conf.kind;
+        channel_stream = conf.channel_stream;
+        cc_id = conf.cc_id;
+        low_resolution = conf.low_resolution;
+        param_id = conf.param_id;
+        input_id = conf.input_id;
+        light_id = conf.light_id;
+    }
     bool has_input() { return input_id >= 0; }
     bool has_light() { return light_id >= 0; }
     bool has_param() { return param_id >= 0; }
@@ -109,9 +108,9 @@ struct EmControlPort
 
     uint16_t em() { return em_value; }
     uint8_t em_low() { return em_value >> 7; }
-    float param() { return param_value; }
+    float parameter() { return param_value; }
     float modulated() { return mod_value; }
-    float amount() { return mod_amount; }
+    float modulation() { return mod_amount; }
     
     void pull_param_cv(Module* module);
     void set_mod_amount(float amount);
@@ -175,7 +174,8 @@ struct Modulation
     void set_modulation_target(int target);
     void sync_send();
     void pull_mod_amount();
-    void update_lights();
+    // on/off lights for active modulation target
+    void update_mod_lights();
 
     void zero_modulation();
 };

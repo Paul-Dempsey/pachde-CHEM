@@ -244,7 +244,7 @@ void ConvoModule::process(const ProcessArgs& args)
     }
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
-        modulation.update_lights();
+        modulation.update_mod_lights();
     }
 }
 

@@ -160,7 +160,7 @@ void MacroModule::process(const ProcessArgs& args)
     }    
 
     if (((args.frame + id) % 63) == 0) {
-        modulation.update_lights();
+        modulation.update_mod_lights();
     }
 
 }

@@ -440,14 +440,13 @@ void CoreModule::processLights(const ProcessArgs &args)
 {
     getLight(L_READY).setBrightnessSmooth(host_busy() ? 0.f : (em.ready ? 1.0f : 0.f), args.sampleTime * 20);
 
-    float rate   = em.get_round_rate() / 127.f;
-    bool initial = em.is_round_initial();
-    bool on_y    = em.get_round_mode() >= Haken::rViaY;
-    bool release = em.get_round_mode() <= Haken::rRelease;
-    getLight(Lights::L_ROUND_Y).setBrightness(1.0f * on_y);
-    getLight(Lights::L_ROUND_INITIAL).setBrightness(1.0f * initial);
-    getLight(Lights::L_ROUND).setBrightness(1.0f * rate);
-    getLight(Lights::L_ROUND_RELEASE).setBrightness(1.0f * ((rate> 0.f) && release));
+    octave.set_shift(em.get_octave_shift());
+    octave.update_lights(this, Lights::L_OCT_SHIFT_FIRST);
+
+    round_leds.set_initial(em.is_round_initial());
+    round_leds.set_mode(em.get_round_mode());
+    round_leds.set_rate(em.get_round_rate());
+    round_leds.update_lights(this, Lights::L_ROUND);
 
     getLight(L_C1_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C1_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);

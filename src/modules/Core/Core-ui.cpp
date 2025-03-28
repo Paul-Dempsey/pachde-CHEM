@@ -21,6 +21,7 @@ using EME = IHandleEmEvents::EventMask;
 // Layout
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
+constexpr const float NAV_ROW = 154.f;
 constexpr const float PICKER_TOP = 200.f;
 constexpr const float PICKER_INTERVAL = 42.f;
 constexpr const float PICKER_LABEL_OFFSET = 14.f;
@@ -58,7 +59,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createScrews(theme);
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
-    createRoundingLeds(r_col - 1.5 * ROUND_LIGHT_SPREAD, 40.f, ROUND_LIGHT_SPREAD);
+
     createIndicatorsCentered(CENTER, PICKER_TOP - 18.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
@@ -66,7 +67,10 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
         Vec(CENTER, 126.f), box.size.x, "[preset]", theme_engine, theme, style));
     preset_label->glowing(true);
 
-    auto prev = createWidgetCentered<PrevButton>(Vec(CENTER - 9.5f, 154.f));
+    createRoundingLeds(CENTER + 40.f, NAV_ROW, ROUND_LIGHT_SPREAD);
+    create_octave_shift_leds(this, CENTER - 40.f, NAV_ROW, 4.5f, my_module, CoreModule::L_OCT_SHIFT_FIRST);
+
+    auto prev = createWidgetCentered<PrevButton>(Vec(CENTER - 9.5f, NAV_ROW));
     if (my_module) {
         prev->describe("Select previous preset");
         prev->setHandler([this](bool c, bool s){ my_module->haken_midi.previous_system_preset(ChemId::Core); });
@@ -74,7 +78,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     prev->applyTheme(theme_engine, theme);
     addChild(prev);
     
-    auto next = createWidgetCentered<NextButton>(Vec(CENTER + 9.f, 154.f));
+    auto next = createWidgetCentered<NextButton>(Vec(CENTER + 9.f, NAV_ROW));
     if (my_module) {
         next->describe("Select next preset");
         next->setHandler([this](bool c, bool s){ my_module->haken_midi.next_system_preset(ChemId::Core); });
@@ -82,14 +86,13 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     next->applyTheme(theme_engine, theme);
     addChild(next);
 
-    addChild(createLightCentered<TinyLight<BlueLight>>(Vec(RACK_GRID_WIDTH * 1.5f, 30), my_module, CoreModule::L_READY));
-    addChild(blip = createBlipCentered(r_col, 30, "EM LED"));
-
     float x, y;
     x = RACK_GRID_WIDTH * 1.5f;
-    y = 42;
-    addChild(createLightCentered<TinySimpleLight<YellowLight>>(Vec(x, y), my_module, CoreModule::L_PULSE));
-    
+    y = 30.f;
+    addChild(createLightCentered<TinyLight<BlueLight>>(Vec(x, y), my_module, CoreModule::L_READY));
+    addChild(blip = createBlipCentered(r_col, y, "EM LED"));
+    addChild(createLightCentered<TinySimpleLight<YellowLight>>(Vec(x + 9.f, y), my_module, CoreModule::L_PULSE));
+
     const NVGcolor co_port = PORT_CORN;
     y = S::PORT_TOP + S::PORT_DY;
     x = RACK_GRID_WIDTH+2;
@@ -202,12 +205,13 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     addChild(w);
 }
 
-void CoreModuleWidget::createRoundingLeds(float x, float y, float spread)
+void CoreModuleWidget::createRoundingLeds(float cx, float cy, float spread)
 {
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, CoreModule::L_ROUND_Y)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, CoreModule::L_ROUND_INITIAL)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, CoreModule::L_ROUND)); x += spread;
-    addChild(createLight<TinySimpleLight<RedLight>>(Vec(x, y), my_module, CoreModule::L_ROUND_RELEASE));
+    float x = cx - 1.5 * spread;
+    addChild(createLightCentered<TinySimpleLight<RedLight>>(Vec(x, cy), my_module, CoreModule::L_ROUND_Y)); x += spread;
+    addChild(createLightCentered<TinySimpleLight<RedLight>>(Vec(x, cy), my_module, CoreModule::L_ROUND_INITIAL)); x += spread;
+    addChild(createLightCentered<TinySimpleLight<RedLight>>(Vec(x, cy), my_module, CoreModule::L_ROUND)); x += spread;
+    addChild(createLightCentered<TinySimpleLight<RedLight>>(Vec(x, cy), my_module, CoreModule::L_ROUND_RELEASE));
 }
 
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)

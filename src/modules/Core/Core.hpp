@@ -5,10 +5,12 @@
 #include "../../services/midi-devices.hpp"
 #include "../../services/midi-io.hpp"
 #include "../../widgets/blip-widget.hpp"
+#include "../../widgets/em-led-widget.hpp"
 #include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/MidiPicker.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/slider-h-widget.hpp"
 #include "haken-task.hpp"
 #include "relay-midi.hpp"
 
@@ -47,7 +49,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     PresetDescription last_preset;
     bool restore_last_preset;
-
+    OctaveShiftLeds octave;
+    RoundingLeds round_leds;
+    
     // ------------------------------------------
     CoreModule();
     virtual ~CoreModule();
@@ -148,6 +152,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_C2_MUSIC_FILTER,
         L_C1_MUTE,
         L_C2_MUTE,
+        L_OCT_SHIFT_FIRST,
+        L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
         NUM_LIGHTS
     };
 
