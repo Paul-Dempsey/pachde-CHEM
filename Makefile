@@ -51,8 +51,6 @@ SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
 # modules
-SOURCES += src/modules/Blank/Blank.cpp
-
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
 SOURCES += src/modules/Core/haken-task.cpp

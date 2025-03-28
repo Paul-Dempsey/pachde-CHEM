@@ -19,8 +19,7 @@ enum class ChemId : uint8_t {
     Sostenuto,
     Sostenuto2,
     Settings,
-    Preset,
-    Blank
+    Preset
 };
 
 inline uint8_t as_u8(ChemId tag) { return static_cast<uint8_t>(tag); }

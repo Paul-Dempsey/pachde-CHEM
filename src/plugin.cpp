@@ -5,7 +5,6 @@ Plugin *pluginInstance(nullptr);
 void init(Plugin *p)
 {
 	pluginInstance = p;
-	p->addModel(modelBlank);
 	p->addModel(modelCore);
 	p->addModel(modelPlay);
 	p->addModel(modelMacro);
@@ -41,7 +40,6 @@ bool isPeerModule(Module* me, Module* candidate)
 			|| (model == modelSostenuto2)
 			|| (model == modelSettings)
 			|| (model == modelPreset)
-			|| (model == modelBlank)
             // add new models here
         );
 }
