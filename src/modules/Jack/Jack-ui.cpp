@@ -54,7 +54,7 @@ JackUi::JackUi(JackModule *module) :
     
     x = CENTER;
     y = 40.f;
-    addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
+    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
     y += LABEL_DY;
     addChild(assign_1_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
@@ -72,7 +72,7 @@ JackUi::JackUi(JackModule *module) :
     addChild(Center(pedal_image_1));
 
     y = 150.f;
-    addChild(Center(createThemedParam<FlipSwitch>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
+    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
     y += LABEL_DY;
     addChild(assign_2_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
@@ -176,7 +176,7 @@ void JackUi::sync_labels()
         float current = my_module->getParam(JackModule::P_ASSIGN_JACK_1).getValue();
         if (current != last_1) {
             last_1 = current;
-            auto q = dynamic_cast<SwitchQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_1));
+            auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_1));
             if (q) {
                 assign_1_label->text(q->getDisplayValueString());
             }
@@ -185,7 +185,7 @@ void JackUi::sync_labels()
         current = my_module->getParam(JackModule::P_ASSIGN_JACK_2).getValue();
         if (current != last_2) {
             last_2 = current;
-            auto q = dynamic_cast<SwitchQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_2));
+            auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_2));
             if (q) {
                 assign_2_label->text(q->getDisplayValueString());
             }

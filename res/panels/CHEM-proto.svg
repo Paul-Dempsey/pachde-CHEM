@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="300"
+   height="380"
+   viewBox="0 0 300 380"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#02441c" />
+      <stop offset="1" stop-color="#001a0a" />
+    </linearGradient>
+  </defs>
+  <g>
+    <rect id="g-panel" fill="url(#gpanel)" x="0" y="0" width="300" height="380" />
+    <path id="SETTINGS--title" fill="#f9a54b" d="M 150,3.5 h -50 v 4 h 50 z M 150,3.5 h 50 v 4 h -50 z" />
+    <path id="f--div" fill="none" stroke="#595959" stroke-width="0.75" d="M 2,278 H 296" />
+    <path id="th" fill="none" stroke="#f9a54b" stroke-width=".25" d="M 5,6.5 h 80 M 295,6.5 h -80" />
+  </g>
+</svg>

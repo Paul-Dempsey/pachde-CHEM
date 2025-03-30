@@ -3,11 +3,17 @@ RACK_DIR ?= ../..
 ifdef BUILD_DEBUG
 FLAGS += -O0
 FLAGS += -DLAYOUT_HELP
+
+# template not listed in plugin.json, etc.
+SOURCES += src/modules/_template/template.cpp
+SOURCES += src/modules/_template/template-ui.cpp
+
 else
 FLAGS += -O3
 FLAGS += -DNDEBUG
 endif
-FLAGS += -Wno-comment
+
+#FLAGS += -Wno-comment
 
 # plugin infra
 SOURCES += src/plugin.cpp
@@ -51,6 +57,10 @@ SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
 # modules
+
+SOURCES += src/modules/_proto/proto.cpp
+SOURCES += src/modules/_proto/proto-ui.cpp
+
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
 SOURCES += src/modules/Core/haken-task.cpp

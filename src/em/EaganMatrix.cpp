@@ -240,28 +240,33 @@ bool EaganMatrix::handle_macro_cc(uint8_t cc, uint8_t value)
 
 void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
 {
-    if (Haken::ccFracM49M90 == cc) {
-        frac_hi = true;
-        frac_lsb = value;
-        return;
-    }
     if (Haken::ccFracIM48 == cc) {
         frac_hi = false;
         frac_lsb = value;
         return;
     }
+    if (Haken::ccFracM49M90 == cc) {
+        frac_hi = true;
+        frac_lsb = value;
+        return;
+    }
     if (get_jack_1_assign() == cc) {
-        jack_1 = (value << 7) + ch1.macro_fraction_lo();
+        assert(0 == frac_lsb);
+        jack_1 = (value << 7) + frac_lsb;
     }
     if (get_jack_2_assign() == cc) {
-        jack_2 = (value << 7) + ch1.macro_fraction_lo();
+        jack_2 = (value << 7) + frac_lsb;
     }
-
     if (handle_macro_cc(cc, value)) {
         return;
     }
-    if (Haken::ccPost == cc) {
-        this->post = (value << 7) + ch1.macro_fraction_lo();
+    switch (cc) {
+    // not received - case Haken:: ccJack1:
+    // not received - case Haken:: ccJack2:
+    case Haken::ccPost:
+        post = (value << 7) + frac_lsb;
+        frac_lsb = 0; 
+        break;
     }
 }
 

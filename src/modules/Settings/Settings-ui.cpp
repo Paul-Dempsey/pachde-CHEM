@@ -45,23 +45,23 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     auto label_style = LabelStyle{"ctl-label", TextAlignment::Right, 14.f};
 
     y += 15.f;
-    addChild(createParamCentered<BendMenu>(Vec(x,y), my_module, SM::P_X));
+    addChild(Center(createThemedParam<BendMenu>(Vec(x,y), my_module, SM::P_X, theme_engine, theme)));
     addChild(x_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "X", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<YMenu>(Vec(x,y), my_module, SM::P_Y));
+    addChild(Center(createThemedParam<YMenu>(Vec(x,y), my_module, SM::P_Y, theme_engine, theme)));
     addChild(y_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Y", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<ZMenu>(Vec(x,y), my_module, SM::P_Z));
+    addChild(Center(createThemedParam<ZMenu>(Vec(x,y), my_module, SM::P_Z, theme_engine, theme)));
     addChild(z_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Z", theme_engine, theme, label_style));
 
     y += row_dy;
     x -= 34.f;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY, theme_engine, theme)));
     addChild(base_polyphony_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 10.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x- label_dx,y-value_dy), 80.f, "Polyphony", theme_engine, theme, label_style));
 
@@ -75,42 +75,43 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     x = menu_axis;
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PROCESSING));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PROCESSING, theme_engine, theme)));
     addChild(note_processing_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note processing", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PRIORITY));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PRIORITY, theme_engine, theme)));
     addChild(note_priority_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note priority", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE, theme_engine, theme)));
     addChild(mono_mode_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 140.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono mode", theme_engine, theme, label_style));
 
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module,SM::P_MONO, SM::L_MONO, theme_engine, theme)));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL, theme_engine, theme)));
     addChild(mono_interval_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono interval", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_TYPE));
-    addChild(octave_type_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave switch", theme_engine, theme, label_style));
+    //addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_SWITCH));
+    //addChild(octave_switch_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
+    //addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave switch", theme_engine, theme, label_style));
 
     //addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module, SM::P_OCTAVE_SWITCH, SM::L_OCTAVE_SWITCH, theme_engine, theme)));
 
     y += row_dy;
-    addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_RANGE));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_JACK_SHIFT, theme_engine, theme)));
     addChild(octave_range_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave shift", theme_engine, theme, label_style));
+
     create_octave_shift_leds(this, 24.f, y, 4.5f, my_module, SM::L_OCT_SHIFT_FIRST);
     
     y += row_dy;
-    addChild(createParamCentered<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING));
+    addChild(Center(createThemedParam<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING, theme_engine, theme)));
     addChild(tuning_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Tuning", theme_engine, theme, label_style));
 
@@ -259,8 +260,9 @@ void SettingsUi::sync_labels()
         sync_switch_label(my_module, SM::P_BASE_POLYPHONY, base_polyphony_value);
         sync_switch_label(my_module, SM::P_MONO_MODE, mono_mode_value);
         sync_switch_label(my_module, SM::P_MONO_INTERVAL, mono_interval_value);
-        sync_switch_label(my_module, SM::P_OCTAVE_TYPE, octave_type_value);
-        sync_switch_label(my_module, SM::P_OCTAVE_RANGE, octave_range_value);
+        //sync_switch_label(my_module, SM::P_OCTAVE_SWITCH, octave_switch_value);
+        //sync_switch_label(my_module, SM::P_OCTAVE_TYPE, octave_type_value);
+        sync_switch_label(my_module, SM::P_JACK_SHIFT, octave_range_value);
         sync_switch_label(my_module, SM::P_ROUND_TYPE, round_type_value);
         sync_switch_label(my_module, SM::P_TUNING, tuning_value);
     }

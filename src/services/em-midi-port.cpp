@@ -32,7 +32,7 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
     case PortKind::Stream:
         haken->begin_stream(tag, channel_stream);
         haken->stream_data(tag, cc_id, em_low());
-        //haken->end_stream(tag); // supposedly optional
+        //haken->end_stream(tag); // HakenMidi.h says optional for poke streams
         break;
 
     default:
@@ -188,9 +188,7 @@ void Modulation::sync_send()
 
             case PortKind::CC:
                 pit->pull_param_cv(module);
-                if (pit->pending() && pit->is_cc()) {
-                    pit->send(module->chem_host, client_tag);
-                }
+                pit->send(module->chem_host, client_tag);
                 break;
 
             case PortKind::Stream:
@@ -219,13 +217,12 @@ void Modulation::sync_send()
             for (auto msg : stream_data) {
                 haken->send_message(msg);
             }
+            haken->end_stream(client_tag);
         }
     } else {
         for (auto pit = ports.begin();pit != ports.end(); pit++) {
             pit->pull_param_cv(module);
-            if (pit->pending()) {
-                pit->send(module->chem_host, client_tag);
-            }
+            pit->send(module->chem_host, client_tag);
         }
     }
 }

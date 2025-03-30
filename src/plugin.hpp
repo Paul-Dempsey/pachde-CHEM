@@ -23,6 +23,7 @@ extern Model* modelSostenuto;
 extern Model* modelSostenuto2;
 extern Model* modelSettings;
 extern Model* modelPreset;
+extern Model* modelProto;
 
 // Theming
 

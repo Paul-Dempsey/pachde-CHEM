@@ -37,7 +37,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
         P_OCTAVE_SWITCH,
         P_OCTAVE_TYPE,
-        P_OCTAVE_RANGE,
+        P_JACK_SHIFT,
 
         P_ROUND_TYPE,
         P_ROUND_INITIAL,
@@ -160,7 +160,7 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     TextLabel* double_computation_value{nullptr};
     TextLabel* mono_mode_value{nullptr};
     TextLabel* mono_interval_value{nullptr};
-    TextLabel* octave_type_value{nullptr};
+    TextLabel* octave_switch_value{nullptr};
     TextLabel* octave_range_value{nullptr};
     TextLabel* round_type_value{nullptr};
     TextLabel* tuning_value{nullptr};

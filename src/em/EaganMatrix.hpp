@@ -100,16 +100,16 @@ struct EaganMatrix
     uint16_t jack_2;
     uint16_t post;
 
-    uint16_t get_macro_value(int id) { return macro[id]; }
-    float get_macro_voltage(int id);
-
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
     PresetDescription preset;
-
+    
     bool is_ready() { return ready; }
     void reset();
-
+    
+    uint16_t get_macro_value(int id) { return macro[id]; }
+    float get_macro_voltage(int id);
+    
     uint16_t get_jack_1() { return jack_1; }
     uint16_t get_jack_2() { return jack_2; }
     uint16_t get_post() { return post; }

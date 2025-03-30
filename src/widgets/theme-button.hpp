@@ -258,6 +258,7 @@ using SquareButton = TButton<SquareButtonSvg>;
 using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
 using CheckButton = TButton<CheckButtonSvg>;
+using DotButton = TButton<DotButtonSvg>;
 
 using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
 using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;

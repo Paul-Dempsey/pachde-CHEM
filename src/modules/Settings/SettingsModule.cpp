@@ -70,7 +70,7 @@ SettingsModule::SettingsModule() :
         "Toggle",
         "Instant"
     });
-    configSwitch(P_OCTAVE_RANGE, 0.f, 7.f, 3.f, "Octave switch range", {
+    configSwitch(P_JACK_SHIFT, 0.f, 7.f, 3.f, "Octave switch range", {
         "-4 octaves",
         "-3 octaves",
         "-2 octaves",
@@ -177,8 +177,8 @@ void SettingsModule::update_from_em()
 
     update_from_em(P_SURFACE_DIRECTION, em->is_reverse_surface());
     update_from_em(P_X, em->get_bend_range());
-    update_from_em(P_Y, em->get_bend_range());
-    update_from_em(P_Z, em->get_bend_range());
+    update_from_em(P_Y, em->get_y_assign());
+    update_from_em(P_Z, em->get_z_assign());
     update_from_em(P_NOTE_PROCESSING, em->get_note_mode());
     update_from_em(P_NOTE_PRIORITY, em->get_note_priority());
     update_from_em(P_BASE_POLYPHONY, em->get_base_polyphony());
@@ -188,7 +188,7 @@ void SettingsModule::update_from_em()
     update_from_em(P_MONO_MODE, em->get_mono_func());
     update_from_em(P_MONO_INTERVAL, em->get_mono_interval());
     update_from_em(P_OCTAVE_SWITCH, em->get_octave_shift());
-    update_from_em(P_OCTAVE_RANGE, em->get_octave_shift());
+    update_from_em(P_JACK_SHIFT, em->get_jack_shift());
     update_from_em(P_ROUND_TYPE, em->get_round_mode());
     update_from_em(P_ROUND_INITIAL, em->get_round_initial());
 
@@ -227,7 +227,7 @@ void SettingsModule::do_message(PackedMidiMessage message)
             break;
 
         case Haken::ccOctShift:
-            // TODO special processing: dx from 60
+            update_from_em(P_OCTAVE_SWITCH, midi_cc_value(message));
             break;
 
         case Haken::ccRndIni: 
@@ -268,7 +268,7 @@ void SettingsModule::do_message(PackedMidiMessage message)
             case Haken::idPressure:  param_index = P_Z; break;
             case Haken::idMonoFunc:  param_index = P_MONO_MODE; break;
             case Haken::idMonoInt:   param_index = P_MONO_INTERVAL; break;
-            case Haken::idJackShift: param_index = P_OCTAVE_RANGE; break;
+            case Haken::idJackShift: param_index = P_JACK_SHIFT; break;
             case Haken::idPresEnc:   param_index = P_KEEP_MIDI; break;
             default: break;
             }
@@ -318,7 +318,6 @@ void SettingsModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiD
 
 void SettingsModule::process_params(const ProcessArgs &args)
 {
-    //modulation.pull_mod_amount();
     rounding_port.set_mod_amount(getParamQuantity(P_MOD_AMOUNT)->getValue());
 }
 
@@ -336,15 +335,10 @@ void SettingsModule::process(const ProcessArgs &args)
         midi_timer.reset();
 
         rounding_port.pull_param_cv(this);
-        if (rounding_port.pending()) {
-            rounding_port.send(chem_host, ChemId::Settings);
-        }
+        rounding_port.send(chem_host, ChemId::Settings);
     }
 
-
     if (((args.frame + id) % 61) == 0) {
-        //modulation.update_mod_lights(); // no mod lights
-
         auto em = chem_host->host_matrix();
 
         round_leds.set_initial(em->is_round_initial());
@@ -365,7 +359,6 @@ void SettingsModule::process(const ProcessArgs &args)
             getLight(p - Params::P_MIDI_DSP + L_MIDI_DSP).setBrightness(v);
         }
     }
-
 }
 
 Model *modelSettings = createModel<SettingsModule, SettingsUi>("chem-settings");

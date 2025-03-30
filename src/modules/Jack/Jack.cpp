@@ -1,46 +1,7 @@
 #include "Jack.hpp"
 #include "../../services/rack-help.hpp"
+
 using namespace pachde;
-
-static const std::vector<uint8_t> ccmap = {
-    Haken::ccUndef,
-    Haken::ccPre,
-    Haken::ccPost,
-    Haken::ccAudIn,
-    Haken::ccI,
-    Haken::ccII,
-    Haken::ccIII,
-    Haken::ccIV,
-    Haken::ccV,
-    Haken::ccVI,
-    Haken::ccSus,
-    Haken::ccSos,
-    Haken::ccSos2,
-    Haken::ccOctShift,
-    Haken::ccMonoSwitch,
-    Haken::ccRoundRate,
-    Haken::ccRndIni,
-    Haken::ccStretch,
-    Haken::ccFineTune,
-    Haken::ccAdvance,
-    Haken::ccReci1,
-    Haken::ccReci2,
-    Haken::ccReci3,
-    Haken::ccReci4,
-    Haken::ccReci5,
-    Haken::ccReci6,
-    Haken::ccReciMix
-
-};
-
-int pedal_to_index(uint8_t assign) {
-    auto it = std::find(ccmap.cbegin(), ccmap.cend(), assign);
-    return it == ccmap.cend() ? 0 : it - ccmap.cbegin();
-}
-
-uint8_t index_to_pedal_cc(int index) {
-    return ccmap[index];
-}
 
 JackModule::JackModule()
 :   glow_knobs(false),
@@ -50,39 +11,9 @@ JackModule::JackModule()
     last_keep(-1)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
-    // What happened to recirculator assignments that were in 10.09?
-    // Todo: adapt HC-1 PedalParam
-    std::vector<std::string> labels = {
-        "(free)",
-        "Pre-level",
-        "Post-level",
-        "Audio in",
-        "Macro i",
-        "Macro ii",
-        "Macro iii",
-        "Macro iv",
-        "Macro v",
-        "Macro vi",
-        "Sustain",
-        "Sos 1",
-        "Sos 2",
-        "Oct switch",
-        "Mono switch",
-        "Round rate",
-        "Round initial",
-        "Oct stretch",
-        "Fine tune",
-        "Advance",
-        "R1",
-        "R2", 
-        "R3",
-        "R4",
-        "R5",
-        "R6",
-        "RMix"
-    };
-    configSwitch(Params::P_ASSIGN_JACK_1, 0.f, labels.size(), 10.f, "Jack 1 assign", labels);
-    configSwitch(Params::P_ASSIGN_JACK_2, 0.f, labels.size(), 12.f, "Jack 2 assign", labels);
+
+    configJackParam(this, 1, Params::P_ASSIGN_JACK_1, "Jack 1 assign");
+    configJackParam(this, 2, Params::P_ASSIGN_JACK_2, "Jack 2 assign");
 
     dp2(configParam(Params::P_MIN_JACK_1, 0.f, 10.f, 0.f, "Jack 1 minimum"));
     dp2(configParam(Params::P_MAX_JACK_1, 0.f, 10.f, 10.f, "Jack 1 maximum"));
@@ -142,8 +73,8 @@ void JackModule::pull_jack_data()
 {
     assert(chem_host);
     auto em = chem_host->host_matrix();
-    last_assign_1 = pedal_to_index(em->get_jack_1_assign());
-    last_assign_2 = pedal_to_index(em->get_jack_2_assign());
+    last_assign_1 = em->get_jack_1_assign();
+    last_assign_2 = em->get_jack_2_assign();
     getParam(P_ASSIGN_JACK_1).setValue(last_assign_1);
     getParam(P_ASSIGN_JACK_2).setValue(last_assign_2);
     getParam(P_MIN_JACK_1).setValue(unipolar_7_to_rack(em->get_pedal_1_min()));
@@ -177,10 +108,10 @@ void JackModule::process_params(const ProcessArgs &args)
         }
         haken->begin_stream(ChemId::Jack, Haken::s_Mat_Poke);
         if (assign_1 != last_assign_1) {
-            haken->stream_data(ChemId::Jack, Haken::idPedal1, index_to_pedal_cc(assign_1));
+            haken->stream_data(ChemId::Jack, Haken::idPedal1, assign_1);
         }
         if (assign_2 != last_assign_2) {
-            haken->stream_data(ChemId::Jack, Haken::idPedal2, index_to_pedal_cc(assign_2));
+            haken->stream_data(ChemId::Jack, Haken::idPedal2, assign_2);
         }
         //haken->end_stream(ChemId::Jack); // optional for poke streams
 
