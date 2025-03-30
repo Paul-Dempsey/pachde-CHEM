@@ -262,17 +262,6 @@ void FxUi::step()
     }
 
     sync_labels();
-
-#ifdef LAYOUT_HELP
-    if (hints != layout_hinting) {
-        layout_hinting = hints;
-        for (auto child: children) {
-            auto tr = dynamic_cast<ClickRegion*>(child);
-            if (tr) tr->visible = layout_hinting;
-        }
-    }
-#endif
-
 }
 
 void FxUi::appendContextMenu(Menu *menu)

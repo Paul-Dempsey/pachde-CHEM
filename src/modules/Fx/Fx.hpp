@@ -124,9 +124,6 @@ struct FxUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[FxModule::NUM_KNOBS];
     TrackWidget* tracks[FxModule::NUM_MOD_PARAMS];
 
-#ifdef LAYOUT_HELP
-    bool layout_hinting{false};
-#endif
     int effect{-1};
 
     FxUi(FxModule *module);

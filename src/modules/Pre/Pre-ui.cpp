@@ -261,15 +261,7 @@ void PreUi::step()
         tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
         tracks[i]->set_active(my_module->getInput(i).isConnected());
     }
-#ifdef LAYOUT_HELP
-    if (hints != layout_hinting) {
-        layout_hinting = hints;
-        for (auto child: children) {
-            auto tr = dynamic_cast<ClickRegion*>(child);
-            if (tr) tr->visible = layout_hinting;
-        }
-    }
-#endif
+
 }
 
 void PreUi::appendContextMenu(Menu *menu)

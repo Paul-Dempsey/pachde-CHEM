@@ -225,17 +225,6 @@ void ConvoUi::step()
         tracks[wi.input]->set_value(my_module->modulation.get_port(id).modulated());
         tracks[wi.input]->set_active(my_module->getInput(wi.input).isConnected());
     }
-
-#ifdef LAYOUT_HELP
-    if (hints != layout_hinting) {
-        layout_hinting = hints;
-        for (auto child: children) {
-            auto tr = dynamic_cast<ClickRegion*>(child);
-            if (tr) tr->visible = layout_hinting;
-        }
-    }
-#endif
-
 }
 
 void ConvoUi::onHoverKey(const HoverKeyEvent &e)

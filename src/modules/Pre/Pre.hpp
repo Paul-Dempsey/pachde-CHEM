@@ -117,10 +117,6 @@ struct PreUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[PreModule::NUM_KNOBS];
     TrackWidget* tracks[PreModule::NUM_MOD_PARAMS];
 
-#ifdef LAYOUT_HELP
-    bool layout_hinting{false};
-#endif
-
     PreUi(PreModule *module);
 
     bool connected();

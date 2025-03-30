@@ -135,9 +135,6 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     GlowKnob* knobs[ConvoModule::NUM_KNOBS];
     TrackWidget* tracks[ConvoModule::NUM_INPUTS];
 
-#ifdef LAYOUT_HELP
-    bool layout_hinting{false};
-#endif
     ConvoUi(ConvoModule *module);
 
     bool connected();

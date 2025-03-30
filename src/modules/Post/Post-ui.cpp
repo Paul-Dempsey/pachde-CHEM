@@ -197,16 +197,6 @@ void PostUi::step()
         tracks[i]->set_active(my_module->getInput(i).isConnected());
     }
 
-#ifdef LAYOUT_HELP
-    if (hints != layout_hinting) {
-        layout_hinting = hints;
-        for (auto child: children) {
-            auto tr = dynamic_cast<ClickRegion*>(child);
-            if (tr) tr->visible = layout_hinting;
-        }
-    }
-#endif
-
 }
 
 void PostUi::onHoverKey(const HoverKeyEvent &e)

@@ -114,9 +114,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
     TrackWidget* tracks[PostModule::NUM_PARAMS];
-#ifdef LAYOUT_HELP
-    bool layout_hinting{false};
-#endif
+
     PostUi(PostModule *module);
 
     bool connected();

@@ -1165,11 +1165,11 @@ void PlayUi::step()
 void PlayUi::draw(const DrawArgs& args)
 {
     Base::draw(args);
-#ifdef LAYOUT_HELP
-    if (hints) {
-        Line(args.vg, RIGHT_MARGIN_CENTER, 0, RIGHT_MARGIN_CENTER, 380, nvgTransRGBAf(PORT_VIOLET, .5f), .5f);
-    }
-#endif
+// #ifdef LAYOUT_HELP
+//     if (hints) {
+//         Line(args.vg, RIGHT_MARGIN_CENTER, 0, RIGHT_MARGIN_CENTER, 380, nvgTransRGBAf(PORT_VIOLET, .5f), .5f);
+//     }
+// #endif
 }
 
 void PlayUi::appendContextMenu(Menu *menu)
