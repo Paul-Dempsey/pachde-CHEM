@@ -202,6 +202,7 @@ void EaganMatrix::onChannelTwoCC(uint8_t cc, uint8_t value)
 
 bool EaganMatrix::set_checked_data_stream(uint8_t stream_id) {
     if (data_stream != -1) {
+        data_stream = static_cast<int>(stream_id);
         broken_midi = true;
         return false;
     } else {
@@ -331,16 +332,15 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
                 case Haken::s_ConText: {
                     preset.text = text_buffer.str();
                 } break;
-
-                // case Haken::s_Mat_Poke: {
-                // } break;
-
-                // case Haken::s_Conv_Poke: {
-                // } break;
                 }
             }
             data_stream = -1;
         } break;
+
+        default: {
+            set_checked_data_stream(value);
+        } break;
+
         }
     } break;
 

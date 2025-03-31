@@ -86,6 +86,7 @@
 
             "in-label":    { "fill": " #a08858"},
             "ctl-frame":    { "stroke": "hsl(40, 60%, 20%)" },
+            "ctl-frame-hi": { "stroke": "hsl(40, 60%, 10%)" },
             "ctl-glyph":    { "fill": "hsl(41, 75%, 70%)", "stroke": " #edc774" },
             "ctl-disabled": { "fill": "hsl(41, 35%, 35%)", "stroke": "hsl(41, 35%, 35%)" },
             "ctl-hovered":  { "fill": "#ff8060" },

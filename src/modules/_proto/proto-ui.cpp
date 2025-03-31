@@ -48,6 +48,7 @@ ProtoUi::ProtoUi(ProtoModule *module) :
     label[1]->text("ccJack1");
     label[2]->text("ccJack2");
     label[3]->text("idJackShift");
+    label[4]->text("idPrio");
     y += 6.f;
     text_entry = new TextField();
     text_entry->box.pos = Vec(15.f, y);
@@ -70,28 +71,23 @@ ProtoUi::ProtoUi(ProtoModule *module) :
     expr_entry->box.size.x = 85.f;
     addChild(expr_entry);
 
-    addChild(value_text[4] = createLabel<TextLabel>(Vec(x + 22.f,y + 5.f), 100.f, "", theme_engine, theme, value_style));
+    addChild(expr_value = createLabel<TextLabel>(Vec(x + 22.f,y + 5.f), 100.f, "", theme_engine, theme, value_style));
 
     btn = Center(createThemedButton<SmallRoundButton>(Vec(x + 12.f,y + 9.f), theme_engine, theme, "expr"));
     btn->setHandler([=](bool ctl, bool shift){
         if (expr_entry->text.empty()) {
-            value_text[4]->text("");
+            expr_value->text("");
             return;
         }
         RawQuantity q;
         q.setDisplayValueString(expr_entry->text);
-        value_text[4]->text(q.getDisplayValueString());
+        expr_value->text(q.getDisplayValueString());
     });
     addChild(btn);
 
     // inputs
 
     // footer
-
-    addChild(warn = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warn->describe("[warning/status]");
-    warn->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
@@ -191,6 +187,9 @@ void ProtoUi::step()
     js = em->get_jack_2();
     value_text[2]->text(format_string("%d (%d:%d)", js, js >> 7, js & 0x7f)); //"ccJack2"
     value_text[3]->text(format_string("%d", em->get_jack_shift())); //"idJackShift"
+
+    auto np = em->get_note_priority();
+    value_text[4]->text(format_string("%d (%0x)", np, np));
 
     //knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 

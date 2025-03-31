@@ -85,10 +85,10 @@ struct ProtoUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel*   haken_device_label{nullptr};
-    TipLabel*   warn{nullptr};
 
     TextLabel* label[5]{nullptr};
     TextLabel* value_text[5]{nullptr};
+    TextLabel* expr_value{nullptr};
 
     TextField* text_entry{nullptr};
     TextField* expr_entry{nullptr};

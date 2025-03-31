@@ -13,8 +13,6 @@ using SM = SettingsModule;
 
 constexpr const float CENTER = 255.f * .5f;
 
-using HamParam = HamburgerUi<ParamWidget>;
-
 bool SettingsUi::connected() {
     if (!my_module) return false;
     if (!chem_host) return false;
@@ -60,16 +58,15 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Z", theme_engine, theme, label_style));
 
     y += row_dy;
-    x -= 34.f;
     addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY, theme_engine, theme)));
     addChild(base_polyphony_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 10.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x- label_dx,y-value_dy), 80.f, "Polyphony", theme_engine, theme, label_style));
 
-    x += 84.f;
+    y += row_dy;
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_EXPAND_POLYPHONY, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Expand", theme_engine, theme, label_style));
 
-    x += 72.f;
+    y += row_dy;
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_DOUBLE_COMPUTATION, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "2x rate", theme_engine, theme, label_style));
 
@@ -97,20 +94,6 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono interval", theme_engine, theme, label_style));
 
     y += row_dy;
-    //addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_OCTAVE_SWITCH));
-    //addChild(octave_switch_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    //addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave switch", theme_engine, theme, label_style));
-
-    //addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module, SM::P_OCTAVE_SWITCH, SM::L_OCTAVE_SWITCH, theme_engine, theme)));
-
-    y += row_dy;
-    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_JACK_SHIFT, theme_engine, theme)));
-    addChild(octave_range_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Octave shift", theme_engine, theme, label_style));
-
-    create_octave_shift_leds(this, 24.f, y, 4.5f, my_module, SM::L_OCT_SHIFT_FIRST);
-    
-    y += row_dy;
     addChild(Center(createThemedParam<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING, theme_engine, theme)));
     addChild(tuning_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Tuning", theme_engine, theme, label_style));
@@ -130,31 +113,30 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 127.f, my_module, SM::P_ROUND_RATE, theme_engine, theme));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round rate", theme_engine, theme, label_style));
 
-    auto center_label_style = LabelStyle{"label", TextAlignment::Center, 10.f};
     x = 200.f;
-    y = 240.f;
+    y = 274.f;
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_KEEP_MIDI, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x,y + 5.f), 50.f, "Keep", theme_engine, theme, center_label_style));
+    addChild(createLabel<TextLabel>(Vec(x,y + 5.f), 50.f, "Keep", theme_engine, theme, S::med_control_label));
 
     // routing
     x = 60.f;
-    y = 228;
-    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, center_label_style));
+    y = 262;
+    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, S::med_control_label));
     y += 15.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 50.f, "Surface", theme_engine, theme, center_label_style));
+    addChild(createLabel<TextLabel>(Vec(x, y), 50.f, "Surface", theme_engine, theme, S::med_control_label));
     y += 21.f;
     x = 96.5f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "DSP",  theme_engine, theme, center_label_style));
+    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "DSP",  theme_engine, theme, S::med_control_label));
     x += 30.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "CVC",  theme_engine, theme, center_label_style));
+    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "CVC",  theme_engine, theme, S::med_control_label));
     x += 30.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, center_label_style));
+    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, S::med_control_label));
 
     const float col_dsp = 97.f;
     const float col_cvc = 127.f;
     const float col_midi = 157.f;
-    const float row_midi = 233.f;
-    const float row_surface = 248.f;
+    const float row_midi = 267.f;
+    const float row_surface = 282.f;
     y = row_midi;
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>( Vec(col_dsp,y), my_module, SM::P_MIDI_DSP, SM::L_MIDI_DSP, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>( Vec(col_cvc,y), my_module, SM::P_MIDI_CVC, SM::L_MIDI_CVC, theme_engine, theme)));
@@ -165,7 +147,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>( Vec(col_midi,y), my_module, SM::P_SURFACE_MIDI, SM::L_SURFACE_MIDI, theme_engine, theme)));
 
     // inputs
-    y = S::PORT_TOP;
+    y = S::PORT_TOP + S::PORT_DY;
     x = CENTER + S::PORT_DX - 5.f;
     addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), module, SM::P_MOD_AMOUNT, theme_engine, theme));
 
@@ -178,11 +160,6 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 25.f, "INIT", theme_engine, theme, S::in_port_label));
 
     // footer
-    addChild(warning_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
-
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
@@ -260,9 +237,6 @@ void SettingsUi::sync_labels()
         sync_switch_label(my_module, SM::P_BASE_POLYPHONY, base_polyphony_value);
         sync_switch_label(my_module, SM::P_MONO_MODE, mono_mode_value);
         sync_switch_label(my_module, SM::P_MONO_INTERVAL, mono_interval_value);
-        //sync_switch_label(my_module, SM::P_OCTAVE_SWITCH, octave_switch_value);
-        //sync_switch_label(my_module, SM::P_OCTAVE_TYPE, octave_type_value);
-        sync_switch_label(my_module, SM::P_JACK_SHIFT, octave_range_value);
         sync_switch_label(my_module, SM::P_ROUND_TYPE, round_type_value);
         sync_switch_label(my_module, SM::P_TUNING, tuning_value);
     }

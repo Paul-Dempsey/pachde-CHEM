@@ -35,15 +35,12 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         P_MONO_MODE,
         P_MONO_INTERVAL,
 
-        P_OCTAVE_SWITCH,
-        P_OCTAVE_TYPE,
-        P_JACK_SHIFT,
-
         P_ROUND_TYPE,
         P_ROUND_INITIAL,
         P_ROUND_RATE,
         P_TUNING, // stored in em_values as packed (same as param)
 
+        P_MIDI_ROUTING,
         P_MIDI_DSP,
         P_MIDI_CVC,
         P_MIDI_MIDI,
@@ -77,10 +74,6 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         L_ROUND,
         L_ROUND_RELEASE,
 
-        // octave shift
-        L_OCT_SHIFT_FIRST,
-        L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
-
         // routing
         L_MIDI_DSP,
         L_MIDI_CVC,
@@ -97,7 +90,6 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
     rack::dsp::Timer midi_timer;
 
     // passive leds that show current em status
-    OctaveShiftLeds octave;
     RoundingLeds round_leds;
 
     std::string device_claim;
@@ -131,6 +123,8 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
     json_t* dataToJson() override;
     void onPortChange(const PortChangeEvent& e) override;
     void update_from_em();
+    uint8_t get_param_routing();
+    void build_update(std::vector<PackedMidiMessage>& stream_data, int param_id, uint8_t haken_id);
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -148,7 +142,6 @@ struct SettingsUi : ChemModuleWidget, IChemClient
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
-    TipLabel*     warning_label{nullptr};
 
     TextLabel* x_value{nullptr};
     TextLabel* y_value{nullptr};
@@ -160,8 +153,6 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     TextLabel* double_computation_value{nullptr};
     TextLabel* mono_mode_value{nullptr};
     TextLabel* mono_interval_value{nullptr};
-    TextLabel* octave_switch_value{nullptr};
-    TextLabel* octave_range_value{nullptr};
     TextLabel* round_type_value{nullptr};
     TextLabel* tuning_value{nullptr};
     FillHSlider* round_rate_slider{nullptr};

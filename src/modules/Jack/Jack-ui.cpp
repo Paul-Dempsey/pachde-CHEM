@@ -17,7 +17,7 @@ bool JackUi::connected() {
 constexpr const float CENTER = 45.f*.5f;
 constexpr const float LABEL_DY = 10.f;
 constexpr const float KNOBS_DY = 20.f;
-constexpr const float PEDAL_DY = 24.f;
+constexpr const float PEDAL_DY = 21.f;
 
 JackUi::JackUi(JackModule *module) :
     my_module(module),
@@ -53,9 +53,9 @@ JackUi::JackUi(JackModule *module) :
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 10.f, false};
     
     x = CENTER;
-    y = 40.f;
+    y = 34.f;
     addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
-    y += LABEL_DY;
+    y += 8.f;
     addChild(assign_1_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
     y += KNOBS_DY;
@@ -71,9 +71,9 @@ JackUi::JackUi(JackModule *module) :
     pedal_image_1->set_index(0);
     addChild(Center(pedal_image_1));
 
-    y = 150.f;
+    y = 130.f;
     addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
-    y += LABEL_DY;
+    y += 8.f;
     addChild(assign_2_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
 
     y += KNOBS_DY;
@@ -89,10 +89,17 @@ JackUi::JackUi(JackModule *module) :
     pedal_image_2->set_index(0);
     addChild(Center(pedal_image_2));
 
-    y += 34.f;
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
-        Vec(x, y), my_module, JackModule::P_KEEP, JackModule::L_KEEP, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y+9.f), 40.f, "Keep", theme_engine, theme, S::control_label));
+    y = 212.f;
+    addChild(Center(createThemedParam<ShiftMenu>(Vec(x, y), my_module, JackModule::P_SHIFT, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Shift", theme_engine, theme, S::med_control_label));
+
+    y += 27.f;
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, JackModule::P_SHIFT_ACTION, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Action", theme_engine, theme, S::med_control_label));
+
+    y += 27.f;
+    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, JackModule::P_KEEP, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Keep", theme_engine, theme, S::med_control_label));
 
     // outputs
     auto co_port = PORT_ORANGE;
@@ -105,12 +112,6 @@ JackUi::JackUi(JackModule *module) :
     y += S::PORT_DY;
     addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", theme_engine, theme, S::in_port_label));
-
-    // footer
-    // addChild(warning_label = createLabel<TipLabel>(
-    //     Vec(7.5f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    // warning_label->describe("[warning/status]");
-    // warning_label->glowing(true);
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
     addChild(link = createIndicatorCentered(30.f,box.size.y-9.f, RampGray(G_50), "[connection]"));

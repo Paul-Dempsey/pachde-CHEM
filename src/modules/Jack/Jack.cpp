@@ -8,7 +8,9 @@ JackModule::JackModule()
     host_connection(false),
     last_assign_1(-1),
     last_assign_2(-1),
-    last_keep(-1)
+    last_keep(-1),
+    last_shift(-1),
+    last_action(-1)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
@@ -20,7 +22,13 @@ JackModule::JackModule()
     dp2(configParam(Params::P_MIN_JACK_2, 0.f, 10.f, 0.f, "Jack 1 minimum"));
     dp2(configParam(Params::P_MAX_JACK_2, 0.f, 10.f, 10.f, "Jack 1 maximum"));
 
-    configSwitch(Params::P_KEEP, 0.f, 1.f, 0.f, "Keep pedal settings", {"off", "on"});
+    configShiftParam(this, Params::P_SHIFT, "Jack shift");
+    configSwitch(Params::P_SHIFT_ACTION, 0.f, 2.f, 0.f, "Jack shift action", {
+        "Switch",
+        "Toggle",
+        "Instant"
+    });
+    configSwitch(Params::P_KEEP, 0.f, 1.f, 0.f, "Keep pedal settings when changing presets", {"off", "on"});
 
     configOutput(Outputs::OUT_JACK_1, "Jack 1");
     configOutput(Outputs::OUT_JACK_2, "Jack 2");
@@ -82,41 +90,42 @@ void JackModule::pull_jack_data()
     getParam(P_MIN_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_min()));
     getParam(P_MAX_JACK_2).setValue(unipolar_7_to_rack(em->get_pedal_2_max()));
 
+    last_shift = em->get_jack_shift();
+    getParam(P_SHIFT).setValue(last_shift);
+
     last_keep = em->is_keep_pedals();
     getParam(P_KEEP).setValue(last_keep);
+}
+
+int JackModule::update_send(std::vector<PackedMidiMessage>& stream_data, int paramId, uint8_t haken_id, int last_value) {
+    int param_value = getParamInt(getParam(paramId));
+    if ((-1 != last_value) && (last_value != param_value)) {
+        stream_data.push_back(MakeStreamData(ChemId::Jack, haken_id, U8(param_value)));
+    }
+    return param_value;
 }
 
 void JackModule::process_params(const ProcessArgs &args)
 {
     assert(chem_host);
+    std::vector<PackedMidiMessage> stream_data;
 
-    auto pkeep = getParamInt(getParam(P_KEEP));
-    if (last_keep == -1) {
-        last_keep = pkeep;
-    } else if (last_keep != pkeep) {
-        last_keep = pkeep;
-        chem_host->host_haken()->keep_pedals(ChemId::Jack, pkeep);
-    }
-    getLight(L_KEEP).setBrightnessSmooth(pkeep, 45.f);
-    
-    int assign_1 = getParamInt(getParam(P_ASSIGN_JACK_1));
-    int assign_2 = getParamInt(getParam(P_ASSIGN_JACK_2));
-    if ((assign_1 != last_assign_1) || (assign_2 != last_assign_2)) {
+    last_assign_1 = update_send(stream_data, P_ASSIGN_JACK_1, Haken::idPedal1, last_assign_1);
+    last_assign_2 = update_send(stream_data, P_ASSIGN_JACK_2, Haken::idPedal2, last_assign_2);
+    last_shift    = update_send(stream_data, P_SHIFT,         Haken::idJackShift, last_shift);
+    last_action   = update_send(stream_data, P_SHIFT_ACTION,  Haken::idSwTogInst, last_action);
+    last_keep     = update_send(stream_data, P_KEEP,          Haken::idPresPed, last_keep);
+
+    if (!stream_data.empty()) {
         auto haken = chem_host->host_haken();
         if (haken->log) {
             haken->log->log_message("Jack", "Pedal assign");
         }
         haken->begin_stream(ChemId::Jack, Haken::s_Mat_Poke);
-        if (assign_1 != last_assign_1) {
-            haken->stream_data(ChemId::Jack, Haken::idPedal1, assign_1);
+        for (auto msg: stream_data) {
+            haken->send_message(msg);
         }
-        if (assign_2 != last_assign_2) {
-            haken->stream_data(ChemId::Jack, Haken::idPedal2, assign_2);
-        }
-        //haken->end_stream(ChemId::Jack); // optional for poke streams
-
-        last_assign_1 = assign_1;
-        last_assign_2 = assign_2;
+        haken->end_stream(ChemId::Jack); // optional for poke streams
     }
 }
 

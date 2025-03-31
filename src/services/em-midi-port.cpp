@@ -194,13 +194,12 @@ void Modulation::sync_send()
             case PortKind::Stream:
                 if (stream == INVALID_STREAM) {
                     stream = pit->channel_stream;
-                    stream_data.push_back(Tag(MakeCC(Haken::ch16, Haken::ccStream, stream), client_tag));
                 } else {
                     assert(stream == pit->channel_stream); // multiple streams in one modulation not implemented
                 }
                 pit->pull_param_cv(module);
                 if (pit->pending()) {
-                    stream_data.push_back(Tag(MakePolyKeyPressure(Haken::ch16, pit->cc_id, pit->em_low()), client_tag));
+                    stream_data.push_back(MakeStreamData(client_tag, pit->cc_id, pit->em_low()));
                     pit->un_pend();
                 }
                 break;
@@ -211,9 +210,10 @@ void Modulation::sync_send()
         }
         // pass 2: send pending data stream
         assert (stream != INVALID_STREAM);
-        if (stream_data.size() > 1) { // send only if data (always have the stream start)
+        if (!stream_data.empty()) {
             auto haken{module->chem_host->host_haken()};
             assert(haken);
+            haken->begin_stream(client_tag, stream);
             for (auto msg : stream_data) {
                 haken->send_message(msg);
             }

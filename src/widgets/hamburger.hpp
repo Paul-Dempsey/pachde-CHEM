@@ -169,4 +169,6 @@ struct HamburgerUi : TBaseWidget, IApplyTheme
     }
 };
 
+using HamParam = HamburgerUi<ParamWidget>;
+
 }

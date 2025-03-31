@@ -78,7 +78,8 @@
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
 
             "in-label":    { "fill": " #6b1b47"},
-            "ctl-frame":   { "stroke": "#1a3e73" },
+            "ctl-frame":   { "stroke": "hsl(216, 60%, 28%)" },
+            "ctl-frame-hi":{ "stroke": "hsl(216, 70%, 28%)" },
             "ctl-glyph":   { "fill": "g85", "stroke": "g85" },
             "ctl-disabled":{ "fill": "g50", "stroke": "g50" },
             "ctl-hovered": { "fill": "#f4e88e" },

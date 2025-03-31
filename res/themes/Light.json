@@ -74,6 +74,7 @@
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
 
             "ctl-frame":   { "stroke": "g50" },
+            "ctl-frame-hi":{ "stroke": "g35" },
             "ctl-glyph":   { "fill": "g20", "stroke": "g20" },
             "ctl-disabled":{ "fill": "g50", "stroke": "g20"  },
             "ctl-hovered": { "fill": "#cd6146" },

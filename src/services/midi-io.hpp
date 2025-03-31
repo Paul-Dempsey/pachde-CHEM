@@ -14,6 +14,9 @@ inline PackedMidiMessage Tag(PackedMidiMessage msg, ChemId tag) {
     msg.bytes.tag = as_u8(tag);
     return msg;
 }
+inline PackedMidiMessage MakeStreamData(ChemId tag, uint8_t id, uint8_t value) {
+    return Tag(MakePolyKeyPressure(15, id, value), tag);
+}
 
 constexpr const float MIDI_RATE = 0.005f;
 constexpr const float DISPATCH_NOW = MIDI_RATE;

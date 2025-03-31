@@ -8,7 +8,7 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <g>
     <rect
-       id="r--ctl-frame"
+       id="r--ctl-frame-hi"
        fill="none" stroke="#a6a6a6" stroke-width="0.75"
        x="1.375"
        y="1.375" 

@@ -9,6 +9,7 @@
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "jack-param.hpp"
+#include "shift-param.hpp"
 
 using namespace pachde;
 
@@ -24,6 +25,8 @@ struct JackModule : ChemModule, IChemClient
     int last_assign_1;
     int last_assign_2;
     int last_keep;
+    int last_shift;
+    int last_action;
 
     JackModule();
     ~JackModule() {
@@ -51,7 +54,8 @@ struct JackModule : ChemModule, IChemClient
         P_MAX_JACK_1, 
         P_MIN_JACK_2,
         P_MAX_JACK_2, 
-
+        P_SHIFT,
+        P_SHIFT_ACTION,
         P_KEEP,
         NUM_PARAMS
     };
@@ -64,7 +68,6 @@ struct JackModule : ChemModule, IChemClient
         NUM_OUTPUTS
     };
     enum Lights {
-        L_KEEP,
         NUM_LIGHTS
     };
 
@@ -72,6 +75,7 @@ struct JackModule : ChemModule, IChemClient
     json_t* dataToJson() override;
 
     void pull_jack_data();
+    int update_send(std::vector<PackedMidiMessage>& stream_data, int paramId, uint8_t haken_id, int last_value);
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };

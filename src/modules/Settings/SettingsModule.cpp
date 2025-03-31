@@ -32,7 +32,7 @@ SettingsModule::SettingsModule() :
         "Highest 3 channels",
         "Highest 4 channels",
     });
-    configSwitch(P_BASE_POLYPHONY, 0.f, 7.f, 3.f, "Base polyphony", {"1", "2", "3", "4", "5", "6", "7", "8"});
+    configSwitch(P_BASE_POLYPHONY, 0.f, 7.f, 3.f, "Base polyphony", {"0", "1", "2", "3", "4", "5", "6", "7", "8"});
     configSwitch(P_EXPAND_POLYPHONY, 0.f, 1.f, 0.f, "Expand polyphony", offon);
     configSwitch(P_DOUBLE_COMPUTATION, 0.f, 1.f, 0.f, "Double computation rate", offon);
     configSwitch(P_MONO, 0.f, 1.f, 0.f, "Mono", offon);
@@ -64,22 +64,7 @@ SettingsModule::SettingsModule() :
         "3 octaves",
         "Maximum",
     });
-    configSwitch(P_OCTAVE_SWITCH, 0.f, 1.f, 0.f, "Octave switch", offon);
-    configSwitch(P_OCTAVE_TYPE, 0.f, 2.f, 0.f, "Octave switch type", {
-        "Switch",
-        "Toggle",
-        "Instant"
-    });
-    configSwitch(P_JACK_SHIFT, 0.f, 7.f, 3.f, "Octave switch range", {
-        "-4 octaves",
-        "-3 octaves",
-        "-2 octaves",
-        "-1 octave",
-        "+1 octave",
-        "+2 octaves",
-        "+3 octaves",
-        "+4 octaves",
-    });
+
     configSwitch(P_ROUND_TYPE, 0.f, 3.f, 0.f, "Round type", {
         "Normal",
         "Release",
@@ -91,6 +76,7 @@ SettingsModule::SettingsModule() :
 
     configTuningParam(this, P_TUNING);
 
+    configParam(P_MIDI_ROUTING, 0.f, Haken::defaultRoute, Haken::defaultRoute, "MIDI Routing");
     configSwitch(P_MIDI_DSP,     0.f, 1.f, 1.f, "Route Midi to DSP",     offon);
     configSwitch(P_MIDI_CVC,     0.f, 1.f, 1.f, "Route Midi to CVC",     offon);
     configSwitch(P_MIDI_MIDI,    0.f, 1.f, 1.f, "Route Midi to MIDI",    offon);
@@ -107,7 +93,6 @@ SettingsModule::SettingsModule() :
 
     // button lights unconfigured to disable tooltip
     //configLight(L_MONO, "Mono mode");
-    //configLight(L_OCTAVE_SWITCH, "Octave switch");
 
     configLight(L_ROUND_Y,       "Round on Y");
     configLight(L_ROUND_INITIAL, "Round initial");
@@ -169,6 +154,10 @@ void SettingsModule::update_from_em(int param_id, uint8_t value) {
     getParam(param_id).setValue(value);
 }
 
+inline uint8_t is_bit(uint8_t value, uint8_t mask) {
+    return 1 * (0 != (value & mask));
+}
+
 void SettingsModule::update_from_em()
 {
     if (!connected()) return;
@@ -187,10 +176,9 @@ void SettingsModule::update_from_em()
     update_from_em(P_MONO, em->is_mono());
     update_from_em(P_MONO_MODE, em->get_mono_func());
     update_from_em(P_MONO_INTERVAL, em->get_mono_interval());
-    update_from_em(P_OCTAVE_SWITCH, em->get_octave_shift());
-    update_from_em(P_JACK_SHIFT, em->get_jack_shift());
     update_from_em(P_ROUND_TYPE, em->get_round_mode());
     update_from_em(P_ROUND_INITIAL, em->get_round_initial());
+    update_from_em(P_KEEP_MIDI, em->is_keep_midi_encoding());
 
     uint8_t value;
     value = em->get_round_rate();
@@ -202,12 +190,32 @@ void SettingsModule::update_from_em()
     getParamQuantity(P_TUNING)->setValue(packTuning(static_cast<Tuning>(value)));
 
     value = em->get_midi_routing();
-    getParam(P_MIDI_DSP).setValue(value & Haken::bMidiInDsp);
-    getParam(P_MIDI_CVC).setValue(value & Haken::bMidiInCvc);
-    getParam(P_MIDI_MIDI).setValue(value & Haken::bMidiInTrad);
-    getParam(P_SURFACE_DSP).setValue(value & Haken::bSurfaceDsp);
-    getParam(P_SURFACE_CVC).setValue(value & Haken::bMidiInCvc);
-    getParam(P_SURFACE_MIDI).setValue(value & Haken::bSurfaceTrad);
+    update_from_em(P_MIDI_ROUTING, value);
+    em_values[P_MIDI_DSP] = is_bit(value, Haken::bMidiInDsp);
+    em_values[P_MIDI_CVC] = is_bit(value, Haken::bMidiInCvc);
+    em_values[P_MIDI_MIDI] = is_bit(value, Haken::bMidiInTrad);
+    em_values[P_SURFACE_DSP] = is_bit(value, Haken::bSurfaceDsp);
+    em_values[P_SURFACE_CVC] = is_bit(value, Haken::bSurfaceCvc);
+    em_values[P_SURFACE_MIDI] = is_bit(value, Haken::bSurfaceTrad);
+
+    getParam(P_MIDI_DSP).setValue(em_values[P_MIDI_DSP]);
+    getParam(P_MIDI_CVC).setValue(em_values[P_MIDI_CVC]);
+    getParam(P_MIDI_MIDI).setValue(em_values[P_MIDI_MIDI]);
+    getParam(P_SURFACE_DSP).setValue(em_values[P_SURFACE_DSP]);
+    getParam(P_SURFACE_CVC).setValue(em_values[P_SURFACE_CVC]);
+    getParam(P_SURFACE_MIDI).setValue(em_values[P_SURFACE_MIDI]);
+}
+
+uint8_t SettingsModule::get_param_routing()
+{
+    uint8_t r = 0;
+    if (getParamInt(getParam(P_MIDI_DSP))) r |= Haken::bMidiInDsp;
+    if (getParamInt(getParam(P_MIDI_CVC))) r |= Haken::bMidiInCvc;
+    if (getParamInt(getParam(P_MIDI_MIDI))) r |= Haken::bMidiInTrad;
+    if (getParamInt(getParam(P_SURFACE_DSP))) r |= Haken::bSurfaceDsp;
+    if (getParamInt(getParam(P_SURFACE_CVC))) r |= Haken::bSurfaceCvc;
+    if (getParamInt(getParam(P_SURFACE_MIDI))) r |= Haken::bSurfaceTrad;
+    return r;
 }
 
 void SettingsModule::do_message(PackedMidiMessage message)
@@ -218,16 +226,8 @@ void SettingsModule::do_message(PackedMidiMessage message)
     case Haken::ccStat1: {
         in_mat_poke = false;
         switch (midi_cc(message)) {
-        case Haken::ccStream:
-            in_mat_poke = Haken::s_Mat_Poke == midi_cc_value(message);
-            return;
-
         case Haken::ccMonoOn:            
             update_from_em(P_MONO, midi_cc_value(message));
-            break;
-
-        case Haken::ccOctShift:
-            update_from_em(P_OCTAVE_SWITCH, midi_cc_value(message));
             break;
 
         case Haken::ccRndIni: 
@@ -247,13 +247,14 @@ void SettingsModule::do_message(PackedMidiMessage message)
             int param_index = -1; //invalid
 
             switch (message.bytes.data1) {
-            case Haken::idPrio:      param_index = P_NOTE_PRIORITY; break;
             case Haken::idNoteMode:  param_index = P_NOTE_PROCESSING; break;
+            case Haken::idPrio:      param_index = P_NOTE_PRIORITY; break;
             case Haken::idReverse:   param_index = P_SURFACE_DIRECTION; break;
-            case Haken::idSwTogInst: param_index = P_OCTAVE_TYPE; break;
             case Haken::idRoundMode: param_index = P_ROUND_TYPE; break;
             case Haken::idOkExpPoly: param_index = P_EXPAND_POLYPHONY; break;
             case Haken::idRouting: {
+                param_index = P_MIDI_ROUTING;
+
                 uint8_t routing = message.bytes.data2;
                 update_from_em(P_MIDI_DSP, routing & Haken::bMidiInDsp);
                 update_from_em(P_MIDI_CVC, routing & Haken::bMidiInCvc);
@@ -268,7 +269,6 @@ void SettingsModule::do_message(PackedMidiMessage message)
             case Haken::idPressure:  param_index = P_Z; break;
             case Haken::idMonoFunc:  param_index = P_MONO_MODE; break;
             case Haken::idMonoInt:   param_index = P_MONO_INTERVAL; break;
-            case Haken::idJackShift: param_index = P_JACK_SHIFT; break;
             case Haken::idPresEnc:   param_index = P_KEEP_MIDI; break;
             default: break;
             }
@@ -321,6 +321,15 @@ void SettingsModule::process_params(const ProcessArgs &args)
     rounding_port.set_mod_amount(getParamQuantity(P_MOD_AMOUNT)->getValue());
 }
 
+void SettingsModule::build_update(std::vector<PackedMidiMessage>& stream_data, int param_id, uint8_t haken_id)
+{
+    uint8_t value = getParamInt(getParam(param_id));
+    if (value != em_values[param_id]) {
+        stream_data.push_back(MakeStreamData(ChemId::Settings, haken_id, value));
+        em_values[param_id] = value;
+    }
+}
+
 void SettingsModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
@@ -334,8 +343,54 @@ void SettingsModule::process(const ProcessArgs &args)
     if (midi_timer.process(args.sampleTime) > MOD_MIDI_RATE) {
         midi_timer.reset();
 
+        auto haken = chem_host->host_haken();
+
+        // cc
         rounding_port.pull_param_cv(this);
         rounding_port.send(chem_host, ChemId::Settings);
+        em_values[P_ROUND_RATE] = rounding_port.em_low();
+
+        auto initial = getParamInt(getParam(P_ROUND_INITIAL));
+        if (initial != em_values[P_ROUND_INITIAL]) {
+            em_values[P_ROUND_INITIAL] = initial;
+            haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccRndIni, U8(initial));
+        }
+
+        auto mono = getParamInt(getParam(P_MONO));
+        if (mono != em_values[P_MONO]) {
+            em_values[P_MONO] = mono;
+            haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccMonoOn, U8(mono));
+        }
+
+        // s_Mat_Poke
+        std::vector<PackedMidiMessage> stream_data;
+        
+        uint8_t routing = get_param_routing();
+        if (routing != em_values[P_MIDI_ROUTING]) {
+            stream_data.push_back(MakeStreamData(ChemId::Settings, Haken::idRouting, routing));
+            em_values[P_MIDI_ROUTING] = routing;
+        }
+        build_update(stream_data, P_SURFACE_DIRECTION, Haken::idReverse);
+        build_update(stream_data, P_X, Haken::idBendRange);
+        build_update(stream_data, P_Y, Haken::idFrontBack);
+        build_update(stream_data, P_Z, Haken::idPressure);
+        build_update(stream_data, P_NOTE_PROCESSING, Haken::idNoteMode);
+        build_update(stream_data, P_NOTE_PRIORITY, Haken::idPrio);
+        build_update(stream_data, P_ROUND_TYPE, Haken::idRoundMode);
+        build_update(stream_data, P_BASE_POLYPHONY, Haken::idPoly);
+        build_update(stream_data, P_EXPAND_POLYPHONY, Haken::idOkExpPoly);
+        build_update(stream_data, P_DOUBLE_COMPUTATION, Haken::idOkIncComp);
+        build_update(stream_data, P_MONO_MODE, Haken::idMonoFunc);
+        build_update(stream_data, P_MONO_INTERVAL, Haken::idMonoInt);
+        build_update(stream_data, P_KEEP_MIDI, Haken::idPresEnc);
+
+        if (!stream_data.empty()) {
+            haken->begin_stream(ChemId::Settings, Haken::s_Mat_Poke);
+            for (auto msg: stream_data) {
+                haken->send_message(msg);
+            }
+            haken->end_stream(ChemId::Settings);
+        }
     }
 
     if (((args.frame + id) % 61) == 0) {
@@ -346,9 +401,6 @@ void SettingsModule::process(const ProcessArgs &args)
         round_leds.set_rate(em->get_round_rate());
         round_leds.update_lights(this, Lights::L_ROUND);
     
-        octave.set_shift(em->get_octave_shift());
-        octave.update_lights(this, Lights::L_OCT_SHIFT_FIRST);
-
         float v;
         
         v = getParam(P_MONO).getValue();
