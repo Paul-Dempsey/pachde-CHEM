@@ -133,13 +133,18 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
     if (e.type == Port::OUTPUT) return;
     if (e.connecting) {
         auto port = get_port_for_input(e.portId);
+        if (!port) return; // unmodulated port
+
         mod_target = port->index;
         auto pq = module->getParamQuantity(mod_param);
         if (pq) {
             pq->setImmediateValue(ports[mod_target].modulation());
         }
     } else {
-        ports[e.portId].set_mod_amount(0.f);
+        auto port = get_port_for_input(e.portId);
+        if (!port) return; // unmodulated port
+
+        port->set_mod_amount(0.f);
 
         int i = 0;
         for (auto port: ports) {
