@@ -114,10 +114,6 @@ PreUi::PreUi(PreModule *module) :
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
     
     // footer
-    addChild(warning_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));

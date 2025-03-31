@@ -80,7 +80,7 @@ struct Template_Ui : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel*   haken_device_label{nullptr};
-    TipLabel*   warn{nullptr};
+    //TipLabel*   warn{nullptr};
 
     //GlowKnob* knobs[Template_Module::NUM_KNOBS];
     //TrackWidget* tracks[Template_Module::NUM_MOD_PARAMS];

@@ -106,7 +106,6 @@ struct MacroUi : ChemModuleWidget, IChemClient
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
-    TipLabel*     warning_label{nullptr};
 
     TipLabel* preset_label;
     TextLabel* m1_label;

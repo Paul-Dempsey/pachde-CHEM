@@ -11,7 +11,7 @@
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="90" height="380" />
       <path id="t--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,57 h 102" />
-      <path id="b--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,278 h 102" />
+      <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,290 h 102" />
    </g>
 
    <g id="small-logo" opacity="0" transform="translate(2.5, 2.5) scale(.125, .125)">

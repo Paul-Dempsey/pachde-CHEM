@@ -115,7 +115,6 @@ struct FxUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel*   haken_device_label{nullptr};
-    TipLabel*   warn{nullptr};
 
     SelectorWidget* selector{nullptr};
     TextLabel* effect_label;

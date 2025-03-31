@@ -49,15 +49,6 @@ void SusUi::create_ui()
     addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_MOD, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme_engine, theme, S::in_port_label));
 
-    // footer
-    // addChild(warning_label = createStaticTextLabel<TipLabel>(
-    //     Vec(S::CORE_LINK_TEXT, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    // warning_label->describe("[warning/status]");
-    // warning_label->glowing(true);
-
-    // addChild(haken_device_label = createStaticTextLabel<TipLabel>(
-    //     Vec(S::CORE_LINK_TEXT, box.size.y - S::CORE_LINK_TEXT_DY), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
-
     link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), theme_engine, theme, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);

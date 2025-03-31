@@ -101,7 +101,6 @@ struct PreUi : ChemModuleWidget, IChemClient
 
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
-    TipLabel*     warning_label{nullptr};
 
     int comp_type;
 

@@ -35,12 +35,12 @@
 
    <path id="pp--div" stroke="#737373" stroke-width="0.75" d="m 114.5,16 0,46" />
    <path id="tr--div" stroke="#737373" stroke-width="0.75" d="m 233,16 0,46" />
+   <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,290 H 283" />
    <path id="t--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,64 H 283" />
-   <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,278 H 283" />
-   <path id="p--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 230,317 h 50" />
-   <path id="1--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 24,291 h 145" />
-   <path id="2--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 36,309 h 145" />
-   <path id="3--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 48,327 h 145" />
-   <path id="4--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 60,345 h 145" />
+   <path id="p--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 230,329 h 50" />
+   <path id="1--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 12,303 h 154" />
+   <path id="2--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 24,320 h 154" />
+   <path id="3--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 36,337 h 154" />
+   <path id="4--p-link" fill="none" stroke="#2d6886" stroke-width=".5" d="M 48,354 h 154" />
    </g>
 </svg>

@@ -7,7 +7,6 @@
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)
 - **Play**: sorting: alpha, id, category
 - Allow shared controllers
-- Cleanup unused warning labels
 
 ## Before release
 

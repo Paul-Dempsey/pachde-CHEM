@@ -100,7 +100,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     float click_dy = 1.5f;
     const float PP_LEFT = 244;
     const float PORT_MOD_DX = 15.f;
-    const float PORT_MOD_DY = 0.f;
+    const float PORT_MOD_DY = .75f;
 
     // Main inputs
     const float pdx[] { 34.f, 34.f, 42.f, 34.f, 0.f};
@@ -149,10 +149,6 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     }
     
     // footer
-    addChild(warning_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));

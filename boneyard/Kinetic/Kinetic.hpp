@@ -96,7 +96,6 @@ struct KineticUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-    TipLabel* warning_label{nullptr};
     GlowKnob* mod_knob{nullptr};
 
     KineticUi(KineticModule *module);

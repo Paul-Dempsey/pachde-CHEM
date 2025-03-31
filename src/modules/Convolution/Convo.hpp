@@ -124,7 +124,6 @@ struct ConvoUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-    TipLabel* warning_label{nullptr};
 
     SmallRoundParamButton* extend_button;
 

@@ -44,11 +44,6 @@ void KineticUi::create_ui()
     y += S::PORT_DY;
 
     // footer
-    addChild(warning_label = createStaticTextLabel<TipLabel>(
-         Vec(S::CORE_LINK_TEXT, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
-
     addChild(haken_device_label = createStaticTextLabel<TipLabel>(
         Vec(S::CORE_LINK_TEXT, box.size.y - S::CORE_LINK_TEXT_DY), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 

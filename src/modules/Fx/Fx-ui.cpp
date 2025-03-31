@@ -33,7 +33,7 @@ FxUi::FxUi(FxModule *module) :
     addChild(effect_label = createLabel<TextLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs with labels
-    const float DY_KNOB = 60.f;
+    const float DY_KNOB = 62.f;
     const float KNOB_DX = 28.f;
     const float KNOB_TOP = 114.f;
     const float LABEL_DY = 18.5f;
@@ -99,11 +99,6 @@ FxUi::FxUi(FxModule *module) :
     }
 
     // footer
-
-    addChild(warn = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warn->describe("[warning/status]");
-    warn->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));

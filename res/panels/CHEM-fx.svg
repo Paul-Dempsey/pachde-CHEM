@@ -10,7 +10,7 @@
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="135" height="380" />
       <path id="a--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 22,86 h 100" />
-      <path id="b--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,278 h 131" />
+      <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,290 h 131" />
    </g>
 
     <path id="1--k#" transform="translate(22, 96)" fill="#4095bf" d="M 0.28320313,0 H 1.8994141 V 6.2011719 H 1.0595703 V 0.8203125 H 0 Z" />

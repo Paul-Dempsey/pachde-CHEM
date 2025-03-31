@@ -31,10 +31,10 @@ Template_Ui::Template_Ui(Template_Module *module) :
 
     // footer
 
-    addChild(warn = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warn->describe("[warning/status]");
-    warn->glowing(true);
+    // addChild(warn = createLabel<TipLabel>(
+    //     Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
+    // warn->describe("[warning/status]");
+    // warn->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));

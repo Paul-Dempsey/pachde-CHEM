@@ -25,7 +25,7 @@ constexpr const float CENTER = PANEL_WIDTH * .5f;
 constexpr const float KNOB_CX = 25.f;
 constexpr const float KNOB_CY = 35.f;
 constexpr const float KNOB_TOP = KNOB_CY - 16.f;
-constexpr const float MACRO_DY = 40.f;
+constexpr const float MACRO_DY = 41.5f;
 constexpr const float LABEL_LEFT = 45.f;
 constexpr const float LABEL_TOP = KNOB_CY;
 
@@ -91,7 +91,7 @@ MacroUi::MacroUi(MacroModule *module) :
     // inputs
     const NVGcolor co_port = PORT_CORN;
     x = INPUT_LEFT;
-    y = S::PORT_TOP + S::PORT_DY*.5f;
+    y = S::PORT_TOP + S::PORT_DY*.5f - 5.f;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, MacroModule::P_MOD_AMOUNT, theme_engine, theme));
     x += INPUT_DX;
     y = S::PORT_TOP;
@@ -116,11 +116,6 @@ MacroUi::MacroUi(MacroModule *module) :
     }
 
     // footer
-
-    addChild(warning_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    warning_label->describe("[warning/status]");
-    warning_label->glowing(true);
 
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, style::haken_label));

@@ -9,8 +9,8 @@
    </defs>
    <g id="g1">
       <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="90" height="380" />
-      <path id="t--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,101 h 102" />
-      <path id="b--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,278 h 102" />
+      <path id="t--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,101 h 102" />
+      <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,290 h 102" />
    </g>
    <path id="th" stroke="#f9a54b" stroke-width=".25" d="M 5,6.25 h 13 M 85,6.25 h -13" />
    <g id="POST" opacity="1" transform="translate(23,3.5)">
