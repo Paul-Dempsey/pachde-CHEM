@@ -11,7 +11,7 @@ using SM = SettingsModule;
 
 // -- Settings UI -----------------------------------
 
-constexpr const float CENTER = 255.f * .5f;
+constexpr const float CENTER = 225.f * .5f;
 
 bool SettingsUi::connected() {
     if (!my_module) return false;
@@ -36,7 +36,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     const float row_dy = 14.f;
     const float menu_axis = CENTER - 18.f;
     x = menu_axis;
-    y = 18;
+    y = 20;
     addChild(Center(createThemedParamButton<SurfaceDirectionParamButton>(Vec(x+18.f,y), my_module, SM::P_SURFACE_DIRECTION, theme_engine, theme)));
 
     auto value_style = LabelStyle{"setting", TextAlignment::Left, 14.f};
@@ -82,11 +82,10 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note priority", theme_engine, theme, label_style));
 
     y += row_dy;
+    addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y), my_module,SM::P_MONO, SM::L_MONO, theme_engine, theme)));
     addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE, theme_engine, theme)));
     addChild(mono_mode_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 140.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono mode", theme_engine, theme, label_style));
-
-    addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y + row_dy*.5), my_module,SM::P_MONO, SM::L_MONO, theme_engine, theme)));
 
     y += row_dy;
     addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL, theme_engine, theme)));
@@ -99,44 +98,48 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Tuning", theme_engine, theme, label_style));
 
     y += row_dy;
+    create_rounding_leds(this, 20.f, y, 6.f, my_module, SM::L_ROUND_Y);
+
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_ROUND_TYPE));
     addChild(round_type_value = createLabel<TextLabel>(Vec(x+value_dx, y-value_dy), 60.f, "", theme_engine, theme, value_style));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Rounding", theme_engine, theme, label_style));
     
     y += row_dy;
-    create_rounding_leds(this, 22.f, y, 6.f, my_module, SM::L_ROUND_Y);
 
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_ROUND_INITIAL, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round initial", theme_engine, theme, label_style));
 
     y += row_dy;
-    addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 127.f, my_module, SM::P_ROUND_RATE, theme_engine, theme));
+    addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 120.f, my_module, SM::P_ROUND_RATE, theme_engine, theme));
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round rate", theme_engine, theme, label_style));
 
-    x = 200.f;
-    y = 274.f;
+    y += row_dy;
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_KEEP_MIDI, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x,y + 5.f), 50.f, "Keep", theme_engine, theme, S::med_control_label));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Keep MIDI", theme_engine, theme, label_style));
+
+    y += row_dy;
+    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_KEEP_SURFACE, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Keep Surface", theme_engine, theme, label_style));
 
     // routing
-    x = 60.f;
-    y = 262;
+    x = 42.5f;
+    y = 267;
     addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, S::med_control_label));
     y += 15.f;
     addChild(createLabel<TextLabel>(Vec(x, y), 50.f, "Surface", theme_engine, theme, S::med_control_label));
-    y += 21.f;
-    x = 96.5f;
+    y += 22.f;
+    x = 81.5f;
     addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "DSP",  theme_engine, theme, S::med_control_label));
     x += 30.f;
     addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "CVC",  theme_engine, theme, S::med_control_label));
     x += 30.f;
     addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", theme_engine, theme, S::med_control_label));
 
-    const float col_dsp = 97.f;
-    const float col_cvc = 127.f;
-    const float col_midi = 157.f;
-    const float row_midi = 267.f;
-    const float row_surface = 282.f;
+    const float col_dsp = 82.5f;
+    const float col_cvc = col_dsp + 30.f;
+    const float col_midi = col_cvc + 30.f;
+    const float row_midi = 273.f;
+    const float row_surface = 288.f;
     y = row_midi;
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>( Vec(col_dsp,y), my_module, SM::P_MIDI_DSP, SM::L_MIDI_DSP, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>( Vec(col_cvc,y), my_module, SM::P_MIDI_CVC, SM::L_MIDI_CVC, theme_engine, theme)));

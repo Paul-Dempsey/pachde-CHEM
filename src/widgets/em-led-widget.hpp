@@ -46,7 +46,7 @@ void create_octave_shift_leds(TParentWidget* parent, float cx, float cy, float s
 
 // Rounding
 //
-// Light ids must be in the following order:
+// Light ids must be contiguous and in the following order:
 //   L_ROUND_Y,
 //   L_ROUND_INITIAL,
 //   L_ROUND,

@@ -49,7 +49,8 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         P_SURFACE_MIDI,
 
         P_KEEP_MIDI,
-
+        P_KEEP_SURFACE,
+        
         P_MOD_AMOUNT,
         NUM_PARAMS,
         NUM_EM_VALUES = P_MOD_AMOUNT

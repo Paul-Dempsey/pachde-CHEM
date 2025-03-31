@@ -83,7 +83,8 @@ SettingsModule::SettingsModule() :
     configSwitch(P_SURFACE_DSP,  0.f, 1.f, 1.f, "Route Surface to DSP",  offon);
     configSwitch(P_SURFACE_CVC,  0.f, 1.f, 1.f, "Route Surface to CVC",  offon);
     configSwitch(P_SURFACE_MIDI, 0.f, 1.f, 1.f, "Route Surface to MIDI", offon);
-    configSwitch(P_KEEP_MIDI,    0.f, 1.f, 0.f, "Keep MIDI settings",    offon);
+    configSwitch(P_KEEP_MIDI,    0.f, 1.f, 0.f, "Keep MIDI settings across preset changes", offon);
+    configSwitch(P_KEEP_SURFACE, 0.f, 1.f, 0.f, "Keep Surface settings across preset changes", offon);
 
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")); 
 
@@ -179,6 +180,7 @@ void SettingsModule::update_from_em()
     update_from_em(P_ROUND_TYPE, em->get_round_mode());
     update_from_em(P_ROUND_INITIAL, em->get_round_initial());
     update_from_em(P_KEEP_MIDI, em->is_keep_midi_encoding());
+    update_from_em(P_KEEP_SURFACE, em->is_keep_surface_processing());
 
     uint8_t value;
     value = em->get_round_rate();
@@ -270,6 +272,7 @@ void SettingsModule::do_message(PackedMidiMessage message)
             case Haken::idMonoFunc:  param_index = P_MONO_MODE; break;
             case Haken::idMonoInt:   param_index = P_MONO_INTERVAL; break;
             case Haken::idPresEnc:   param_index = P_KEEP_MIDI; break;
+            case Haken::idPresSurf:  param_index = P_KEEP_SURFACE; break;
             default: break;
             }
             if (param_index >= 0) {
@@ -335,6 +338,8 @@ void SettingsModule::process(const ProcessArgs &args)
     ChemModule::process(args);
 
     if (!connected() || chem_host->host_busy()) return;
+    auto haken = chem_host->host_haken();
+    auto em = chem_host->host_matrix();
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
@@ -343,17 +348,29 @@ void SettingsModule::process(const ProcessArgs &args)
     if (midi_timer.process(args.sampleTime) > MOD_MIDI_RATE) {
         midi_timer.reset();
 
-        auto haken = chem_host->host_haken();
-
         // cc
         rounding_port.pull_param_cv(this);
         rounding_port.send(chem_host, ChemId::Settings);
         em_values[P_ROUND_RATE] = rounding_port.em_low();
 
-        auto initial = getParamInt(getParam(P_ROUND_INITIAL));
-        if (initial != em_values[P_ROUND_INITIAL]) {
-            em_values[P_ROUND_INITIAL] = initial;
-            haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccRndIni, U8(initial));
+        if (getInput(IN_ROUND_INITIAL).isConnected()) {
+            auto v = getInput(IN_ROUND_INITIAL).getVoltage();
+            bool high = v > 9.5f;
+            bool low = v < .125f;
+            bool initial = chem_host->host_matrix()->is_round_initial();
+            if (high && (high != initial)) {
+                haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccRndIni, 1);
+                update_from_em(P_ROUND_INITIAL, 1);
+            } else if (low && (low != initial)) {
+                haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccRndIni, 0);
+                update_from_em(P_ROUND_INITIAL, 0);
+            }
+        } else {
+            bool initial = getParamInt(getParam(P_ROUND_INITIAL));
+            if (initial != static_cast<bool>(em_values[P_ROUND_INITIAL])) {
+                em_values[P_ROUND_INITIAL] = initial;
+                haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccRndIni, U8(initial));
+            }
         }
 
         auto mono = getParamInt(getParam(P_MONO));
@@ -383,6 +400,7 @@ void SettingsModule::process(const ProcessArgs &args)
         build_update(stream_data, P_MONO_MODE, Haken::idMonoFunc);
         build_update(stream_data, P_MONO_INTERVAL, Haken::idMonoInt);
         build_update(stream_data, P_KEEP_MIDI, Haken::idPresEnc);
+        build_update(stream_data, P_KEEP_SURFACE, Haken::idPresSurf);
 
         if (!stream_data.empty()) {
             haken->begin_stream(ChemId::Settings, Haken::s_Mat_Poke);
@@ -394,8 +412,6 @@ void SettingsModule::process(const ProcessArgs &args)
     }
 
     if (((args.frame + id) % 61) == 0) {
-        auto em = chem_host->host_matrix();
-
         round_leds.set_initial(em->is_round_initial());
         round_leds.set_mode(em->get_round_mode());
         round_leds.set_rate(em->get_round_rate());
