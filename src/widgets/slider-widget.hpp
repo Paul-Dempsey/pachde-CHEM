@@ -42,7 +42,7 @@ struct FillSlider : BasicSlider
 
     ElementStyle fill;
 
-    FillSlider() : fill("slide-fill", "#f9a54b", 2.5f) {}
+    FillSlider() : fill("slide-fill", "hsl(32,90%,60%)", "hsl(32,90%,60%)", 3.5f) {}
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {

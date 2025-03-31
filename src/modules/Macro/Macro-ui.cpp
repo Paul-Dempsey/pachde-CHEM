@@ -135,15 +135,16 @@ MacroUi::MacroUi(MacroModule *module) :
     // Browsing UI
 
     if (browsing) {
-        m1_label->text("Size");
-        m2_label->text("OctBelow");
-        m3_label->text("DelayAmt");
-        m4_label->text("DblLevel");
-        m5_label->text("DelayTime");
-        m6_label->text("Motion");
-        
+        m1_label->text("i");
+        m2_label->text("ii");
+        m3_label->text("iii");
+        m4_label->text("iv");
+        m5_label->text("v");
+        m6_label->text("vi");
         m1_ped_label->text("p1");
         m3_ped_label->text("p2");
+
+        addChild(createWidgetCentered<Logo>(Vec(68, box.size.y*.25)));
     }
 
     // init

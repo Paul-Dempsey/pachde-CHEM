@@ -132,6 +132,12 @@ PostUi::PostUi(PostModule *module) :
     }
     addChild(link_button);
 
+    if (!module) {
+        auto logo = new Logo(0.75f);
+        logo->box.pos = Vec(CENTER, box.size.y*.5);
+        addChild(Center(logo));
+    }
+
     // init
 
     if (!my_module || my_module->glow_knobs) {

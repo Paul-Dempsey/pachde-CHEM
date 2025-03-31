@@ -168,9 +168,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     // Browsing UI
 
     if (browsing) {
-        auto logo = new Logo(0.35f);
-        logo->box.pos = Vec(CENTER - logo->box.size.x*.5, S::PORT_TOP + S::PORT_DY *.5f);
-        addChild(logo);
+        addChild(createWidgetCentered<Logo>(Vec(CENTER, 136)));
     }
 
     // init

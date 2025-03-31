@@ -1,5 +1,6 @@
 #include "Jack.hpp"
 #include "../../widgets/uniform-style.hpp"
+#include "../../widgets/logo-widget.hpp"
 #include "../../widgets/flip-switch.hpp"
 #include "../../widgets/theme-knob.hpp"
 
@@ -84,10 +85,16 @@ JackUi::JackUi(JackModule *module) :
     addChild(createLabel<TextLabel>(Vec(32, y), 15.f, "max", theme_engine, theme, knob_label_style));
 
     y += PEDAL_DY;
-    pedal_image_2 = new SymbolSetWidget(&symbols);
-    pedal_image_2->box.pos = Vec(CENTER, y);
-    pedal_image_2->set_index(0);
-    addChild(Center(pedal_image_2));
+    if (module) {
+        pedal_image_2 = new SymbolSetWidget(&symbols);
+        pedal_image_2->box.pos = Vec(CENTER, y);
+        pedal_image_2->set_index(0);
+        addChild(Center(pedal_image_2));
+    } else {
+        auto logo = new Logo(.35f);
+        logo->box.pos = Vec(CENTER, y);
+        addChild(Center(logo));
+    }
 
     y = 212.f;
     addChild(Center(createThemedParam<ShiftMenu>(Vec(x, y), my_module, JackModule::P_SHIFT, theme_engine, theme)));

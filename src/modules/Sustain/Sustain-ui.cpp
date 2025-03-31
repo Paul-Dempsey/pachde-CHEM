@@ -1,5 +1,6 @@
 #include "Sustain.hpp"
 #include "../../services/colors.hpp"
+#include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
@@ -62,6 +63,12 @@ void SusUi::create_ui()
         });
     }
     addChild(link_button);
+
+    if (!module) {
+        auto logo = new Logo(0.25f);
+        logo->box.pos = Vec(CENTER, 60);
+        addChild(Center(logo));
+    }
 
     // init
 

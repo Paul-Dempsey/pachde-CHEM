@@ -133,10 +133,12 @@ PreUi::PreUi(PreModule *module) :
     // Browsing UI
 
     if (browsing) {
+        auto logo = new Logo(0.75f);
+        logo->box.pos = Vec(CENTER, box.size.y*.5);
+        addChild(Center(logo));
     }
 
     // init
-
     if (!my_module || my_module->glow_knobs) {
         glowing_knobs(true);
     }

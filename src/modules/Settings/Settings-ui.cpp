@@ -182,7 +182,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     if (browsing) {
         auto logo = new Logo(0.8f);
-        logo->box.pos = Vec(CENTER + 10.f, 80.f);
+        logo->box.pos = Vec(CENTER, 80.f);
         addChild(logo);
     }
 
