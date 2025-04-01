@@ -22,12 +22,12 @@ Every other module must be connected to a **Core** module, using the link button
 | [**Sustain**](./sus.md)  | On-screen Sustain |
 | [**Sostenuto**](./sus.md)  | On-screen Sostenuto |
 | [**Sostenuto 2**](./sus.md)  | On-screen Sostenuto 2 |
+| [**Settings**](./settings.md) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing. |
 
-More modules are planned to cover other important controls, such as rounding and polyphony,
-and a means to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
+More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
 
 We take requests! Open an issue on the GitHub repository,
- or get in touch with me on the VCV Rack Community forum or on Discord — where I go by "pachde" — or on Facebook — where I am Paul Dempsey.
+ or get in touch with me on the VCV Rack Community forum or on Discord — where I go by "pachde" — or on the Haken Continuum and Expressive E Osmose Facebook groups where I am Paul Dempsey.
 
 ## Modulation (voltage control)
 
