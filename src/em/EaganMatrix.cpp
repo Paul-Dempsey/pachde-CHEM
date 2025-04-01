@@ -252,7 +252,6 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
         return;
     }
     if (get_jack_1_assign() == cc) {
-        assert(0 == frac_lsb);
         jack_1 = (value << 7) + frac_lsb;
     }
     if (get_jack_2_assign() == cc) {

@@ -136,9 +136,12 @@ struct TrimPotSvg {
     static std::string bg() { return "res/widgets/trimpot-bg.svg"; }
     static std::string knob() { return "res/widgets/trimpot.svg"; }
 };
-
+struct UselessSvg {
+    static std::string bg() { return "res/widgets/useless-knob-bg.svg"; }
+    static std::string knob() { return "res/widgets/useless-knob.svg"; }
+};
 using BasicKnob = TKnob<GrayKnobSvg>;
-
+using UselessKnob = TKnob<UselessSvg>;
 using GrayKnob = TKnob<GrayKnobSvg>;
 using BlueKnob = TKnob<BlueKnobSvg>;
 using RedKnob = TKnob<RedKnobSvg>;

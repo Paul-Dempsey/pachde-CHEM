@@ -43,6 +43,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool is_busy;
     bool in_reboot;
     bool heartbeat;
+    WallTimer ticker;
 
     std::vector<IChemClient*> chem_clients;
     HakenTasks tasks;
@@ -130,6 +131,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_C2_MUSIC_FILTER,
         P_C1_MUTE,
         P_C2_MUTE,
+        P_NOTHING,
         NUM_PARAMS
     };
     enum Inputs {

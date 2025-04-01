@@ -13,6 +13,7 @@ CoreModule::CoreModule() :
     heartbeat(false),
     restore_last_preset(false)
 {
+    ticker.set_interval(1.0f);
     em_event_mask = EME::LoopDetect
         + EME::EditorReply 
         + EME::PresetChanged
@@ -29,6 +30,7 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C2_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
     configSwitch(Params::P_C1_MUTE, 0.f, 1.f, 0.f, "MIDI 1 data", { "passed", "blocked" } );
     configSwitch(Params::P_C2_MUTE, 0.f, 1.f, 0.f, "MIDI 2 data", { "passed", "blocked" } );
+    configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", "")->snapEnabled = true;
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
     configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
@@ -517,6 +519,13 @@ void CoreModule::process(const ProcessArgs &args)
     }
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
         processLights(args);
+        if (ticker.lap()) {
+            auto next = getParam(P_NOTHING).getValue() + 1.0f;
+            if (next > getParamQuantity(P_NOTHING)->getMaxValue()) {
+                next = 0.f;
+            }
+            getParam(P_NOTHING).setValue(next);
+        }
     }
 }
 

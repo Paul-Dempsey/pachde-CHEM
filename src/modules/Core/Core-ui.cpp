@@ -3,6 +3,7 @@
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "../../widgets/theme-button.hpp"
+#include "../../widgets/theme-knob.hpp"
 #include "../../em/preset-meta.hpp"
 
 CoreModuleWidget::~CoreModuleWidget()
@@ -59,6 +60,13 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createScrews(theme);
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
+
+    auto useless = createChemKnob<UselessKnob>(Vec(CENTER, 70.f), my_module, CoreModule::P_NOTHING, theme_engine, theme);
+    useless->speed = .5f;
+    useless->bright = true;
+    useless->minAngle = 0;
+    useless->maxAngle = 2*M_PI;
+    addChild(useless);
 
     createIndicatorsCentered(CENTER, PICKER_TOP - 18.f, 9.f);
 

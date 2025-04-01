@@ -159,7 +159,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 25.f, "RATE", theme_engine, theme, S::in_port_label));
 
     x = CENTER - S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_ROUND_INITIAL, S::InputColorKey, PORT_ORANGE, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_ROUND_INITIAL, S::InputColorKey, PORT_GRASS, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 25.f, "INIT", theme_engine, theme, S::in_port_label));
 
     // footer
