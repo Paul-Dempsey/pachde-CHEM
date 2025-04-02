@@ -2,12 +2,12 @@
 
 ![CHEM banner](./image/repo-banner.svg)
 
-**CHEM** is the successor to pachde (#d) **HC One**, for EaganMatrix devices running firmware 10.4x.
+To get started, you must have installed VCV Rack and download the CHEM `.vcvplugin` file from GitHub.
+To download and install the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
-**Note** – Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio or Expressive E.
+Start with the [**Core**](./core.md) module.
 
-If you own more than one Eagan Matrix device, add an instance of **Core** for each device you want to control.
-Every other module must be connected to a **Core** module, using the link button in the module footer.
+## Module Index
 
 | Module | Description |
 | -- | -- |
@@ -18,7 +18,7 @@ Every other module must be connected to a **Core** module, using the link button
 | [**Fx**](./fx.md)    | The "effects", a.k.a. Recirculator section. |
 | [**Post**](./post.md)  | The post- master section controls, including a global Mute, post level (Volume), and EQ. Post-section convolution controls are in the Convolution module.|
 | [**Convolution**](./convo.md) | Controls for pre- and post- convolutions. |
-| [**Jack**](./jack.md)  | Pedal assignment, min/max settings and jack output CV. |
+| [**Jack**](./jack.md)  | Pedal assignment, min/max settings, Octave shift settings, Pedal preservation, and jack output CV. |
 | [**Sustain**](./sus.md)  | On-screen Sustain |
 | [**Sostenuto**](./sus.md)  | On-screen Sostenuto |
 | [**Sostenuto 2**](./sus.md)  | On-screen Sostenuto 2 |
@@ -26,13 +26,28 @@ Every other module must be connected to a **Core** module, using the link button
 
 More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
 
+## Community and Contacts
+
 We take requests! Open an issue on the GitHub repository,
- or get in touch with me on the VCV Rack Community forum or on Discord — where I go by "pachde" — or on the Haken Continuum and Expressive E Osmose Facebook groups where I am Paul Dempsey.
+ or get in touch with me online.
+You can find me online as *pachde* or *Paul Dempsey* in:
+
+- [VCV Rack Community](https://community.vcvrack.com/) (Discourse)
+
+- [VCV - Discord](https://discord.gg/rhcztE4sZd)
+
+- The *Haken Continuum* and *Expressive E Osmose* Facebook groups
+
+- [Expressive E community - Discord](https://discord.gg/UtMynfPqw7) -- the "official" Osmose Discord monitored by Expressive E.
+
+- [Expressive E instruments - Discord](https://discord.gg/ZjHTgmCR9w) -- a community Discord. (Check out the Eagan Matrix channel).
+
+If you want something more private, you can also get my email contact from the right-click menu of any CHEM module.
 
 ## Modulation (voltage control)
 
 The user interface for modulation using voltage control works the same across all the CHEM modules.
-See [CHEM Modulation](./modulation.md) for details on how the common **Modulation amount** knob works.
+See [**CHEM Modulation**](./modulation.md) for details on using CV with CHEM.
 
 ## Themes
 
@@ -50,17 +65,17 @@ Here, we show the **Pre** module modeling the themes against a Light-themed Rack
 ### Custom themes
 
 If you're adventurous, you can try creating a custom theme.
-Each theme is defined a JSON file in the `pachde-CHEM/res/themes` folder.
+Each theme is defined in a JSON file in the `pachde-CHEM/res/themes` folder.
 These are plain-text files you can edit in any text editor.
 
 To make your own custom theme, make a copy of one of the predefined themes and edit away.
-**Dark** is the best one to start from becuase it contains an entry for every theme-able element in CHEM.
-The name of your theme file should match the "name" item at the top of the JSON file.
+**Dark** is the best one to start from becuase it should contain an entry for every theme-able element in CHEM.
+The filename of your theme file should match the "name" item at the top of the JSON file.
 
-If you make a mistake while editing like a JSON syntax error,
+If you make a mistake while editing, like a JSON syntax error,
 Rack will crash on startup with a diagnostic error message in the log with a hint of what went wrong.
 Don't worry, Rack and your computer are not permanently damaged. Just fix the error and try again.
-When working on a theme, it can be helpful to run Rack from the console using -d to see the log on the console isntead of in the log file.
+When working on a theme, it can be helpful to run Rack from the console using the `-d` command-line option (debug mode) to see the log on the console instead of the log file.
 
 You don't have to restart Rack to see results of each change as you work.
 Choose **Hot-reload themes** in the right click menu or press F5 after clicking on a CHEM module.

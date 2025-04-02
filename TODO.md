@@ -1,12 +1,13 @@
 # CHEM To-Do
 
-- Global settings module(s) (poly/mpe, mono, routing, surface, ...)
 - Overlay macro system modules
+- Preset module
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
-- Decode category info for preset desciption tooltip (started)
+- Decode category info for preset description tooltip (started)
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)
 - **Play**: sorting: alpha, id, category
 - Allow shared controllers
+- Slim Attenuation?
 
 ## Before release
 

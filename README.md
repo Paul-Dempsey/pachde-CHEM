@@ -6,11 +6,13 @@ CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to
 Haken EaganMatrix firmware version 10.40 added many features and improvements to the MIDI protocol.
 The changes are big enough to warrant a redesign of the modularization and user interface, hence a new plugin.
 
-Read the [Documentation](./doc/index.md) for information on **#d CHEM**.
-
 [![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
 
 To download the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
+
+Read the [Documentation](./doc/index.md) for more information on **#d CHEM**.
+
+At this point (April 1 2025 -- *no fooling*!), CHEM is Beta quality, and I think more reliable and usable than HC One (not to mention better looking :-)
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
