@@ -13,8 +13,6 @@ FLAGS += -O3
 FLAGS += -DNDEBUG
 endif
 
-#FLAGS += -Wno-comment
-
 # plugin infra
 SOURCES += src/plugin.cpp
 SOURCES += src/chem.cpp
@@ -58,8 +56,8 @@ SOURCES += src/widgets/uniform-style.cpp
 
 # modules
 
-SOURCES += src/modules/_proto/proto.cpp
-SOURCES += src/modules/_proto/proto-ui.cpp
+#SOURCES += src/modules/_proto/proto.cpp
+#SOURCES += src/modules/_proto/proto-ui.cpp
 
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp

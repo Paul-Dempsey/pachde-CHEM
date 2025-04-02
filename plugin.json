@@ -14,14 +14,6 @@
   "minRackVersion": "2.4.0",
   "modules": [
     {
-      "slug": "chem-proto",
-      "name": "CHEM Prototype",
-      "description": "CHEM Prototype for experimentation",
-      "tags": [
-        "Experimental"
-      ]
-    },
-    {
       "slug": "chem-core",
       "name": "CHEM Core",
       "description": "CHEM Core for Haken Eagan Matrix",
