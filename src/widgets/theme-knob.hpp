@@ -46,12 +46,15 @@ struct GlowKnob : rack::RoundKnob {
         if (layer != 1) return;
         if (!enabled) return;
         if (rack::settings::rackBrightness > .95f) return;
+        if (!module) return;
         if (bright) fb->draw(args);
     }
 
     void draw(const DrawArgs& args) override
     {
-        if (enabled && bright && rack::settings::rackBrightness < .95f) return;
+        if (module) {
+            if (enabled && bright && rack::settings::rackBrightness < .95f) return;
+        }
         if (enabled) {
             Base::draw(args);
         } else {
@@ -94,6 +97,7 @@ struct TKnob : GlowKnob, IApplyTheme
     {
         if (layer != 1) return;
         if (rack::settings::rackBrightness > .95f) return;
+        if (!module) return;
 
         bool base_bright = bright;
         if (wire) {
