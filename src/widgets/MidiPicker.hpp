@@ -17,9 +17,11 @@ struct MidiPicker : TipWidget, IApplyTheme
     widget::FramebufferWidget* fb;
     widget::SvgWidget* sw;
     MidiDeviceHolder* setter;
-    bool is_em;
+    MidiDeviceHolder* em_holder;
 
-    MidiPicker() : setter(nullptr), is_em(false)
+    bool is_em() { return setter == em_holder; }
+
+    MidiPicker() : setter(nullptr)
     {
         fb = new widget::FramebufferWidget;
         addChild(fb);
@@ -37,9 +39,12 @@ struct MidiPicker : TipWidget, IApplyTheme
     }
 
 
-    void setDeviceHolder(MidiDeviceHolder * holder) {
+    void setDeviceHolder(MidiDeviceHolder * holder, MidiDeviceHolder* main_holder) {
         assert(holder);
+        assert(main_holder && main_holder->device_role == ChemDevice::Haken);
+
         setter = holder;
+        em_holder = main_holder;
     }
 
     void onButton(const ButtonEvent& e) override
@@ -57,20 +62,16 @@ struct MidiPicker : TipWidget, IApplyTheme
         auto broker = MidiDeviceBroker::get();
         broker->sync();
 
-        menu->addChild(createMenuLabel( is_em ? "Eagan Matrix device" : "MIDI controller"));
+        menu->addChild(createMenuLabel( is_em() ? "Eagan Matrix device" : "MIDI controller"));
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Reset (none)", "", [=](){
-            auto claim = setter->getClaim(); 
-            if (!claim.empty()) {
-                broker->revokeClaim(claim);
-            }
             setter->clear();
         }));
 
-        auto current_claim = setter->getClaim();
+        auto current_claim = setter->get_claim();
 
         auto connections = EnumerateMidiConnections(false);
-        if (is_em) {
+        if (is_em()) {
             for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
                 auto conn = *it;
                 if (is_EMDevice(conn->info.input_device_name)) {
@@ -80,14 +81,7 @@ struct MidiPicker : TipWidget, IApplyTheme
 
                     menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
                         [=](){ return mine; },
-                        [=](){
-                            if (!current_claim.empty()) {
-                                broker->revokeClaim(current_claim);
-                            }
-                            if (broker->claimDevice(item_claim, setter)) {
-                                setter->connect(conn);
-                            }
-                        }, unavailable));
+                        [=](){ setter->connect(conn); }, unavailable));
                 }
             }
             menu->addChild(new MenuSeparator);
@@ -100,14 +94,7 @@ struct MidiPicker : TipWidget, IApplyTheme
 
                     menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
                         [=](){ return mine; },
-                        [=](){
-                            if (!current_claim.empty()) {
-                                broker->revokeClaim(current_claim);
-                            }
-                            if (broker->claimDevice(item_claim, setter)) {
-                                setter->connect(conn);
-                            }
-                        }, unavailable));
+                        [=](){ setter->connect(conn); }, unavailable));
                 }
             }));
         } else {
@@ -115,18 +102,11 @@ struct MidiPicker : TipWidget, IApplyTheme
                 auto conn = *it;
                 auto item_claim = conn->info.claim();
                 bool mine = (0 == current_claim.compare(item_claim));
-                bool unavailable = mine ? false : !broker->available(item_claim);
-
+                bool unavailable = mine ? false : 0 == item_claim.compare(em_holder->get_claim());
+                
                 menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
                     [=](){ return mine; },
-                    [=](){
-                        if (!current_claim.empty()) {
-                            broker->revokeClaim(current_claim);
-                        }
-                        if (broker->claimDevice(item_claim, setter)) {
-                            setter->connect(conn);
-                        }
-                    }, unavailable));
+                    [=](){ setter->connect(conn); }, unavailable));
             }
         }
     }

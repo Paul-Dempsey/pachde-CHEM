@@ -6,7 +6,6 @@
 - Decode category info for preset description tooltip (started)
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)
 - **Play**: sorting: alpha, id, category
-- Allow shared controllers
 - Slim Attenuation?
 
 ## Before release

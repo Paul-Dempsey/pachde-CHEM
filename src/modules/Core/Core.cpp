@@ -337,15 +337,15 @@ void CoreModule::dataFromJson(json_t *root)
 
     j = json_object_get(root, "haken-device");
     if (j) {
-        haken_device.setClaim(json_string_value(j));
+        haken_device.set_claim(json_string_value(j));
     }
     j = json_object_get(root, "controller-1");
     if (j) {
-        controller1.setClaim(json_string_value(j));
+        controller1.set_claim(json_string_value(j));
     }
     j = json_object_get(root, "controller-2");
     if (j) {
-        controller2.setClaim(json_string_value(j));
+        controller2.set_claim(json_string_value(j));
     }
     j = json_object_get(root, "log-midi");
     if (j) {
@@ -371,9 +371,9 @@ void CoreModule::dataFromJson(json_t *root)
 json_t* CoreModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(haken_device.getClaim().c_str()));
-    json_object_set_new(root, "controller-1", json_string(controller1.getClaim().c_str()));
-    json_object_set_new(root, "controller-2", json_string(controller2.getClaim().c_str()));
+    json_object_set_new(root, "haken-device", json_string(haken_device.get_claim().c_str()));
+    json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
+    json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging()));
     json_object_set_new(root, "restore-preset", json_boolean(restore_last_preset));
     if (!last_preset.empty()) {

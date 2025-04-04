@@ -94,8 +94,9 @@ struct MidiDeviceHolder
     MidiDeviceHolder() : connection(nullptr), device_role(ChemDevice::Unknown), client(nullptr) {}
     void init(ChemDevice role, IMidiDeviceNotify *client) { device_role = role; subscribe(client); }
     ChemDevice role() const { return device_role; }
-    const std::string & getClaim() const { return device_claim; }
-    void setClaim(const std::string &claim) { device_claim = claim; }
+
+    const std::string & get_claim() const { return device_claim; }
+    void set_claim(const std::string &claim) { device_claim = claim; }
     void notifyChanged();
     void clear();
     void connect(std::shared_ptr<MidiDeviceConnection> connection);
@@ -113,7 +114,6 @@ struct MidiDeviceBroker
     MidiDeviceBroker(const MidiDeviceBroker&) = delete;
 
     std::vector<MidiDeviceHolder*> holders;
-    std::map<std::string, MidiDeviceHolder*> claims;
 
     MidiDeviceBroker();
     static std::shared_ptr<MidiDeviceBroker> get();
@@ -122,13 +122,8 @@ struct MidiDeviceBroker
     void registerDeviceHolder(MidiDeviceHolder* holder);
     void unRegisterDeviceHolder(MidiDeviceHolder* holder);
     void clear();
-    bool empty() { return claims.empty(); }
     bool available(const std::string& claim);
-    bool claimDevice(const std::string claim, MidiDeviceHolder* claimant);
-    void revokeClaim(const std::string& claim);
-    void revokeClaim(MidiDeviceHolder* claimant);
     void sync();
-    // returns true if an available EM device was bound
     bool bindAvailableEm(MidiDeviceHolder* holder);
 };
 

@@ -145,7 +145,7 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 {
     float y = PICKER_TOP;
-    haken_picker = createMidiPicker(S::UHALF, y, true, "Choose HAKEN device", &my_module->haken_device, theme);
+    haken_picker = createMidiPicker(S::UHALF, y, "Choose HAKEN device", &my_module->haken_device, &my_module->haken_device, theme);
     LabelStyle style{"dytext", TextAlignment::Center, 10.f};
     addChild(firmware_label = createLabel<TextLabel>(
         Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
@@ -158,7 +158,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
 
     y += PICKER_INTERVAL;
-    controller1_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #1", &my_module->controller1, theme);
+    controller1_picker = createMidiPicker(S::UHALF, y, "Choose MIDI controller #1", &my_module->controller1, &my_module->haken_device, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
@@ -168,7 +168,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         Vec(155.f, y + 6.f), my_module, CoreModule::P_C1_MUTE, CoreModule::L_C1_MUTE, theme_engine, theme)));
 
     y += PICKER_INTERVAL;
-    controller2_picker = createMidiPicker(S::UHALF, y, false, "Choose MIDI controller #2", &my_module->controller2, theme);
+    controller2_picker = createMidiPicker(S::UHALF, y, "Choose MIDI controller #2", &my_module->controller2, &my_module->haken_device, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
@@ -183,13 +183,8 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     if (my_module) {
         w->setHandler([=](bool ctrl, bool shift) {
             if (ctrl) {
-                // clear claims and revoke connections
-                // todo: integrate claim revocation somewhere in Core, or MidiDeviceHolder
                 auto broker = MidiDeviceBroker::get();
                 assert(broker);
-                broker->revokeClaim(&my_module->haken_device);
-                broker->revokeClaim(&my_module->controller1);
-                broker->revokeClaim(&my_module->controller2);
                 my_module->haken_device.clear();
                 my_module->controller1.clear();
                 my_module->controller2.clear();
@@ -245,12 +240,13 @@ void CoreModuleWidget::resetIndicators()
     syncdevices_indicator  ->setColor(co); syncdevices_indicator  ->setFill(false);
 }
 
-MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device, std::shared_ptr<SvgTheme> theme)
+MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme)
 {
     auto picker = createThemedWidget<MidiPicker>(Vec(x, y), theme_engine, theme);
     picker->describe(tip);
-    picker->setDeviceHolder(device);
-    picker->is_em = isEM;
+    if (my_module) {
+        picker->setDeviceHolder(device, haken_device);
+    }
     addChild(picker);
     return picker;
 }
@@ -290,7 +286,7 @@ rack::engine::Module* CoreModuleWidget::client_module()
 }
 std::string CoreModuleWidget::client_claim()
 {
-    return my_module ? my_module->haken_device.getClaim() : "";
+    return my_module ? my_module->haken_device.get_claim() : "";
 }
 void CoreModuleWidget::onConnectHost(IChemHost* host)
 {

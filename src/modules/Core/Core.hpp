@@ -89,7 +89,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool host_has_client(IChemClient* client) override;
     std::shared_ptr<MidiDeviceConnection> host_connection(ChemDevice device) override;
     std::string host_claim() override {
-        return haken_device.getClaim();
+        return haken_device.get_claim();
     }
     const PresetDescription* host_preset() override {
         return em.preset.id.valid() ? &em.preset : nullptr;
@@ -226,7 +226,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void set_theme_colors(const std::string& theme = "");
 
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
-    MidiPicker* createMidiPicker(float x, float y, bool isEM, const char *tip, MidiDeviceHolder* device, std::shared_ptr<SvgTheme> theme);
+    MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme);
 
     void createScrews(std::shared_ptr<SvgTheme> theme);
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);

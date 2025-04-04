@@ -71,7 +71,9 @@ inline bool is_music_message(PackedMidiMessage msg)
     case Haken::progChg1:
     case Haken::progChg2:
     case Haken::progChg16:
-    case Haken::ccStat16: // no ch16 cc
+
+    // no ch16 cc
+    case Haken::ccStat16:
         return false;
 
     default:
