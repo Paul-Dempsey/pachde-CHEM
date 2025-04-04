@@ -77,6 +77,7 @@ inline bool is_music_message(PackedMidiMessage msg)
         return false;
 
     default:
+        if (Haken::ch16 == midi_channel(msg)) return false;
         break;
     }
     return true;
