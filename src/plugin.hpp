@@ -32,3 +32,8 @@ bool initThemeEngine();
 bool reloadThemes();
 
 bool isPeerModule(Module* me, Module* candidate);
+
+// <rack-user>/<plugin>/<asset>
+inline std::string user_plugin_asset(const std::string& asset) {
+    return system::join(asset::user(pluginInstance->slug.c_str()), asset);
+}

@@ -30,6 +30,7 @@ SOURCES += src/services/colors.cpp
 SOURCES += src/services/em-midi-port.cpp
 SOURCES += src/services/haken-midi.cpp
 SOURCES += src/services/HakenMidiOutput.cpp
+SOURCES += src/services/kv-store.cpp
 SOURCES += src/services/midi-devices.cpp
 SOURCES += src/services/midi-io.cpp
 SOURCES += src/services/midi-log.cpp

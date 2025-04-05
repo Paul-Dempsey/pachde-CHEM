@@ -2,6 +2,7 @@
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
 #include "../../services/colors.hpp"
+#include "../../services/kv-store.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/blip-widget.hpp"
 #include "../../widgets/theme-button.hpp"

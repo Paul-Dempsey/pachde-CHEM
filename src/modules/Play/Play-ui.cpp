@@ -425,6 +425,12 @@ void PlayUi::open_playlist()
     if (modified && module && !my_module->playlist_file.empty()) {
         save_playlist();
     }
+    if (my_module->playlist_folder.empty()) {
+        auto kv = get_plugin_kv_store();
+        if (kv && kv->load()) {
+            my_module->playlist_folder = kv->lookup("playlist-folder");
+        }
+    }
     bool ok = openFileDialog(my_module->playlist_folder, "Playlists (.json):json;Any (*):*", playlist_name, path);
     if (ok) {
         load_playlist(path, true);

@@ -1,5 +1,6 @@
 #include "Play.hpp"
 #include <ghc/filesystem.hpp>
+
 namespace fs = ghc::filesystem;
 using namespace pachde;
 
@@ -37,7 +38,6 @@ void PlayModule::dataFromJson(json_t* root)
     if (j) {
         playlist_folder = json_string_value(j);
     }
-
     j = json_object_get(root, "playlist-file");
     if (j) {
         playlist_file = json_string_value(j);
@@ -65,6 +65,15 @@ json_t* PlayModule::dataToJson()
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "track-live", json_boolean(track_live));
     json_object_set_new(root, "playlist-folder", json_string(playlist_folder.c_str()));
+    if (!playlist_folder.empty()) {
+        auto kv = get_plugin_kv_store();
+        if (kv && kv->load()) {
+            if (kv->lookup("playlist-folder").empty()) {
+                kv->update("playlist-folder", playlist_folder);
+                kv->save();
+            }
+        }
+    }    
     json_object_set_new(root, "playlist-file", json_string(playlist_file.c_str()));
     
     auto jaru = json_array();
