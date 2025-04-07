@@ -1,7 +1,6 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/draw-button.hpp"
-#include "../../widgets/uniform-style.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../em/preset-meta.hpp"
@@ -57,7 +56,9 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     set_theme_colors();
 
-    createScrews(theme);
+    if (style::show_screws()) {
+        createScrews(theme);
+    }
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
 
@@ -99,7 +100,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     y = 30.f;
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(x, y), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(r_col, y, "EM LED"));
-    addChild(createLightCentered<TinySimpleLight<YellowLight>>(Vec(x + 9.f, y), my_module, CoreModule::L_PULSE));
 
     const NVGcolor co_port = PORT_CORN;
     y = S::PORT_TOP + S::PORT_DY;
@@ -138,8 +138,8 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 {
     addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH *.5f, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH - 7.5f, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
@@ -356,9 +356,11 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
             em_status_label->text("Reduce Polyphony");
             break;
         case Haken::inFactCalib:
-            em_status_label->text("Factory Calibration");
+            em_status_label->text("Factory Calibration...");
             break;
         case Haken::eraseMessage:
+        case Haken::endSysNames:
+        case Haken::endUserNames:
             em_status_label->text("");
             break;
         case Haken::midiLoopback:
@@ -370,17 +372,11 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
         case Haken::testErr:
             em_status_label->text("MIDI test failed");
             break;
-        case Haken::endSysNames:
-            em_status_label->text("");
-            break;
         case Haken::beginSysNames:
-            em_status_label->text("System preset names");
+            em_status_label->text("Gathering System presets...");
             break;
         case Haken::beginUserNames:
-            em_status_label->text("User preset names");
-            break;
-        case Haken::endUserNames:
-            em_status_label->text("");
+            em_status_label->text("Gathering User presets...");
             break;
         case Haken::rxOver:
         case Haken::txOver:

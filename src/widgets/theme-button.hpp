@@ -194,7 +194,6 @@ struct TParamButton : SvgSwitch, IApplyTheme
     }
 };
 
-
 template <typename TPButton>
 TPButton * createThemedParamButton(math::Vec pos, engine::Module*module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
     TPButton * o  = createParam<TPButton>(pos, module, paramId);
@@ -252,6 +251,27 @@ struct CheckButtonSvg {
     static std::string down() { return "res/widgets/check-button-down.svg"; }
 };
 
+struct CatButtonSvg {
+    static std::string up() { return "res/widgets/category-button.svg"; }
+    static std::string down() { return "res/widgets/category-button-down.svg"; }
+};
+struct GearButtonSvg {
+    static std::string up() { return "res/widgets/gear-button.svg"; }
+    static std::string down() { return "res/widgets/gear-button-down.svg"; }
+};
+struct TypeButtonSvg {
+    static std::string up() { return "res/widgets/type-button.svg"; }
+    static std::string down() { return "res/widgets/type-button-down.svg"; }
+};
+struct CharacterButtonSvg {
+    static std::string up() { return "res/widgets/character-button.svg"; }
+    static std::string down() { return "res/widgets/character-button-down.svg"; }
+};
+struct MatrixButtonSvg {
+    static std::string up() { return "res/widgets/matrix-button.svg"; }
+    static std::string down() { return "res/widgets/matrix-button-down.svg"; }
+};
+
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
@@ -265,5 +285,11 @@ using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
 using DotParamButton = TParamButton<DotButtonSvg>;
 using SurfaceDirectionParamButton = TParamButton<SurfaceDirectionButtonSvg>;
 using CheckParamButton = TParamButton<CheckButtonSvg>;
+
+using CatParamButton = TParamButton<CatButtonSvg>;
+using CharacterParamButton = TParamButton<CharacterButtonSvg>;
+using GearParamButton = TParamButton<GearButtonSvg>;
+using MatrixParamButton = TParamButton<MatrixButtonSvg>;
+using TypeParamButton = TParamButton<TypeButtonSvg>;
 
 }

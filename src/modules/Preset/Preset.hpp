@@ -3,16 +3,43 @@
 #include "../../chem.hpp"
 #include "../../chem-core.hpp"
 #include "../../services/colors.hpp"
-#include "../../widgets/themed-widgets.hpp"
+#include "../../services/ModuleBroker.hpp"
+#include "../../widgets/draw-button.hpp"
+#include "../../widgets/theme-button.hpp"
+#include "../../widgets/tip-label-widget.hpp"
+#include "search-widget.hpp"
+
 using namespace pachde;
 
 struct PresetModule : ChemModule, IChemClient
 {
+    enum Params {
+        P_CAT,
+        P_TYPE,
+        P_CHARACTER,
+        P_MATRIX,
+        P_GEAR,
+        NUM_PARAMS
+    };
+    enum Inputs {
+        IN_PREV,
+        IN_NEXT,
+        NUM_INPUTS
+    };
+    enum Outputs {
+        NUM_OUTPUTS
+    };
+    enum Lights {
+        NUM_LIGHTS
+    };
+
     std::string device_claim;
 
-    //PresetModule() : {}
+    PresetModule();
     ~PresetModule() {
-        if (chem_host) chem_host->unregister_chem_client(this);
+        if (chem_host) {
+            chem_host->unregister_chem_client(this);
+        }
     }
 
     void dataFromJson(json_t* root) override;
@@ -27,15 +54,41 @@ struct PresetModule : ChemModule, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 };
 
+enum PresetTab { User, System };
 
 struct PresetModuleWidget : ChemModuleWidget
 {
     using Base = ChemModuleWidget;
-    PresetModule *my_module = nullptr;
+    PresetModule* my_module = nullptr;
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
+    LinkButton* link_button{nullptr};
+    TipLabel* haken_device_label{nullptr};
+
+    SearchField* search_entry{nullptr};
+
+    PresetTab active_tab{PresetTab::System};
+    LabelStyle tab_style{"tab-label", TextAlignment::Right, 16.f};
+    LabelStyle current_tab_style{"tab-label-hi", TextAlignment::Right, 16.f, true};
+    TextLabel* user_label{nullptr};
+    TextLabel* system_label{nullptr};
+
+    TextLabel* page_label{nullptr};
+    UpButton* up_button{nullptr};
+    DownButton* down_button{nullptr};
 
     PresetModuleWidget(PresetModule *module);
+    
+    // ChemModuleWidget
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
+    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+
+    void on_search_text_changed();
+    void on_search_text_enter();
+    void set_tab(PresetTab tab);
+    void page_up(bool control, bool shift);
+    void page_down(bool control, bool shift);
+    void previous_preset(bool c, bool s);
+    void next_preset(bool c, bool s);
 
     //void step() override;
     void draw(const DrawArgs& args) override;

@@ -11,6 +11,7 @@
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/preset-widget.hpp"
+#include "../../widgets/spinner.hpp"
 
 using namespace pachde;
 
@@ -71,7 +72,7 @@ struct PlayModule : ChemModule, IChemClient
 };
 
 // -- Play UI -----------------------------------
-
+enum class FillOptions { None, User, System, All };
 struct EmHandler;
 struct PlayMenu;
 constexpr const int PLAYLIST_LENGTH = 15;
@@ -94,7 +95,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     Blip*       blip{nullptr};
 
     EmHandler* em_handler{nullptr};
-    bool gather{false};
+    FillOptions gather{FillOptions::None};
     bool pending_device_check{false};
     bool modified{false};
     void set_modified(bool schmutz) {
@@ -164,7 +165,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void to_down();
     void to_n(int dx);
     void check_playlist_device();
-    void fill(bool system);
+    void fill(FillOptions which);
     void on_fill_complete();
 
     // IChemClient

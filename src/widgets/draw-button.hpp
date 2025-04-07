@@ -237,15 +237,7 @@ struct UpButton: CtlBase
         Base::draw(args);
         auto vg = args.vg;
 
-        nvgBeginPath(vg);
-        nvgMoveTo(vg, .5f, box.size.y);
-        nvgLineTo(vg, .5f, .5f);
-        nvgLineTo(vg, box.size.x - 1.f, .5f);
-        nvgLineTo(vg, box.size.x - 1.f, box.size.y);
-
-        nvgStrokeColor(vg, color_styles[ColorIndex::Frame].color);
-        nvgStrokeWidth(vg, .75f);
-        nvgStroke(vg);
+        BoxRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Frame].color, .75f);
 
         if (hovered && enabled && !button_down) {
             Halo(vg, 7.5f, 7.5f, 0.1f, 9.5f, color_styles[ColorIndex::Hovered].color, HALO_FADE);
@@ -281,15 +273,7 @@ struct DownButton: CtlBase
         Base::draw(args);
         auto vg = args.vg;
 
-        nvgBeginPath(vg);
-        nvgMoveTo(vg, .5f, 0.f);
-        nvgLineTo(vg, .5f, box.size.y - 1.f);
-        nvgLineTo(vg, box.size.x - 1.f, box.size.y - 1.f);
-        nvgLineTo(vg, box.size.x - 1.f, 0.f);
-        //nvgClosePath(vg);
-        nvgStrokeColor(vg, color_styles[ColorIndex::Frame].color);
-        nvgStrokeWidth(vg, .75f);
-        nvgStroke(vg);
+        BoxRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Frame].color, .75f);
 
         if (hovered && enabled && !button_down) {
             Halo(vg, 7.5f, 7.5f, 0.1f, 9.5, color_styles[ColorIndex::Hovered].color, HALO_FADE);
@@ -355,7 +339,7 @@ struct NextButton: CtlBase
         Base::draw(args);
         auto vg = args.vg;
 
-        BoxRect(vg, .5f, .5f, 14.5f, 14.5f, color_styles[ColorIndex::Frame].color, .75f);
+        BoxRect(vg, .5f, .5f, 14.25f, 14.25f, color_styles[ColorIndex::Frame].color, .75f);
         if (hovered && enabled && !button_down) {
             Halo(vg, 7.5f, 7.5f, 0.1f, 9.5f, color_styles[ColorIndex::Hovered].color, HALO_FADE);
         }

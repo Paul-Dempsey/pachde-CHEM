@@ -162,7 +162,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     GlowKnob* mod_knob;
 
     bool connected();
-
+    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+    
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }

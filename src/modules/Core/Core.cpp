@@ -1,6 +1,7 @@
 #include "Core.hpp"
 #include "../../em/PresetId.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../services/kv-store.hpp"
 
 using namespace pachde;
 
@@ -41,7 +42,6 @@ CoreModule::CoreModule() :
     configLight(L_ROUND_RELEASE, "Round on release");
 
     configLight(L_READY,         "Haken device ready");
-    configLight(L_PULSE,         "Loopback pulse");
 
     configOutput(Outputs::OUT_READY, "Ready gate");
 
@@ -166,7 +166,6 @@ void CoreModule::restore_midi_rate()
 void CoreModule::onLoopDetect(uint8_t cc, uint8_t value)
 {
     heartbeat = !heartbeat;
-    getLight(L_PULSE).setBrightness(heartbeat ? 0.f : value);
 }
 
 void CoreModule::onEditorReply(uint8_t reply)
@@ -220,13 +219,6 @@ void CoreModule::onMahlingComplete()
 
 void CoreModule::onHakenTaskChange(HakenTask id)
 {
-    if (id == HakenTask::HeartBeat) {
-        auto task = tasks.get_task(id);
-        if (task->waiting()) {
-            heartbeat = !heartbeat;
-            getLight(L_PULSE).setBrightness(heartbeat);
-        }
-    }
 }
 
 // IChemHost
@@ -257,7 +249,6 @@ void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
 void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 {
     auto sample_time = APP->engine->getSampleTime();
-    getLight(L_PULSE).setBrightnessSmooth(0.f, 10 * sample_time);
     getLight(L_READY).setBrightnessSmooth(0.f, 20 * sample_time);
 
     switch (source->role()) {

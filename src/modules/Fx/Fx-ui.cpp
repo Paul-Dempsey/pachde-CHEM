@@ -22,7 +22,9 @@ FxUi::FxUi(FxModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-    
+    if (S::show_screws()) {
+        createScrews(theme);
+    }
     float x, y;
     bool browsing = !module;
 
@@ -144,6 +146,11 @@ void FxUi::center_knobs()
     for (int i = 0; i < 6; ++i) {
         my_module->getParam(i).setValue(5.0f);
     }
+}
+
+void FxUi::createScrews(std::shared_ptr<SvgTheme> theme)
+{
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
 void FxUi::setThemeName(const std::string& name, void * context)

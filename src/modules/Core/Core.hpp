@@ -9,8 +9,9 @@
 #include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/MidiPicker.hpp"
-#include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/slider-h-widget.hpp"
+#include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
 #include "haken-task.hpp"
 #include "relay-midi.hpp"
 
@@ -149,7 +150,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_ROUND_INITIAL,
         L_ROUND,
         L_ROUND_RELEASE,
-        L_PULSE,
         L_C1_MUSIC_FILTER,
         L_C2_MUSIC_FILTER,
         L_C1_MUTE,
@@ -225,17 +225,19 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     const NVGcolor& taskStateColor(TaskState state);
     void set_theme_colors(const std::string& theme = "");
 
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
     MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme);
-
-    void createScrews(std::shared_ptr<SvgTheme> theme);
+    
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);
     void createIndicatorsCentered(float x, float y, float spread);
     void createRoundingLeds(float x, float y, float spread);
     void resetIndicators();
-
+    
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
+    
+    // ChemModuleWidget
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
+    void createScrews(std::shared_ptr<SvgTheme> theme) override;
 
     // IChemClient
     IChemHost* chem_host;

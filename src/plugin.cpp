@@ -21,29 +21,33 @@ void init(Plugin *p)
 	//p->addModel(modelProto);
 }
 
+bool isChemModule(Module* candidate)
+{
+    if (!candidate) return false;
+    auto model =  candidate->model;
+    return ((model == modelCore)
+        || (model == modelPlay)
+        || (model == modelMacro)
+        || (model == modelPre)
+        || (model == modelFx)
+        || (model == modelPost)
+        || (model == modelConvo)
+        || (model == modelJack)
+        || (model == modelSustain)
+        || (model == modelSostenuto)
+        || (model == modelSostenuto2)
+        || (model == modelSettings)
+        || (model == modelPreset)
+        //|| (model == modelProto)
+        // add new models here
+	);
+}
+
 bool isPeerModule(Module* me, Module* candidate)
 {
-    if (!me) return false;
     if (!candidate) return false;
-
-    auto model =  candidate->model;
-    return (me->model != model) && (
-            (model == modelCore)
-            || (model == modelPlay)
-            || (model == modelMacro)
-            || (model == modelPre)
-            || (model == modelFx)
-			|| (model == modelPost)
-			|| (model == modelConvo)
-			|| (model == modelJack)
-			|| (model == modelSustain)
-			|| (model == modelSostenuto)
-			|| (model == modelSostenuto2)
-			|| (model == modelSettings)
-			|| (model == modelPreset)
-			//|| (model == modelProto)
-            // add new models here
-        );
+	if (me == candidate) return false;
+	return isChemModule(candidate);
 }
 
 // Theming

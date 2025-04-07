@@ -1,4 +1,6 @@
 #include "uniform-style.hpp"
+#include "../services/kv-store.hpp"
+
 namespace pachde {
 namespace style {
 
@@ -16,4 +18,20 @@ LabelStyle med_control_label  {"label",      TextAlignment::Center,   12.f, fals
 LabelStyle heading_label      {"ctl-label",  TextAlignment::Center,   16.f, true};
 LabelStyle pedal_label        {"ped-assign", TextAlignment::Left,     10.f, false};
 
-}}
+bool show_screws()
+{
+    auto kv = get_plugin_kv_store();
+    if (kv && kv->load()) {
+        const char* key = "show-screws";
+        auto value = kv->lookup(key);
+        if (value.empty()) {
+            kv->update(key, KVStore::bool_text(true));
+            kv->save();
+            return true;
+        }
+        return KVStore::bool_value(value);
+    }
+    return true;
+}
+
+}};

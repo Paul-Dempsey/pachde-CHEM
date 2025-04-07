@@ -76,6 +76,7 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
         return module ? getChemModule()->getThemeName() : ::rack::settings::preferDarkPanels ? "Dark": "Light";
     }
 
+    virtual void createScrews(std::shared_ptr<SvgTheme> theme) {}
     void set_extender_theme(LeftRight which, const std::string& name);
 
     void setThemeName(const std::string& name, void *context) override;

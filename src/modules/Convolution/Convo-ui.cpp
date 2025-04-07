@@ -28,7 +28,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-
+    if (style::show_screws()) {
+        createScrews(theme);
+    }
     float x, y;
     bool browsing = !module;
     LabelStyle heading_style{"ctl-label-hi", TextAlignment::Left, 14.f, true};
@@ -189,7 +191,15 @@ void ConvoUi::glowing_knobs(bool glow) {
     }
 }
 
-void ConvoUi::setThemeName(const std::string& name, void * context)
+void ConvoUi::createScrews(std::shared_ptr<SvgTheme> theme)
+{
+    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), theme_engine, theme));
+    //addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+}
+
+void ConvoUi::setThemeName(const std::string &name, void *context)
 {
     Base::setThemeName(name, context);
 }

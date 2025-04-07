@@ -21,6 +21,9 @@ struct KVStore {
     const std::string lookup(const std::string& key);
     bool load();
     bool save();
+
+    static const char* bool_text(bool f);
+    static bool bool_value(const std::string& text, bool default_value = false);
 };
 
 std::shared_ptr<KVStore> get_plugin_kv_store();

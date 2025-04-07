@@ -2,6 +2,37 @@
 
 namespace pachde {
 
+const char* KVStore::bool_text(bool f)
+{
+    return f ? "true": "false";
+}
+
+bool KVStore::bool_value(const std::string& text, bool default_value)
+{
+    switch (text.size()) {
+    case 0:
+        return default_value;
+
+    case 1: 
+        if ('1' == *text.cbegin()) return true;
+        if ('0' == *text.cbegin()) return false;
+        break;
+
+    case 4:
+        if (0 == text.compare("true")) return true;
+        break;
+
+    case 5:
+        if (0 == text.compare("false")) return false;
+        break;
+
+    default:
+        break;
+    }
+    assert(false);
+    return default_value;
+}
+    
 inline std::string scan_part(const char* start, const char* limit, const char** next)
 {
     const char *scan = start;
@@ -36,7 +67,7 @@ bool KVStore::load() {
         loaded = true;
         return true;
     }
-    auto f = std::fopen(path.c_str(), "br");
+    auto f = std::fopen(path.c_str(), "rb");
     if (!f) return false;
     char* bytes = (char*)malloc(size);
     auto red = std::fread(bytes, 1, size, f);
@@ -55,13 +86,14 @@ bool KVStore::load() {
     }
     free(bytes);
     loaded = true;
+    modified = false;
     return true;
 }
 
 bool KVStore::save() {
     assert(!path.empty());
     if (!modified) return true;
-    auto f = std::fopen(path.c_str(), "bw");
+    auto f = std::fopen(path.c_str(), "wb");
     if (!f) return false;
     for (auto pair : data) {
         std::string line = pair.first + '=' + pair.second + '\n';

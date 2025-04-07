@@ -95,6 +95,7 @@ SOURCES += src/modules/Settings/tuning.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
+SOURCES += src/modules/Preset/search-widget.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

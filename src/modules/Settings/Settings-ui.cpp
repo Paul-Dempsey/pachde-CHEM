@@ -19,6 +19,12 @@ bool SettingsUi::connected() {
     return my_module->connected();
 }
 
+void SettingsUi::createScrews(std::shared_ptr<SvgTheme> theme)
+{
+    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+}
+
 SettingsUi::SettingsUi(SettingsModule *module) :
     my_module(module)
 {
@@ -28,6 +34,11 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
+
+    if (S::show_screws()) {
+        createScrews(theme);
+    }
+
     float x, y;
     bool browsing = !module;
     const float value_dx = 9.f;

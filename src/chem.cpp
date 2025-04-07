@@ -1,6 +1,8 @@
 #include "chem.hpp"
 #include "widgets/logo-widget.hpp"
 #include "widgets/layout-help.hpp"
+#include "widgets/uniform-style.hpp"
+#include "services/kv-store.hpp"
 
 void ChemModule::setThemeName(const std::string &name, void *)
 {
@@ -63,6 +65,46 @@ void ChemModule::process(const ProcessArgs &args)
 // ---------------------------------------------------------------------------
 // UI
 //
+void add_screws()
+{
+    auto engine = APP->engine;
+    auto mods = engine->getModuleIds();
+    for (auto id: mods) {
+        auto module = engine->getModule(id);
+        if (isChemModule(module)) {
+            auto chem = dynamic_cast<ChemModule*>(module);
+            assert(chem);
+            auto ui = chem->chem_ui;
+            if (ui) {
+                auto theme = theme_engine.getTheme(ui->getThemeName());
+                ui->createScrews(theme);
+            }
+        }
+    }
+}
+
+void remove_screws()
+{
+    auto engine = APP->engine;
+    auto mods = engine->getModuleIds();
+    for (auto id: mods) {
+        auto module = engine->getModule(id);
+        if (isChemModule(module)) {
+            auto chem = dynamic_cast<ChemModule*>(module);
+            assert(chem);
+            if (chem->chem_ui) {
+                std::vector<Widget*> screws;
+                for (auto child: chem->chem_ui->children) {
+                    auto screw = dynamic_cast<ThemeScrew*>(child);
+                    if (screw) screws.push_back(screw);
+                }
+                for (auto screw: screws) {
+                    chem->chem_ui->removeChild(screw);
+                }
+            }
+        }
+    }
+}
 
 void ChemModuleWidget::set_extender_theme(LeftRight which, const std::string& name)
 {
@@ -197,6 +239,24 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     AppendThemeMenu(menu, this, theme_engine, follow, this);
 
     menu->addChild(new MenuSeparator);
+    bool screws = style::show_screws();
+    menu->addChild(createCheckMenuItem("Show screws", "",
+        [screws](){ return screws; },
+        [=](){
+            auto kv = get_plugin_kv_store();
+            if (kv && kv->load()) {
+                auto key = "show-screws";
+                bool screws = !KVStore::bool_value(kv->lookup(key), true);
+                if (screws) {
+                    add_screws();
+                } else {
+                    remove_screws();
+                }
+                kv->update(key, KVStore::bool_text(screws));
+                kv->save();
+            }
+        }));
+
     menu->addChild(createCheckMenuItem("Follow Rack theme", "",
         [=](){ return follow; },
         [=](){

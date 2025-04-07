@@ -72,6 +72,7 @@
             "ctl-frame":   { "stroke": "g50" },
             "ctl-frame-hi":{ "stroke": "g65" },
             "ctl-glyph":   { "fill": "g70", "stroke": "g70" },
+            "ctl-glyph-down": { "fill": "g40", "stroke": "g40" },
             "ctl-disabled":{ "fill": "g50", "stroke": "g50" },
             "ctl-hovered": { "fill": "#f4e88e" },
             "ctl-label":   { "fill": "g65" },

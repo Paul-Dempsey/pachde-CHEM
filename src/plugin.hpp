@@ -31,6 +31,7 @@ extern svg_theme::SvgThemeEngine theme_engine;
 bool initThemeEngine();
 bool reloadThemes();
 
+bool isChemModule(Module* candidate);
 bool isPeerModule(Module* me, Module* candidate);
 
 // <rack-user>/<plugin>/<asset>

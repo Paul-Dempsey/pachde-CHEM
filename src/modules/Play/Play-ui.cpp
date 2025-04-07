@@ -11,6 +11,7 @@ namespace fs = ghc::filesystem;
 using namespace svg_theme;
 using namespace pachde;
 
+
 // -- Play Menu ---------------------------------
 
 struct PlayMenu : Hamburger
@@ -71,8 +72,9 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
     }
     menu->addChild(new MenuSeparator);
     menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
-        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(false); }));
-        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(true); }));
+        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
+        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
+        menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
     }));
 
     menu->addChild(new MenuSeparator);
@@ -121,6 +123,9 @@ PlayUi::PlayUi(PlayModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
+    if (S::show_screws()) {
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    }
 
     float y = PRESETS_TOP;
     for (int i = 0; i < 15; ++i) {
@@ -848,7 +853,7 @@ void PlayUi::to_down()
 
 void PlayUi::onPresetChange()
 {
-    if (gather) {
+    if (gather != FillOptions::None) {
         auto preset = chem_host->host_preset();
         if (preset) {
             if (preset->empty()) return;
@@ -934,21 +939,44 @@ struct EmHandler: IHandleEmEvents
     }
 };
 
-void PlayUi::fill(bool system)
+void PlayUi::fill(FillOptions which)
 {
     if (!chem_host) return;
     auto haken = chem_host->host_haken();
-    if (!haken) return;
     auto matrix = chem_host->host_matrix();
     em_handler = new EmHandler(this);
     matrix->subscribeEMEvents(em_handler);
-    gather = true;
-    system ? haken->request_system(ChemId::Play) : haken->request_user(ChemId::Play);
+    gather = which;
+
+    startSpinner(this);
+
+    switch (which) {
+    case FillOptions::None: break;
+    case FillOptions::User: haken->request_user(ChemId::Play); break;
+    case FillOptions::System: haken->request_system(ChemId::Play); break;
+    case FillOptions::All: haken->request_user(ChemId::Play); break;
+    }
 }
 
 void PlayUi::on_fill_complete()
 {
-    gather = false;
+    if (!chem_host) return;
+    switch (gather) {
+    case FillOptions::None:
+        assert(false);
+        return;
+    case FillOptions::User:
+    case FillOptions::System:
+        break;
+    case FillOptions::All:
+        gather = FillOptions::System;
+        chem_host->host_haken()->request_system(ChemId::Play);
+        return;
+    }
+
+    stopSpinner(this);
+
+    gather = FillOptions::None;
     auto matrix = chem_host->host_matrix();
     matrix->unsubscribeEMEvents(em_handler);
     delete em_handler;

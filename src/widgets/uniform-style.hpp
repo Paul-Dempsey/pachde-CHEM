@@ -41,4 +41,5 @@ extern const char * const NotConnected;
 extern const char * const InputColorKey;
 extern const char * const OutputColorKey;
 
+bool show_screws();
 }}
