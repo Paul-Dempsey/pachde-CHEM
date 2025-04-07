@@ -10,7 +10,7 @@ The changes are big enough to warrant a redesign of the modularization and user 
 
 To download the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
-Read the [Documentation](./doc/index.md) for more information on **#d CHEM**.
+Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
 At this point (April 1 2025 -- *no fooling*!), CHEM is Beta quality, and I think more reliable and usable than HC One (not to mention better looking :-)
 

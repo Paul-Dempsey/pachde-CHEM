@@ -5,25 +5,25 @@
 To get started, you must have installed VCV Rack and download the CHEM `.vcvplugin` file from GitHub.
 To download and install the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
-Start with the [**Core**](./core.md) module.
+Start with the [**Core**](./core.md#chem-core) module.
 
 ## Module Index
 
 | Module | Description |
 | -- | -- |
-| [**Core**](./core.md#CHEM-Core)  | An instance of Core must exist in the patch. It provides the connection to an EaganMatrix device for the rest of the modules. Certain Eagan Matrix utility functions are available in the right-click menu. |
-| [**Play**](./play.md#CHEM-Play)  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
-| [**Preset**](./preset.md#CHEM-Preset) | Access to User and System presets on your device. |
-| [**Macro**](./macro.md#CHEM-Macro) | Tha main i-vi macro controls. |
-| [**Pre**](./pre.md#CHEM-Pre)   | The pre-master section controls, with general pre-effects level, and controls for the Compressor/Tanh. Pre-section convolution controls are in the Convolution module. |
-| [**Fx**](./fx.md#CHEM-Fx)    | The "effects", a.k.a. Recirculator section. |
-| [**Post**](./post.md#CHEM-Post)  | The post- master section controls, including a global Mute, post level (Volume), and EQ. Post-section convolution controls are in the Convolution module.|
-| [**Convolution**](./convo.md#CHEM-Convolution) | Controls for pre- and post- convolutions. |
-| [**Jack**](./jack.md#CHEM-Jack)  | Pedal assignment, min/max settings, Octave shift settings, Pedal preservation, and jack output CV. |
-| [**Sustain**](./sus.md)  | On-screen Sustain |
-| [**Sostenuto**](./sus.md)  | On-screen Sostenuto |
-| [**Sostenuto 2**](./sus.md)  | On-screen Sostenuto 2 |
-| [**Settings**](./settings.md#CHEM-Settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing. |
+| [**Core**](./core.md#chem-core)  | An instance of Core must exist in the patch. It provides the connection to an EaganMatrix device for the rest of the modules. Certain Eagan Matrix utility functions are available in the right-click menu. |
+| [**Play**](./play.md#chem-play)  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
+| [**Preset**](./preset.md#chem-preset) | Access to User and System presets on your device. |
+| [**Macro**](./macro.md#chem-macro) | Tha main i-vi macro controls. |
+| [**Pre**](./pre.md#chem-pre)   | The pre-master section controls, with general pre-effects level, and controls for the Compressor/Tanh. Pre-section convolution controls are in the Convolution module. |
+| [**Fx**](./fx.md#chem-fx)    | The "effects", a.k.a. Recirculator section. |
+| [**Post**](./post.md#chem-post)  | The post- master section controls, including a global Mute, post level (Volume), and EQ. Post-section convolution controls are in the Convolution module.|
+| [**Convolution**](./convo.md#chem-convolution) | Controls for pre- and post- convolutions. |
+| [**Jack**](./jack.md#chem-jack)  | Pedal assignment, min/max settings, Octave shift settings, Pedal preservation, and jack output CV. |
+| [**Sustain**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sustain |
+| [**Sostenuto**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto |
+| [**Sostenuto 2**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto 2 |
+| [**Settings**](./settings.md#chem-settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing. |
 
 More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
 
@@ -48,7 +48,7 @@ If you want something more private, you can also get my email contact from the r
 ## Modulation (voltage control)
 
 The user interface for modulation using voltage control works the same across all the CHEM modules.
-See [**CHEM Modulation**](./modulation.md) for details on using CV with CHEM.
+See [**CHEM Modulation**](./modulation.md#chem-modulation-voltage-control) for details on using CV with CHEM.
 
 ## Themes
 

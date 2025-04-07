@@ -12,7 +12,7 @@ The **Fx Off** button turns off the effects section.
 This is the same as "Disable Recirculator" in the Haken Editor's Global and MIDI Settings.
 
 The modulation inputs and **Amount** knob work the same across all CHEM modules.
-See [CHEM Modulation](./modulation.md) for details.
+See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.
 
 ---
 

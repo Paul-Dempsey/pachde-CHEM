@@ -10,7 +10,7 @@
 The M3 input has a green light to indicate that the **Modulation amount** knob is adjusts the M3 input. To adjust modulation on another input, click on or near the jack. such as on the jack label.
 
 The modulation inputs and **Amount** knob work the same across all CHEM modules.
-See [CHEM Modulation](./modulation.md) for details.
+See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.
 
 ---
 

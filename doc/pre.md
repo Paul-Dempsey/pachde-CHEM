@@ -12,7 +12,7 @@ Even without compression, at high levels it can used for saturation and overdriv
 The Blue knob controls the mix of straight signal with the effects of compression or tanh saturation.
 
 The modulation inputs and purple **Amount** knob work the same across all CHEM modules.
-See [CHEM Modulation](./modulation.md) for details.
+See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.
 
 ---
 

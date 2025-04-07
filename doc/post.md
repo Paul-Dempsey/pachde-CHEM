@@ -11,7 +11,7 @@ The **Mute input** (red jack) allows you to mute your device with a trigger CV.
 The Blue knob controls the mix of straight signal with equalization (EQ).
 
 The modulation inputs and **Amount** knob work the same across all CHEM modules.
-See [CHEM Modulation](./modulation.md) for details.
+See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.
 
 ---
 

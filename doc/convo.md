@@ -18,7 +18,7 @@ Modulating *Length*, *Tuning*, and *Width* can introduce artifacts, so should be
 The **Extend** button enables extended computation, which increases the quality at the expense of DSP usage.
 
 The modulation inputs and **Modulation amount** knob work the same across all CHEM modules.
-See [CHEM Modulation](./modulation.md) for details.
+See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.
 
 ---
 
