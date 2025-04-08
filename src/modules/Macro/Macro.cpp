@@ -45,14 +45,9 @@ MacroModule::MacroModule() :
 void MacroModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    json_t* j = json_object_get(root, "haken-device");
-    if (j) {
-        device_claim = json_string_value(j);
-    }
-    j = json_object_get(root, "glow-knobs");
-    if (j) {
-        glow_knobs = json_boolean_value(j);
-    }
+    json_read_string(root, "haken-device", device_claim);
+    json_read_bool(root, "glow-knobs", glow_knobs);
+
     if (!device_claim.empty()) {
         modulation.mod_from_json(root);
     }

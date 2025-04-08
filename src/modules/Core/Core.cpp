@@ -15,6 +15,8 @@ CoreModule::CoreModule() :
     restore_last_preset(false)
 {
     ticker.set_interval(1.0f);
+    
+
     em_event_mask = EME::LoopDetect
         + EME::EditorReply 
         + EME::PresetChanged
@@ -324,36 +326,11 @@ void CoreModule::onReset(const ResetEvent &e)
 void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    json_t* j;
-
-    j = json_object_get(root, "haken-device");
-    if (j) {
-        haken_device.set_claim(json_string_value(j));
-    }
-    j = json_object_get(root, "controller-1");
-    if (j) {
-        controller1.set_claim(json_string_value(j));
-    }
-    j = json_object_get(root, "controller-2");
-    if (j) {
-        controller2.set_claim(json_string_value(j));
-    }
-    j = json_object_get(root, "log-midi");
-    if (j) {
-        enable_logging(json_boolean_value(j));
-    } else {
-        enable_logging(false);
-    }
-
-    j = json_object_get(root, "restore-preset");
-    if (j) {
-        restore_last_preset = json_boolean_value(j);
-    }
-    j = json_object_get(root, "last-preset");
-    if (j) {
-        last_preset.fromJson(j);
-    }
-
+    haken_device.set_claim(GetString(root, "haken-device"));
+    controller1.set_claim(GetString(root, "controller-1"));
+    controller2.set_claim(GetString(root, "controller-2"));
+    enable_logging(GetBool(root, "log-midi", false));
+    json_read_bool(root, "restore-preset", restore_last_preset);
     if (!restore_last_preset) {
         this->tasks.get_task(HakenTask::LastPreset)->not_applicable();
     }

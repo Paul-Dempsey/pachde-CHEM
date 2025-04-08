@@ -141,6 +141,18 @@ float GetFloat(const json_t* root, const char* key, float default_value) {
     return j ? json_real_value(j) : default_value;
 }
 
+std::string GetString(const json_t* root, const char* key, const std::string& default_value)
+{
+    auto j = json_object_get(root, key);
+    return j ? json_string_value(j) : default_value;
+}
+
+std::string GetString(const json_t* root, const char* key)
+{
+    auto j = json_object_get(root, key);
+    return j ? json_string_value(j) : "";
+}
+
 // std::string AbbreviatedName(std::string name)
 // {
 //     if (name.size() <= 9) return name.substr(0, 9);

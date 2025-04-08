@@ -10,6 +10,7 @@
 #include "search-widget.hpp"
 
 using namespace pachde;
+struct PresetUi;
 
 struct PresetModule : ChemModule, IChemClient
 {
@@ -34,6 +35,7 @@ struct PresetModule : ChemModule, IChemClient
     };
 
     std::string device_claim;
+    bool track_live;
 
     PresetModule();
     ~PresetModule() {
@@ -41,26 +43,29 @@ struct PresetModule : ChemModule, IChemClient
             chem_host->unregister_chem_client(this);
         }
     }
+    PresetUi* ui() { return reinterpret_cast<PresetUi*>(chem_ui); }
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
     // IChemClient
-
-    rack::engine::Module* client_module() override;
-    std::string client_claim() override;
+    rack::engine::Module* client_module() override { return this; }
+    std::string client_claim() override { return device_claim; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
+
+    void process(const ProcessArgs& args) override;
 };
 
 enum PresetTab { User, System };
 
-struct PresetModuleWidget : ChemModuleWidget
+struct PresetUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
-    PresetModule* my_module = nullptr;
+    PresetModule* my_module{nullptr};
 
+    IChemHost*  chem_host{nullptr};
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
 
@@ -75,8 +80,16 @@ struct PresetModuleWidget : ChemModuleWidget
     TextLabel* page_label{nullptr};
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
+    TipLabel* live_preset_label{nullptr};
 
-    PresetModuleWidget(PresetModule *module);
+    PresetUi(PresetModule *module);
+
+    // IChemClient
+    ::rack::engine::Module* client_module() override { return my_module; }
+    std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
+    void onConnectHost(IChemHost* host) override;
+    void onPresetChange() override;
+    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
     
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
@@ -90,7 +103,7 @@ struct PresetModuleWidget : ChemModuleWidget
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
 
-    //void step() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

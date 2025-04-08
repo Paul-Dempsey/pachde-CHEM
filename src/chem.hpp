@@ -37,20 +37,6 @@ struct ChemModule : Module, IThemeHolder
 };
 
 
-template<typename TClientModule>
-void bind_host(TClientModule* client_module)
-{
-    if (!client_module) return;
-    if (client_module->seek_host && !client_module->get_host()) {
-        auto host = client_module->find_expander_host();
-        if (host) {
-            host->register_chem_client(client_module);
-        }
-        client_module->seek_host = false;
-    }
-}    
-
-
 enum class LeftRight: uint8_t { Left, Right };
 inline bool left(LeftRight lr) { return LeftRight::Left == lr; }
 inline bool right(LeftRight lr) { return LeftRight::Right == lr; }
@@ -93,6 +79,22 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback);
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback);
+
+// Impls
+
+// bind_host use from ModuleWidget::step()
+template<typename TClientModule>
+void bind_host(TClientModule* client_module)
+{
+    if (!client_module) return;
+    if (client_module->seek_host && !client_module->get_host()) {
+        auto host = client_module->find_expander_host();
+        if (host) {
+            host->register_chem_client(client_module);
+        }
+        client_module->seek_host = false;
+    }
+}    
 
 template <typename TModule>
 void onConnectHostModuleImpl(TModule* self, IChemHost* host)

@@ -565,6 +565,7 @@ void PlayUi::onConnectHost(IChemHost* host)
     } else {
         onConnectionChange(ChemDevice::Haken, nullptr);
         live_preset_label->text("");
+        live_preset_label->describe("none");
     }
 }
 

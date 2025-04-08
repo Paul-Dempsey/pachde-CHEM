@@ -24,24 +24,10 @@ void PlayModule::update_mru(std::string path)
 void PlayModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    json_t* j = json_object_get(root, "haken-device");
-    if (j) {
-        device_claim = json_string_value(j);
-    }
-
-    j = json_object_get(root,"track-live");
-    if (j) {
-        track_live = json_boolean_value(j);
-    }
-    
-    j = json_object_get(root, "playlist-folder");
-    if (j) {
-        playlist_folder = json_string_value(j);
-    }
-    j = json_object_get(root, "playlist-file");
-    if (j) {
-        playlist_file = json_string_value(j);
-    }
+    json_read_string(root, "haken-device", device_claim);
+    json_read_string(root, "playlist-folder", playlist_folder);
+    json_read_string(root, "playlist-file", playlist_file);
+    json_read_bool(root, "track-live", track_live);
 
     playlist_mru.clear();
     auto jar = json_object_get(root, "history");

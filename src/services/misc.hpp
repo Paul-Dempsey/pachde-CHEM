@@ -38,6 +38,28 @@ inline bool in_range_limit(T value, T minimum, T limit) { return minimum <= valu
 
 bool GetBool(const json_t* root, const char* key, bool default_value);
 float GetFloat(const json_t* root, const char* key, float default_value);
+std::string GetString(const json_t* root, const char* key, const std::string& default_value);
+std::string GetString(const json_t* root, const char* key);
+
+inline void json_read_string(json_t* root, const char* name, std::string& var) {
+    if (json_t* j = json_object_get(root, name)) {
+        var = json_string_value(j);
+    }
+}
+
+inline void json_read_bool(json_t* root, const char* name, bool& var) {
+    if (json_t* j = json_object_get(root, name)) {
+        var = json_boolean_value(j);
+    }
+}
+
+inline void json_read_float(json_t* root, const char * name, float& var){
+    if (json_t* j = json_object_get(root, name)) {
+        var = json_real_value(j);
+    }
+}
+
+
 
 // enum Expansion {
 //     None  = 0x00,

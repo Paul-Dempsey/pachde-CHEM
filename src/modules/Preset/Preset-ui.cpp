@@ -12,7 +12,7 @@ constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float ROW_HEIGHT = 16.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 
-PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
+PresetUi::PresetUi(PresetModule *module) :
     my_module(module)
 {
     setModule(module);
@@ -97,10 +97,13 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     addChild(Center(createThemedParamButton<GearParamButton>(Vec(x,y), my_module, PM::P_GEAR, theme_engine, theme)));
 
     // footer
+    link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), theme_engine, theme, "Core link");
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+        Vec(32.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    LabelStyle cp_style{"curpreset", TextAlignment::Right, 10.f, true};
+    addChild(live_preset_label = createLabel<TipLabel>(
+        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 200.f, "[preset]", theme_engine, theme, cp_style));
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -122,25 +125,58 @@ PresetModuleWidget::PresetModuleWidget(PresetModule *module) :
     }
 }
 
-void PresetModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
+void no_preset(TipLabel* label) {
+    label->text("");
+    label->describe("(none)");
+}
+
+void PresetUi::onConnectHost(IChemHost *host)
+{
+    if (chem_host) {
+        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
+        onPresetChange();
+    } else {
+        onConnectionChange(ChemDevice::Haken, nullptr);
+        no_preset(live_preset_label);
+    }
+}
+
+void PresetUi::onPresetChange()
+{
+    if (chem_host) {
+        auto preset = chem_host->host_preset();
+        if (preset) {
+            live_preset_label->text(printable(preset->name));
+            live_preset_label->describe(printable(preset->text));
+            return;
+        }
+    }
+    no_preset(live_preset_label);
+}
+
+void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
+{
+    onConnectionChangeUiImpl(this, device, connection);
+}
+
+void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
 {
     addChild(createThemedWidget<ThemeScrew>(Vec(5 * RACK_GRID_WIDTH, 0), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 6 * RACK_GRID_WIDTH, 0), theme_engine, theme));
     
     addChild(createThemedWidget<ThemeScrew>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-    //addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
-void PresetModuleWidget::on_search_text_changed()
+void PresetUi::on_search_text_changed()
 {
 }
 
-void PresetModuleWidget::on_search_text_enter()
+void PresetUi::on_search_text_enter()
 {
 }
 
-void PresetModuleWidget::set_tab(PresetTab tab)
+void PresetUi::set_tab(PresetTab tab)
 {
     if (tab == PresetTab::User) {
         user_label->style(current_tab_style);
@@ -156,28 +192,29 @@ void PresetModuleWidget::set_tab(PresetTab tab)
     system_label->applyTheme(theme_engine, theme);
 }
 
-void PresetModuleWidget::page_up(bool ctrl, bool shift)
+void PresetUi::page_up(bool ctrl, bool shift)
 {
 }
 
-void PresetModuleWidget::page_down(bool ctrl, bool shift)
+void PresetUi::page_down(bool ctrl, bool shift)
 {
 }
 
-void PresetModuleWidget::next_preset(bool ctrl, bool shift)
+void PresetUi::next_preset(bool ctrl, bool shift)
 {
 }
 
-void PresetModuleWidget::previous_preset(bool ctrl, bool shift)
+void PresetUi::previous_preset(bool ctrl, bool shift)
 {
 }
 
-// void PresetModuleWidget::step()
-// {
-//     ChemModuleWidget::step();
-// }
+void PresetUi::step()
+{
+    Base::step();
+    bind_host(my_module);
+}
 
-void PresetModuleWidget::draw(const DrawArgs& args)
+void PresetUi::draw(const DrawArgs &args)
 {
     Base::draw(args);
     #ifdef LAYOUT_HELP
@@ -187,7 +224,7 @@ void PresetModuleWidget::draw(const DrawArgs& args)
     #endif
 }
 
-void PresetModuleWidget::appendContextMenu(Menu *menu)
+void PresetUi::appendContextMenu(Menu *menu)
 {
     Base::appendContextMenu(menu);
 }

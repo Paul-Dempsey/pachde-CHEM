@@ -117,14 +117,7 @@ void SettingsModule::zero_modulation()
 void SettingsModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    json_t* j = json_object_get(root, "haken-device");
-    if (j) {
-        device_claim = json_string_value(j);
-    }
-    if (!device_claim.empty()) {
-        //modulation.mod_from_json(root);
-    }
-
+    json_read_string(root, "haken-device", device_claim);
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -132,9 +125,6 @@ json_t* SettingsModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    if (!device_claim.empty()) {
-        //modulation.mod_to_json(root);
-    }
     return root;
 }
 
