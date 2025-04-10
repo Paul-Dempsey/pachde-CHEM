@@ -5,7 +5,7 @@ PresetModule::PresetModule()
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     configSwitch(P_CAT, 0.f, 13.f, 0.f, "Category", {
-        "- none -",
+        "- any -",
         "Strings",
         "Winds",
         "Vocal",
@@ -21,7 +21,7 @@ PresetModule::PresetModule()
         "Utility"
     });
     configSwitch(P_TYPE, 0.f, 14.f, 0.f, "Type", {
-        "- none -",
+        "- any -",
         "Atonal",
         "Bass",
         "Bowed",
@@ -38,7 +38,7 @@ PresetModule::PresetModule()
         "Struck"
     });
     configSwitch(P_CHARACTER, 0.f, 39.f, 0.f, "Character", {
-        "- none -",
+        "- any -",
         "Acoustic",
         "Aggressive",
         "Airy",
@@ -80,7 +80,7 @@ PresetModule::PresetModule()
         "Woody"
     });
     configSwitch(P_MATRIX, 0.f, 18.f, 0.f, "EaganMatrix", {
-        "- none -",
+        "- any -",
         "Additive",
         "BiqBank",
         "BiqGraph",
@@ -101,7 +101,7 @@ PresetModule::PresetModule()
         "WaveBank"
     });
     configSwitch(P_GEAR, 0.f, 8.f, 0.f, "Setting", {
-        "- none - ",
+        "- any - ",
         "Channel 1",
         "External Midi Clock",
         "Mono Interval",
@@ -127,6 +127,12 @@ json_t* PresetModule::dataToJson()
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "track-live", json_boolean(track_live));
     return root;
+}
+
+// IDoMidi
+
+void PresetModule::do_message(PackedMidiMessage message)
+{
 }
 
 // IChemClient

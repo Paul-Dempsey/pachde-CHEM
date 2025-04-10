@@ -1,4 +1,5 @@
 #include "Preset.hpp"
+#include "../../em/preset-meta.hpp"
 #include "../../services/colors.hpp"
 #include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
@@ -7,7 +8,96 @@
 namespace S = pachde::style;
 using PM = PresetModule;
 
+// Preset Menu
+
+struct PresetMenu : Hamburger
+{
+    using Base = Hamburger;
+
+    PresetUi* ui;
+    PresetMenu() : ui(nullptr) { }
+
+    void setUi(PresetUi* w) { ui = w; }
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    void appendContextMenu(ui::Menu* menu) override;
+
+    void onHoverKey(const HoverKeyEvent& e) override
+    {
+        Base::onHoverKey(e);
+        switch (e.key) {
+        case GLFW_KEY_ENTER:
+        case GLFW_KEY_MENU:
+            if (e.action == GLFW_RELEASE) {
+                e.stopPropagating();
+                createContextMenu();
+            }
+        }
+    }
+
+};
+
+bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+{
+    return Base::applyTheme(engine, theme);
+}
+
+void PresetMenu::appendContextMenu(ui::Menu* menu)
+{
+    menu->addChild(createMenuLabel("— Preset Actions —"));
+    menu->addChild(createMenuItem("Sort by category", "",    [this](){ /*ui->open_playlist();*/ }, false));
+    menu->addChild(createMenuItem("Sort alphabetically", "",    [this](){ /*ui->open_playlist();*/ }, false));
+    menu->addChild(createMenuItem("System order", "",    [this](){ /*ui->open_playlist();*/ }, false));
+
+    // menu->addChild(createMenuItem("Open...", "",    [this](){ ui->open_playlist(); }, false));
+    // menu->addChild(createMenuItem("Close", "",      [this](){ ui->close_playlist(); }, false));
+    // menu->addChild(createMenuItem("Save", "",       [this](){ ui->save_playlist(); } , false));
+    // menu->addChild(createMenuItem("Save as...", "", [this](){ ui->save_as_playlist(); } , false));
+    // menu->addChild(createMenuItem("Clear", "", [this](){ ui->clear_playlist(false); }, ui->presets.empty()));
+
+    // if (ui->my_module) {
+    //     menu->addChild(new MenuSeparator);
+    //     menu->addChild(createSubmenuItem("Open recent", "", [=](Menu* menu) {
+    //         if (ui->my_module->playlist_mru.empty()) {
+    //             menu->addChild(createMenuLabel("(empty)"));
+    //         } else {
+    //             for (auto path : ui->my_module->playlist_mru) {
+    //                 auto name = system::getStem(path);
+    //                 menu->addChild(createMenuItem(name, "", [=]() {
+    //                     ui->load_playlist(path, true);
+    //                 }));
+    //             }
+    //         }
+    //     }));
+    //     menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); }, false));
+    // }
+    // menu->addChild(new MenuSeparator);
+    // menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
+    //     menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
+    //     menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
+    //     menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
+    // }));
+
+    // menu->addChild(new MenuSeparator);
+    // bool no_selection =  ui->selected.empty();
+    // bool first = (0 == ui->first_selected());
+    // bool last = (ui->last_selected() == static_cast<int>(ui->presets.size())-1);
+    // menu->addChild(createMenuLabel("— Selected —"));
+    // menu->addChild(createMenuItem("Duplicate", "",     [this](){ ui->clone(); }, no_selection));
+    // menu->addChild(createMenuItem("Remove", "",        [this](){ ui->remove_selected(); }, no_selection));
+    // menu->addChild(new MenuSeparator);
+    // menu->addChild(createMenuItem("Move to first", "", [this](){ ui->to_first(); }, first || no_selection));
+    // menu->addChild(createMenuItem("Move up", "",       [this](){ ui->to_up(); }, first || no_selection));
+    // menu->addChild(createMenuItem("Move down", "",     [this](){ ui->to_down(); }, last || no_selection));
+    // menu->addChild(createMenuItem("Move to last", "",  [this](){ ui->to_last(); }, last || no_selection));
+    // menu->addChild(new MenuSeparator);
+    // menu->addChild(createMenuItem("Select none", "Esc",  [this](){ ui->select_none(); }, no_selection));
+}
+
+
+
 constexpr const int ROWS = 20;
+constexpr const int COLS = 2;
+constexpr const int PAGE_CAPACITY = ROWS * COLS;
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float ROW_HEIGHT = 16.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
@@ -22,13 +112,10 @@ PresetUi::PresetUi(PresetModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-    if (S::show_screws()) {
-        createScrews(theme);
-    }
 
     float x, y;
     search_entry = new SearchField();
-    search_entry->box.pos = Vec(23.5f, 10.f);
+    search_entry->box.pos = Vec(23.5f, 11.f);
     search_entry->box.size = Vec(114.f, 14.f);
     search_entry->applyTheme(theme_engine, theme);
     search_entry->placeholder = "preset search";
@@ -84,6 +171,11 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(next);
 
+    menu = Center(createThemedWidget<PresetMenu>(Vec(x, 132.f), theme_engine, theme));
+    menu->setUi(this);
+    menu->describe("Preset actions menu");
+    addChild(menu);
+
     const float FILTER_DY = 20.f;
     y = 168.f;
     addChild(Center(createThemedParamButton<CatParamButton>(Vec(x,y), my_module, PM::P_CAT, theme_engine, theme)));
@@ -98,13 +190,6 @@ PresetUi::PresetUi(PresetModule *module) :
 
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), theme_engine, theme, "Core link");
-    addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(32.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
-
-    LabelStyle cp_style{"curpreset", TextAlignment::Right, 10.f, true};
-    addChild(live_preset_label = createLabel<TipLabel>(
-        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 200.f, "[preset]", theme_engine, theme, cp_style));
-
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ui::Menu* menu = createMenu();
@@ -114,6 +199,18 @@ PresetUi::PresetUi(PresetModule *module) :
         });
     }
     addChild(link_button);
+
+    addChild(haken_device_label = createLabel<TipLabel>(
+        Vec(32.f, box.size.y - 13.f), 150.f, S::NotConnected, theme_engine, theme, S::haken_label));
+
+    LabelStyle cp_style{"curpreset", TextAlignment::Right, 10.f, true};
+    addChild(live_preset_label = createLabel<TipLabel>(
+        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 125.f, "[preset]", theme_engine, theme, cp_style));
+    live_preset_label->glowing(true);
+
+    if (S::show_screws()) {
+        createScrews(theme);
+    }
 
     if (!module) {
         auto logo = new WatermarkLogo(1.8f);
@@ -132,6 +229,7 @@ void no_preset(TipLabel* label) {
 
 void PresetUi::onConnectHost(IChemHost *host)
 {
+    chem_host = host;
     if (chem_host) {
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
@@ -146,12 +244,28 @@ void PresetUi::onPresetChange()
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
-            live_preset_label->text(printable(preset->name));
-            live_preset_label->describe(printable(preset->text));
+            live_preset = std::make_shared<PresetDescription>();
+            live_preset->init(preset);
+            live_preset_label->text(live_preset->name);
+            if (preset->text.empty()) {
+                live_preset_label->describe(preset->summary());
+            } else {
+                auto meta = hakenCategoryCode.make_category_mulitline_text(preset->text);
+                auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), meta.c_str());
+                live_preset_label->describe(text);
+            }
             return;
+        } else {
+            live_preset = nullptr;
+            no_preset(live_preset_label);
         }
+    } else {
+        live_preset = nullptr;
+        no_preset(live_preset_label);
     }
-    no_preset(live_preset_label);
+    if (live_preset && my_module->track_live) {
+        //scroll_to_live();
+    }
 }
 
 void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -166,6 +280,14 @@ void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
     
     addChild(createThemedWidget<ThemeScrew>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+}
+
+void PresetUi::set_track_live(bool track)
+{
+    if (!module) return;
+    if (track == my_module->track_live) return;
+    my_module->track_live = track;
+    // TODO: track live preset
 }
 
 void PresetUi::on_search_text_changed()
@@ -226,5 +348,10 @@ void PresetUi::draw(const DrawArgs &args)
 
 void PresetUi::appendContextMenu(Menu *menu)
 {
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createCheckMenuItem("Track live preset", "", 
+        [this](){ return my_module->track_live; },
+        [this](){ set_track_live(!my_module->track_live); }
+    ));
     Base::appendContextMenu(menu);
 }

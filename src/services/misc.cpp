@@ -131,23 +131,28 @@ int randomZeroTo(int size)
     } while(true);
 }
 
-bool GetBool(const json_t* root, const char* key, bool default_value) {
+bool get_json_bool(const json_t* root, const char* key, bool default_value) {
     auto j = json_object_get(root, key);
     return j ? json_is_true(j) : default_value;
 }
 
-float GetFloat(const json_t* root, const char* key, float default_value) {
+float get_json_float(const json_t* root, const char* key, float default_value) {
     auto j = json_object_get(root, key);
     return j ? json_real_value(j) : default_value;
 }
 
-std::string GetString(const json_t* root, const char* key, const std::string& default_value)
+int get_json_int(const json_t* root, const char* key, int default_value) {
+    auto j = json_object_get(root, key);
+    return j ? json_integer_value(j) : default_value;
+}
+
+std::string get_json_string(const json_t* root, const char* key, const std::string& default_value)
 {
     auto j = json_object_get(root, key);
     return j ? json_string_value(j) : default_value;
 }
 
-std::string GetString(const json_t* root, const char* key)
+std::string get_json_string(const json_t* root, const char* key)
 {
     auto j = json_object_get(root, key);
     return j ? json_string_value(j) : "";

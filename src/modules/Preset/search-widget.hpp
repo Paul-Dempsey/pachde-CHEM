@@ -11,7 +11,7 @@ struct SearchField : TextField, IApplyTheme
 {
     using Base = TextField;
 
-    ElementStyle bg_style{"entry_bg", "hsla(42, 20%, 100%, 2%)", "hsl(0, 0%, 100%, 90%)", .25f};
+    ElementStyle bg_style{"entry_bg", "hsla(42, 20%, 100%, 5%)", "hsl(42, 50%, 40%)", .25f};
     ElementStyle text_style{"entry-text", "hsl(0, 0%, 65%)"};
     ElementStyle prompt_style{"entry-prompt", "hsla(0, 0%, 55%, 75%)"};
     ElementStyle selection_style{"entry_sel", "hsl(200, 50%, 40%)"};

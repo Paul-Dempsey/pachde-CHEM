@@ -471,7 +471,7 @@ void PlayUi::save_playlist()
         if (chem_host) {
             auto em = chem_host->host_matrix();
             if (em) {
-                playlist_device = HardwarePresetClass(em->hardware);
+                playlist_device = PresetClassName(em->hardware);
             }
         }
     }
@@ -508,7 +508,7 @@ void PlayUi::save_as_playlist()
             if (chem_host) {
                 auto em = chem_host->host_matrix();
                 if (em) {
-                    playlist_device = HardwarePresetClass(em->hardware);
+                    playlist_device = PresetClassName(em->hardware);
                 }
             }
         }
@@ -879,8 +879,8 @@ void PlayUi::onPresetChange()
         } else {
             live_preset = nullptr;
         }
-        live_preset_label->text(preset ? printable(preset->name) : "");
-        live_preset_label->describe(preset ? printable(preset->text) : "");
+        live_preset_label->text(preset ? preset->name : "");
+        live_preset_label->describe(preset ? preset->text : "");
     } else {
         live_preset_label->text("");
         live_preset_label->describe("(none)");
@@ -910,7 +910,7 @@ void PlayUi::check_playlist_device()
     if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em && em->hardware != 0) {
-            const char * current_device = HardwarePresetClass(em->hardware);
+            const char * current_device = PresetClassName(em->hardware);
             if (0 != strcmp(current_device, playlist_device.c_str())) {
                 warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
             } else {

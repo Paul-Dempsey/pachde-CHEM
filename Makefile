@@ -48,7 +48,6 @@ SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
-SOURCES += src/widgets/preset-widget.cpp
 SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/slider-widget.cpp
 SOURCES += src/widgets/slider-h-widget.cpp
@@ -66,6 +65,7 @@ SOURCES += src/modules/Core/haken-task.cpp
 
 SOURCES += src/modules/Play/Play.cpp
 SOURCES += src/modules/Play/Play-ui.cpp
+SOURCES += src/modules/Play/preset-widget.cpp
 
 SOURCES += src/modules/Macro/Macro.cpp
 SOURCES += src/modules/Macro/Macro-ui.cpp
@@ -95,6 +95,7 @@ SOURCES += src/modules/Settings/tuning.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
+SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/search-widget.cpp
 
 DISTRIBUTABLES += res

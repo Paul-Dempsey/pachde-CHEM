@@ -29,7 +29,7 @@ void SusModule::dataFromJson(json_t* root)
     ChemModule::dataFromJson(root);
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "glow-knobs", glow_knobs);
-    getParam(P_MOD_AMOUNT).setValue(GetFloat(root, "mod-amount", 0.f));
+    getParam(P_MOD_AMOUNT).setValue(get_json_float(root, "mod-amount", 0.f));
     ModuleBroker::get()->try_bind_client(this);
 }
 

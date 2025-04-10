@@ -81,7 +81,14 @@ void SearchField:: draw(const DrawArgs& args)
     nvgSave(vg);
     nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_LEFT);
 
-    FillRect(vg, 0, 0, box.size.x, box.size.y, bg_style.nvg_color());
+    auto bg_fill = bg_style.nvg_color();
+    if (bg_fill.a > 0.f) {
+        FillRect(vg, 0, 0, box.size.x, box.size.y, bg_fill);
+    }
+    auto bg_stroke =  bg_style.nvg_stroke_color();
+    if (bg_stroke.a > 0.f) {
+        FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, bg_stroke, Fit::Inside, bg_style.width());
+    }
 
     bool active = (this == APP->event->selectedWidget);
     if (active || !text.empty()) {

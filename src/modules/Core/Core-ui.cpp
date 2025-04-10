@@ -16,6 +16,15 @@ CoreModuleWidget::~CoreModuleWidget()
     }
 }
 
+void CoreModuleWidget::show_busy(bool busy)
+{
+    if (busy) {
+        startSpinner(this);
+    } else {
+        stopSpinner(this);
+    }
+}
+
 using EME = IHandleEmEvents::EventMask;
 
 // Layout

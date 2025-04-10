@@ -1,6 +1,6 @@
 #include "preset-widget.hpp"
-#include "../services/colors.hpp"
-#include "../services/misc.hpp"
+#include "../../services/colors.hpp"
+#include "../../services/misc.hpp"
 namespace pachde {
 
 constexpr const double DRAG_DELAY_INTERVAL = 0.35;

@@ -10,8 +10,8 @@
 #include "../../widgets/hamburger.hpp"
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/preset-widget.hpp"
 #include "../../widgets/spinner.hpp"
+#include "preset-widget.hpp"
 
 using namespace pachde;
 

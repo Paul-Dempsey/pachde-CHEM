@@ -192,31 +192,37 @@ void CoreModule::onPresetChanged()
 void CoreModule::onUserBegin()
 {
     is_busy = true;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onUserComplete()
 {
     is_busy = false;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onSystemBegin()
 {
     is_busy = true;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onSystemComplete()
 {
     is_busy = false;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onMahlingBegin()
 {
     is_busy = true;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onMahlingComplete()
 {
     is_busy = false;
+    if (chem_ui) ui()->show_busy(is_busy);
 }
 
 void CoreModule::onHakenTaskChange(HakenTask id)
@@ -326,10 +332,10 @@ void CoreModule::onReset(const ResetEvent &e)
 void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    haken_device.set_claim(GetString(root, "haken-device"));
-    controller1.set_claim(GetString(root, "controller-1"));
-    controller2.set_claim(GetString(root, "controller-2"));
-    enable_logging(GetBool(root, "log-midi", false));
+    haken_device.set_claim(get_json_string(root, "haken-device"));
+    controller1.set_claim(get_json_string(root, "controller-1"));
+    controller2.set_claim(get_json_string(root, "controller-2"));
+    enable_logging(get_json_bool(root, "log-midi", false));
     json_read_bool(root, "restore-preset", restore_last_preset);
     if (!restore_last_preset) {
         this->tasks.get_task(HakenTask::LastPreset)->not_applicable();

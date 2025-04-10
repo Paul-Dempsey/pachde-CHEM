@@ -185,9 +185,7 @@ void PreUi::onConnectHost(IChemHost* host)
 
 void PreUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    onConnectionChangeUiImpl(this, device, connection);
 }
 
 void PreUi::sync_labels()

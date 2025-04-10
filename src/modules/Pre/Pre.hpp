@@ -71,8 +71,8 @@ struct PreModule : ChemModule, IChemClient, IDoMidi
     void do_message(PackedMidiMessage message) override;
     
     // IChemClient
-    rack::engine::Module* client_module() override;
-    std::string client_claim() override;
+    rack::engine::Module* client_module() override { return this; }
+    std::string client_claim() override { return device_claim; }
     IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
@@ -94,17 +94,15 @@ struct PreUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
-    IChemHost* chem_host{nullptr};
     PreModule* my_module{nullptr};
-
-    TextLabel* effect_label;
-
-    LinkButton*   link_button{nullptr};
-    TipLabel*     haken_device_label{nullptr};
+    IChemHost* chem_host{nullptr};
+    LinkButton* link_button{nullptr};
+    TipLabel* haken_device_label{nullptr};
 
     int comp_type;
-
+    
     SelectorWidget* selector{nullptr};
+    TextLabel* effect_label;
     TextLabel* selector_label;
     TextLabel* top_knob_label;
     TextLabel* mid_knob_label;

@@ -10,6 +10,7 @@
 #include "../../widgets/label-widget.hpp"
 #include "../../widgets/MidiPicker.hpp"
 #include "../../widgets/slider-h-widget.hpp"
+#include "../../widgets/spinner.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "haken-task.hpp"
@@ -234,7 +235,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
-    
+
+    void show_busy(bool busy);
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
     void createScrews(std::shared_ptr<SvgTheme> theme) override;

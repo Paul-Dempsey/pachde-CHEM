@@ -108,9 +108,6 @@ void PreModule::do_message(PackedMidiMessage message)
 }
 
 // IChemClient
-::rack::engine::Module* PreModule::client_module() { return this; }
-std::string PreModule::client_claim() { return device_claim; }
-
 void PreModule::onConnectHost(IChemHost* host)
 {
     onConnectHostModuleImpl(this, host);

@@ -36,10 +36,12 @@ inline bool in_range(T value, T minimum, T maximum) { return minimum <= value &&
 template <typename T>
 inline bool in_range_limit(T value, T minimum, T limit) { return minimum <= value && value < limit; }
 
-bool GetBool(const json_t* root, const char* key, bool default_value);
-float GetFloat(const json_t* root, const char* key, float default_value);
-std::string GetString(const json_t* root, const char* key, const std::string& default_value);
-std::string GetString(const json_t* root, const char* key);
+bool get_json_bool(const json_t* root, const char* key, bool default_value);
+float get_json_float(const json_t* root, const char* key, float default_value);
+int get_json_int(const json_t* root, const char* key, int default_value);
+
+std::string get_json_string(const json_t* root, const char* key, const std::string& default_value);
+std::string get_json_string(const json_t* root, const char* key);
 
 inline void json_read_string(json_t* root, const char* name, std::string& var) {
     if (json_t* j = json_object_get(root, name)) {
