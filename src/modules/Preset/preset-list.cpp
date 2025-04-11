@@ -43,7 +43,6 @@ bool PresetList::save(const std::string &path, const std::string& connection_inf
 bool PresetList::from_json(const json_t* root,const std::string &path)
 {
     presets.clear();
-    index.clear();
 
     uint16_t ver = get_json_int(root, "firmware", 0);
     auto hw = get_json_int(root, "hardware", 0);

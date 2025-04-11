@@ -19,9 +19,13 @@ CoreModuleWidget::~CoreModuleWidget()
 void CoreModuleWidget::show_busy(bool busy)
 {
     if (busy) {
-        startSpinner(this);
+        if (!spinning) {
+            startSpinner(this, Vec(box.size.x*.5, 70.f));
+        }
+        spinning = true;
     } else {
         stopSpinner(this);
+        spinning = false;
     }
 }
 

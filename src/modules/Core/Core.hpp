@@ -40,7 +40,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     RelayMidi midi_relay;
     MidiLog* midi_log;
-    
+
     EaganMatrix em;
     bool is_busy;
     bool in_reboot;
@@ -200,6 +200,8 @@ enum ThemeColor {
 struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHakenTaskEvents
 {
     CoreModule* my_module = nullptr;
+    bool spinning{false};
+
     MidiPicker* haken_picker = nullptr;
     MidiPicker* controller1_picker = nullptr;
     MidiPicker* controller2_picker = nullptr;

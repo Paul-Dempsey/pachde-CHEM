@@ -88,9 +88,9 @@ struct ChemSpinSvg {
 using ChemSpinner = Spinner<ChemSpinSvg>;
 
 template <typename Tparent>
-void startSpinner(Tparent* parent) {
+void startSpinner(Tparent* parent, Vec pos) {
     auto spinner = new ChemSpinner();
-    spinner->box.pos = Vec(parent->box.size.x*.5, parent->box.size.y*.5);
+    spinner->box.pos = pos;
     spinner->applyTheme(theme_engine, theme_engine.getTheme(parent->getThemeName()));
     Center(spinner);
     parent->addChild(spinner);
@@ -98,12 +98,14 @@ void startSpinner(Tparent* parent) {
 
 template <typename Tparent>
 void stopSpinner(Tparent* parent) {
-    ChemSpinner* spinner{nullptr};
+    std::vector<ChemSpinner*> spinners;
     for (auto child : parent->children) {
-        spinner = dynamic_cast<ChemSpinner*>(child);
-        if (spinner) break;
+        auto spinner = dynamic_cast<ChemSpinner*>(child);
+        if (spinner) spinners.push_back(spinner);
     }
-    parent->removeChild(spinner);
+    for (auto spinner: spinners) {
+        parent->removeChild(spinner);
+    }
 }
 
 

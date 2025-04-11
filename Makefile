@@ -95,6 +95,7 @@ SOURCES += src/modules/Settings/tuning.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
+SOURCES += src/modules/Preset/preset-entry.cpp
 SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/search-widget.cpp
 

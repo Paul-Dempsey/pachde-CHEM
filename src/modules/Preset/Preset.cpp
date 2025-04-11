@@ -118,6 +118,9 @@ void PresetModule::dataFromJson(json_t *root)
     ChemModule::dataFromJson(root);
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "track-live", track_live);
+    hardware = get_json_int(root, "hardware", 0);
+    firmware = get_json_int(root, "firmware", 0);
+    active_tab = get_json_int(root, "tab", 0);
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -126,13 +129,10 @@ json_t* PresetModule::dataToJson()
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "track-live", json_boolean(track_live));
+    json_object_set_new(root, "hardware", json_integer(hardware));
+    json_object_set_new(root, "firmware", json_integer(firmware));
+    json_object_set_new(root, "tab", json_integer(active_tab));
     return root;
-}
-
-// IDoMidi
-
-void PresetModule::do_message(PackedMidiMessage message)
-{
 }
 
 // IChemClient

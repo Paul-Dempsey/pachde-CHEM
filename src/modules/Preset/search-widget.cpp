@@ -18,8 +18,8 @@ bool SearchField::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::share
 
 void SearchField::onSelectKey(const SelectKeyEvent &e)
 {
-    if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-        if (e.key == GLFW_KEY_ESCAPE && (0 == e.mods)) {
+    if (e.action == GLFW_PRESS) {
+        if (e.key == GLFW_KEY_ESCAPE && !(e.mods & RACK_MOD_MASK)) {
             setText("");
             //APP->event->setSelectedWidget(nullptr);
             e.consume(this);

@@ -44,60 +44,45 @@ bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> th
 void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
     menu->addChild(createMenuLabel("— Preset Actions —"));
-    menu->addChild(createMenuItem("Sort by category", "",    [this](){ /*ui->open_playlist();*/ }, false));
-    menu->addChild(createMenuItem("Sort alphabetically", "",    [this](){ /*ui->open_playlist();*/ }, false));
-    menu->addChild(createMenuItem("System order", "",    [this](){ /*ui->open_playlist();*/ }, false));
+    menu->addChild(createMenuItem("Sort by category", "",    [this](){ /*ui->foo();*/ }, false));
+    menu->addChild(createMenuItem("Sort alphabetically", "",    [this](){ /*ui->foo();*/ }, false));
+    menu->addChild(createMenuItem("System order", "",    [this](){ /*ui->foo();*/ }, false));
 
-    // menu->addChild(createMenuItem("Open...", "",    [this](){ ui->open_playlist(); }, false));
-    // menu->addChild(createMenuItem("Close", "",      [this](){ ui->close_playlist(); }, false));
-    // menu->addChild(createMenuItem("Save", "",       [this](){ ui->save_playlist(); } , false));
-    // menu->addChild(createMenuItem("Save as...", "", [this](){ ui->save_as_playlist(); } , false));
-    // menu->addChild(createMenuItem("Clear", "", [this](){ ui->clear_playlist(false); }, ui->presets.empty()));
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createMenuItem("Show live preset", "",
+        [this](){ ui->scroll_to_live(); },
+        !ui->get_live_id().valid()
+    ));
+    menu->addChild(createMenuItem("Clear filters", "",
+        [this](){ ui->clear_filters(); },
+        !ui->my_module
+    ));
 
-    // if (ui->my_module) {
-    //     menu->addChild(new MenuSeparator);
-    //     menu->addChild(createSubmenuItem("Open recent", "", [=](Menu* menu) {
-    //         if (ui->my_module->playlist_mru.empty()) {
-    //             menu->addChild(createMenuLabel("(empty)"));
-    //         } else {
-    //             for (auto path : ui->my_module->playlist_mru) {
-    //                 auto name = system::getStem(path);
-    //                 menu->addChild(createMenuItem(name, "", [=]() {
-    //                     ui->load_playlist(path, true);
-    //                 }));
-    //             }
-    //         }
-    //     }));
-    //     menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); }, false));
-    // }
-    // menu->addChild(new MenuSeparator);
-    // menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
-    //     menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
-    //     menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
-    //     menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
-    // }));
-
-    // menu->addChild(new MenuSeparator);
-    // bool no_selection =  ui->selected.empty();
-    // bool first = (0 == ui->first_selected());
-    // bool last = (ui->last_selected() == static_cast<int>(ui->presets.size())-1);
-    // menu->addChild(createMenuLabel("— Selected —"));
-    // menu->addChild(createMenuItem("Duplicate", "",     [this](){ ui->clone(); }, no_selection));
-    // menu->addChild(createMenuItem("Remove", "",        [this](){ ui->remove_selected(); }, no_selection));
-    // menu->addChild(new MenuSeparator);
-    // menu->addChild(createMenuItem("Move to first", "", [this](){ ui->to_first(); }, first || no_selection));
-    // menu->addChild(createMenuItem("Move up", "",       [this](){ ui->to_up(); }, first || no_selection));
-    // menu->addChild(createMenuItem("Move down", "",     [this](){ ui->to_down(); }, last || no_selection));
-    // menu->addChild(createMenuItem("Move to last", "",  [this](){ ui->to_last(); }, last || no_selection));
-    // menu->addChild(new MenuSeparator);
-    // menu->addChild(createMenuItem("Select none", "Esc",  [this](){ ui->select_none(); }, no_selection));
+    menu->addChild(new MenuSeparator);
+    menu->addChild(createCheckMenuItem("Track live preset", "", 
+        [this](){ return ui->my_module->track_live; },
+        [this](){ ui->set_track_live(!ui->my_module->track_live); },
+        !ui->my_module
+    ));
+    menu->addChild(createCheckMenuItem("Use cached User presets", "", 
+        [this]() { return ui->my_module->use_cached_user_presets; },
+        [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
+        !ui->my_module
+    ));
+    menu->addChild(new MenuSeparator);
+    bool host = ui->host_available();
+    menu->addChild(createMenuItem("Refresh User presets", "", 
+        [this](){ ui->request_presets(PresetTab::User); },
+        !host
+    ));
+    menu->addChild(createMenuItem("Refresh System presets", "", 
+        [this](){ ui->request_presets(PresetTab::System); },
+        !host
+    ));
 }
 
 
 
-constexpr const int ROWS = 20;
-constexpr const int COLS = 2;
-constexpr const int PAGE_CAPACITY = ROWS * COLS;
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float ROW_HEIGHT = 16.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
@@ -115,7 +100,7 @@ PresetUi::PresetUi(PresetModule *module) :
 
     float x, y;
     search_entry = new SearchField();
-    search_entry->box.pos = Vec(23.5f, 11.f);
+    search_entry->box.pos = Vec(23.5f, 18.f);
     search_entry->box.size = Vec(114.f, 14.f);
     search_entry->applyTheme(theme_engine, theme);
     search_entry->placeholder = "preset search";
@@ -125,7 +110,7 @@ PresetUi::PresetUi(PresetModule *module) :
 
     // tab labels
     x = 270.f;
-    y = 10.f;
+    y = 18.f;
     addChild(user_label = createLabel<TextLabel>(Vec(x,y), 26.f, "User", theme_engine, theme, tab_style));
     addChild(createClickRegion(RECT_ARGS(user_label->box.grow(Vec(6,2))), (int)PresetTab::User, [=](int id, int mods) { set_tab((PresetTab)id); }));
 
@@ -136,10 +121,12 @@ PresetUi::PresetUi(PresetModule *module) :
     // right controls
 
     x = RCENTER;
+    y = 28.f;
     LabelStyle style{"dytext", TextAlignment::Center, 9.f};
-    addChild(page_label = createLabel<TextLabel>(Vec(x, 16.f), 20.f, "1 of 1", theme_engine, theme, style));
+    addChild(page_label = createLabel<TextLabel>(Vec(x - .75, y), 30.f, "1 of 1", theme_engine, theme, style));
 
-    up_button = createWidgetCentered<UpButton>(Vec(x, 36.f));
+    y = 46.f;
+    up_button = createWidgetCentered<UpButton>(Vec(x, y));
     up_button->describe("Page up");
     up_button->applyTheme(theme_engine, theme);
     up_button->setHandler([this](bool c, bool s){ 
@@ -147,7 +134,8 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(up_button);
 
-    down_button = createWidgetCentered<DownButton>(Vec(x, 51.f));
+    y += 15.f;
+    down_button = createWidgetCentered<DownButton>(Vec(x, y));
     down_button->describe("Page down");
     down_button->applyTheme(theme_engine, theme);
     down_button->setHandler([this](bool c, bool s){
@@ -155,7 +143,8 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(down_button);
 
-    auto prev = createWidgetCentered<PrevButton>(Vec(x, 74.f));
+    y = 84.f;
+    auto prev = createWidgetCentered<PrevButton>(Vec(x, y));
     prev->describe("Select previous preset");
     prev->applyTheme(theme_engine, theme);
     prev->setHandler([this](bool c, bool s) {
@@ -163,7 +152,8 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(prev);
 
-    auto next = createWidgetCentered<NextButton>(Vec(x, 88.f));
+    y += 15.f;
+    auto next = createWidgetCentered<NextButton>(Vec(x, y));
     next->describe("Select next preset");
     next->applyTheme(theme_engine, theme);
     next->setHandler([this](bool c, bool s){ 
@@ -187,6 +177,21 @@ PresetUi::PresetUi(PresetModule *module) :
     addChild(Center(createThemedParamButton<MatrixParamButton>(Vec(x,y), my_module, PM::P_MATRIX, theme_engine, theme)));
     y += FILTER_DY;
     addChild(Center(createThemedParamButton<GearParamButton>(Vec(x,y), my_module, PM::P_GEAR, theme_engine, theme)));
+
+    // preset grid
+    const float PRESET_TOP = 38.f;
+    x = 9.f; y = PRESET_TOP;
+    for (int i = 0; i < PAGE_CAPACITY; ++i) {
+        auto entry = PresetEntry::create(Vec(x,y), preset_grid, theme);
+        preset_grid.push_back(entry);
+        addChild(entry);
+
+        y += 16.f;
+        if (i == PAGE_CAPACITY/2 - 1) {
+            x = 172;
+            y = PRESET_TOP;
+        }
+    }
 
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), theme_engine, theme, "Core link");
@@ -219,7 +224,19 @@ PresetUi::PresetUi(PresetModule *module) :
     }
     if (module) {
         my_module->set_chem_ui(this);
+        user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        set_tab(PresetTab(my_module->active_tab));
     }
+}
+
+void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
+{
+    addChild(createThemedWidget<ThemeScrew>(Vec(5 * RACK_GRID_WIDTH, 0), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 6 * RACK_GRID_WIDTH, 0), theme_engine, theme));
+    
+    addChild(createThemedWidget<ThemeScrew>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
 void no_preset(TipLabel* label) {
@@ -227,20 +244,172 @@ void no_preset(TipLabel* label) {
     label->describe("(none)");
 }
 
-void PresetUi::onConnectHost(IChemHost *host)
+
+void PresetUi::request_presets(PresetTab which)
 {
-    chem_host = host;
-    if (chem_host) {
-        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
-        onPresetChange();
-    } else {
-        onConnectionChange(ChemDevice::Haken, nullptr);
-        no_preset(live_preset_label);
+    if (!host_available()) return;
+
+    switch (which) {
+    case PresetTab::Unset:
+        assert(false);
+        break;
+    case PresetTab::User:
+        user_tab.clear();
+        gathering = PresetTab::User;
+        chem_host->host_haken()->request_user(ChemId::Preset);
+        break;
+    case PresetTab::System:
+        system_tab.clear();
+        gathering = PresetTab::System;
+        chem_host->host_haken()->request_system(ChemId::Preset);
+        break;
+    }
+}
+
+std::string PresetUi::preset_file(PresetTab which)
+{
+    assert(PresetTab::Unset != which);
+    const char * s_u = which == PresetTab::System ? "system" : "user";
+    auto em = chem_host->host_matrix();
+    auto preset_filename = format_string("%s-%s-%d.json", PresetClassName(em->hardware), s_u, em->firmware_version);
+    return user_plugin_asset(preset_filename);
+}
+
+bool PresetUi::load_presets(PresetTab which)
+{
+    assert(PresetTab::Unset != which);
+    if (!host_available()) return false;
+
+    if ((PresetTab::User == which) && !my_module->use_cached_user_presets) return false;
+
+    auto em = chem_host->host_matrix();
+    if (!em || (0 == em->firmware_version) || (0 == em->hardware)) return false;
+
+    auto path = preset_file(which);
+    if (!system::exists(path)) return false;
+
+    FILE* file = std::fopen(path.c_str(), "r");
+	if (!file) return false;
+
+    DEFER({std::fclose(file);});
+
+    json_error_t error;
+	json_t* root = json_loadf(file, 0, &error);
+	if (!root) {
+		WARN("Invalid JSON at %d:%d %s in %s", error.line, error.column, error.text, path.c_str());
+        return false;
+    }
+    Tab& tab = get_tab(which);
+    tab.list.set_device_info(em->firmware_version, em->hardware);
+    return tab.list.from_json(root, path);
+}
+
+bool PresetUi::save_presets(PresetTab which)
+{
+    if (!host_available()) return false;
+
+    Tab& tab = get_tab(which);
+    if (tab.list.presets.empty()) return false;
+
+    auto root = json_object();
+    if (!root) { return false; }
+	DEFER({json_decref(root);});
+
+    auto path = preset_file(which);
+    auto dir = system::getDirectory(path);
+    system::createDirectories(dir);
+    
+    FILE* file = std::fopen(path.c_str(), "wb");
+    if (!file) return false;
+
+    tab.list.to_json(root, my_module->device_claim);
+    auto e = json_dumpf(root, file, JSON_INDENT(2));
+	std::fclose(file);
+    return e >= 0;
+}
+
+void PresetUi::onSystemBegin()
+{
+    if (PresetTab::Unset == gathering) {
+        other_system_gather = true;
+    }
+}
+
+void PresetUi::onSystemComplete()
+{
+    if (other_system_gather) {
+        other_system_gather = false;
+        return;
+    }
+    if (gathering == PresetTab::System) {
+        gathering = PresetTab::Unset;
+
+        auto em = chem_host->host_matrix();
+        system_tab.list.set_device_info(em->firmware_version, em->hardware);
+        save_presets(PresetTab::System);
+
+        if (active_tab_id == PresetTab::System) {
+            scroll_to(0);
+        }
+    }
+}
+
+void PresetUi::onUserBegin()
+{
+    if (PresetTab::Unset == gathering) {
+        other_user_gather = true;
+    }
+}
+
+void PresetUi::onUserComplete()
+{
+    if (other_user_gather) {
+        other_user_gather = false;
+        return;
+    }
+    if (gathering == PresetTab::User) {
+        gathering = PresetTab::Unset;
+
+        auto em = chem_host->host_matrix();
+        user_tab.list.set_device_info(em->firmware_version, em->hardware);
+        save_presets(PresetTab::User);
+
+        if (active_tab_id == PresetTab::User) {
+            scroll_to(0);
+        }
     }
 }
 
 void PresetUi::onPresetChange()
 {
+    // ignore preset changes while some other module is gathering presets
+    if (other_user_gather || other_system_gather) return;
+
+    if (chem_host){
+        auto em = chem_host->host_matrix();
+        if (em->ready) {
+            if (my_module){
+                my_module->firmware = em->firmware_version;
+                my_module->hardware = em->hardware;
+            }
+            user_tab.list.set_device_info(em->firmware_version, em->hardware);
+            system_tab.list.set_device_info(em->firmware_version, em->hardware);
+        }
+    }
+    switch (gathering) {
+    case PresetTab::Unset:
+        break;
+    case PresetTab::User:
+    case PresetTab::System: {
+        auto preset = chem_host->host_preset();
+        if (preset && !preset->empty()) {
+            auto pd = std::make_shared<PresetDescription>();
+            pd->init(preset);
+            get_tab(gathering).list.add(pd);
+        }
+        return;
+    } break;
+    }
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
@@ -264,22 +433,48 @@ void PresetUi::onPresetChange()
         no_preset(live_preset_label);
     }
     if (live_preset && my_module->track_live) {
-        //scroll_to_live();
+        scroll_to_live();
+    }
+    for (auto pw : preset_grid) {
+        if (!pw->preset_id.valid()) break;
+        pw->live = live_preset ? pw->preset_id == live_preset->id : false;
+    }
+}
+
+bool PresetUi::host_available()
+{
+    if (!chem_host) return false;
+    if (chem_host->host_busy()) return false;
+    if (!chem_host->host_connection(ChemDevice::Haken)) return false;
+    auto em = chem_host->host_matrix();
+    if (!em || !em->is_ready()) return false;
+
+    return true;
+}
+
+void PresetUi::onConnectHost(IChemHost *host)
+{
+    if (chem_host) {
+        chem_host->host_matrix()->unsubscribeEMEvents(this);
+    }
+    chem_host = host;
+    if (chem_host) {
+        chem_host->host_matrix()->subscribeEMEvents(this);
+        onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
+        onPresetChange();
+    } else {
+        onConnectionChange(ChemDevice::Haken, nullptr);
+        no_preset(live_preset_label);
     }
 }
 
 void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
+    if (ChemDevice::Haken == device) {
+        user_tab.clear();
+        system_tab.clear();
+    }
     onConnectionChangeUiImpl(this, device, connection);
-}
-
-void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
-{
-    addChild(createThemedWidget<ThemeScrew>(Vec(5 * RACK_GRID_WIDTH, 0), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 6 * RACK_GRID_WIDTH, 0), theme_engine, theme));
-    
-    addChild(createThemedWidget<ThemeScrew>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
 void PresetUi::set_track_live(bool track)
@@ -298,28 +493,143 @@ void PresetUi::on_search_text_enter()
 {
 }
 
-void PresetUi::set_tab(PresetTab tab)
+void PresetUi::set_tab(PresetTab tab_id)
 {
-    if (tab == PresetTab::User) {
+    switch (tab_id) {
+    case PresetTab::User:
         user_label->style(current_tab_style);
         system_label->style(tab_style);
-        active_tab = PresetTab::User;
-    } else {
+        active_tab_id = PresetTab::User;
+        break;
+
+    case PresetTab::Unset:
+        assert(false);
+        goto sys;
+
+    case PresetTab::System:
+    sys:
         user_label->style(tab_style);
         system_label->style(current_tab_style);
-        active_tab = PresetTab::System;
+        active_tab_id = PresetTab::System;
+        break;
     }
+
+    if (my_module) {
+        my_module->active_tab = int(active_tab_id);
+    }
+
+    Tab& tab = active_tab();
+    if (tab.list.presets.empty()) {
+        if (!load_presets(tab_id)) {
+            request_presets(tab_id);
+        }
+    }
+    
     auto theme = theme_engine.getTheme(getThemeName());
     user_label->applyTheme(theme_engine, theme);
     system_label->applyTheme(theme_engine, theme);
+
+    scroll_to(tab.scroll_top);
+}
+
+void PresetUi::scroll_to(ssize_t index)
+{
+    Tab& tab = active_tab();
+    tab.scroll_top = index;
+    size_t ip = tab.scroll_top;
+    for (auto pw: preset_grid) {
+        if (ip < tab.list.presets.size()) {
+            auto preset = tab.list.nth(ip);
+            auto live_id = get_live_id();
+            bool live = live_id.valid() && (preset->id == live_id);
+            pw->set_preset(ip, false, live, preset);
+        } else {
+            pw->clear_preset();
+        }
+        ++ip;
+    }
+    update_page_controls();
+}
+
+void PresetUi::scroll_to_live()
+{
+    auto live_id = get_live_id();
+    if (!live_id.valid()) return;
+    size_t index = 0;
+    for (auto p : active_tab().list.presets) {
+        if (live_id == p->id) break;
+        index++;
+    }
+
+    scroll_to(PAGE_CAPACITY * (index / PAGE_CAPACITY));
+}
+
+void PresetUi::clear_filters()
+{
+    if (!my_module) return;
+    for (Param& p : my_module->params) {
+        p.setValue(0);
+    }
 }
 
 void PresetUi::page_up(bool ctrl, bool shift)
 {
+    Tab& tab = active_tab();
+    if (tab.scroll_top < PAGE_CAPACITY) return;
+    if (ctrl) {
+        scroll_to(0);
+    } else {
+        auto index = std::max(ssize_t(0), ssize_t(tab.scroll_top) - PAGE_CAPACITY);
+        scroll_to(index);
+    }
 }
 
 void PresetUi::page_down(bool ctrl, bool shift)
 {
+    Tab& tab = active_tab();
+    auto count = tab.list.count();
+    if (count < PAGE_CAPACITY) {
+        scroll_to(0);
+        return;
+    }
+    if (ctrl) {
+        scroll_to((count / PAGE_CAPACITY) * PAGE_CAPACITY);
+    } else {
+        size_t pos = std::min(count, tab.scroll_top + PAGE_CAPACITY);
+        size_t page = pos / PAGE_CAPACITY;
+        scroll_to(page * PAGE_CAPACITY);
+    }
+}
+
+void PresetUi::update_page_controls()
+{
+    Tab& tab = active_tab();
+    size_t count = tab.list.count();
+    size_t page = 1 + (tab.scroll_top / PAGE_CAPACITY);
+    size_t pages = 1 + (count / PAGE_CAPACITY);
+    auto info = format_string("%d of %d", page, pages);
+    page_label->text(info);
+
+    if (0 == tab.scroll_top) {
+        up_button->enable(false);
+        down_button->enable(count > PAGE_CAPACITY);
+        return;
+    }
+
+    up_button->enable(true);
+    down_button->enable(true);
+
+    if (count <= PAGE_CAPACITY) {
+        up_button->enable(false);
+        down_button->enable(false);
+        return;
+    }
+    if (tab.scroll_top < PAGE_CAPACITY) {
+        up_button->enable(false);
+    }
+    if (count - tab.scroll_top <= PAGE_CAPACITY) {
+        down_button->enable(false);
+    }
 }
 
 void PresetUi::next_preset(bool ctrl, bool shift)
@@ -334,6 +644,9 @@ void PresetUi::step()
 {
     Base::step();
     bind_host(my_module);
+    if (active_tab().list.empty() && host_available()) {
+        set_tab(active_tab_id);
+    }
 }
 
 void PresetUi::draw(const DrawArgs &args)
@@ -348,10 +661,11 @@ void PresetUi::draw(const DrawArgs &args)
 
 void PresetUi::appendContextMenu(Menu *menu)
 {
-    menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Track live preset", "", 
-        [this](){ return my_module->track_live; },
-        [this](){ set_track_live(!my_module->track_live); }
-    ));
+    // menu->addChild(new MenuSeparator);
+    // menu->addChild(createCheckMenuItem("Track live preset", "", 
+    //     [this](){ return my_module->track_live; },
+    //     [this](){ set_track_live(!my_module->track_live); }
+    // ));
+
     Base::appendContextMenu(menu);
 }

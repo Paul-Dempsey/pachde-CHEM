@@ -14,214 +14,76 @@
     </linearGradient>
   </defs>
   <rect id="g-panel" fill="url(#panel-gradient)" x="0" y="0"  width="360" height="380" />
-
   <path
      id="grid"
      fill="url(#grid-grad)"
-     d="M 7.5,28 V 41.599609 L 169.23242,41.476562 169.24414,28 Z m 162.49414,0 -0.0117,13.476562 161.46875,-0.123046 V 28 Z m 161.45703,14.103516 -161.46875,0.123046 -0.0137,15.25 161.48242,-0.123046 z M 169.23242,42.226562 7.5,42.349609 v 15.25 l 161.71875,-0.123047 z m 162.21875,15.876954 -161.48242,0.123046 -0.0137,15.25 161.49609,-0.123046 z M 169.21875,58.226562 7.5,58.349609 v 15.25 l 161.70508,-0.123047 z m 162.23242,15.876954 -161.49609,0.123046 -0.0137,15.25 161.50976,-0.123046 z M 169.20508,74.226562 7.5,74.349609 v 15.25 l 161.69141,-0.123047 z m 162.24609,15.876954 -161.50976,0.123046 -0.0137,15.249998 161.52344,-0.12304 z M 169.19141,90.226562 7.5,90.349609 v 15.250001 l 161.67773,-0.12305 z m 162.25976,15.876958 -161.52344,0.12304 -0.0137,15.25 161.53711,-0.12304 z M 169.17773,106.22656 7.5,106.34961 v 15.25 l 161.66406,-0.12305 z m 162.27344,15.87696 -161.53711,0.12304 -0.0137,14.75 161.55078,-0.12304 z M 169.16406,122.22656 7.5,122.34961 v 14.75 l 161.65039,-0.12305 z m 162.28711,15.37696 -161.55078,0.12304 -0.0137,15.25 161.56445,-0.12304 z M 169.15039,137.72656 7.5,137.84961 v 15.25 l 161.63672,-0.12305 z m 162.30078,15.87696 -161.56445,0.12304 -0.0137,15.25 161.57812,-0.12304 z M 169.13672,153.72656 7.5,153.84961 v 15.25 l 161.62305,-0.12305 z m 162.31445,15.87696 -161.57812,0.12304 -0.0137,15.25 161.59179,-0.12304 z M 169.12305,169.72656 7.5,169.84961 v 15.25 l 161.60938,-0.12305 z m 162.32812,15.87696 -161.59179,0.12304 -0.0137,15.25 161.60547,-0.12304 z M 169.10938,185.72656 7.5,185.84961 v 15.25 l 161.5957,-0.12305 z m 162.34179,15.87696 -161.60547,0.12304 -0.0137,15.25 161.61914,-0.12304 z M 169.0957,201.72656 7.5,201.84961 v 15.25 l 161.58203,-0.12305 z m 162.35547,15.87696 -161.61914,0.12304 -0.0137,15.25 161.63281,-0.12304 z M 169.08203,217.72656 7.5,217.84961 v 15.25 l 161.56836,-0.12305 z m 162.36914,15.87696 -161.63281,0.12304 -0.0137,15.25 161.64648,-0.12304 z M 169.06836,233.72656 7.5,233.84961 v 15.25 l 161.55469,-0.12305 z m 162.38281,15.87696 -161.64648,0.12304 -0.0137,15.25 161.66015,-0.12304 z M 169.05469,249.72656 7.5,249.84961 v 15.25 l 161.54102,-0.12305 z m 162.39648,15.87696 -161.66015,0.12304 -0.0137,15.25 161.67383,-0.12304 z M 169.04102,265.72656 7.5,265.84961 v 15.25 l 161.52734,-0.12305 z m 162.41015,15.87696 -161.67383,0.12304 -0.0137,15.25 161.6875,-0.12304 z M 169.02734,281.72656 7.5,281.84961 v 15.25 l 161.51367,-0.12305 z m 162.42383,15.87696 -161.6875,0.12304 -0.0137,15.25 161.70117,-0.12304 z M 169.01367,297.72656 7.5,297.84961 v 15.25 L 169,312.97656 Z m 162.4375,15.87696 -161.70117,0.12304 -0.0137,15.25 161.71484,-0.12304 z M 169,313.72656 7.5,313.84961 v 15.25 l 161.48633,-0.12305 z m 162.45117,15.87696 -161.71679,0.12304 -0.0117,15.25 161.72851,-0.12304 z M 168.98438,329.72656 7.5,329.84961 v 15.25 l 161.47266,-0.12305 z m 162.46679,15.87696 -161.73047,0.12304 -0.0117,15.25 161.74219,-0.12304 z M 168.9707,345.72656 7.5,345.84961 v 15.25 l 161.45898,-0.12305 z" />
-  <g id="filter-label" transform="translate(20, 2.5)">
+     d="
+  M 8,38  h 162 v 14 h -162 z
+  M 8,54  h 162 v 14 h -162 z
+  M 8,70  h 162 v 14 h -162 z
+  M 8,86  h 162 v 14 h -162 z
+  M 8,102 h 162 v 14 h -162 z
+  M 8,118 h 162 v 14 h -162 z
+  M 8,134 h 162 v 14 h -162 z
+  M 8,150 h 162 v 14 h -162 z
+  M 8,166 h 162 v 14 h -162 z
+  M 8,182 h 162 v 14 h -162 z
+  M 8,198 h 162 v 14 h -162 z
+  M 8,214 h 162 v 14 h -162 z
+  M 8,230 h 162 v 14 h -162 z
+  M 8,246 h 162 v 14 h -162 z
+  M 8,262 h 162 v 14 h -162 z
+  M 8,278 h 162 v 14 h -162 z
+  M 8,294 h 162 v 14 h -162 z
+  M 8,310 h 162 v 14 h -162 z
+  M 8,326 h 162 v 14 h -162 z
+  M 8,342 h 162 v 14 h -162 z
+
+  M 171,38  h 162 v 14 h -162 z
+  M 171,54  h 162 v 14 h -162 z
+  M 171,70  h 162 v 14 h -162 z
+  M 171,86  h 162 v 14 h -162 z
+  M 171,102 h 162 v 14 h -162 z
+  M 171,118 h 162 v 14 h -162 z
+  M 171,134 h 162 v 14 h -162 z
+  M 171,150 h 162 v 14 h -162 z
+  M 171,166 h 162 v 14 h -162 z
+  M 171,182 h 162 v 14 h -162 z
+  M 171,198 h 162 v 14 h -162 z
+  M 171,214 h 162 v 14 h -162 z
+  M 171,230 h 162 v 14 h -162 z
+  M 171,246 h 162 v 14 h -162 z
+  M 171,262 h 162 v 14 h -162 z
+  M 171,278 h 162 v 14 h -162 z
+  M 171,294 h 162 v 14 h -162 z
+  M 171,310 h 162 v 14 h -162 z
+  M 171,326 h 162 v 14 h -162 z
+  M 171,342 h 162 v 14 h -162 z
+        " />
+  <g id="filter-label" transform="translate(20, 4.5)">
     <circle id="ƒ--filter-frame" fill="#282828" stroke="#246c6c" stroke-width=".5" cx="149.25" cy="19.25" r="8" />
     <path id="ƒ--filter-label" fill="#246c6c" d="m 153,14 c 0,0.224922 -0.0562,0.46762 -0.1687,0.728077 -0.10653,0.254532 -0.21309,0.381791 -0.31964,0.381791 -0.13624,0 -0.40253,-0.09759 -0.79912,-0.293007 -0.3729,-0.183493 -0.70737,-0.275247 -1.00333,-0.275247 -0.4025,0 -0.68663,0.180538 -0.85238,0.541614 -0.14199,0.301887 -0.25156,0.879021 -0.32851,1.731402 l -0.0355,0.41731 1.96225,-0.01773 c 0.13623,0 0.2131,0.0444 0.23086,0.133199 0.006,0.03561 -0.003,0.142139 -0.0267,0.319646 -0.077,0.254532 -0.38182,0.369956 -0.91454,0.346287 l -1.32297,-0.05334 -0.23973,2.4062 c -0.13015,1.314091 -0.50016,2.296685 -1.10986,2.947813 -0.51499,0.556419 -1.15132,0.834621 -1.90898,0.834621 -0.77541,0 -1.16313,-0.115469 -1.16313,-0.346271 0,-0.242697 0.0473,-0.491305 0.14199,-0.745837 0.0888,-0.254532 0.1687,-0.381791 0.23972,-0.381791 0.11243,0 0.33149,0.09471 0.65704,0.284127 0.32557,0.195343 0.59193,0.293007 0.79911,0.293007 0.29005,0 0.49426,-0.162778 0.61264,-0.48835 0.13017,-0.355151 0.26045,-1.136508 0.39068,-2.34404 l 0.19534,-1.891225 c 0.0474,-0.414355 -0.0976,-0.633368 -0.43507,-0.657038 l -0.74582,-0.05334 c -0.15391,-0.01212 -0.20125,-0.09168 -0.14199,-0.239727 0.0592,-0.219013 0.41139,-0.328527 1.05659,-0.328527 h 0.38179 l 0.0533,-0.38179 c 0.12426,-0.858306 0.47652,-1.598218 1.0566,-2.219752 0.63929,-0.674798 1.39695,-1.012204 2.27302,-1.012204 0.97668,0 1.46503,0.121379 1.46503,0.364046 z" />
     <path id="colon--filter-label" fill="#246c6c" d="m 154,18 c 0.19922,0 0.36914,0.07031 0.50977,0.210938 0.14063,0.140625 0.21094,0.3125 0.21094,0.515625 0,0.203125 -0.0703,0.375 -0.21094,0.515625 -0.14063,0.140625 -0.31055,0.210937 -0.50977,0.210937 -0.19921,0 -0.36913,-0.07031 -0.50976,-0.210937 -0.14063,-0.140625 -0.21094,-0.3125 -0.21094,-0.515625 0,-0.199219 0.0703,-0.369141 0.21094,-0.509766 0.14063,-0.144531 0.31055,-0.216797 0.50976,-0.216797 z m 0,3.25 c 0.19922,0 0.36914,0.07031 0.50977,0.210938 0.14063,0.140625 0.21094,0.3125 0.21094,0.515625 0,0.199219 -0.0703,0.371094 -0.21094,0.515625 -0.14063,0.140625 -0.31055,0.210937 -0.50977,0.210937 -0.19921,0 -0.36913,-0.07031 -0.50976,-0.210937 -0.14063,-0.144531 -0.21094,-0.316406 -0.21094,-0.515625 0,-0.203125 0.0703,-0.375 0.21094,-0.515625 0.14063,-0.140625 0.31055,-0.210938 0.50976,-0.210938 z" />
   </g>
-  <text
-     id="left-col"
-     opacity=".2"
-     style="font-size:12px;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk, Normal';font-variant-ligatures:none;text-align:end;text-orientation:upright;text-anchor:end;display:inline;stroke-width:0.648871"
-     x="9.7960005"
-     y="37.638477"><tspan
-       id="tspan10"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="37.638477">Alpha</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="53.638477"
-       id="tspan11">Beta</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="69.638481"
-       id="tspan12">Gamma</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="85.638481"
-       id="tspan13">Delta</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="101.63848"
-       id="tspan14">Super</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="117.63848"
-       id="tspan15">Awesome</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="133.63847"
-       id="tspan16">Materials in Motion</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="149.63847"
-       id="tspan17">Around the periapsis ch1</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="165.63849"
-       id="tspan18">Kittens on the Moon</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="181.63849"
-       id="tspan19">Fuzzy bloodlines</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="197.63849"
-       id="tspan20">Pumpkin Pie</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="213.63849"
-       id="tspan21">Apple and Onion Pie</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="229.63849"
-       id="tspan22">Wedge fries</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="245.63849"
-       id="tspan23">Deeper Canyons</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="261.63849"
-       id="tspan24">Somewhere over the rainbow</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="277.63849"
-       id="tspan25">Do you want to play again?</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#d9d9d9;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="293.63849"
-       id="tspan28">Magical Moments Once Again</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="309.63849"
-       id="tspan26">brutish negroni</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="325.63849"
-       id="tspan31">Howard Hessman</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       id="tspan34"
-       x="9.7960005"
-       y="341.63849">Frisbees and superballs</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="9.7960005"
-       y="357.63849"
-       id="tspan33">Cretaceous banquet</tspan></text>
-  <text
-     opacity=".2"
-     style="font-size:12px;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk, Normal';font-variant-ligatures:none;text-align:end;text-orientation:upright;text-anchor:end;display:inline;stroke-width:0.648871"
-     x="172.32555"
-     y="37.638477"
-     id="text99"><tspan
-       id="tspan79"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="37.638477">Wiggle room</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="53.638477"
-       id="tspan80">Artificial Gravity</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="69.638481"
-       id="tspan81">Arctic Blast</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="85.638481"
-       id="tspan82">Atmospheric River</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="101.63848"
-       id="tspan83">Bomb Cyclone</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="117.63848"
-       id="tspan84">Crisis Fever</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="133.63847"
-       id="tspan85">Materials at rest</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="149.63847"
-       id="tspan86">Experimental party favor</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="165.63849"
-       id="tspan87">Experimental party favor T</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="181.63849"
-       id="tspan88">Ambiguous cultural reference</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="197.63849"
-       id="tspan89">Chocolate Pie</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="213.63849"
-       id="tspan90">Warm milk</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="229.63849"
-       id="tspan91">Catastrophic Consequence</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="245.63849"
-       id="tspan92">Delusional Metaphor</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="261.63849"
-       id="tspan95">Do me a favor</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="277.63849"
-       id="tspan96">Only a mother could love</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="293.63849"
-       id="tspan97">Blotchy skin</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       id="tspan98"
-       x="172.32555"
-       y="309.63849">Burnt popcorn</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="325.63849"
-       id="tspan99">Another reason to leave</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="341.63849"
-       id="tspan100">Butter Backlash</tspan><tspan
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:16px;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1;stroke:none;stroke-width:0.648871;stroke-opacity:1"
-       x="172.32555"
-       y="357.63849"
-       id="tspan101">Waxed moustache</tspan></text>
   <path 
      id="icon-search--ctl-frame"
      fill="none"
      stroke="#808080"
      stroke-width="1.5"
-     d="M 12.447445,13.840708 A 4.1974452,4.1991103 0 0 0 8.25,18.039818 a 4.1974452,4.1991103 0 0 0 4.197445,4.19911 4.1974452,4.1991103 0 0 0 4.197446,-4.19911 4.1974452,4.1991103 0 0 0 -4.197446,-4.19911 z m 2.837473,7.306451 3.685357,3.678421 z" />
+      transform="translate(0,6)"
+     d="M 12.45,14 A 4.1974452,4.1991103 0 0 0 8.25,18.039818 a 4.1974452,4.1991103 0 0 0 4.197445,4.19911 4.1974452,4.1991103 0 0 0 4.197446,-4.19911 4.1974452,4.1991103 0 0 0 -4.197446,-4.19911 z m 2.837473,7.306451 3.685357,3.678421 z" />
   <rect opacity="0" id="search" fill="none" stroke="#a6a6a6" stroke-width="0.5" x="23.5" y="10"  width="114" height="14" />
 
-  <path id="filter--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 334,153.5 h 9.43981 m 5.27933,0 h 9.28086" />
+  <path id="d1--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 334,116 h 22" />
+  <path id="filter--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 334,153.5 h 9 m 5.28,0 h 9" />
   <path id="filter--div-label" fill="#a6a6a6" d="m 348.44468,150.21842 c 0,0.14843 -0.0371,0.30859 -0.11133,0.48047 -0.0703,0.16797 -0.14062,0.25195 -0.21093,0.25195 -0.0899,0 -0.26563,-0.0644 -0.52735,-0.19336 -0.24609,-0.12109 -0.4668,-0.18164 -0.66211,-0.18164 -0.26562,0 -0.45312,0.11914 -0.5625,0.35742 -0.0937,0.19922 -0.16601,0.58008 -0.21679,1.14258 l -0.0234,0.27539 1.29492,-0.0117 c 0.0899,0 0.14063,0.0293 0.15235,0.0879 0.004,0.0235 -0.002,0.0938 -0.0176,0.21094 -0.0508,0.16797 -0.25197,0.24414 -0.60352,0.22852 l -0.87305,-0.0352 -0.1582,1.58789 c -0.0859,0.86719 -0.33007,1.51562 -0.73242,1.94531 -0.33985,0.36719 -0.75977,0.55078 -1.25977,0.55078 -0.51171,0 -0.76757,-0.0762 -0.76757,-0.22851 0,-0.16016 0.0312,-0.32422 0.0937,-0.49219 0.0586,-0.16797 0.11133,-0.25195 0.1582,-0.25195 0.0742,0 0.21875,0.0625 0.43359,0.1875 0.21485,0.12891 0.39063,0.19336 0.52735,0.19336 0.19141,0 0.32617,-0.10742 0.40429,-0.32227 0.0859,-0.23437 0.17188,-0.75 0.25782,-1.54687 l 0.1289,-1.24805 c 0.0313,-0.27344 -0.0644,-0.41797 -0.28711,-0.43359 l -0.49218,-0.0352 c -0.10157,-0.008 -0.1328,-0.0605 -0.0937,-0.1582 0.0391,-0.14453 0.27149,-0.2168 0.69726,-0.2168 h 0.25195 l 0.0352,-0.25195 c 0.082,-0.56641 0.31446,-1.05469 0.69727,-1.46485 0.42187,-0.44531 0.92187,-0.66797 1.5,-0.66797 0.64453,0 0.96679,0.0801 0.96679,0.24024 z" />
-  <path id="d1--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 333,113.5 h 24" />
-  <path id="d2--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 333,262 h 24" />
+  <path id="d2--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 334,262 h 22" />
   <path
      id="U|S--vsep"
      fill="none"
      stroke="#8c8c8c"
      stroke-width="0.75"
-     d="M 278,13 V 24" />
+     d="M 278,20 v 14" />
   <g id="PRESET" transform="translate(148, 3.5)">
     <path id="PRESET--title" fill="#f9a54b" d="m 0,0.180176 h 1.125 q 0.953613,0 1.538086,0.448242 0.584473,0.448242 0.584473,1.164551 0,0.720703 -0.619629,1.208496 Q 2.012695,3.489258 0.75586,3.476074 V 5.778808 H 0 Z m 0.75586,0.667968 v 1.959961 q 0.861328,-0.0088 1.274414,-0.241699 0.41748,-0.237305 0.41748,-0.755859 0,-0.391114 -0.316406,-0.676758 Q 1.819336,0.848144 0.75586,0.848144 Z M 12.438477,0.180176 h 1.21289 q 0.905274,0 1.472168,0.452636 0.571289,0.448242 0.571289,1.151367 0,0.5625 -0.36914,0.993165 -0.369141,0.430664 -1.151367,0.606445 l 1.630371,2.395019 H 14.930176 L 13.374512,3.476074 h -0.171387 v 2.302734 h -0.764648 z m 0.764648,0.676757 v 1.951172 q 1.691895,0.03516 1.691895,-0.97998 0,-0.355957 -0.197754,-0.580078 -0.197754,-0.228516 -0.527344,-0.307618 -0.32959,-0.0835 -0.966797,-0.0835 z M 24.758301,0.180176 h 3.102539 v 0.764648 h -2.34668 v 1.397461 h 2.34668 v 0.755859 h -2.34668 v 1.924805 h 2.34668 V 5.778808 H 24.758301 Z M 40.180664,0.799804 39.561035,1.296387 Q 39.314942,1.041504 39.112793,0.918457 38.915039,0.791015 38.53711,0.791015 q -0.413086,0 -0.672364,0.188965 -0.254883,0.184571 -0.254883,0.479004 0,0.254883 0.224122,0.452637 0.224121,0.193359 0.764648,0.426269 0.540527,0.228516 0.839355,0.430664 0.303223,0.197754 0.496582,0.439454 0.19336,0.241699 0.285645,0.509765 0.09668,0.268067 0.09668,0.566895 0,0.69873 -0.509766,1.190918 -0.505371,0.492187 -1.226074,0.492187 -0.703125,0 -1.243653,-0.382324 Q 36.80127,5.19873 36.511231,4.429687 l 0.764648,-0.215332 q 0.417481,0.944824 1.278809,0.944824 0.41748,0 0.694336,-0.250488 0.276855,-0.250488 0.276855,-0.632812 0,-0.228516 -0.145019,-0.457032 Q 39.23584,3.585937 39.020508,3.436523 38.805176,3.287109 38.330567,3.098144 37.860352,2.904785 37.605469,2.746582 37.354981,2.583984 37.17041,2.364258 36.98584,2.140137 36.897949,1.92041 q -0.0835,-0.219727 -0.0835,-0.470215 0,-0.602051 0.483399,-1.023926 Q 37.781246,0 38.471188,0 q 0.457031,0 0.927246,0.197754 0.470214,0.197754 0.782226,0.60205 z m 9.019531,-0.619628 h 3.10254 v 0.764648 h -2.34668 v 1.397461 h 2.34668 v 0.755859 h -2.34668 v 1.924805 h 2.34668 v 0.755859 h -3.10254 z m 11.660645,0 h 3.42334 V 0.944824 H 62.948242 V 5.778808 H 62.192383 V 0.944824 H 60.86084 Z" />
   </g>

@@ -949,7 +949,7 @@ void PlayUi::fill(FillOptions which)
     matrix->subscribeEMEvents(em_handler);
     gather = which;
 
-    startSpinner(this);
+    startSpinner(this, Vec(box.size.x*.5f, box.size.y * .5f));
 
     switch (which) {
     case FillOptions::None: break;
