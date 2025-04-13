@@ -120,7 +120,9 @@ void PresetModule::dataFromJson(json_t *root)
     json_read_bool(root, "track-live", track_live);
     hardware = get_json_int(root, "hardware", 0);
     firmware = get_json_int(root, "firmware", 0);
-    active_tab = get_json_int(root, "tab", 0);
+    active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
+    user_order = PresetOrder(get_json_int(root, "user-sort-order", int(PresetOrder::Natural)));
+    system_order = PresetOrder(get_json_int(root, "system-sort-order", int(PresetOrder::Alpha)));
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -131,8 +133,19 @@ json_t* PresetModule::dataToJson()
     json_object_set_new(root, "track-live", json_boolean(track_live));
     json_object_set_new(root, "hardware", json_integer(hardware));
     json_object_set_new(root, "firmware", json_integer(firmware));
-    json_object_set_new(root, "tab", json_integer(active_tab));
+    json_object_set_new(root, "tab", json_integer(int(active_tab)));
+    json_object_set_new(root, "user-sort-order", json_integer(int(user_order)));
+    json_object_set_new(root, "system-sort-order", json_integer(int(system_order)));
     return root;
+}
+
+void PresetModule::set_order(PresetTab tab, PresetOrder order)
+{
+    switch (tab) {
+    case PresetTab::User: user_order = order; return;
+    case PresetTab::System: system_order = order; return;
+    default: break;
+    }
 }
 
 // IChemClient

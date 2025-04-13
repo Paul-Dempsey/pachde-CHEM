@@ -58,8 +58,12 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
         json_array_foreach(jar, index, jp) {
             auto preset = std::make_shared<PresetDescription>();
             preset->fromJson(jp);
-            presets.push_back(preset);
+            presets.push_back(std::make_shared<PresetInfo>(preset));
         }
+    }
+    if (order != PresetOrder(get_json_int(root, "order", int(order)))) {
+        auto orderfn = getPresetSort(order);
+        std::sort(presets.begin(), presets.end(), orderfn);
     }
     return true;
 }
@@ -70,11 +74,21 @@ void PresetList::to_json(json_t* root, const std::string& connection_info)
     json_object_set_new(root, "firmware", json_integer(firmware));
     json_object_set_new(root, "connection", json_string(connection_info.c_str()));
     json_object_set_new(root, "preset-class", json_string(PresetClassName(hardware))); // human-readable
+    json_object_set_new(root, "order", json_integer(int(order)));
     auto jar = json_array();
     for (auto preset: presets) {
         json_array_append_new(jar, preset->toJson(true, true, true));
     }
     json_object_set_new(root, "presets", jar);
+}
+
+void PresetList::sort(PresetOrder order)
+{
+    if (this->order != order) {
+        this->order = order;
+        auto orderfn = getPresetSort(order);
+        std::sort(presets.begin(), presets.end(), orderfn);
+    }
 }
 
 }

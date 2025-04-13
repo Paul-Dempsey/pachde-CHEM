@@ -151,13 +151,14 @@ public:
 
     std::shared_ptr<PresetMeta> find(uint16_t key) const;
     std::vector<std::shared_ptr<PresetMeta>> make_category_list(const std::string& text) const;
-    std::string make_category_json(const std::string& text) const;
-    std::string make_category_mulitline_text(const std::string& text) const;
+    //std::string make_category_json(const std::string& text) const;
+    std::string make_category_multiline_text(const std::string& text) const;
     std::string categoryName(uint16_t key) const;
 };
 
 void FillCategoryCodeList(const std::string& text, std::vector<uint16_t>& vec);
 void foreach_code(const std::string&, std::function<bool(uint16_t)> callback);
+bool order_codes(const uint16_t &a, const uint16_t &b);
 
 extern const HakenCategoryCode hakenCategoryCode;
 

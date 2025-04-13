@@ -24,6 +24,7 @@ SOURCES += src/em/midi-message.cpp
 SOURCES += src/em/preset.cpp
 SOURCES += src/em/preset-macro.cpp
 SOURCES += src/em/preset-meta.cpp
+SOURCES += src/em/preset-sort.cpp
 
 # services
 SOURCES += src/services/colors.cpp

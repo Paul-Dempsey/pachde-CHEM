@@ -349,7 +349,7 @@ void CoreModuleWidget::onPresetChanged()
         if (preset->text.empty()) {
             preset_label->describe(preset->summary());
         } else {
-            auto meta = hakenCategoryCode.make_category_mulitline_text(preset->text);
+            auto meta = hakenCategoryCode.make_category_multiline_text(preset->text);
             auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), meta.c_str());
             preset_label->describe(text);
         }

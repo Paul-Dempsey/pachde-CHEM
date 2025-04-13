@@ -6,7 +6,6 @@
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/draw-button.hpp"
-#include "../../widgets/hamburger.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "preset-common.hpp"
@@ -44,7 +43,9 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     uint16_t firmware{0};
     bool track_live{false};
     bool use_cached_user_presets{false};
-    int active_tab{0};
+    PresetTab active_tab{PresetTab::System};
+    PresetOrder user_order{PresetOrder::Natural};
+    PresetOrder system_order{PresetOrder::Alpha};
 
     PresetModule();
     ~PresetModule() {
@@ -57,6 +58,7 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void set_order(PresetTab tab, PresetOrder order);
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
     std::string client_claim() override { return device_claim; }
@@ -98,10 +100,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
 
     struct Tab {
         size_t scroll_top{0};
+        ssize_t current_index{-1};
         PresetList list;
         Tab(const Tab&) = delete;
         Tab(PresetTab id) : list(id) {}
         PresetTab id() { return list.tab; }
+        size_t count() { return list.count(); }
         void clear() { list.clear(); }
     };
     PresetTab active_tab_id{PresetTab::System};
@@ -110,6 +114,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     PresetTab gathering{PresetTab::Unset};
     bool other_user_gather{false};
     bool other_system_gather{false};
+
     std::vector<PresetEntry*> preset_grid;
 
     PresetUi(PresetModule *module);
@@ -130,7 +135,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     PresetList& presets() {
         return preset_list(active_tab_id);
     }
-
+    void set_current_index(size_t index);
     bool host_available();
 
     // IChemClient
@@ -149,9 +154,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     std::string preset_file(PresetTab which);
     bool load_presets(PresetTab which);
     bool save_presets(PresetTab which);
+    void sort_presets(PresetOrder order);
     void set_track_live(bool track);
     void set_tab(PresetTab tab);
     void scroll_to(ssize_t index);
+    void scroll_to_page_of_index(ssize_t index);
+    ssize_t page_index_of_index(ssize_t index);
     void scroll_to_live();
     void clear_filters();
     void page_up(bool control, bool shift);
@@ -172,6 +180,10 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void onUserComplete() override;
 
     // ModuleWidget
+    void onButton(const ButtonEvent&e) override;
+    void onSelectKey(const SelectKeyEvent &e) override;
+    void onHoverScroll(const HoverScrollEvent & e) override;
+
     void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;

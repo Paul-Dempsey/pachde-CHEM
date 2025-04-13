@@ -4,12 +4,12 @@
 #include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
+#include "../../widgets/hamburger.hpp"
 
 namespace S = pachde::style;
 using PM = PresetModule;
 
-// Preset Menu
-
+// PresetMenu
 struct PresetMenu : Hamburger
 {
     using Base = Hamburger;
@@ -33,7 +33,6 @@ struct PresetMenu : Hamburger
             }
         }
     }
-
 };
 
 bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
@@ -44,9 +43,21 @@ bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> th
 void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
     menu->addChild(createMenuLabel("— Preset Actions —"));
-    menu->addChild(createMenuItem("Sort by category", "",    [this](){ /*ui->foo();*/ }, false));
-    menu->addChild(createMenuItem("Sort alphabetically", "",    [this](){ /*ui->foo();*/ }, false));
-    menu->addChild(createMenuItem("System order", "",    [this](){ /*ui->foo();*/ }, false));
+
+    auto item = createMenuItem<ColorDotMenuItem>("Sort alphabetically", "",
+        [this](){ ui->sort_presets(PresetOrder::Alpha); }, false);
+    item->color = ui->active_tab().list.order == PresetOrder::Alpha ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    menu->addChild(item);
+
+    item = createMenuItem<ColorDotMenuItem>("Sort by category", "",
+        [this](){ ui->sort_presets(PresetOrder::Category); }, false);
+    item->color = ui->active_tab().list.order == PresetOrder::Category ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    menu->addChild(item);
+
+    item = createMenuItem<ColorDotMenuItem>("Sort by Natural (system) order", "",
+        [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
+    item->color = ui->active_tab().list.order == PresetOrder::Natural ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    menu->addChild(item);
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuItem("Show live preset", "",
@@ -81,7 +92,7 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
     ));
 }
 
-
+// PresetUi
 
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float ROW_HEIGHT = 16.f;
@@ -182,7 +193,7 @@ PresetUi::PresetUi(PresetModule *module) :
     const float PRESET_TOP = 38.f;
     x = 9.f; y = PRESET_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
-        auto entry = PresetEntry::create(Vec(x,y), preset_grid, theme);
+        auto entry = PresetEntry::create(Vec(x,y), preset_grid, this, theme);
         preset_grid.push_back(entry);
         addChild(entry);
 
@@ -225,7 +236,9 @@ PresetUi::PresetUi(PresetModule *module) :
     if (module) {
         my_module->set_chem_ui(this);
         user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        user_tab.list.order = my_module->user_order;
         system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        system_tab.list.order = my_module->system_order;
         set_tab(PresetTab(my_module->active_tab));
     }
 }
@@ -243,7 +256,6 @@ void no_preset(TipLabel* label) {
     label->text("");
     label->describe("(none)");
 }
-
 
 void PresetUi::request_presets(PresetTab which)
 {
@@ -300,7 +312,9 @@ bool PresetUi::load_presets(PresetTab which)
         return false;
     }
     Tab& tab = get_tab(which);
+    tab.clear();
     tab.list.set_device_info(em->firmware_version, em->hardware);
+    tab.list.order = which == PresetTab::User ? my_module->user_order : my_module->system_order;
     return tab.list.from_json(root, path);
 }
 
@@ -328,6 +342,33 @@ bool PresetUi::save_presets(PresetTab which)
     return e >= 0;
 }
 
+void PresetUi::sort_presets(PresetOrder order)
+{
+    if (!my_module) return;
+    
+    Tab & tab = active_tab();
+    if (tab.list.order == order) return;
+    my_module->set_order(active_tab_id, order);
+
+    ssize_t current_index = -1;
+    if (!my_module->track_live) {
+        for (const PresetEntry* pw : preset_grid) {
+            if (!pw->valid()) break;
+            if (pw->current) {
+                current_index = pw->preset_index;
+                break;
+            }
+        }
+    }
+    tab.list.sort(order);
+    save_presets(active_tab_id);
+    if (my_module->track_live) {
+        scroll_to_live();
+    } else {
+        scroll_to_page_of_index(current_index);
+    }
+}
+
 void PresetUi::onSystemBegin()
 {
     if (PresetTab::Unset == gathering) {
@@ -346,6 +387,7 @@ void PresetUi::onSystemComplete()
 
         auto em = chem_host->host_matrix();
         system_tab.list.set_device_info(em->firmware_version, em->hardware);
+        system_tab.list.sort(my_module->system_order);
         save_presets(PresetTab::System);
 
         if (active_tab_id == PresetTab::System) {
@@ -372,6 +414,7 @@ void PresetUi::onUserComplete()
 
         auto em = chem_host->host_matrix();
         user_tab.list.set_device_info(em->firmware_version, em->hardware);
+        user_tab.list.sort(my_module->user_order);
         save_presets(PresetTab::User);
 
         if (active_tab_id == PresetTab::User) {
@@ -419,11 +462,10 @@ void PresetUi::onPresetChange()
             if (preset->text.empty()) {
                 live_preset_label->describe(preset->summary());
             } else {
-                auto meta = hakenCategoryCode.make_category_mulitline_text(preset->text);
+                auto meta = hakenCategoryCode.make_category_multiline_text(preset->text);
                 auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), meta.c_str());
                 live_preset_label->describe(text);
             }
-            return;
         } else {
             live_preset = nullptr;
             no_preset(live_preset_label);
@@ -436,9 +478,14 @@ void PresetUi::onPresetChange()
         scroll_to_live();
     }
     for (auto pw : preset_grid) {
-        if (!pw->preset_id.valid()) break;
-        pw->live = live_preset ? pw->preset_id == live_preset->id : false;
+        if (!pw->valid()) break;
+        pw->live = live_preset && live_preset->valid() && (pw->preset_id() == live_preset->id);
     }
+}
+
+void PresetUi::set_current_index(size_t index)
+{
+    active_tab().current_index = index;
 }
 
 bool PresetUi::host_available()
@@ -515,7 +562,7 @@ void PresetUi::set_tab(PresetTab tab_id)
     }
 
     if (my_module) {
-        my_module->active_tab = int(active_tab_id);
+        my_module->active_tab = tab_id;
     }
 
     Tab& tab = active_tab();
@@ -535,20 +582,32 @@ void PresetUi::set_tab(PresetTab tab_id)
 void PresetUi::scroll_to(ssize_t index)
 {
     Tab& tab = active_tab();
-    tab.scroll_top = index;
+    tab.scroll_top = index < 0 ? 0 : size_t(index);
     size_t ip = tab.scroll_top;
     for (auto pw: preset_grid) {
         if (ip < tab.list.presets.size()) {
             auto preset = tab.list.nth(ip);
             auto live_id = get_live_id();
             bool live = live_id.valid() && (preset->id == live_id);
-            pw->set_preset(ip, false, live, preset);
+            pw->set_preset(ip, ssize_t(ip) == tab.current_index, live, preset);
         } else {
             pw->clear_preset();
         }
         ++ip;
     }
     update_page_controls();
+}
+
+void PresetUi::scroll_to_page_of_index(ssize_t index)
+{
+    scroll_to(page_index_of_index(index));
+}
+
+ssize_t PresetUi::page_index_of_index(ssize_t index)
+{
+    index = std::max(ssize_t(0), index);
+    index = std::min(ssize_t(active_tab().count()), index);
+    return PAGE_CAPACITY * (index / PAGE_CAPACITY);
 }
 
 void PresetUi::scroll_to_live()
@@ -638,6 +697,137 @@ void PresetUi::next_preset(bool ctrl, bool shift)
 
 void PresetUi::previous_preset(bool ctrl, bool shift)
 {
+}
+
+void PresetUi::onButton(const ButtonEvent &e)
+{
+    Base::onButton(e);
+    e.consume(this);
+}
+
+void PresetUi::onSelectKey(const SelectKeyEvent &e)
+{
+    Tab& tab = active_tab();
+    if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT))
+    {
+        switch (e.key) {
+        case GLFW_KEY_ESCAPE:
+            APP->event->setSelectedWidget(nullptr);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_ENTER:
+            if (0 == (e.mods & RACK_MOD_MASK))  {
+                if ((tab.current_index >= 0) && host_available()) {
+                    chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+                }
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_UP:
+            if (0 == (e.mods & RACK_MOD_MASK))  {
+                if (tab.current_index < 0) {
+                    tab.current_index = 0;
+                    scroll_to_page_of_index(0);
+                    e.consume(this);
+                    return;
+                } else if (tab.current_index > 0) {
+                    tab.current_index -= 1;
+                    scroll_to_page_of_index(tab.current_index);
+                }
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_PAGE_UP:
+            if (e.mods & RACK_MOD_CTRL) {
+                page_up(false, (e.mods & RACK_MOD_SHIFT));
+                e.consume(this);
+                return;
+            }
+
+            if (tab.current_index < 0) {
+                tab.current_index = 0;
+                scroll_to_page_of_index(0);
+            } else if (tab.current_index > 0) {
+                tab.current_index -= PAGE_CAPACITY;
+                if (tab.current_index < 0) tab.current_index = 0;
+                scroll_to_page_of_index(tab.current_index);
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_DOWN:
+            if (0 == (e.mods & RACK_MOD_MASK)) {
+                if (tab.current_index < 0) {
+                    tab.current_index = 0;
+                    scroll_to_page_of_index(0);
+                } else if (tab.current_index < ssize_t(tab.count())) {
+                    tab.current_index += 1;
+                    scroll_to_page_of_index(tab.current_index);
+                }
+            }
+            e.consume(this);
+            return;
+        case GLFW_KEY_PAGE_DOWN:
+            if (0 == (e.mods & RACK_MOD_MASK)) {
+                if (tab.current_index < 0) {
+                tab.current_index = 0;
+                scroll_to_page_of_index(0);
+                } else if (tab.current_index < ssize_t(tab.count())) {
+                    tab.current_index = std::min(ssize_t(tab.count()) -1, tab.current_index + PAGE_CAPACITY);
+                    scroll_to_page_of_index(tab.current_index);
+                }
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_RIGHT:
+            if (0 == (e.mods & RACK_MOD_MASK)) {
+                if (tab.current_index < 0) {
+                    tab.current_index = 0;
+                    scroll_to_page_of_index(0);
+                } else if (tab.current_index - tab.scroll_top < ROWS) {
+                    tab.current_index = std::min(ssize_t(tab.count()) -1, tab.current_index + ROWS);
+                    scroll_to_page_of_index(tab.current_index);
+                }
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_LEFT:
+            if (0 == (e.mods & RACK_MOD_MASK)) {
+                if (tab.current_index < 0) {
+                    tab.current_index = 0;
+                    scroll_to_page_of_index(0);
+                } else if (tab.current_index - tab.scroll_top > ROWS) {
+                    tab.current_index = std::max(ssize_t(0), tab.current_index - ROWS);
+                    scroll_to_page_of_index(tab.current_index);
+                }
+            }
+            e.consume(this);
+            return;
+        }
+    }
+    Base::onSelectKey(e);
+}
+
+void PresetUi::onHoverScroll(const HoverScrollEvent &e)
+{
+    if (in_range(e.pos.x, 8.f, 334.f) && in_range(e.pos.y, 38.f, 185.f)) {
+        int delta = PAGE_CAPACITY * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
+        if (0 != delta) {
+            Tab& tab = active_tab();
+            auto index = tab.scroll_top + delta;
+            if (index <= tab.count()) {
+                scroll_to_page_of_index(index);
+            }
+        }
+        e.consume(this);
+        return;
+    }
+    Base::onHoverScroll(e);
 }
 
 void PresetUi::step()

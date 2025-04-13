@@ -211,7 +211,7 @@ std::vector<std::shared_ptr<PresetMeta>> HakenCategoryCode::make_category_list(c
     return result;
 }
 
-std::string HakenCategoryCode::make_category_mulitline_text(const std::string& text) const
+std::string HakenCategoryCode::make_category_multiline_text(const std::string& text) const
 {
     if (text.empty()) return "";
     std::string result;
