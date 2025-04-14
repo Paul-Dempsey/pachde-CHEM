@@ -51,4 +51,21 @@ std::string PresetDescription::summary() const
     return format_string("[%d.%d.%d] %s", id.bank_hi(), id.bank_lo(), id.number(), name.c_str());
 }
 
+std::string PresetDescription::meta_text() const
+{
+    if (text.empty()) return summary();
+
+    auto info = name + format_string("\n[%d.%d.%d]", name.c_str(), id.bank_hi(), id.bank_lo(), id.number());
+    auto cats = hakenCategoryCode.make_category_multiline_text(text);
+    if (!cats.empty()) {
+        info.push_back('\n');
+        info.append(cats);
+    }
+    auto author = parse_author(text);
+    if (!author.empty()) {
+        info.append("\nAuthor: ");
+        info.append(author);
+    }
+    return info;
+}
 }

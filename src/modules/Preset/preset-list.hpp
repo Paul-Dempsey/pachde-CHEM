@@ -28,21 +28,20 @@ struct PresetList {
         firmware = firmware_version;
         hardware = hardware_type;
     }
-    void add(std::shared_ptr<PresetDescription> preset) {
-        auto pi = std::make_shared<PresetInfo>(preset);
-        presets.push_back(pi);
-    }
+    void add(const PresetDescription* preset);
     void clear() {
         firmware = 0;
         hardware = 0;
         presets.clear();
     }
+    ssize_t index_of_id(PresetId id);
     bool load(const std::string& path);
     bool save(const std::string& path, const std::string& connection_info);
     bool from_json(const json_t* root, const std::string &path);
     void to_json(json_t* root, const std::string& connection_info);
     void sort(PresetOrder order);
     std::shared_ptr<PresetInfo> nth(ssize_t which) {
+        if (which < 0) which = 0;
         return presets[which];
     }
 };

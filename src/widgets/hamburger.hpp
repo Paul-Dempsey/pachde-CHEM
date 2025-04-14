@@ -59,7 +59,7 @@ struct HamData : IApplyTheme
 
 struct Hamburger : TipWidget, IApplyTheme
 {
-    using base = TipWidget;
+    using Base = TipWidget;
     HamData data;
 
     Hamburger() {
@@ -75,28 +75,28 @@ struct Hamburger : TipWidget, IApplyTheme
     void onHover(const HoverEvent& e) override
     {
         e.consume(this);
-        base::onHover(e);
+        Base::onHover(e);
     }
 
     void onEnter(const EnterEvent& e) override
     {
         data.hovered = true;
-        base::onEnter(e);
+        Base::onEnter(e);
     }
 
     void onLeave(const LeaveEvent& e) override
     {
         data.hovered = false;
-        base::onLeave(e);
+        Base::onLeave(e);
     }
 
     void onButton(const ButtonEvent& e) override
     {
-        if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+        if ((e.action == GLFW_PRESS) && (e.button == GLFW_MOUSE_BUTTON_LEFT) && (e.mods & RACK_MOD_MASK) == 0) {
             createContextMenu();
             e.consume(this);
         }
-        base::onButton(e);
+        Base::onButton(e);
     }
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
@@ -143,7 +143,7 @@ struct HamburgerUi : TBaseWidget, IApplyTheme
 
     void onButton(const ::rack::Widget::ButtonEvent& e) override
     {
-        if (e.action == GLFW_PRESS && (e.mods & RACK_MOD_MASK) == 0) {
+        if ((e.action == GLFW_PRESS) && ((e.mods & RACK_MOD_MASK) == 0)) {
             switch (e.button) {
             case GLFW_MOUSE_BUTTON_LEFT:
                 Base::createContextMenu();

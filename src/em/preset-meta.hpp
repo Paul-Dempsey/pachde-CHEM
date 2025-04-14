@@ -162,4 +162,6 @@ bool order_codes(const uint16_t &a, const uint16_t &b);
 
 extern const HakenCategoryCode hakenCategoryCode;
 
+std::string parse_author(const std::string& text);
+
 }

@@ -48,7 +48,7 @@ struct PresetDescription
     json_t* toJson(bool include_id, bool include_name, bool include_text);
     void fromJson(const json_t* root);
     std::string summary() const;
-
+    std::string meta_text() const;
 };
 
 struct PresetInfo : PresetDescription {
@@ -71,6 +71,15 @@ struct PresetInfo : PresetDescription {
         FillCategoryCodeList(preset->text, meta);
     }
 
+    PresetInfo(const PresetDescription* preset)
+    {
+        Base::id = preset->id;
+        Base::name = preset->name;
+        Base::text = preset->text;
+
+        FillCategoryCodeList(text, meta);
+    }
+
     void init(const PresetDescription* source) {
         Base::init(source);
         meta.clear();
@@ -82,10 +91,6 @@ struct PresetInfo : PresetDescription {
         return CategoryCode(meta[0]).to_string();
     }
 
-    std::string meta_text() {
-        auto info = hakenCategoryCode.make_category_multiline_text(text);
-        return format_string("%s\n[%d.%d.%d]\n%s", name.c_str(), id.bank_hi(), id.bank_lo(), id.number(), info.c_str());
-    }
 };
 
 }

@@ -82,6 +82,24 @@ void PresetList::to_json(json_t* root, const std::string& connection_info)
     json_object_set_new(root, "presets", jar);
 }
 
+ssize_t PresetList::index_of_id(PresetId id)
+{
+    if (presets.empty()) return -1;
+    auto key = id.key();
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [key](const std::shared_ptr<pachde::PresetInfo> p){ return key == p->id.key(); });
+    if (it == presets.cend()) return -1;
+    return it - presets.cbegin();
+}
+
+void PresetList::add(const PresetDescription* preset)
+{
+    auto index = index_of_id(preset->id);
+    if (-1 == index) {
+        auto pi = std::make_shared<PresetInfo>(preset);
+        presets.push_back(pi);
+    }
+}
+
 void PresetList::sort(PresetOrder order)
 {
     if (this->order != order) {

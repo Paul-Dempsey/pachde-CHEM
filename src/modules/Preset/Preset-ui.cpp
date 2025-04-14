@@ -5,6 +5,7 @@
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "../../widgets/hamburger.hpp"
+#include "../../widgets/spinner.hpp"
 
 namespace S = pachde::style;
 using PM = PresetModule;
@@ -23,15 +24,16 @@ struct PresetMenu : Hamburger
 
     void onHoverKey(const HoverKeyEvent& e) override
     {
-        Base::onHoverKey(e);
         switch (e.key) {
-        case GLFW_KEY_ENTER:
-        case GLFW_KEY_MENU:
+            case GLFW_KEY_ENTER:
+            case GLFW_KEY_MENU:
             if (e.action == GLFW_RELEASE) {
-                e.stopPropagating();
+                e.consume(this);
                 createContextMenu();
+                return;
             }
         }
+        Base::onHoverKey(e);
     }
 };
 
@@ -123,11 +125,11 @@ PresetUi::PresetUi(PresetModule *module) :
     x = 270.f;
     y = 18.f;
     addChild(user_label = createLabel<TextLabel>(Vec(x,y), 26.f, "User", theme_engine, theme, tab_style));
-    addChild(createClickRegion(RECT_ARGS(user_label->box.grow(Vec(6,2))), (int)PresetTab::User, [=](int id, int mods) { set_tab((PresetTab)id); }));
+    addChild(createClickRegion(RECT_ARGS(user_label->box.grow(Vec(6,2))), (int)PresetTab::User, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
     x += 55.f;
     addChild(system_label = createLabel<TextLabel>(Vec(x,y), 40.f, "System", theme_engine, theme, current_tab_style));
-    addChild(createClickRegion(RECT_ARGS(system_label->box.grow(Vec(6,2))), (int)PresetTab::System, [=](int id, int mods) { set_tab((PresetTab)id); }));
+    addChild(createClickRegion(RECT_ARGS(system_label->box.grow(Vec(6,2))), (int)PresetTab::System, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
     // right controls
 
@@ -239,7 +241,7 @@ PresetUi::PresetUi(PresetModule *module) :
         user_tab.list.order = my_module->user_order;
         system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         system_tab.list.order = my_module->system_order;
-        set_tab(PresetTab(my_module->active_tab));
+        set_tab(PresetTab(my_module->active_tab), false);
     }
 }
 
@@ -323,16 +325,19 @@ bool PresetUi::save_presets(PresetTab which)
     if (!host_available()) return false;
 
     Tab& tab = get_tab(which);
-    if (tab.list.presets.empty()) return false;
+    if (0 == tab.count()) return false;
 
     auto root = json_object();
     if (!root) { return false; }
 	DEFER({json_decref(root);});
 
     auto path = preset_file(which);
+    if (system::exists(path)) {
+        system::remove(path);
+    }
     auto dir = system::getDirectory(path);
     system::createDirectories(dir);
-    
+
     FILE* file = std::fopen(path.c_str(), "wb");
     if (!file) return false;
 
@@ -349,23 +354,24 @@ void PresetUi::sort_presets(PresetOrder order)
     Tab & tab = active_tab();
     if (tab.list.order == order) return;
     my_module->set_order(active_tab_id, order);
+    if (0 == tab.count()) return;
 
-    ssize_t current_index = -1;
-    if (!my_module->track_live) {
-        for (const PresetEntry* pw : preset_grid) {
-            if (!pw->valid()) break;
-            if (pw->current) {
-                current_index = pw->preset_index;
-                break;
-            }
-        }
+    PresetId current_id;
+    if (tab.current_index >= 0) {
+        current_id = tab.list.nth(tab.current_index)->id;
     }
+
     tab.list.sort(order);
     save_presets(active_tab_id);
+
     if (my_module->track_live) {
         scroll_to_live();
     } else {
-        scroll_to_page_of_index(current_index);
+        if (current_id.valid()) {
+            size_t index = tab.list.index_of_id(current_id);
+            tab.current_index = index;
+        }
+        scroll_to_page_of_index(tab.current_index);
     }
 }
 
@@ -373,11 +379,20 @@ void PresetUi::onSystemBegin()
 {
     if (PresetTab::Unset == gathering) {
         other_system_gather = true;
+    } else {
+        if (!spinning) {
+            startSpinner(this, Vec(170.f, 190.f));
+            spinning = true;
+        }
+        gather_start = true;
     }
 }
 
 void PresetUi::onSystemComplete()
 {
+    stopSpinner(this);
+    spinning = false;
+    gather_start = false;
     if (other_system_gather) {
         other_system_gather = false;
         return;
@@ -400,11 +415,20 @@ void PresetUi::onUserBegin()
 {
     if (PresetTab::Unset == gathering) {
         other_user_gather = true;
+    } else {
+        if (!spinning) {
+            startSpinner(this, Vec(170.f, 190.f));
+            spinning = true;
+        }
+        gather_start = true;
     }
 }
 
 void PresetUi::onUserComplete()
 {
+    stopSpinner(this);
+    spinning = false;
+    gather_start = false;
     if (other_user_gather) {
         other_user_gather = false;
         return;
@@ -444,11 +468,10 @@ void PresetUi::onPresetChange()
         break;
     case PresetTab::User:
     case PresetTab::System: {
+        if (!gather_start) return;
         auto preset = chem_host->host_preset();
         if (preset && !preset->empty()) {
-            auto pd = std::make_shared<PresetDescription>();
-            pd->init(preset);
-            get_tab(gathering).list.add(pd);
+            get_tab(gathering).list.add(preset);
         }
         return;
     } break;
@@ -459,13 +482,7 @@ void PresetUi::onPresetChange()
             live_preset = std::make_shared<PresetDescription>();
             live_preset->init(preset);
             live_preset_label->text(live_preset->name);
-            if (preset->text.empty()) {
-                live_preset_label->describe(preset->summary());
-            } else {
-                auto meta = hakenCategoryCode.make_category_multiline_text(preset->text);
-                auto text = format_string("%s\n[%d.%d.%d]\n%s", preset->name.c_str(), preset->id.bank_hi(), preset->id.bank_lo(), preset->id.number(), meta.c_str());
-                live_preset_label->describe(text);
-            }
+            live_preset_label->describe(live_preset->meta_text());
         } else {
             live_preset = nullptr;
             no_preset(live_preset_label);
@@ -494,7 +511,7 @@ bool PresetUi::host_available()
     if (chem_host->host_busy()) return false;
     if (!chem_host->host_connection(ChemDevice::Haken)) return false;
     auto em = chem_host->host_matrix();
-    if (!em || !em->is_ready()) return false;
+    if (!em || !em->is_ready() || em->busy()) return false;
 
     return true;
 }
@@ -540,7 +557,7 @@ void PresetUi::on_search_text_enter()
 {
 }
 
-void PresetUi::set_tab(PresetTab tab_id)
+void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 {
     switch (tab_id) {
     case PresetTab::User:
@@ -566,7 +583,7 @@ void PresetUi::set_tab(PresetTab tab_id)
     }
 
     Tab& tab = active_tab();
-    if (tab.list.presets.empty()) {
+    if (fetch && (0 == tab.count()) && host_available()) {
         if (!load_presets(tab_id)) {
             request_presets(tab_id);
         }
@@ -585,7 +602,7 @@ void PresetUi::scroll_to(ssize_t index)
     tab.scroll_top = index < 0 ? 0 : size_t(index);
     size_t ip = tab.scroll_top;
     for (auto pw: preset_grid) {
-        if (ip < tab.list.presets.size()) {
+        if (ip < tab.count()) {
             auto preset = tab.list.nth(ip);
             auto live_id = get_live_id();
             bool live = live_id.valid() && (preset->id == live_id);
@@ -614,12 +631,8 @@ void PresetUi::scroll_to_live()
 {
     auto live_id = get_live_id();
     if (!live_id.valid()) return;
-    size_t index = 0;
-    for (auto p : active_tab().list.presets) {
-        if (live_id == p->id) break;
-        index++;
-    }
-
+    ssize_t index = active_tab().list.index_of_id(live_id);
+    if (index < 0) index = 0;
     scroll_to(PAGE_CAPACITY * (index / PAGE_CAPACITY));
 }
 
@@ -701,16 +714,25 @@ void PresetUi::previous_preset(bool ctrl, bool shift)
 
 void PresetUi::onButton(const ButtonEvent &e)
 {
-    Base::onButton(e);
-    e.consume(this);
+   //e.consume(this);
+   Base::onButton(e);
 }
 
 void PresetUi::onSelectKey(const SelectKeyEvent &e)
 {
+    if (APP->event->getSelectedWidget() != this) {
+        Base::onSelectKey(e);
+        return;
+    }
     Tab& tab = active_tab();
     if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT))
     {
         switch (e.key) {
+        case GLFW_KEY_TAB:
+            APP->event->setSelectedWidget(this->search_entry);
+            e.consume(this);
+            return;
+
         case GLFW_KEY_ESCAPE:
             APP->event->setSelectedWidget(nullptr);
             e.consume(this);
@@ -835,7 +857,7 @@ void PresetUi::step()
     Base::step();
     bind_host(my_module);
     if (active_tab().list.empty() && host_available()) {
-        set_tab(active_tab_id);
+        set_tab(active_tab_id, true);
     }
 }
 

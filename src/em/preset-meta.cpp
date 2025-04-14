@@ -144,7 +144,7 @@ void foreach_code(const std::string& text, std::function<bool(uint16_t)> callbac
 {
     if (text.empty()) return;
     auto token = std::make_pair(text.cbegin(), text.cend());
-    if (token.first == token.second) return;
+    //if (token.first == token.second) return;
     while (true) {
         token = get_token(token.first, text.cend(), is_space);
         if (token.first == token.second) break;
@@ -284,5 +284,47 @@ std::string HakenCategoryCode::make_category_multiline_text(const std::string& t
 //     return result;
 // }
 
+std::string parse_author(const std::string &text)
+{
+    if (text.empty()) return text;
+    enum State { SOL, Text, A };
+    State state = SOL;
+    for (auto scan = text.cbegin(); scan != text.cend(); scan++) {
+        switch (state) {
+        case SOL: 
+            if ('A' == *scan) {
+                state = A;
+            } else {
+                state = Text;
+            }
+            break;
+        case Text:
+            if ('\n' == *scan) {
+                state = SOL;
+            }
+            break;
+        case A:
+            if ('=' == *scan) {
+                scan++;
+                std::string result;
+                result.reserve(text.cend() - scan);
+                while (scan != text.cend()) {
+                    if ('\n' == *scan) break;
+                    if ('_' == *scan) {
+                        result.push_back(' ');
+                    } else {
+                        result.push_back(*scan);
+                    }
+                    scan++;
+                }
+                return result;
+            } else {
+                state = Text;
+            }
+            break;
+        }
+    }
+    return "";
+}
 
 }

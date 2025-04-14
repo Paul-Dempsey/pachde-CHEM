@@ -19,10 +19,19 @@ bool SearchField::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::share
 void SearchField::onSelectKey(const SelectKeyEvent &e)
 {
     if (e.action == GLFW_PRESS) {
-        if (e.key == GLFW_KEY_ESCAPE && !(e.mods & RACK_MOD_MASK)) {
-            setText("");
-            //APP->event->setSelectedWidget(nullptr);
+        if (GLFW_KEY_TAB == e.key) {
+            APP->event->setSelectedWidget(getParent());
             e.consume(this);
+            return;
+        }
+
+        if (!(e.mods & RACK_MOD_MASK)) {
+            switch (e.key) {
+            case GLFW_KEY_ESCAPE:
+                setText("");
+                e.consume(this);
+                return;
+            }
         }
     }
     Base::onSelectKey(e);

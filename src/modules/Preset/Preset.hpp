@@ -112,9 +112,10 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     Tab user_tab {PresetTab::User};
     Tab system_tab {PresetTab::System};
     PresetTab gathering{PresetTab::Unset};
+    bool gather_start{false};
     bool other_user_gather{false};
     bool other_system_gather{false};
-
+    bool spinning{false};
     std::vector<PresetEntry*> preset_grid;
 
     PresetUi(PresetModule *module);
@@ -138,17 +139,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void set_current_index(size_t index);
     bool host_available();
 
-    // IChemClient
-    ::rack::engine::Module* client_module() override { return my_module; }
-    std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
-    void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
-    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
-    // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
-    void createScrews(std::shared_ptr<SvgTheme> theme) override;
-    
     PresetId get_live_id() { PresetId dead; return live_preset ? live_preset->id : dead; }
     void request_presets(PresetTab which);
     std::string preset_file(PresetTab which);
@@ -156,7 +146,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool save_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
-    void set_tab(PresetTab tab);
+    void set_tab(PresetTab tab, bool fetch);
     void scroll_to(ssize_t index);
     void scroll_to_page_of_index(ssize_t index);
     ssize_t page_index_of_index(ssize_t index);
@@ -172,6 +162,17 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void on_search_text_changed();
     void on_search_text_enter();
 
+    // IChemClient
+    ::rack::engine::Module* client_module() override { return my_module; }
+    std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
+    void onConnectHost(IChemHost* host) override;
+    void onPresetChange() override;
+    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
+    
+    // ChemModuleWidget
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
+    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+    
     // IHandleEmEvents
     IHandleEmEvents::EventMask em_event_mask{(EventMask)(UserBegin + SystemComplete + UserBegin + UserComplete)};
     void onSystemBegin() override;
