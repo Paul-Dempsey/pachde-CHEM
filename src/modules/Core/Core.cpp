@@ -16,7 +16,6 @@ CoreModule::CoreModule() :
 {
     ticker.set_interval(1.0f);
     
-
     em_event_mask = EME::LoopDetect
         + EME::EditorReply 
         + EME::PresetChanged

@@ -59,8 +59,8 @@ struct Spinner : OpaqueWidget, IApplyTheme
         box.size = sw->box.size;
 
         shadow->box.size = sw->box.size;
-        // Move shadow downward by 10%
-        shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
+        // Move shadow
+        shadow->box.pos = math::Vec(sw->box.size.x * .05, sw->box.size.y * 0.15);
     
         fb->setDirty();
     }

@@ -65,7 +65,7 @@ public:
         preset_name = name;
     }
     bool empty() {
-        assert(((preset_index >= 0 && preset_id.valid())) || ((-1 == preset_index) && !preset_id.valid()));
+        //assert(((preset_index >= 0 && preset_id.valid())) || ((-1 == preset_index) && !preset_id.valid()));
         return !preset_id.valid();
     }
     void clear_states();

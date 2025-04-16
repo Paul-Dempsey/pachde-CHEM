@@ -19,7 +19,11 @@ bool PresetList::load(const std::string &path)
         return false;
     }
 	DEFER({json_decref(root);});
-    return from_json(root, path);
+    bool ok = from_json(root, path);
+    if (ok) {
+        modified = false;
+    }
+    return ok;
 }
 
 bool PresetList::save(const std::string &path, const std::string& connection_info)
@@ -37,7 +41,11 @@ bool PresetList::save(const std::string &path, const std::string& connection_inf
     if (!root) { return false; }
 	DEFER({json_decref(root);});
     to_json(root, connection_info);
-    return json_dumpf(root, file, JSON_INDENT(2)) < 0 ? false : true;
+    bool ok = json_dumpf(root, file, JSON_INDENT(2)) < 0 ? false : true;
+    if (ok) {
+        modified = false;
+    }
+    return ok;
 }
 
 bool PresetList::from_json(const json_t* root,const std::string &path)
@@ -97,6 +105,7 @@ void PresetList::add(const PresetDescription* preset)
     if (-1 == index) {
         auto pi = std::make_shared<PresetInfo>(preset);
         presets.push_back(pi);
+        modified = true;
     }
 }
 
@@ -106,6 +115,7 @@ void PresetList::sort(PresetOrder order)
         this->order = order;
         auto orderfn = getPresetSort(order);
         std::sort(presets.begin(), presets.end(), orderfn);
+        modified = true;
     }
 }
 

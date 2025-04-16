@@ -21,7 +21,8 @@ inline bool match_insensitive(const std::string& alpha, const std::string& beta)
     return alpha.size() == beta.size()
         && alpha.size() == common_prefix_length_insensitive(alpha, beta);
 }
-
+std::string spaceless(const std::string& str);
+std::string collapse_space(const std::string& str);
 std::string to_lower_case(const std::string& name);
 bool is_safe_file_char(char ch, bool allow_space = true);
 std::string to_file_safe(const std::string& str, bool allow_space = true);

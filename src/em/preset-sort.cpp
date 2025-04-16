@@ -15,9 +15,9 @@ bool preset_category_order(const std::shared_ptr<PresetInfo>& p1, const std::sha
     if (p2->meta.empty()) {
         return true;
     }
-    auto m1 = hakenCategoryCode.find(*p1->meta.cbegin());
+    auto m1 = hakenMetaCode.find(*p1->meta.cbegin());
     assert(m1 && m1->group == PresetGroup::Category);
-    auto m2 = hakenCategoryCode.find(*p2->meta.cbegin());
+    auto m2 = hakenMetaCode.find(*p2->meta.cbegin());
     assert(m2 && m2->group == PresetGroup::Category);
     if (m1->group == m2->group) {
         if (m1->group == PresetGroup::Unknown) {

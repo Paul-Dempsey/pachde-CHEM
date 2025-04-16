@@ -231,7 +231,9 @@ PlayUi::PlayUi(PlayModule *module) :
 
     if (my_module) {
         my_module->set_chem_ui(this);
-        onConnectHost(my_module->chem_host);
+        if (!chem_host) {
+            onConnectHost(my_module->chem_host);
+        }
         if (!my_module->playlist_file.empty()) {
             load_playlist(my_module->playlist_file, false);
         }
@@ -870,6 +872,8 @@ void PlayUi::onPresetChange()
         }
         return;
     }
+
+    if (my_module && my_module->batch_busy()) return;
 
     if (chem_host) {
         auto preset = chem_host->host_preset();

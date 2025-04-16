@@ -574,9 +574,6 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             menu->addChild(createMenuItem("Editor Hello", "", [this]() {
                 my_module->haken_midi.editor_present(ChemId::Core);
             }));
-            menu->addChild(createMenuItem("ConText", "", [this]() {
-                my_module->haken_midi.request_con_text(ChemId::Core);
-            }));
             menu->addChild(createMenuItem("Updates", "", [this]() {
                 my_module->haken_midi.request_updates(ChemId::Core);
             }));

@@ -18,4 +18,6 @@ struct PresetMacro
     void parse_text(const std::string& text);
 };
 
+std::string make_macro_summary(const std::string& text);
+
 }

@@ -68,6 +68,30 @@ std::string spaceless(const std::string& str)
     return text;
 }
 
+std::string collapse_space(const std::string &str)
+{
+    if (str.empty()) return "";
+    std::string text;
+    auto back = std::back_inserter(text);
+    bool in_space{std::isspace(*str.cbegin())};
+    for (auto ch: str) {
+        if (in_space) {
+            if (!std::isspace(ch)) {
+                *back++ = ch;
+                in_space = false;
+            }
+        } else {
+            if (std::isspace(ch)) {
+                *back++ = ' ';
+                in_space = true;
+            } else {
+                *back++ = ch;
+            }
+        }
+    }
+    return text;
+}
+
 bool is_safe_file_char(char ch, bool allow_space /*= true*/)
 {
     if (ch < 0) return true;

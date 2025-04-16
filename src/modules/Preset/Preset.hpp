@@ -5,6 +5,7 @@
 #include "../../em/EaganMatrix.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../widgets/bits-widget.hpp"
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
@@ -75,6 +76,37 @@ constexpr const int ROWS = 20;
 constexpr const int COLS = 2;
 constexpr const int PAGE_CAPACITY = ROWS * COLS;
 
+struct Tab {
+    size_t scroll_top{0};
+    ssize_t current_index{-1};
+    PresetList list;
+    Tab(const Tab&) = delete;
+    Tab(PresetTab id) : list(id) {}
+    PresetTab id() { return list.tab; }
+    size_t count() { return list.count(); }
+    void clear() { list.clear(); }
+    uint64_t filter_masks[5];
+};
+
+struct DBBuilder {
+    std::deque<PresetId> presets;
+    void init(const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current) {
+        for (auto p : source) {
+            presets.push_back(p->id);
+        }
+        if (current.valid()) {
+            presets.push_back(current);
+        }
+    }
+    bool next(HakenMidi* haken) {
+        if (presets.empty()) return false;
+        PresetId id = presets.front();
+        presets.pop_front();
+        haken->select_preset(ChemId::Preset, id);
+        return true;
+    }
+};
+
 struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
     using Base = ChemModuleWidget;
@@ -98,16 +130,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     
     std::shared_ptr<PresetDescription> live_preset;
 
-    struct Tab {
-        size_t scroll_top{0};
-        ssize_t current_index{-1};
-        PresetList list;
-        Tab(const Tab&) = delete;
-        Tab(PresetTab id) : list(id) {}
-        PresetTab id() { return list.tab; }
-        size_t count() { return list.count(); }
-        void clear() { list.clear(); }
-    };
     PresetTab active_tab_id{PresetTab::System};
     Tab user_tab {PresetTab::User};
     Tab system_tab {PresetTab::System};
@@ -118,7 +140,10 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool spinning{false};
     std::vector<PresetEntry*> preset_grid;
 
+    DBBuilder* db_builder{nullptr};
+
     PresetUi(PresetModule *module);
+    ~PresetUi();
     
     Tab& get_tab(PresetTab id) {
        switch (id) {
@@ -138,8 +163,10 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     }
     void set_current_index(size_t index);
     bool host_available();
-
+    void start_spinner();
+    void stop_spinner();
     PresetId get_live_id() { PresetId dead; return live_preset ? live_preset->id : dead; }
+    void build_database(PresetTab which);
     void request_presets(PresetTab which);
     std::string preset_file(PresetTab which);
     bool load_presets(PresetTab which);

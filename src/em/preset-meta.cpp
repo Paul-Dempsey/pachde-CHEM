@@ -26,10 +26,10 @@ const char * toString(PresetGroup group)
     }
 }
 
-const uint16_t CATEGORY_TAG = CategoryCode('C', '=');
-const HakenCategoryCode hakenCategoryCode = {};
+const uint16_t CATEGORY_TAG = MetaCode('C', '=');
+const HakenMetaCode hakenMetaCode {};
 
-HakenCategoryCode::HakenCategoryCode()
+HakenMetaCode::HakenMetaCode()
 {
     data.reserve(92);
     data.push_back(std::make_shared<PresetMeta>("ST", PresetGroup::Category, 1, "Strings"));
@@ -45,6 +45,7 @@ HakenCategoryCode::HakenCategoryCode()
     data.push_back(std::make_shared<PresetMeta>("MD", PresetGroup::Category, 11, "Midi"));
     data.push_back(std::make_shared<PresetMeta>("CV", PresetGroup::Category, 12, "Control Voltage"));
     data.push_back(std::make_shared<PresetMeta>("UT", PresetGroup::Category, 13, "Utility"));
+    data.push_back(std::make_shared<PresetMeta>("ZZ", PresetGroup::Category, 14, "(Unkown)"));
     data.push_back(std::make_shared<PresetMeta>("AT", PresetGroup::Type, 0, "Atonal"));
     data.push_back(std::make_shared<PresetMeta>("BA", PresetGroup::Type, 1, "Bass"));
     data.push_back(std::make_shared<PresetMeta>("BO", PresetGroup::Type, 2, "Bowed"));
@@ -124,17 +125,17 @@ HakenCategoryCode::HakenCategoryCode()
     data.push_back(std::make_shared<PresetMeta>("SP", PresetGroup::Setting, 5, "Split Voice"));
     data.push_back(std::make_shared<PresetMeta>("SV", PresetGroup::Setting, 6, "Single Voice"));
     data.push_back(std::make_shared<PresetMeta>("TA", PresetGroup::Setting, 7, "Touch Area"));
-    //DEBUG("HCCategoryCode size: %lld", data.size());
+    //DEBUG("HCMetaCode size: %lld", data.size());
     std::sort(data.begin(), data.end(), [](const std::shared_ptr<PresetMeta>& a, const std::shared_ptr<PresetMeta>& b) { return a->code < b->code; });
 }
 
-std::string HakenCategoryCode::categoryName(uint16_t key) const
+std::string HakenMetaCode::categoryName(uint16_t key) const
 {
     auto cat = find(key);
     return cat ? cat->name : "Unknown";
 }
 
-std::shared_ptr<PresetMeta> HakenCategoryCode::find(uint16_t key) const
+std::shared_ptr<PresetMeta> HakenMetaCode::find(uint16_t key) const
 {
     auto item = std::lower_bound(data.cbegin(), data.cend(), key, [](const std::shared_ptr<PresetMeta> &p, uint16_t key){ return p->code < key; });
     return data.cend() != item ? *item : nullptr;
@@ -148,13 +149,13 @@ void foreach_code(const std::string& text, std::function<bool(uint16_t)> callbac
     while (true) {
         token = get_token(token.first, text.cend(), is_space);
         if (token.first == token.second) break;
-        if (CATEGORY_TAG == CategoryCode(token.first)) {
+        if (CATEGORY_TAG == MetaCode(token.first)) {
             auto it = token.first + 2;
             auto end = token.second;
             while (true) {
                 token = get_token(it, end, is_underscore);
                 if (token.first == token.second) break;
-                if (!callback(CategoryCode(token.first))) return;
+                if (!callback(MetaCode(token.first))) return;
                 it = token.second;
             }
             break;
@@ -165,8 +166,8 @@ void foreach_code(const std::string& text, std::function<bool(uint16_t)> callbac
 
 bool order_codes(const uint16_t &a, const uint16_t &b)
 {
-    auto p1 = hakenCategoryCode.find(a);
-    auto p2 = hakenCategoryCode.find(b);
+    auto p1 = hakenMetaCode.find(a);
+    auto p2 = hakenMetaCode.find(b);
     if (!p1 && !p2) return a < b;
     if (p1 && !p2) return true;
     if (!p1) return false; //p2 is non-null from above two
@@ -175,7 +176,7 @@ bool order_codes(const uint16_t &a, const uint16_t &b)
     return false;
 }
 
-void FillCategoryCodeList(const std::string& text, std::vector<uint16_t>& vec)
+void FillMetaCodeList(const std::string& text, std::vector<uint16_t>& vec)
 {
     if (text.empty()) return;
     foreach_code(text, [&vec](uint16_t code) mutable {
@@ -183,24 +184,35 @@ void FillCategoryCodeList(const std::string& text, std::vector<uint16_t>& vec)
         return true;
         });
     std::sort(vec.begin(), vec.end(), order_codes);
-    auto default_code = CategoryCode("OT").code; // default to Other if category missing
+    auto default_code = MetaCode("ZZ").code; // default to Unknown if category missing
     if (vec.empty()) {
         vec.push_back(default_code);
     } else {
-        auto first_code = hakenCategoryCode.find(*vec.cbegin());
+        auto first_code = hakenMetaCode.find(*vec.cbegin());
         if (!first_code || first_code->group != PresetGroup::Category) {
             vec.insert(vec.begin(), default_code);
         }
     }
 }
 
-std::vector<std::shared_ptr<PresetMeta>> HakenCategoryCode::make_category_list(const std::string& text) const
+void FillMetaCodeMasks(const std::vector<uint16_t>& meta_codes, uint64_t* masks)
+{
+    for (uint16_t code : meta_codes) {
+        auto meta = hakenMetaCode.find(code);
+        if (meta) {
+            size_t g = size_t(meta->group);
+            masks[g] = masks[g] | uint64_t(1) << meta->index;
+        }
+    }
+}
+
+std::vector<std::shared_ptr<PresetMeta>> HakenMetaCode::make_category_list(const std::string& text) const
 {
     std::vector<std::shared_ptr<PresetMeta>> result;
     if (text.empty()) return result;
     // BUGBUG: relies on category codes in text to be in PresetGroup + index order.
     // If this bug shows up (e.g. with Osmose), we can fix it by sorting the codes 
-    // as in FillCategoryCodeList.
+    // as in FillMetaCodeList.
     foreach_code(text, [this, &result](uint16_t code) mutable { 
         auto item = find(code);
         if (item) {
@@ -211,7 +223,7 @@ std::vector<std::shared_ptr<PresetMeta>> HakenCategoryCode::make_category_list(c
     return result;
 }
 
-std::string HakenCategoryCode::make_category_multiline_text(const std::string& text) const
+std::string HakenMetaCode::make_category_multiline_text(const std::string& text) const
 {
     if (text.empty()) return "";
     std::string result;
@@ -240,7 +252,7 @@ std::string HakenCategoryCode::make_category_multiline_text(const std::string& t
     return result;
 }
 
-// std::string HCCategoryCode::make_category_json(const std::string& text) const
+// std::string HCMetaCode::make_category_json(const std::string& text) const
 // {
 //     if (text.empty()) return "";
 //     std::string result;
@@ -287,11 +299,13 @@ std::string HakenCategoryCode::make_category_multiline_text(const std::string& t
 std::string parse_author(const std::string &text)
 {
     if (text.empty()) return text;
-    enum State { SOL, Text, A };
-    State state = SOL;
-    for (auto scan = text.cbegin(); scan != text.cend(); scan++) {
+    enum State { SOI, Text, A };
+    auto scan = text.cbegin();
+    while (is_space(*scan) && scan != text.cend()) scan ++;
+    if (scan == text.cend()) return "";
+    for (State state = SOI; scan != text.cend(); scan++) {
         switch (state) {
-        case SOL: 
+        case SOI:
             if ('A' == *scan) {
                 state = A;
             } else {
@@ -299,8 +313,8 @@ std::string parse_author(const std::string &text)
             }
             break;
         case Text:
-            if ('\n' == *scan) {
-                state = SOL;
+            if (is_space(*scan)) {
+                state = SOI;
             }
             break;
         case A:
@@ -309,7 +323,7 @@ std::string parse_author(const std::string &text)
                 std::string result;
                 result.reserve(text.cend() - scan);
                 while (scan != text.cend()) {
-                    if ('\n' == *scan) break;
+                    if (is_space(*scan)) break;
                     if ('_' == *scan) {
                         result.push_back(' ');
                     } else {

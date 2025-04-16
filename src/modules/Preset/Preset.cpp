@@ -118,6 +118,7 @@ void PresetModule::dataFromJson(json_t *root)
     ChemModule::dataFromJson(root);
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "track-live", track_live);
+    json_read_bool(root, "cache_user", use_cached_user_presets);
     hardware = get_json_int(root, "hardware", 0);
     firmware = get_json_int(root, "firmware", 0);
     active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
@@ -131,6 +132,7 @@ json_t* PresetModule::dataToJson()
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "track-live", json_boolean(track_live));
+    json_object_set_new(root, "cache_user", json_boolean(use_cached_user_presets));
     json_object_set_new(root, "hardware", json_integer(hardware));
     json_object_set_new(root, "firmware", json_integer(firmware));
     json_object_set_new(root, "tab", json_integer(int(active_tab)));
@@ -170,7 +172,6 @@ void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDev
 void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
-    if (!chem_host || chem_host->host_busy() || !ui()) return;
 }
 
 Model *modelPreset = createModel<PresetModule, PresetUi>("chem-preset");

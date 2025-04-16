@@ -15,7 +15,7 @@
   </defs>
   <rect id="g-panel" fill="url(#panel-gradient)" x="0" y="0"  width="360" height="380" />
   <path
-     id="grid"
+     id="g-grid"
      fill="url(#grid-grad)"
      d="
   M 8,38  h 162 v 14 h -162 z

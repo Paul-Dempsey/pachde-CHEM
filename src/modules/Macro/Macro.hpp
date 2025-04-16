@@ -1,6 +1,7 @@
 #pragma once
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
+#include "../../em/em-batch-state.hpp"
 #include "../../em/preset-macro.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
@@ -56,6 +57,7 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
     Modulation modulation;
     uint8_t macro_lsb;
     bool glow_knobs;
+    EmBatchState em_batch;
 
     MacroModule();
     ~MacroModule() {
@@ -63,6 +65,7 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
             chem_host->unregister_chem_client(this);
         }
     }
+    bool batch_busy() { return em_batch.busy(); }
 
     void set_modulation_target(int id) {
         modulation.set_modulation_target(id);

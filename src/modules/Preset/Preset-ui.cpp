@@ -92,6 +92,12 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         [this](){ ui->request_presets(PresetTab::System); },
         !host
     ));
+    std::string name = format_string("Build full %s database", ui->active_tab_id == PresetTab::User ? "User" : "System");
+    menu->addChild(createMenuItem(name, "",
+        [this](){ ui->build_database(PresetTab::System); },
+        !host
+    ));
+
 }
 
 // PresetUi
@@ -237,11 +243,24 @@ PresetUi::PresetUi(PresetModule *module) :
     }
     if (module) {
         my_module->set_chem_ui(this);
+        if (!chem_host) {
+            onConnectHost(my_module->chem_host);
+        }
         user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         user_tab.list.order = my_module->user_order;
         system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         system_tab.list.order = my_module->system_order;
         set_tab(PresetTab(my_module->active_tab), false);
+    }
+}
+
+PresetUi::~PresetUi()
+{
+    if (user_tab.list.dirty()) {
+        save_presets(PresetTab::User);
+    }
+    if (user_tab.list.dirty()) {
+        save_presets(PresetTab::System);
     }
 }
 
@@ -257,6 +276,17 @@ void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
 void no_preset(TipLabel* label) {
     label->text("");
     label->describe("(none)");
+}
+
+void PresetUi::build_database(PresetTab which)
+{
+    if (!host_available()) return;
+    start_spinner();
+    Tab& tab = active_tab();
+    db_builder = new DBBuilder();
+    PresetId dummy;
+    db_builder->init(tab.list.presets, live_preset ? live_preset->id : dummy);
+    db_builder->next(chem_host->host_haken());
 }
 
 void PresetUi::request_presets(PresetTab which)
@@ -380,18 +410,14 @@ void PresetUi::onSystemBegin()
     if (PresetTab::Unset == gathering) {
         other_system_gather = true;
     } else {
-        if (!spinning) {
-            startSpinner(this, Vec(170.f, 190.f));
-            spinning = true;
-        }
+        start_spinner();
         gather_start = true;
     }
 }
 
 void PresetUi::onSystemComplete()
 {
-    stopSpinner(this);
-    spinning = false;
+    stop_spinner();
     gather_start = false;
     if (other_system_gather) {
         other_system_gather = false;
@@ -416,18 +442,14 @@ void PresetUi::onUserBegin()
     if (PresetTab::Unset == gathering) {
         other_user_gather = true;
     } else {
-        if (!spinning) {
-            startSpinner(this, Vec(170.f, 190.f));
-            spinning = true;
-        }
+        start_spinner();
         gather_start = true;
     }
 }
 
 void PresetUi::onUserComplete()
 {
-    stopSpinner(this);
-    spinning = false;
+    stop_spinner();
     gather_start = false;
     if (other_user_gather) {
         other_user_gather = false;
@@ -463,6 +485,36 @@ void PresetUi::onPresetChange()
             system_tab.list.set_device_info(em->firmware_version, em->hardware);
         }
     }
+
+    if (db_builder) {
+        bool done = false;
+        if (host_available()) {
+            auto preset = chem_host->host_preset();
+            if (preset) {
+                Tab& tab = active_tab();
+                auto n = tab.list.index_of_id(preset->id);
+                if (n >= 0) {
+                    auto p = tab.list.nth(n);
+                    p->set_text(preset->text);
+                    tab.list.set_dirty();
+                }
+                if (!db_builder->next(chem_host->host_haken())) {
+                    save_presets(active_tab_id);
+                    done = true;
+                }
+            }
+        } else {
+            done = true;
+        }
+
+        if (done) {
+            delete db_builder;
+            db_builder = nullptr;
+            stop_spinner();
+        }
+        return;
+    }
+    
     switch (gathering) {
     case PresetTab::Unset:
         break;
@@ -483,6 +535,13 @@ void PresetUi::onPresetChange()
             live_preset->init(preset);
             live_preset_label->text(live_preset->name);
             live_preset_label->describe(live_preset->meta_text());
+            Tab& tab = active_tab();
+            auto n = tab.list.index_of_id(live_preset->id);
+            if (n >= 0) {
+                auto p = tab.list.nth(n);
+                p->set_text(live_preset->text);
+                tab.list.set_dirty();
+            }
         } else {
             live_preset = nullptr;
             no_preset(live_preset_label);
@@ -514,6 +573,20 @@ bool PresetUi::host_available()
     if (!em || !em->is_ready() || em->busy()) return false;
 
     return true;
+}
+
+void PresetUi::start_spinner()
+{
+    if (!spinning) {
+        startSpinner(this, Vec(170.f, 190.f));
+        spinning = true;
+    }
+}
+
+void PresetUi::stop_spinner()
+{
+    stopSpinner(this);
+    spinning = false;
 }
 
 void PresetUi::onConnectHost(IChemHost *host)

@@ -1,6 +1,7 @@
 #pragma once
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
+#include "../../em/em-batch-state.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/kv-store.hpp"
 #include "../../services/ModuleBroker.hpp"
@@ -28,6 +29,7 @@ struct PlayModule : ChemModule, IChemClient
     std::string playlist_file;
     std::deque<std::string> playlist_mru;
     bool track_live;
+    EmBatchState em_batch;
     
     PlayModule();
     ~PlayModule() {
@@ -40,10 +42,12 @@ struct PlayModule : ChemModule, IChemClient
 
     void update_mru(std::string path);
     void clear_mru() { playlist_mru.clear(); }
+    bool batch_busy() { return em_batch.busy(); }
 
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
+    IDoMidi* client_do_midi() override { return &em_batch; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;

@@ -181,6 +181,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
 
     if (my_module) {
         my_module->set_chem_ui(this);
+        if (!chem_host) {
+            onConnectHost(my_module->chem_host);
+        }
         onConnectHost(my_module->chem_host);
     }
 }

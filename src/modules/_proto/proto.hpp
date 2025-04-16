@@ -10,6 +10,7 @@
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/knob-track-widget.hpp"
+#include "../../widgets/bits-widget.hpp"
 
 using namespace pachde;
 
@@ -86,13 +87,8 @@ struct ProtoUi : ChemModuleWidget, IChemClient
     LinkButton* link_button{nullptr};
     TipLabel*   haken_device_label{nullptr};
 
-    TextLabel* label[5]{nullptr};
-    TextLabel* value_text[5]{nullptr};
-    TextLabel* expr_value{nullptr};
-
-    TextField* text_entry{nullptr};
-    TextField* expr_entry{nullptr};
-
+    TextLabel* label{nullptr};
+    BitsWidget* bits{nullptr};
     //GlowKnob* knobs[ProtoModule::NUM_KNOBS];
     //TrackWidget* tracks[ProtoModule::NUM_MOD_PARAMS];
 
@@ -115,6 +111,7 @@ struct ProtoUi : ChemModuleWidget, IChemClient
 
     void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
+    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 

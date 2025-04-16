@@ -1,5 +1,6 @@
 #include "preset.hpp"
 #include "../services/misc.hpp"
+#include "preset-macro.hpp"
 
 namespace pachde {
 
@@ -7,43 +8,26 @@ json_t* PresetDescription::toJson(bool include_id, bool include_name, bool inclu
 {
     json_t* root = json_object();
     if (include_id) {
-        json_object_set_new(root, "hi", json_integer(id.bank_hi()));
-        json_object_set_new(root, "lo", json_integer(id.bank_lo()));
-        json_object_set_new(root, "num", json_integer(id.number()));
+        json_object_set_new(root, "id", json_integer(id.key()));
     }
     if (include_name) {
         json_object_set_new(root, "name", json_stringn(name.c_str(), name.size()));
     }
     if (include_text && text.size()) {
-        json_object_set_new(root, "text", json_stringn(text.c_str(), text.size()));
+        auto data = collapse_space(text);
+        json_object_set_new(root, "text", json_stringn(data.c_str(), data.size()));
     }
     return root;
 }
 
 void PresetDescription::fromJson(const json_t* root)
 {
-    uint8_t hi = 0, lo = 0, number = 0;
-    auto j = json_object_get(root, "hi");
+    auto j = json_object_get(root, "id");
     if (j) {
-        hi = json_integer_value(j);
+        id = {uint32_t(json_integer_value(j))};
     }
-    j = json_object_get(root, "lo");
-    if (j) {
-        lo = json_integer_value(j);
-    }
-    j = json_object_get(root, "num");
-    if (j) {
-        number = json_integer_value(j);
-    }
-    id = {hi, lo, number};
-    j = json_object_get(root, "name");
-    if (j) {
-        name = json_string_value(j);
-    }
-    j = json_object_get(root, "text");
-    if (j) {
-        text = json_string_value(j);
-    }
+    name = get_json_string(root, "name");
+    text = get_json_string(root, "text");
 }
 
 std::string PresetDescription::summary() const
@@ -55,12 +39,20 @@ std::string PresetDescription::meta_text() const
 {
     if (text.empty()) return summary();
 
-    auto info = name + format_string("\n[%d.%d.%d]", name.c_str(), id.bank_hi(), id.bank_lo(), id.number());
-    auto cats = hakenCategoryCode.make_category_multiline_text(text);
+    auto info = format_string("%s\n[%d.%d.%d]", name.c_str(), id.bank_hi(), id.bank_lo(), id.number());
+
+    auto macs = make_macro_summary(text);
+    if (!macs.empty()) {
+        info.push_back('\n');
+        info.append(macs);
+    }
+ 
+    auto cats = hakenMetaCode.make_category_multiline_text(text);
     if (!cats.empty()) {
         info.push_back('\n');
         info.append(cats);
     }
+
     auto author = parse_author(text);
     if (!author.empty()) {
         info.append("\nAuthor: ");

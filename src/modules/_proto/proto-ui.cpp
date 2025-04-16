@@ -32,58 +32,65 @@ ProtoUi::ProtoUi(ProtoModule *module) :
     float x, y;
     bool browsing = !module;
 
-    //const float PANEL_WIDTH = 300.f;
-    //const float CENTER = PANEL_WIDTH*.5f;
-    auto label_style = LabelStyle{"ctl-label", TextAlignment::Right, 12.f};
-    auto value_style = LabelStyle{"setting", TextAlignment::Left, 12.f};
+    // //const float PANEL_WIDTH = 300.f;
+    // //const float CENTER = PANEL_WIDTH*.5f;
+    auto label_style = LabelStyle{"ctl-label", TextAlignment::Left, 12.f};
+    y = 24.f;
+    x = 15.f;
+    addChild(label = createLabel<TextLabel>(Vec(x,y), 100.f, "", theme_engine, theme, label_style));
+    std::vector<std::string> items {
+        "Acoustic",
+        "Aggressive",
+        "Airy",
+        "Analog",
+        "Arpeggio",
+        "Big",
+        "Bright",
+        "Chords",
+        "Clean",
+        "Dark",
+        "Digital",
+        "Distorted",
+        "Dry",
+        "Echo",
+        "Electric",
+        "Ensemble",
+        "Evolving",
+        "FM",
+        "Hybrid",
+        "Icy",
+        "Intimate",
+        "Lo-fi",
+        "Looping",
+        "Layered",
+        "Morphing",
+        "Metallic",
+        "Nature",
+        "Noise",
+        "Random",
+        "Reverberant",
+        "Sound Design",
+        "Stereo",
+        "Shaking",
+        "Simple",
+        "Soft",
+        "Strumming",
+        "Synthetic",
+        "Warm",
+        "Woody"
+    };
+    bits = new BitsWidget(0, 10, items, [=](int item){
+        label->text(format_string("x%0.8llx | %d", bits->state, item));
+    }, theme_engine, theme);
+    bits->box.pos.x = 15.f;
+    bits->box.pos.y = 36;
+    bits->setVisible(false);
+    addChild(bits);
 
-    x = 100.f;
-    y = 18.f;
-    for (int i = 0; i < 5; ++i) {
-        addChild(label[i] = createLabel<TextLabel>(Vec(x,y), 100.f, "", theme_engine, theme, label_style));
-        addChild(value_text[i] = createLabel<TextLabel>(Vec(x + 5.f,y), 100.f, "", theme_engine, theme, value_style));
-        y += 14.f;
-    }
-    label[0]->text("ccOctShift");
-    label[1]->text("ccJack1");
-    label[2]->text("ccJack2");
-    label[3]->text("idJackShift");
-    label[4]->text("idPrio");
-    y += 6.f;
-    text_entry = new TextField();
-    text_entry->box.pos = Vec(15.f, y);
-    text_entry->box.size.x = 85.f;
-    addChild(text_entry);
+    addChild(Center(createClickRegion(bits->box.pos.x + bits->box.size.x * .5f, 30.f, 12.f, 12.f, 0, [=](int, int){
+        bits->setVisible(!bits->isVisible());
+    })));
 
-    auto btn = Center(createThemedButton<SmallRoundButton>(Vec(x + 12.f,y + 9.f), theme_engine, theme, "poke"));
-    btn->setHandler([=](bool ctl, bool shift){
-        if (!chem_host) return;
-        if (text_entry->text.empty()) return;
-        int value = clamp(std::atoi(text_entry->text.c_str()), 0, 127);
-        chem_host->host_haken()->begin_stream(ChemId::Proto, Haken::s_Mat_Poke);
-        chem_host->host_haken()->key_pressure(ChemId::Proto, Haken::ch16, Haken::idJackShift, value);
-    });
-    addChild(btn);
-
-    y += 22.f;
-    expr_entry = new TextField();
-    expr_entry->box.pos = Vec(15.f, y);
-    expr_entry->box.size.x = 85.f;
-    addChild(expr_entry);
-
-    addChild(expr_value = createLabel<TextLabel>(Vec(x + 22.f,y + 5.f), 100.f, "", theme_engine, theme, value_style));
-
-    btn = Center(createThemedButton<SmallRoundButton>(Vec(x + 12.f,y + 9.f), theme_engine, theme, "expr"));
-    btn->setHandler([=](bool ctl, bool shift){
-        if (expr_entry->text.empty()) {
-            expr_value->text("");
-            return;
-        }
-        RawQuantity q;
-        q.setDisplayValueString(expr_entry->text);
-        expr_value->text(q.getDisplayValueString());
-    });
-    addChild(btn);
 
     // inputs
 
@@ -156,20 +163,20 @@ bool ProtoUi::connected() {
 
 void ProtoUi::onHoverKey(const HoverKeyEvent &e)
 {
-    if (my_module) {
-        if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
-            switch (e.key) {
-            case GLFW_KEY_0:
-                e.consume(this);
-                //my_module->modulation.zero_modulation();
-                return;
-            case GLFW_KEY_5:
-                center_knobs();
-                e.consume(this);
-                return;
-            }
-        }
-    }
+    // if (my_module) {
+    //     if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
+    //         switch (e.key) {
+    //         case GLFW_KEY_0:
+    //             e.consume(this);
+    //             //my_module->modulation.zero_modulation();
+    //             return;
+    //         case GLFW_KEY_5:
+    //             center_knobs();
+    //             e.consume(this);
+    //             return;
+    //         }
+    //     }
+    // }
     Base::onHoverKey(e);
 }
 
@@ -179,45 +186,28 @@ void ProtoUi::step()
     if (!my_module) return;
     bind_host(my_module);
 
-    if (!chem_host) return;
-    auto em = chem_host->host_matrix();
-    value_text[0]->text(format_string("%d", em->get_octave_shift())); //"ccOctShift"
-    auto js = em->get_jack_1();
-    value_text[1]->text(format_string("%d (%d:%d)", js, js >> 7, js & 0x7f)); //"ccJack1"
-    js = em->get_jack_2();
-    value_text[2]->text(format_string("%d (%d:%d)", js, js >> 7, js & 0x7f)); //"ccJack2"
-    value_text[3]->text(format_string("%d", em->get_jack_shift())); //"idJackShift"
+}
 
-    auto np = em->get_note_priority();
-    value_text[4]->text(format_string("%d (%0x)", np, np));
-
-    //knobs[K_MODULATION]->enable(my_module->modulation.has_target());
-
-    // for (int i = 0; i < K_MODULATION; ++i) {
-    //     tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
-    //     tracks[i]->set_active(my_module->getInput(i).isConnected());
-    // }
-
+void ProtoUi::draw(const DrawArgs &args)
+{
+    Base::draw(args);
+    auto vg = args.vg;
+    Circle(vg, bits->box.pos.x + bits->box.size.x * .5f, 30.f, 5.5f, nvgHSL(200.f/360.f, .5f, .5f));
 }
 
 void ProtoUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
-    menu->addChild(new MenuSeparator);
+//    menu->addChild(new MenuSeparator);
 
-    // bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
-    // menu->addChild(createMenuItem("Zero modulation", "0", [this](){
-    //     my_module->modulation.zero_modulation();
-    // }, unconnected));
-    
-    menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
+//    menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
-        [this](){ return my_module->glow_knobs; },
-        [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
-            glowing_knobs(my_module->glow_knobs);
-        }
-    ));
+    // menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    //     [this](){ return my_module->glow_knobs; },
+    //     [this](){
+    //         my_module->glow_knobs = !my_module->glow_knobs; 
+    //         glowing_knobs(my_module->glow_knobs);
+    //     }
+    // ));
     Base::appendContextMenu(menu);
 }

@@ -155,7 +155,9 @@ MacroUi::MacroUi(MacroModule *module) :
 
     if (my_module) {
         my_module->set_chem_ui(this);
-        onConnectHost(my_module->chem_host);
+        if (!chem_host) {
+            onConnectHost(my_module->chem_host);
+        }
     }
 }
 
@@ -213,6 +215,7 @@ void MacroUi::unconnected_ui()
 void MacroUi::onPresetChange()
 {
     if (my_module) {
+        //if (my_module->batch_busy()) return;
         m1_label->text(my_module->macro_names.macro[M1]);
         m2_label->text(my_module->macro_names.macro[M2]);
         m3_label->text(my_module->macro_names.macro[M3]);

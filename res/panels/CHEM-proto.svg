@@ -14,6 +14,7 @@
   </defs>
   <g>
     <rect id="g-panel" fill="url(#gpanel)" x="0" y="0" width="300" height="380" />
+    <rect opacity="0" fill="#576380" x="3.5", y="32" width="260" height="200"/>
     <path id="SETTINGS--title" fill="#f9a54b" d="M 150,3.5 h -50 v 4 h 50 z M 150,3.5 h 50 v 4 h -50 z" />
     <path id="f--div" fill="none" stroke="#595959" stroke-width="0.75" d="M 2,290 H 296" />
     <path id="th" fill="none" stroke="#f9a54b" stroke-width=".25" d="M 5,6.5 h 80 M 295,6.5 h -80" />

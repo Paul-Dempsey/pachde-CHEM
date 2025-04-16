@@ -16,12 +16,16 @@ struct PresetList {
     uint8_t hardware{0};
     std::vector<std::shared_ptr<PresetInfo>> presets;
 
+    bool modified{false};
+
     PresetList(PresetTab id):
         tab(id),
         order(PresetTab::User == id ? PresetOrder::Natural : PresetOrder::Alpha) 
     {}
 
     bool empty() { return presets.empty(); }
+    bool dirty() { return modified; }
+    void set_dirty() { modified = true; }
     size_t count() { return presets.size(); }
 
     void set_device_info(uint16_t firmware_version, uint8_t hardware_type) {
@@ -30,6 +34,7 @@ struct PresetList {
     }
     void add(const PresetDescription* preset);
     void clear() {
+        modified = false;
         firmware = 0;
         hardware = 0;
         presets.clear();

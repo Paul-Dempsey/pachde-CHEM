@@ -59,36 +59,36 @@ struct PresetInfo : PresetDescription {
     PresetInfo(PresetId id, std::string name, std::string text) :
         PresetDescription(id, name, text)
     {
-        FillCategoryCodeList(text, meta);
+        FillMetaCodeList(text, meta);
     }
 
-    PresetInfo(std::shared_ptr<PresetDescription> preset)
+    PresetInfo(std::shared_ptr<PresetDescription> preset) :
+        PresetDescription(preset->id, preset->name, preset->text)
     {
-        Base::id = preset->id;
-        Base::name = preset->name;
-        Base::text = preset->text;
-
-        FillCategoryCodeList(preset->text, meta);
+        FillMetaCodeList(preset->text, meta);
     }
 
-    PresetInfo(const PresetDescription* preset)
+    PresetInfo(const PresetDescription* preset) :
+        PresetDescription(preset->id, preset->name, preset->text)
     {
-        Base::id = preset->id;
-        Base::name = preset->name;
-        Base::text = preset->text;
-
-        FillCategoryCodeList(text, meta);
+        FillMetaCodeList(text, meta);
     }
 
     void init(const PresetDescription* source) {
         Base::init(source);
         meta.clear();
-        FillCategoryCodeList(text, meta);
+        FillMetaCodeList(text, meta);
+    }
+
+    void set_text(const std::string & new_text) {
+        text = new_text;
+        meta.clear();
+        FillMetaCodeList(text, meta);
     }
 
     std::string category_code() {
         if (meta.empty()) return "OT";
-        return CategoryCode(meta[0]).to_string();
+        return MetaCode(meta[0]).to_string();
     }
 
 };

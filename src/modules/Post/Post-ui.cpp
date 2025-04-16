@@ -146,7 +146,9 @@ PostUi::PostUi(PostModule *module) :
 
     if (my_module) {
         my_module->set_chem_ui(this);
-        onConnectHost(my_module->chem_host);
+        if (!chem_host) {
+            onConnectHost(my_module->chem_host);
+        }
     }
 }
 

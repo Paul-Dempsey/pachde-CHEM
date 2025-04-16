@@ -140,4 +140,44 @@ void PresetMacro::parse_text(const std::string& text)
     }
 }
 
+const char * name_for_index(int i) {
+    switch (i) {
+    case 0: return "i";
+    case 1: return "ii";
+    case 2: return "iii";
+    case 3: return "iv";
+    case 4: return "v";
+    case 5: return "vi";
+    default: return "?";
+    }
+}
+
+std::string make_macro_summary(const std::string &source)
+{
+    PresetMacro mac;
+    mac.parse_text(source);
+    bool any{false};
+    for (int i = 0; i < 6; ++i) {
+        if (!mac.macro[i].empty()) {
+            any = true;
+            break;
+        }
+    }
+    if (!any) return "";
+
+    std::string text = "Macros: ";
+    any = false;
+    for (int i = 0; i < 6; ++i) {
+        if (!mac.macro[i].empty()) {
+            if (any) {
+                text.push_back(' ');
+            }
+            text.append(name_for_index(i));
+            text.push_back('=');
+            text.append(mac.macro[i]);
+            any = true;
+        }
+    }
+    return text;
+}
 }

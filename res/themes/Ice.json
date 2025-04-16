@@ -2,7 +2,7 @@
     {
         "name": "Ice",
         "theme": {
-            "panel" : { "fill": "hsl(200, 35.80%, 21.40%)" },
+            "panel" : { "fill": "hsl(200, 35.80%, 22%)" },
             "g-panel": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
             "panel-border": { "stroke": {"color":"brand", "width": 0.5 }},
 
@@ -12,8 +12,14 @@
             "title": {"fill": "brand" },
             "setting": { "fill": " hsl(60, 50%, 60%)" },
 
+
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
             "div": { "stroke": "#387390" },
+
+            "choice":  { "fill" : "hsl(200, 80%, 80%)", "stroke": { "color":"#233d4a", "width":0.25}},
+            "choice-hover": { "stroke": { "color":"hsl(60, 50%, 60%)", "width":0.25}},
+            "options-box": { "fill": "hsl(200, 35.80%, 22%)", "stroke": { "color":"hsl(200, 50.00%, 60.00%)", "width":0.25}},
+            "option-check": { "fill": "hsl(120, 50%, 50%)" },
 
             "k#": { "fill": "#4095bf" },
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #80afc7"}, { "index":1, "color":" #091921"}]}},
@@ -58,6 +64,7 @@
             "grid-bg":         { "fill": "hsl(190, 50%, 15%)" },
             "grid-line":       { "stroke": "hsl(200, 35.80%, 21.40%)" },
             "grid-new":        { "fill": "hsl(206, 40%, 30%)" },
+            "g-grid":  { "fill": { "gradient": [{ "index":0, "color":"rgb(66, 123, 151)"}, { "index":1, "color":"rgb(32, 67, 84)"}]}},
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
