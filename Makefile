@@ -57,9 +57,10 @@ SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
 # modules
-
+ifdef BUILD_DEBUG
 SOURCES += src/modules/_proto/proto.cpp
 SOURCES += src/modules/_proto/proto-ui.cpp
+endif
 
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp

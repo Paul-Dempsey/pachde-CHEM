@@ -103,7 +103,6 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 // PresetUi
 
 constexpr const float PANEL_WIDTH = 360.f;
-constexpr const float ROW_HEIGHT = 16.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 
 PresetUi::PresetUi(PresetModule *module) :
