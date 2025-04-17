@@ -21,8 +21,8 @@
             "choice-hover": { "stroke": { "color":"hsl(60, 50%, 90%)", "width":0.25}},
             "options-box": { "fill": "hsl(327, 60%, 40%)", "stroke": { "color":"hsl(327, 90%, 20%)", "width":1.5}},
             "option-check": { "fill": "hsl(120, 80%, 60%)" },
-            "option-exit": { "stroke": { "color":"hsl(60, 50%, 90%)", "width":0.75}}},
-            "option-title": { "fill": "#f9eb6a" },
+            "option-exit": { "stroke": { "color":"hsl(60, 50%, 90%)", "width":0.75}},
+            "options-title": { "fill": "#f9eb6a" },
 
             "hexoid": { "fill": "#810047" },
             "CHEM": {"fill": " #810047"},

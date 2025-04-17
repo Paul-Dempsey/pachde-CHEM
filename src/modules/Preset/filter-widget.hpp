@@ -75,6 +75,10 @@ struct TFilterButton : SvgButton, IApplyTheme
                 fb->setDirty();
             }
         }
+        if (dialog && !dialog->isVisible()) {
+            // dialog is not a child widget when not shown
+            ApplyChildrenTheme(dialog, engine, theme);
+        }
         return true;
     }
 

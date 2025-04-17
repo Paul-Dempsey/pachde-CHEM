@@ -21,9 +21,12 @@
             "rteh": { "fill": "hsl(220, 90%, 20%)" },
 
             "options-box": { "fill": "hsl(41, 35%, 50%)", "stroke": { "color":"#404040", "width":1}},
-            "choice":  { "fill" : "g5", "stroke": { "color":"g50", "width":0.25}},
+            "choice":  { "fill" : "g5" },
             "choice-hover": { "stroke": { "color":"hsl(41, 75%, 80%)", "width":0.25}},
             "option-check": { "fill": "hsl(120, 100%, 60%)" },
+            "option-exit": { "stroke": { "color":"hsl(0, 0%, 10%)", "width":0.75}},
+            "options-title": { "fill": " hsl(100, 80%, 85%)" },
+
             "g-grid":  { "fill": { "gradient": [{ "index":0, "color":"hsl(41, 36%, 40%)"}, { "index":1, "color":"hsl(41, 36%, 25%)"}]}},
 
             "div": {"stroke": "#312307"},

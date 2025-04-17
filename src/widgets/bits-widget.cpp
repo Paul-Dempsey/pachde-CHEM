@@ -82,7 +82,7 @@ BitsWidget::BitsWidget(
         }
     }
     box.size.y = top + (rows * ROW_HEIGHT) + MARGIN_DY;
-    applyTheme(theme_engine, theme);
+    ApplyChildrenTheme(this, theme_engine, theme);
 }
 
 bool BitsWidget::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)

@@ -16,9 +16,12 @@
             "rteh": { "fill":"#337799" },
 
             "options-box": { "fill": "g20", "stroke": { "color":"g60", "width":0.25}},
+            "options-title": { "fill": " #f9eb6a" },
             "choice":  { "fill" : "g75", "stroke": { "color":"g50", "width":0.25}},
             "choice-hover": { "stroke": { "color":"hsl(41, 75%, 80%)", "width":0.25}},
             "option-check": { "fill": "hsl(120, 50%, 40%)" },
+            "option-exit": { "stroke": { "color":" hsl(60, 50%, 90%)", "width":0.75}},
+
             "g-grid":  { "fill": { "gradient": [{ "index":0, "color":"hsla(41, 60%, 88%, 20%)"}, { "index":1, "color":"hsla(41, 60%, 78%, 20%)"}]}},
 
             "div": { "stroke": {"color":"#606060", "width":0.25 }},

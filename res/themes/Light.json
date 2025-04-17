@@ -19,12 +19,12 @@
             "th": {"stroke": "#1f1f1f" },
             "jack-glyph": {"fill": " #052d68" },
 
-            "choice":  { "fill" : "g5", "stroke": { "color":"g50", "width":0.25}},
+            "choice":  { "fill" : "g5" },
             "choice-hover": { "stroke": { "color":"g10", "width":0.25}},
             "options-box": { "fill": "g80", "stroke": { "color":"#404040", "width":1}},
             "option-check": { "fill": "hsl(120, 50%, 40%)" },
-            "option-exit": { "stroke": { "color":"hsl(0, 0%, 10%)", "width":0.75}}},
-            "option-title": { "fill": "#000000" },
+            "option-exit": { "stroke": { "color":"hsl(0, 0%, 10%)", "width":0.75}},
+            "options-title": { "fill": "#000000" },
 
             "g-grid":  { "fill": { "gradient": [{ "index":0, "color":"hsl(0, 0%, 88%)"}, { "index":1, "color":"hsl(0, 0%, 78%)"}]}},
 

@@ -15,6 +15,13 @@
             "setting": { "fill": " hsl(60, 50%, 60%)" },
             "div": {"stroke": " #606060"},
 
+            "options-box": { "fill": "g20", "stroke": { "color":"g60", "width":1.25}},
+            "options-title": { "fill": " #f9eb6a" },
+            "choice":  { "fill" : "g75", "stroke": { "color":"g50", "width":0.25}},
+            "choice-hover": { "stroke": { "color":"hsl(41, 75%, 80%)", "width":0.25}},
+            "option-check": { "fill": "hsl(120, 50%, 40%)" },
+            "option-exit": { "stroke": { "color":" hsl(60, 50%, 90%)", "width":0.75}},
+
             "fb-dir": { "fill": "#cf7917" },
 
             "k#": { "fill": "#4095bf" },

@@ -16,10 +16,12 @@
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#233d4a"}, { "index":1, "color":"#0d1f28"}]}},
             "div": { "stroke": "#387390" },
 
-            "choice":  { "fill" : "hsl(200, 80%, 80%)", "stroke": { "color":"#233d4a", "width":0.25}},
+            "choice":  { "fill" : "hsl(200, 80%, 80%)" },
             "choice-hover": { "stroke": { "color":"hsl(60, 50%, 60%)", "width":0.25}},
             "options-box": { "fill": "hsl(200, 35.80%, 22%)", "stroke": { "color":"hsl(200, 50.00%, 60.00%)", "width":0.25}},
             "option-check": { "fill": "hsl(120, 50%, 50%)" },
+            "option-exit": { "stroke": { "color":" hsl(60, 50%, 90%)", "width":0.75}},
+            "options-title": { "fill": " #f9eb6a" },
 
             "k#": { "fill": "#4095bf" },
             "k-face": { "fill": { "gradient": [{ "index":0, "color":" #80afc7"}, { "index":1, "color":" #091921"}]}},
