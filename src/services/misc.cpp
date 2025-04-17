@@ -25,6 +25,23 @@ size_t format_buffer(char * buffer, size_t length, const char* fmt, ...)
     return r;
 }
 
+uint64_t parse_hex_u64(const std::string& str)
+{
+    if (str.empty()) return 0;
+    uint64_t result = 0;
+    for (char c: str) {
+        assert(std::isxdigit(c));
+        if (in_range(c, '0', '9')) {
+            result = (result << 4) | (c - '0');
+        } else if (in_range(c, 'a', 'f')) {
+            result = (result << 4) | (10 + c - 'a');
+        } else if (in_range(c, 'A', 'F')) {
+            result = (result << 4) | (10 + c - 'A');
+        }
+    }
+    return result;
+}
+
 // case-insensitive
 bool alpha_order(const std::string& a, const std::string& b)
 {
@@ -73,7 +90,7 @@ std::string collapse_space(const std::string &str)
     if (str.empty()) return "";
     std::string text;
     auto back = std::back_inserter(text);
-    bool in_space{std::isspace(*str.cbegin())};
+    bool in_space{bool(std::isspace(*str.cbegin()))};
     for (auto ch: str) {
         if (in_space) {
             if (!std::isspace(ch)) {

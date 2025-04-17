@@ -16,6 +16,9 @@ struct PresetList {
     uint8_t hardware{0};
     std::vector<std::shared_ptr<PresetInfo>> presets;
 
+    std::vector<std::shared_ptr<PresetInfo>> preset_view;
+    uint64_t filter_masks[5];
+
     bool modified{false};
 
     PresetList(PresetTab id):

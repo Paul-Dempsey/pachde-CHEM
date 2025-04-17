@@ -21,6 +21,8 @@
             "choice-hover": { "stroke": { "color":"hsl(60, 50%, 90%)", "width":0.25}},
             "options-box": { "fill": "hsl(327, 60%, 40%)", "stroke": { "color":"hsl(327, 90%, 20%)", "width":1.5}},
             "option-check": { "fill": "hsl(120, 80%, 60%)" },
+            "option-exit": { "stroke": { "color":"hsl(60, 50%, 90%)", "width":0.75}}},
+            "option-title": { "fill": "#f9eb6a" },
 
             "hexoid": { "fill": "#810047" },
             "CHEM": {"fill": " #810047"},
@@ -67,8 +69,8 @@
 
             "curpreset": { "fill": "rgb(255, 234, 44)" },
 
-            "tab-label":       { "fill": "g80" },
-            "tab-label-hi":    { "fill": "g95" },
+            "tab-label":       { "fill": "hsl(0, 0%, 92%)" },
+            "tab-label-hi":    { "fill": "hsl(0, 0%, 98%)" },
             "preset":          { "fill": "black" },
             "preset-live":     { "fill": " #6f9de3" },
             "preset-livetext": { "fill": " #8c72f5" },
@@ -79,6 +81,8 @@
             "preset-drag" :    { "fill": "#0b5202" },
             "preset-dragcur" : { "fill": "#38d723" },
             "preset-new":      { "fill": "#790b0b" },
+            "preset-cat":      { "fill": " hsl(90, 90%, 20%)" },
+            "preset-hover":    { "fill": "hsl(327, 60%, 80%)", "stroke": { "color":"g80", "width": 0.5 }},
 
             "inactive-favorite": { "stroke": "#e64747", "fill": "none" },
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },

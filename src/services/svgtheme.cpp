@@ -916,10 +916,32 @@ bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr
     return modified;
 }
 
+bool alpha_order(const std::string& a, const std::string& b)
+{
+    if (a.empty()) return false;
+    if (b.empty()) return true;
+    auto ita = a.cbegin();
+    auto itb = b.cbegin();
+    for (; ita != a.cend() && itb != b.cend(); ++ita, ++itb) {
+        if (*ita == *itb) continue;
+        auto c1 = std::tolower(*ita);
+        auto c2 = std::tolower(*itb);
+        if (c1 == c2) continue;
+        if (c1 < c2) return true;
+        return false;
+    }
+    if (ita == a.cend() && itb != b.cend()) {
+        return true;
+    }
+    return false;
+}
+
 void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable, void* context)
 {
     auto theme_names = themes.getThemeNames();
     if (theme_names.empty()) return; // no themes
+
+    std::sort(theme_names.begin(), theme_names.end(), alpha_order);
 
     for (auto theme : theme_names) {
         menu->addChild(createCheckMenuItem(

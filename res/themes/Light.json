@@ -23,6 +23,9 @@
             "choice-hover": { "stroke": { "color":"g10", "width":0.25}},
             "options-box": { "fill": "g80", "stroke": { "color":"#404040", "width":1}},
             "option-check": { "fill": "hsl(120, 50%, 40%)" },
+            "option-exit": { "stroke": { "color":"hsl(0, 0%, 10%)", "width":0.75}}},
+            "option-title": { "fill": "#000000" },
+
             "g-grid":  { "fill": { "gradient": [{ "index":0, "color":"hsl(0, 0%, 88%)"}, { "index":1, "color":"hsl(0, 0%, 78%)"}]}},
 
             "sctn": { "fill": { "gradient": [{ "index":0, "color":"#e6e6e6"}, { "index":1, "color":"#e0e0e0"}]}},
@@ -64,12 +67,15 @@
             "preset":          { "fill": "g20" },
             "preset-live":     { "fill": " #250b91" },
             "preset-livetext": { "fill": " #3c2a84" },
-            "preset-current":  { "fill": " #06833c" },
+            "preset-current":  { "fill": "rgb(4, 97, 45)" },
             "preset-selected": { "fill": "brand" },
             "preset-seltext":  { "fill": "g10" },
             "preset-grip":     { "fill":"#000000", "opacity": 0.4 },
             "preset-drag" :    { "fill": " #9d9131" },
             "preset-dragcur" : { "fill": " #9d9131"},
+            "preset-cat":      { "fill": " hsl(200, 90%, 35%)" },
+            "preset-hover":    { "fill": "hsl(0, 0%, 90%)", "stroke": { "color":"g50", "width": 0.5 }},
+
             "grid-bg":         { "fill": " #d6d6d6" },
             "grid-line":       { "stroke": "rack-white" },
             "grid-new":        { "fill": "hsl(220, 50%, 80%)" },

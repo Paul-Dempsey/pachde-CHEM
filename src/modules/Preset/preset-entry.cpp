@@ -55,6 +55,8 @@ bool PresetEntry::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTh
     preset_element.apply_theme(theme);
     live_element.apply_theme(theme);
     current_element.apply_theme(theme);
+    hover_element.apply_theme(theme);
+    category_style.apply_theme(theme);
     label->applyTheme(theme_engine, theme);
     return true;
 }

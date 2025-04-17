@@ -61,6 +61,9 @@
             "preset-grip":     { "fill":"#9d9131", "opacity": 0.4 },
             "preset-drag" :    { "fill": "#9d9131" },
             "preset-dragcur" : { "fill": "#9d9131", "opacity": 0.4 },
+            "preset-cat":      { "fill": " hsl(90, 60%, 65%)" },
+            "preset-hover":    { "fill": "hsl(200, 100%, 20%)", "stroke": { "color":"g80", "width": 0.5 }},
+
             "grid-bg":         { "fill": "hsl(190, 50%, 15%)" },
             "grid-line":       { "stroke": "hsl(200, 35.80%, 21.40%)" },
             "grid-new":        { "fill": "hsl(206, 40%, 30%)" },

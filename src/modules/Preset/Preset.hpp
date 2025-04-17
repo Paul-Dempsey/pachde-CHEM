@@ -12,6 +12,7 @@
 #include "preset-common.hpp"
 #include "preset-entry.hpp"
 #include "preset-list.hpp"
+#include "filter-widget.hpp"
 #include "search-widget.hpp"
 
 using namespace pachde;
@@ -20,11 +21,6 @@ struct PresetUi;
 struct PresetModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
-        P_CAT,
-        P_TYPE,
-        P_CHARACTER,
-        P_MATRIX,
-        P_GEAR,
         NUM_PARAMS
     };
     enum Inputs {
@@ -47,6 +43,12 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     PresetTab active_tab{PresetTab::System};
     PresetOrder user_order{PresetOrder::Natural};
     PresetOrder system_order{PresetOrder::Alpha};
+
+    uint64_t cat_filter{0};
+    uint64_t type_filter{0};
+    uint64_t character_filter{0};
+    uint64_t matrix_filter{0};
+    uint64_t gear_filter{0};
 
     PresetModule();
     ~PresetModule() {
@@ -85,7 +87,6 @@ struct Tab {
     PresetTab id() { return list.tab; }
     size_t count() { return list.count(); }
     void clear() { list.clear(); }
-    uint64_t filter_masks[5];
 };
 
 struct DBBuilder {
@@ -126,8 +127,13 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
-    PresetMenu* menu;
-    
+    PresetMenu* menu{nullptr};
+    CatFilter* cat_filter{nullptr};
+    TypeFilter* type_filter{nullptr};
+    CharacterFilter* character_filter{nullptr};
+    MatrixFilter* matrix_filter{nullptr};
+    GearFilter* gear_filter{nullptr};
+
     std::shared_ptr<PresetDescription> live_preset;
 
     PresetTab active_tab_id{PresetTab::System};
@@ -211,6 +217,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void onButton(const ButtonEvent&e) override;
     void onSelectKey(const SelectKeyEvent &e) override;
     void onHoverScroll(const HoverScrollEvent & e) override;
+    void onRemove(const RemoveEvent& e) override;
 
     void step() override;
     void draw(const DrawArgs& args) override;

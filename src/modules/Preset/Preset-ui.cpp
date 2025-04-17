@@ -187,15 +187,24 @@ PresetUi::PresetUi(PresetModule *module) :
 
     const float FILTER_DY = 20.f;
     y = 168.f;
-    addChild(Center(createThemedParamButton<CatParamButton>(Vec(x,y), my_module, PM::P_CAT, theme_engine, theme)));
+    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme)));
     y += FILTER_DY;
-    addChild(Center(createThemedParamButton<TypeParamButton>(Vec(x,y), my_module, PM::P_TYPE, theme_engine, theme)));
+    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme)));
     y += FILTER_DY;
-    addChild(Center(createThemedParamButton<CharacterParamButton>(Vec(x,y), my_module, PM::P_CHARACTER, theme_engine, theme)));
+    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme)));
     y += FILTER_DY;
-    addChild(Center(createThemedParamButton<MatrixParamButton>(Vec(x,y), my_module, PM::P_MATRIX, theme_engine, theme)));
+    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme)));
     y += FILTER_DY;
-    addChild(Center(createThemedParamButton<GearParamButton>(Vec(x,y), my_module, PM::P_GEAR, theme_engine, theme)));
+    addChild(Center(gear_filter = makeGearFilter(Vec(x,y), theme_engine, theme)));
+
+    if (my_module) {
+        cat_filter->set_state(my_module->cat_filter);
+        type_filter->set_state(my_module->type_filter);
+        character_filter->set_state(my_module->character_filter);
+        matrix_filter->set_state(my_module->matrix_filter);
+        gear_filter->set_state(my_module->gear_filter);
+    }
+
 
     // preset grid
     const float PRESET_TOP = 38.f;
@@ -797,6 +806,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
         Base::onSelectKey(e);
         return;
     }
+    auto mods = e.mods & RACK_MOD_MASK;
     Tab& tab = active_tab();
     if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT))
     {
@@ -812,7 +822,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             return;
 
         case GLFW_KEY_ENTER:
-            if (0 == (e.mods & RACK_MOD_MASK))  {
+            if (0 == mods)  {
                 if ((tab.current_index >= 0) && host_available()) {
                     chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
                 }
@@ -820,8 +830,30 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             e.consume(this);
             return;
 
+        case GLFW_KEY_HOME:
+            if (0 == mods)  {
+                tab.current_index = tab.scroll_top;
+                scroll_to_page_of_index(tab.current_index);
+            } else if (mods & RACK_MOD_CTRL) {
+                tab.current_index = 0;
+                scroll_to_page_of_index(0);
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_END:
+            if (0 == mods)  {
+                tab.current_index = tab.scroll_top + PAGE_CAPACITY - 1;
+                scroll_to_page_of_index(tab.current_index);
+            } else if (mods & RACK_MOD_CTRL) {
+                tab.current_index = tab.count() - 1;
+                scroll_to_page_of_index(tab.current_index);
+            }
+            e.consume(this);
+            return;
+
         case GLFW_KEY_UP:
-            if (0 == (e.mods & RACK_MOD_MASK))  {
+            if (0 == mods)  {
                 if (tab.current_index < 0) {
                     tab.current_index = 0;
                     scroll_to_page_of_index(0);
@@ -836,7 +868,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             return;
 
         case GLFW_KEY_PAGE_UP:
-            if (e.mods & RACK_MOD_CTRL) {
+            if (mods & RACK_MOD_CTRL) {
                 page_up(false, (e.mods & RACK_MOD_SHIFT));
                 e.consume(this);
                 return;
@@ -854,7 +886,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             return;
 
         case GLFW_KEY_DOWN:
-            if (0 == (e.mods & RACK_MOD_MASK)) {
+            if (0 == mods) {
                 if (tab.current_index < 0) {
                     tab.current_index = 0;
                     scroll_to_page_of_index(0);
@@ -865,8 +897,9 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             }
             e.consume(this);
             return;
+            
         case GLFW_KEY_PAGE_DOWN:
-            if (0 == (e.mods & RACK_MOD_MASK)) {
+            if (0 == mods) {
                 if (tab.current_index < 0) {
                 tab.current_index = 0;
                 scroll_to_page_of_index(0);
@@ -879,7 +912,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             return;
 
         case GLFW_KEY_RIGHT:
-            if (0 == (e.mods & RACK_MOD_MASK)) {
+            if (0 == mods) {
                 if (tab.current_index < 0) {
                     tab.current_index = 0;
                     scroll_to_page_of_index(0);
@@ -892,7 +925,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             return;
 
         case GLFW_KEY_LEFT:
-            if (0 == (e.mods & RACK_MOD_MASK)) {
+            if (0 == mods) {
                 if (tab.current_index < 0) {
                     tab.current_index = 0;
                     scroll_to_page_of_index(0);
@@ -923,6 +956,17 @@ void PresetUi::onHoverScroll(const HoverScrollEvent &e)
         return;
     }
     Base::onHoverScroll(e);
+}
+
+void PresetUi::onRemove(const RemoveEvent &e)
+{
+    if (my_module) {
+        my_module->cat_filter = cat_filter->get_state();
+        my_module->type_filter = type_filter->get_state();
+        my_module->character_filter = character_filter->get_state();
+        my_module->matrix_filter = matrix_filter->get_state();
+        my_module->gear_filter = gear_filter->get_state();
+    }
 }
 
 void PresetUi::step()

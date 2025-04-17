@@ -22,6 +22,7 @@ struct IPresetAction {
     virtual void onChoosePreset(PresetWidget* source) = 0;
     virtual PresetWidget* getDropTarget(Vec pos) = 0;
     virtual void onDropPreset(PresetWidget* target) = 0;
+    virtual Widget* widget() = 0;
 };
 
 class PresetWidget : public OpaqueWidget, public IApplyTheme

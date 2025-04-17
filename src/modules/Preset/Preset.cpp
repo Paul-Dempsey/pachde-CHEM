@@ -3,114 +3,6 @@
 PresetModule::PresetModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
-
-    configSwitch(P_CAT, 0.f, 13.f, 0.f, "Category", {
-        "- any -",
-        "Strings",
-        "Winds",
-        "Vocal",
-        "Keyboard",
-        "Classic",
-        "Other",
-        "Percussion",
-        "Tuned Percussion",
-        "Processor",
-        "Drone",
-        "Midi",
-        "Control Voltage",
-        "Utility"
-    });
-    configSwitch(P_TYPE, 0.f, 14.f, 0.f, "Type", {
-        "- any -",
-        "Atonal",
-        "Bass",
-        "Bowed",
-        "Brass",
-        "Demo Preset",
-        "Electric Piano",
-        "Flute",
-        "Lead",
-        "Organ",
-        "Pad",
-        "Plucked",
-        "Double Reed",
-        "Single Reed",
-        "Struck"
-    });
-    configSwitch(P_CHARACTER, 0.f, 39.f, 0.f, "Character", {
-        "- any -",
-        "Acoustic",
-        "Aggressive",
-        "Airy",
-        "Analog",
-        "Arpeggio",
-        "Big",
-        "Bright",
-        "Chords",
-        "Clean",
-        "Dark",
-        "Digital",
-        "Distorted",
-        "Dry",
-        "Echo",
-        "Electric",
-        "Ensemble",
-        "Evolving",
-        "FM",
-        "Hybrid",
-        "Icy",
-        "Intimate",
-        "Lo-fi",
-        "Looping",
-        "Layered",
-        "Morphing",
-        "Metallic",
-        "Nature",
-        "Noise",
-        "Random",
-        "Reverberant",
-        "Sound Design",
-        "Stereo",
-        "Shaking",
-        "Simple",
-        "Soft",
-        "Strumming",
-        "Synthetic",
-        "Warm",
-        "Woody"
-    });
-    configSwitch(P_MATRIX, 0.f, 18.f, 0.f, "EaganMatrix", {
-        "- any -",
-        "Additive",
-        "BiqBank",
-        "BiqGraph",
-        "BiqMouth",
-        "Cutoff Mod",
-        "Formula Delay",
-        "Micro Delay",
-        "Sum Delay",
-        "Voice Delay",
-        "HarMan",
-        "Kinetic",
-        "ModMan",
-        "Osc Jenny",
-        "Osc Phase",
-        "Osc DSF",
-        "SineBank",
-        "SineSpray",
-        "WaveBank"
-    });
-    configSwitch(P_GEAR, 0.f, 8.f, 0.f, "Setting", {
-        "- any - ",
-        "Channel 1",
-        "External Midi Clock",
-        "Mono Interval",
-        "Portamento",
-        "Rounding",
-        "Split Voice",
-        "Single Voice",
-        "Touch Area"
-    });
 }
 
 void PresetModule::dataFromJson(json_t *root)
@@ -124,6 +16,13 @@ void PresetModule::dataFromJson(json_t *root)
     active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
     user_order = PresetOrder(get_json_int(root, "user-sort-order", int(PresetOrder::Natural)));
     system_order = PresetOrder(get_json_int(root, "system-sort-order", int(PresetOrder::Alpha)));
+    
+    cat_filter = parse_hex_u64(get_json_string(root, "cat-filter"));
+    type_filter = parse_hex_u64(get_json_string(root, "type-filter"));
+    character_filter = parse_hex_u64(get_json_string(root, "character-filter"));
+    matrix_filter = parse_hex_u64(get_json_string(root, "matrix-filter"));
+    gear_filter = parse_hex_u64(get_json_string(root, "gear-filter"));
+
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -138,6 +37,11 @@ json_t* PresetModule::dataToJson()
     json_object_set_new(root, "tab", json_integer(int(active_tab)));
     json_object_set_new(root, "user-sort-order", json_integer(int(user_order)));
     json_object_set_new(root, "system-sort-order", json_integer(int(system_order)));
+    json_object_set_new(root, "cat-filter", json_string(u64_to_string(cat_filter).c_str()));
+    json_object_set_new(root, "type-filter", json_string(u64_to_string(type_filter).c_str()));
+    json_object_set_new(root, "character-filter", json_string(u64_to_string(character_filter).c_str()));
+    json_object_set_new(root, "matrix-filter", json_string(u64_to_string(matrix_filter).c_str()));
+    json_object_set_new(root, "gear-filter", json_string(u64_to_string(gear_filter).c_str()));
     return root;
 }
 

@@ -79,7 +79,7 @@ ProtoUi::ProtoUi(ProtoModule *module) :
         "Warm",
         "Woody"
     };
-    bits = new BitsWidget(0, 10, items, [=](int item){
+    bits = new BitsWidget("Character", 10, 42.f, items, [=](int item){
         label->text(format_string("x%0.8llx | %d", bits->state, item));
     }, theme_engine, theme);
     bits->box.pos.x = 15.f;

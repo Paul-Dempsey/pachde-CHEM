@@ -36,11 +36,6 @@ PresetWidget::PresetWidget()
 
 bool PresetWidget::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
 {
-    // if (!preset_name) {
-    //     LabelStyle style{"preset", TextAlignment::Left, 14.f};
-    //     preset_name = createStaticTextLabel<TipLabel>(Vec(2.5f, 2.5f), 145.f, "", theme_engine, theme, style);
-    //     addChild(preset_name);
-    // }
     wire_style = theme->name == "Wire";
     grip_color =          fromPacked(theme->getFillColor("preset-grip", true));
     live_color =          fromPacked(theme->getFillColor("preset-live", true));
@@ -123,6 +118,7 @@ void PresetWidget::onHoverKey(const HoverKeyEvent& e)
             e.consume(this);
             stop_drag();
             agent->onChoosePreset(this);
+            APP->event->setSelectedWidget(agent->widget());
         }
         break;
 
@@ -131,6 +127,7 @@ void PresetWidget::onHoverKey(const HoverKeyEvent& e)
             e.consume(this);
             set_selected(!selected);
             agent->onSetSelection(this, selected);
+            APP->event->setSelectedWidget(agent->widget());
         }
         break;
 
@@ -173,6 +170,7 @@ void PresetWidget::onButton(const ButtonEvent&e)
                     }
                 }
                 button_down = false;
+                APP->event->setSelectedWidget(agent->widget());
             }
             break;
 
