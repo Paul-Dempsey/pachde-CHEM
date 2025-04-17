@@ -45,6 +45,7 @@ SOURCES += src/services/text.cpp
 
 # widgets
 SOURCES += src/widgets/blip-widget.cpp
+SOURCES += src/widgets/bits-widget.cpp
 SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
@@ -57,8 +58,8 @@ SOURCES += src/widgets/uniform-style.cpp
 
 # modules
 
-#SOURCES += src/modules/_proto/proto.cpp
-#SOURCES += src/modules/_proto/proto-ui.cpp
+SOURCES += src/modules/_proto/proto.cpp
+SOURCES += src/modules/_proto/proto-ui.cpp
 
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
@@ -99,6 +100,7 @@ SOURCES += src/modules/Preset/Preset-ui.cpp
 SOURCES += src/modules/Preset/preset-entry.cpp
 SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/search-widget.cpp
+SOURCES += src/modules/Preset/filter-widget.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets
