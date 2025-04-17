@@ -6,24 +6,30 @@
       <stop offset="0" stop-color="#282828" />
       <stop offset="1" stop-color="#181818" />
    </linearGradient>
-   <g id="g1">
+    <linearGradient id="grid-grad" x1="45%" y1="0" x2="50%" y2="100%" gradientUnits="objectBoundingBox" >
+      <stop stop-color="#404040" offset="0" />
+      <stop stop-color="#242424" offset="1" />
+    </linearGradient>
+   <g>
       <rect id="g-panel" fill="url(#panel-gradient)" width="210" height="380" x="0" y="0" />
       <g id="grid">
-         <rect fill="#333333" id="grid-bg" width="150" height="300" x="12" y="32" stroke-width=".5" />
-         <path transform="translate(12, 52)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl1--grid-line" />
-         <path transform="translate(12, 72)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl2--grid-line" />
-         <path transform="translate(12, 92)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl3--grid-line" />
-         <path transform="translate(12, 112)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl4--grid-line" />
-         <path transform="translate(12, 132)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl5--grid-line" />
-         <path transform="translate(12, 152)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl6--grid-line" />
-         <path transform="translate(12, 172)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl7--grid-line" />
-         <path transform="translate(12, 192)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl8--grid-line" />
-         <path transform="translate(12, 212)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl9--grid-line" />
-         <path transform="translate(12, 232)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl10--grid-line" />
-         <path transform="translate(12, 252)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl11--grid-line" />
-         <path transform="translate(12, 272)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl12--grid-line" />
-         <path transform="translate(12, 292)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl13--grid-line" />
-         <path transform="translate(12, 312)" stroke="#1f1f1f" stroke-width="1px" d="M 0,0 H 150 Z" id="gl14--grid-line" />
+         <path fill="url(#grid-grad)" id="g-grid" d="
+            M 12,34 h 150 v 18 h -150 z
+            M 12,54 h 150 v 18 h -150 z
+            M 12,74 h 150 v 18 h -150 z
+            M 12,94 h 150 v 18 h -150 z
+            M 12,114 h 150 v 18 h -150 z
+            M 12,134 h 150 v 18 h -150 z
+            M 12,154 h 150 v 18 h -150 z
+            M 12,174 h 150 v 18 h -150 z
+            M 12,194 h 150 v 18 h -150 z
+            M 12,214 h 150 v 18 h -150 z
+            M 12,234 h 150 v 18 h -150 z
+            M 12,254 h 150 v 18 h -150 z
+            M 12,274 h 150 v 18 h -150 z
+            M 12,294 h 150 v 18 h -150 z
+            M 12,314 h 150 v 18 h -150 z
+            " />
          <rect fill="#464060" id="grid-new" width="150" height="21" x="12" y="336" />
       </g>
 

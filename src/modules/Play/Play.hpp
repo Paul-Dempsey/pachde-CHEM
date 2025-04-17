@@ -79,7 +79,7 @@ struct PlayModule : ChemModule, IChemClient
 enum class FillOptions { None, User, System, All };
 struct EmHandler;
 struct PlayMenu;
-constexpr const int PLAYLIST_LENGTH = 15;
+constexpr const int PAGE_CAPACITY = 15;
 
 struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 {
@@ -145,11 +145,13 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void sync_to_presets();
     void update_live();
     void update_up_down();
-    void page_up(bool ctrl, bool shift, bool refresh);
-    void page_down(bool ctrl, bool shift, bool refresh);
+    void page_up(bool ctrl, bool shift);
+    void page_down(bool ctrl, bool shift);
     void make_visible(ssize_t index);
-    void scroll_to(ssize_t index, bool refresh);
+    void scroll_to(ssize_t index);
     void scroll_to_live();
+    void scroll_to_page_of_index(ssize_t index);
+    ssize_t page_index_of_index(ssize_t index);
     bool is_visible(ssize_t index);
     bool load_playlist(std::string path, bool set_folder);
     void add_live();
@@ -188,12 +190,17 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void onChoosePreset(PresetWidget* source) override;
     PresetWidget* getDropTarget(Vec pos) override;
     void onDropPreset(PresetWidget* target) override;
-    
+    Widget* widget() override { return this; }
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-play.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;
+    void onButton(const ButtonEvent&e) override;
+    void onSelectKey(const SelectKeyEvent &e) override;
+    void onHoverScroll(const HoverScrollEvent & e) override;
+
     void step() override;
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;

@@ -128,7 +128,7 @@ PlayUi::PlayUi(PlayModule *module) :
     }
 
     float y = PRESETS_TOP;
-    for (int i = 0; i < 15; ++i) {
+    for (int i = 0; i < PAGE_CAPACITY; ++i) {
         auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme_engine, theme);
         if (!module) {
             pw->set_text(in_range(i, 4, 14) ? "..." : format_string("[preset #%d]", 1 + i));
@@ -145,7 +145,7 @@ PlayUi::PlayUi(PlayModule *module) :
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    LabelStyle style{"dytext", TextAlignment::Left, 16.f};
+    LabelStyle style{"dytext", TextAlignment::Left, 14.f};
     addChild(playlist_label = createLabel<TipLabel>(
         Vec(ONEU, 16), 148.f, "My Favorites", theme_engine, theme, style));
     playlist_label->glowing(true);
@@ -182,7 +182,7 @@ PlayUi::PlayUi(PlayModule *module) :
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
     up_button->describe("Page up");
     up_button->setHandler([this](bool c, bool s){ 
-        page_up(c, s, true);
+        page_up(c, s);
     });
     up_button->applyTheme(theme_engine, theme);
     addChild(up_button);
@@ -190,7 +190,7 @@ PlayUi::PlayUi(PlayModule *module) :
     down_button = createWidgetCentered<DownButton>(Vec(RIGHT_MARGIN_CENTER, 67.f));
     down_button->describe("Page down");
     down_button->setHandler([this](bool c, bool s){
-        page_down(c, s, true);
+        page_down(c, s);
     });
     down_button->applyTheme(theme_engine, theme);
     addChild(down_button);
@@ -306,7 +306,7 @@ void PlayUi::add_live()
     if (it == presets.cend()) {
         presets.push_back(live_preset);
         set_modified(true);
-        page_down(true, false, true);
+        page_down(true, false);
     } else {
         auto cit = std::find_if(preset_widgets.cbegin(), preset_widgets.cend(), [this](PresetWidget* pw) {
             return pw->get_preset_id() == live_preset->id;
@@ -342,7 +342,6 @@ void PlayUi::sync_to_current_index()
     }
     make_visible(current_index);
     select_preset(current_preset->id);
-
 }
 
 void PlayUi::widgets_clear_current()
@@ -555,7 +554,7 @@ void PlayUi::select_none()
 {
     if (selected.empty()) return;
     clear_selected();
-    scroll_to(scroll_top, true);
+    scroll_to(scroll_top);
 }
 
 void PlayUi::onConnectHost(IChemHost* host)
@@ -596,74 +595,72 @@ void PlayUi::update_live()
 void PlayUi::update_up_down()
 {
     bool up{false}, down{false};
-    if (presets.size() > PLAYLIST_LENGTH) {
+    if (presets.size() > PAGE_CAPACITY) {
         up = scroll_top > 0;
-        down = scroll_top < preset_count() - PLAYLIST_LENGTH;
+        down = scroll_top < preset_count() - PAGE_CAPACITY;
     }
     up_button->enable(up);
     down_button->enable(down);
 
-    int page  = 1 + (scroll_top / PLAYLIST_LENGTH);
-    int total = 1 + (preset_count() / PLAYLIST_LENGTH);
+    int page  = 1 + (scroll_top / PAGE_CAPACITY);
+    int total = 1 + (preset_count() / PAGE_CAPACITY);
     page_label->text(format_string("%d of %d", page, total));
 }
 
-void PlayUi::page_up(bool ctrl, bool shift, bool refresh)
+void PlayUi::page_up(bool ctrl, bool shift)
 {
     if (ctrl || presets.empty()) {
-        scroll_to(0, refresh);
+        scroll_to(0);
     } else {
-        scroll_to(std::max(SSIZE_0, scroll_top - PLAYLIST_LENGTH), refresh);
+        scroll_to(std::max(SSIZE_0, scroll_top - PAGE_CAPACITY));
     }
 }
 
-void PlayUi::page_down(bool ctrl, bool shift, bool refresh)
+void PlayUi::page_down(bool ctrl, bool shift)
 {
-    ssize_t last_page = (preset_count() / PLAYLIST_LENGTH) * PLAYLIST_LENGTH;
+    ssize_t last_page = (preset_count() / PAGE_CAPACITY) * PAGE_CAPACITY;
 
     if (ctrl) {
-        scroll_to(last_page, refresh);
+        scroll_to(last_page);
     } else {
-        ssize_t next_page = 1 + (scroll_top / PLAYLIST_LENGTH);
-        scroll_to(std::min(last_page, next_page) * PLAYLIST_LENGTH, refresh);
+        ssize_t next_page = 1 + (scroll_top / PAGE_CAPACITY);
+        scroll_to(std::min(last_page, next_page) * PAGE_CAPACITY);
     }
 }
 
-void PlayUi::scroll_to(ssize_t pos, bool refresh)
+void PlayUi::scroll_to(ssize_t pos)
 {
     // if (pos < 0) {
     //     pos = 0;
     //     refresh = true;
-    // } else if (pos > preset_count() - PLAYLIST_LENGTH) {
-    //     pos = preset_count() - PLAYLIST_LENGTH;
+    // } else if (pos > preset_count() - PAGE_CAPACITY) {
+    //     pos = preset_count() - PAGE_CAPACITY;
     //     refresh = true;
     // }
     assert(pos >= SSIZE_0);
 
-    if (scroll_top != pos || refresh) {
-        scroll_top = pos;
-        auto live_id = get_live_id();
-        auto sit = get_selected_indices().cbegin();
+    scroll_top = pos;
+    auto live_id = get_live_id();
+    auto sit = get_selected_indices().cbegin();
 
-        auto pit = presets.cbegin() + pos;
-        for (auto pw : preset_widgets) {
-            pw->clear_states();
-            if (pit != presets.cend()) {
-                pw->set_preset(pos, current_preset == *pit, live_id == (*pit)->id, *pit);
+    auto pit = presets.cbegin() + pos;
+    for (auto pw : preset_widgets) {
+        pw->clear_states();
+        if (pit != presets.cend()) {
+            pw->set_preset(pos, current_index == pos, live_id == (*pit)->id, *pit);
 
-                if (sit != selected.cend()) {
-                    bool is_selected = (pos == *sit);
-                    pw->set_selected(is_selected);
-                    if (is_selected) sit++;
-                } else {
-                    pw->set_selected(false);
-                }
-
-                ++pos;
-                pit++;
+            if (sit != selected.cend()) {
+                bool is_selected = (pos == *sit);
+                pw->set_selected(is_selected);
+                if (is_selected) sit++;
             } else {
-                pw->clear_preset();
+                pw->set_selected(false);
             }
+
+            ++pos;
+            pit++;
+        } else {
+            pw->clear_preset();
         }
     }
     update_up_down();
@@ -671,7 +668,7 @@ void PlayUi::scroll_to(ssize_t pos, bool refresh)
 
 void PlayUi::make_visible(ssize_t index)
 {
-    scroll_to((index / PLAYLIST_LENGTH) * PLAYLIST_LENGTH, true);
+    scroll_to_page_of_index(index);
 }
 
 void PlayUi::scroll_to_live()
@@ -684,6 +681,18 @@ void PlayUi::scroll_to_live()
     if (it != presets.cend()) {
         make_visible(it - presets.cbegin());
     }
+}
+
+void PlayUi::scroll_to_page_of_index(ssize_t index)
+{
+    scroll_to(page_index_of_index(index));
+}
+
+ssize_t PlayUi::page_index_of_index(ssize_t index)
+{
+    index = std::max(ssize_t(0), index);
+    index = std::min(ssize_t(presets.size() - 1), index);
+    return PAGE_CAPACITY * (index / PAGE_CAPACITY);
 }
 
 int PlayUi::first_selected()
@@ -736,7 +745,7 @@ void PlayUi::clone()
         selected.push_back(index--);
     }
     std::sort(selected.begin(), selected.end());
-    page_down(true, false, true);
+    page_down(true, false);
     set_modified(true);
 }
 
@@ -776,7 +785,7 @@ void PlayUi::to_first()
         selected.push_back(static_cast<int>(i));
     }
     std::sort(selected.begin(), selected.end());
-    page_up(true, false, true);
+    page_up(true, false);
     set_modified(true);
 }
 
@@ -797,7 +806,7 @@ void PlayUi::to_last()
         selected.push_back(index--);
     }
     std::sort(selected.begin(), selected.end());
-    page_down(true, false, true);
+    page_down(true, false);
     set_modified(true);
 }
 
@@ -840,7 +849,7 @@ void PlayUi::to_n(int dx)
     }
     assert(xit == extracted.cend());
     int first = dx < 0 ? first_selected() : last_selected();
-    scroll_to((first / PLAYLIST_LENGTH) * PLAYLIST_LENGTH, true);
+    scroll_to((first / PAGE_CAPACITY) * PAGE_CAPACITY);
     set_modified(true);
 }
 
@@ -1009,7 +1018,7 @@ void PlayUi::onSetSelection(PresetWidget* source, bool on)
     } else {
         unselect_item(index);
     }
-    scroll_to(scroll_top, true);
+    scroll_to(scroll_top);
 }
 
 void PlayUi::onDelete(PresetWidget* source)
@@ -1146,51 +1155,135 @@ void PlayUi::onDropPreset(PresetWidget* target)
 
 void PlayUi::onHoverKey(const HoverKeyEvent& e)
 {
-    auto mods = e.mods & RACK_MOD_MASK;
-    switch (e.key) {
-    case GLFW_KEY_ESCAPE: {
-        if ((e.action == GLFW_RELEASE) && (0 == mods)) {
-            e.consume(this);
-            select_none();
-        }
-    } break;
-
-    case GLFW_KEY_HOME:
-        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
-            e.consume(this);
-            scroll_to(0, true);
-        }
-        break;
-
-    case GLFW_KEY_END:
-        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
-            e.consume(this);
-            page_down(true, false, true);
-        }
-        break;
-
-    case GLFW_KEY_PAGE_UP: 
-        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
-            e.consume(this);
-            page_up(false, false, true);
-        }
-        break;
-
-    case GLFW_KEY_PAGE_DOWN: 
-        if ((e.action == GLFW_RELEASE) && (mods == GLFW_MOD_ALT)) {
-            e.consume(this);
-            page_down(false, false, true);
-        }
-        break;
-
-    case GLFW_KEY_MENU:
-        if ((e.action == GLFW_RELEASE) && (0 == mods)) {
-            e.consume(this);
-            createContextMenu();
-        }
-        break;
-    }
     Base::onHoverKey(e);
+}
+
+void PlayUi::onButton(const ButtonEvent &e)
+{
+    Base::onButton(e);
+}
+
+void PlayUi::onSelectKey(const SelectKeyEvent &e)
+{
+    if (APP->event->getSelectedWidget() != this) {
+        Base::onSelectKey(e);
+        return;
+    }
+    auto mods = e.mods & RACK_MOD_MASK;
+    if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT)) {
+        switch (e.key) {
+        case GLFW_KEY_ESCAPE:
+            if (0 == mods) {
+                select_none();
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_ENTER:
+            if (current_index < 0) {
+            } else {
+                current_preset = presets[current_index];
+                auto haken = chem_host->host_haken();
+                if (haken) {
+                    if (haken->log) {
+                        haken->log->log_message("play", format_string("Selecting %s", current_preset->summary().c_str()));
+                    }
+                    haken->select_preset(ChemId::Play, current_preset->id);
+                } 
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_UP:
+            if (current_index < 0) {
+                current_index = 0;
+                scroll_to(0);
+            } else if ((0 == mods) && current_index > 0) {
+                current_index--;
+                scroll_to_page_of_index(current_index);
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_DOWN:
+            if (current_index < 0) {
+                current_index = 0;
+                scroll_to(0);
+            } else if ((0 == mods) && (current_index < ssize_t(presets.size())-1)) {
+                current_index++;
+                scroll_to_page_of_index(current_index);
+            }
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_HOME:
+            if (0 == mods) {
+                current_index = scroll_top;
+            } else if (mods & RACK_MOD_CTRL) {
+                current_index = 0;
+            }
+            scroll_to(current_index);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_END:
+            if (0 == mods) {
+                current_index = std::min(ssize_t(presets.size()) - 1, scroll_top + PAGE_CAPACITY - 1);
+            } else if (mods & RACK_MOD_CTRL) {
+                current_index = presets.size() -1;
+            }
+            scroll_to_page_of_index(current_index);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_PAGE_UP: 
+            if (current_index < 0) {
+                page_up(false, false);
+            } else {
+                current_index = std::max(ssize_t(0), current_index - PAGE_CAPACITY);
+            }
+            scroll_to_page_of_index(current_index);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_PAGE_DOWN: 
+            if (current_index < 0) {
+                page_down(false, false);
+            } else {
+                current_index = std::min(ssize_t(presets.size()) - 1, current_index + PAGE_CAPACITY);
+            }
+            scroll_to_page_of_index(current_index);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_MENU:
+            if (0 == mods) {
+                e.consume(this);
+                createContextMenu();
+                return;
+            }
+            break;
+        }
+    }
+    Base::onSelectKey(e);
+}
+
+void PlayUi::onHoverScroll(const HoverScrollEvent &e)
+{
+    if (in_range(e.pos.x, PRESETS_LEFT, PRESETS_LEFT + 150.f) && in_range(e.pos.y, PRESETS_TOP, 340.f)) {
+        int delta = 5 * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
+        auto mods = APP->window->getMods();
+        if (mods & GLFW_MOD_CONTROL) {
+            delta *= 3.f;
+        }
+        ssize_t index = scroll_top + delta;
+        if (index > ssize_t(presets.size()) - PAGE_CAPACITY) index = presets.size() - PAGE_CAPACITY;
+        if (index < 0) index = 0;
+        scroll_to(index);
+        e.consume(this);
+        return;
+    }
+    Base::onHoverScroll(e);
 }
 
 void PlayUi::step()
