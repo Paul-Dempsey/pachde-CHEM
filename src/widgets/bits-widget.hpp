@@ -19,7 +19,7 @@ struct BitsWidget : OpaqueWidget, IApplyTheme
     std::vector<TextLabel*> labels;
     TextLabel* title;
 
-    std::function<void(int item)> change_fn{nullptr};
+    std::function<void(uint64_t item)> change_fn{nullptr};
 
     LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
     ElementStyle envelope{"options-box", "#282828", "hsl(0, 0%, 65%)", 1.25f};
@@ -32,9 +32,9 @@ struct BitsWidget : OpaqueWidget, IApplyTheme
         int rows,
         float item_width,
         const std::vector<std::string>& items,
-        std::function<void(int item)> on_change,
         SvgThemeEngine& theme_engine,
-        std::shared_ptr<svg_theme::SvgTheme> theme
+        std::shared_ptr<svg_theme::SvgTheme> theme,
+        std::function<void(uint64_t state)> on_change
     );
     bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override;
     uint64_t get_state() { return state; }

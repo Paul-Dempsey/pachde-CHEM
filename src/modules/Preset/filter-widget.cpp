@@ -3,15 +3,24 @@
 namespace pachde {
 
 template <typename TFilter>
-TFilter* makeFilter(Vec pos, const std::string&name, int rows, float item_width, std::vector<std::string>& items, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+TFilter* makeFilter(
+    Vec pos,
+    const std::string&name,
+    int rows,
+    float item_width,
+    std::vector<std::string>& items,
+    SvgThemeEngine &engine,
+    std::shared_ptr<SvgTheme> theme,
+    std::function<void(uint64_t item)> on_change
+    )
 {
     TFilter* o = new TFilter();
     o->box.pos = pos;
-    o->init(name, rows, item_width, items, engine, theme);
+    o->init(name, rows, item_width, items, engine, theme, on_change);
     return o;
 }
 
-CatFilter* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+CatFilter* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Strings",
@@ -28,10 +37,10 @@ CatFilter* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgThe
         "Control Voltage",
         "Utility"
     };
-    return makeFilter<CatFilter>(pos, "Category", 5, 56.f, info, engine, theme);
+    return makeFilter<CatFilter>(pos, "Category", 5, 56.f, info, engine, theme, on_change);
 }
 
-TypeFilter* makeTypeFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+TypeFilter* makeTypeFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Atonal",
@@ -49,10 +58,10 @@ TypeFilter* makeTypeFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgT
         "Single Reed",
         "Struck"
     };
-    return makeFilter<TypeFilter>(pos, "Type",  5, 50.f, info, engine, theme);
+    return makeFilter<TypeFilter>(pos, "Type",  5, 50.f, info, engine, theme, on_change);
 }
 
-CharacterFilter* makeCharacterFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+CharacterFilter* makeCharacterFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Acoustic",
@@ -95,10 +104,10 @@ CharacterFilter* makeCharacterFilter(Vec pos, SvgThemeEngine &engine, std::share
         "Warm",
         "Woody"
     };
-    return makeFilter<CharacterFilter>(pos, "Character", 10, 50.f, info, engine, theme);
+    return makeFilter<CharacterFilter>(pos, "Character", 10, 50.f, info, engine, theme, on_change);
 }
 
-MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Additive",
@@ -120,10 +129,10 @@ MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<
         "SineSpray",
         "WaveBank"
     };
-    return makeFilter<MatrixFilter>(pos, "Matrix", 6, 50.f, info, engine, theme);
+    return makeFilter<MatrixFilter>(pos, "Matrix", 6, 50.f, info, engine, theme, on_change);
 }
 
-GearFilter* makeGearFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+GearFilter* makeGearFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Channel 1",
@@ -135,7 +144,7 @@ GearFilter* makeGearFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgT
         "Single Voice",
         "Touch Area"
     };
-    return makeFilter<GearFilter>(pos, "Setting", 4, 60.f, info, engine, theme);
+    return makeFilter<GearFilter>(pos, "Setting", 4, 60.f, info, engine, theme, on_change);
 }
 
 }

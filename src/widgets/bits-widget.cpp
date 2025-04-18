@@ -13,14 +13,13 @@ BitsWidget::BitsWidget(
     int rows,
     float item_width,
     const std::vector<std::string>& items,
-    std::function<void(int item)> on_change,
     SvgThemeEngine& theme_engine,
-    std::shared_ptr<svg_theme::SvgTheme> theme
+    std::shared_ptr<svg_theme::SvgTheme> theme,
+    std::function<void(uint64_t state)> on_change
 ) :
     name(name),
     count(items.size()),
     rows(rows),
-    
     label_width(item_width),
     change_fn(on_change)
 {
@@ -47,7 +46,7 @@ BitsWidget::BitsWidget(
     addChild(none_label);
     addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) { 
         state = 0;
-        if (change_fn) change_fn(-1);
+        if (change_fn) change_fn(state);
     }, "choice-hover"));
 
     style.align = TextAlignment::Left;
@@ -71,7 +70,7 @@ BitsWidget::BitsWidget(
             } else {
                 state |= bit;
             }
-            if (change_fn) change_fn(id);
+            if (change_fn) change_fn(state);
         }, "choice-hover"));
 
         if (0 == ((i+1) % rows)) {

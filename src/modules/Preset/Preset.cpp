@@ -76,6 +76,13 @@ void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDev
 void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
+    if (((args.frame + id) % 80) == 0) {
+        if (cat_filter | type_filter | character_filter | matrix_filter | gear_filter) {
+            getLight(L_FILTER).setBrightness(1.f);
+        } else {
+            getLight(L_FILTER).setBrightness(0.f);
+        }
+    }
 }
 
 Model *modelPreset = createModel<PresetModule, PresetUi>("chem-preset");

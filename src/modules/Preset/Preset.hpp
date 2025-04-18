@@ -32,6 +32,7 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
         NUM_OUTPUTS
     };
     enum Lights {
+        L_FILTER,
         NUM_LIGHTS
     };
 
@@ -195,6 +196,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void on_search_text_changed();
     void on_search_text_enter();
 
+    void on_cat_filter_change(uint64_t state);
+    void on_type_filter_change(uint64_t state);
+    void on_character_filter_change(uint64_t state);
+    void on_matrix_filter_change(uint64_t state);
+    void on_gear_filter_change(uint64_t state);
+
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
@@ -217,7 +224,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void onButton(const ButtonEvent&e) override;
     void onSelectKey(const SelectKeyEvent &e) override;
     void onHoverScroll(const HoverScrollEvent & e) override;
-    void onRemove(const RemoveEvent& e) override;
 
     void step() override;
     void draw(const DrawArgs& args) override;

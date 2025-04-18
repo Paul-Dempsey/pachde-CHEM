@@ -126,6 +126,10 @@ PresetUi::PresetUi(PresetModule *module) :
     search_entry->enter_handler = [this](){ this->on_search_text_enter(); };
     addChild(search_entry);
 
+    x = 184.f;
+    y = 23.75f;
+    addChild(createLightCentered<SmallLight<RedLight>>(Vec(x,y), my_module, PresetModule::L_FILTER));;
+
     // tab labels
     x = 270.f;
     y = 18.f;
@@ -186,15 +190,15 @@ PresetUi::PresetUi(PresetModule *module) :
 
     const float FILTER_DY = 20.f;
     y = 168.f;
-    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme)));
+    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_cat_filter_change(state); })));
     y += FILTER_DY;
-    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme)));
+    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_type_filter_change(state); })));
     y += FILTER_DY;
-    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme)));
+    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_character_filter_change(state); })));
     y += FILTER_DY;
-    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme)));
+    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_matrix_filter_change(state); })));
     y += FILTER_DY;
-    addChild(Center(gear_filter = makeGearFilter(Vec(x,y), theme_engine, theme)));
+    addChild(Center(gear_filter = makeGearFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_gear_filter_change(state); })));
 
     if (my_module) {
         cat_filter->set_state(my_module->cat_filter);
@@ -203,7 +207,6 @@ PresetUi::PresetUi(PresetModule *module) :
         matrix_filter->set_state(my_module->matrix_filter);
         gear_filter->set_state(my_module->gear_filter);
     }
-
 
     // preset grid
     const float PRESET_TOP = 38.f;
@@ -638,6 +641,41 @@ void PresetUi::on_search_text_enter()
 {
 }
 
+void PresetUi::on_cat_filter_change(uint64_t state)
+{
+    if (my_module) {
+        my_module->cat_filter = state;
+    }
+}
+
+void PresetUi::on_type_filter_change(uint64_t state)
+{
+    if (my_module) {
+        my_module->type_filter = state;
+    }
+}
+
+void PresetUi::on_character_filter_change(uint64_t state)
+{
+    if (my_module) {
+        my_module->character_filter = state;
+    }
+}
+
+void PresetUi::on_matrix_filter_change(uint64_t state)
+{
+    if (my_module) {
+        my_module->matrix_filter = state;
+    }
+}
+
+void PresetUi::on_gear_filter_change(uint64_t state)
+{
+    if (my_module) {
+        my_module->gear_filter = state;
+    }
+}
+
 void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 {
     switch (tab_id) {
@@ -719,9 +757,17 @@ void PresetUi::scroll_to_live()
 
 void PresetUi::clear_filters()
 {
-    if (!my_module) return;
-    for (Param& p : my_module->params) {
-        p.setValue(0);
+    cat_filter->set_state(0);
+    type_filter->set_state(0);
+    character_filter->set_state(0);
+    matrix_filter->set_state(0);
+    gear_filter->set_state(0);
+    if (my_module) {
+        my_module->cat_filter = 0;
+        my_module->type_filter = 0;
+        my_module->character_filter = 0;
+        my_module->matrix_filter = 0;
+        my_module->gear_filter = 0;
     }
 }
 
@@ -955,17 +1001,6 @@ void PresetUi::onHoverScroll(const HoverScrollEvent &e)
         return;
     }
     Base::onHoverScroll(e);
-}
-
-void PresetUi::onRemove(const RemoveEvent &e)
-{
-    if (my_module) {
-        my_module->cat_filter = cat_filter->get_state();
-        my_module->type_filter = type_filter->get_state();
-        my_module->character_filter = character_filter->get_state();
-        my_module->matrix_filter = matrix_filter->get_state();
-        my_module->gear_filter = gear_filter->get_state();
-    }
 }
 
 void PresetUi::step()
