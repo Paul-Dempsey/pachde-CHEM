@@ -42,6 +42,8 @@ struct BitsWidget : OpaqueWidget, IApplyTheme
     std::string make_summary();
     Vec check_pos(int i);
     Rect exit_box_rect();
+    void close();
+    void select_item(int id, int mods);
     void onSelectKey(const SelectKeyEvent& e) override;
     void onShow(const ShowEvent& e) override;
     void onHide(const HideEvent& e) override;

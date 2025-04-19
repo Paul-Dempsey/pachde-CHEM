@@ -82,6 +82,12 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
         !ui->my_module
     ));
+    menu->addChild(createCheckMenuItem("Keep search filters", "", 
+        [this]() { return ui->my_module->keep_search_filters; },
+        [this]() { ui->my_module->keep_search_filters = !ui->my_module->keep_search_filters; },
+        !ui->my_module
+    ));
+
     menu->addChild(new MenuSeparator);
     bool host = ui->host_available();
     menu->addChild(createMenuItem("Refresh User presets", "", 
@@ -190,22 +196,25 @@ PresetUi::PresetUi(PresetModule *module) :
 
     const float FILTER_DY = 20.f;
     y = 168.f;
-    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_cat_filter_change(state); })));
+    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
     y += FILTER_DY;
-    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_type_filter_change(state); })));
+    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
     y += FILTER_DY;
-    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_character_filter_change(state); })));
+    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
     y += FILTER_DY;
-    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_matrix_filter_change(state); })));
+    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
     y += FILTER_DY;
-    addChild(Center(gear_filter = makeGearFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_gear_filter_change(state); })));
+    addChild(Center(setting_filter = makeSettingFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
 
     if (my_module) {
-        cat_filter->set_state(my_module->cat_filter);
-        type_filter->set_state(my_module->type_filter);
-        character_filter->set_state(my_module->character_filter);
-        matrix_filter->set_state(my_module->matrix_filter);
-        gear_filter->set_state(my_module->gear_filter);
+        user_tab.list.init_filters(my_module->user_filters);
+        system_tab.list.init_filters(my_module->system_filters);
+        auto filters = my_module->filters();
+        cat_filter       -> set_state(filters[FilterId::Category]);
+        type_filter      -> set_state(filters[FilterId::Type]);
+        character_filter -> set_state(filters[FilterId::Character]);
+        matrix_filter    -> set_state(filters[FilterId::Matrix]);
+        setting_filter   -> set_state(filters[FilterId::Setting]);
     }
 
     // preset grid
@@ -254,13 +263,12 @@ PresetUi::PresetUi(PresetModule *module) :
     }
     if (module) {
         my_module->set_chem_ui(this);
-        if (!chem_host) {
-            onConnectHost(my_module->chem_host);
-        }
-        user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        onConnectHost(my_module->chem_host);
+        //user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
+        //system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         user_tab.list.order = my_module->user_order;
-        system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         system_tab.list.order = my_module->system_order;
+
         set_tab(PresetTab(my_module->active_tab), false);
     }
 }
@@ -296,7 +304,7 @@ void PresetUi::build_database(PresetTab which)
     Tab& tab = active_tab();
     db_builder = new DBBuilder();
     PresetId dummy;
-    db_builder->init(tab.list.presets, live_preset ? live_preset->id : dummy);
+    db_builder->init(tab.list.preset_list, live_preset ? live_preset->id : dummy);
     db_builder->next(chem_host->host_haken());
 }
 
@@ -356,7 +364,7 @@ bool PresetUi::load_presets(PresetTab which)
     }
     Tab& tab = get_tab(which);
     tab.clear();
-    tab.list.set_device_info(em->firmware_version, em->hardware);
+    //tab.list.set_device_info(em->firmware_version, em->hardware);
     tab.list.order = which == PresetTab::User ? my_module->user_order : my_module->system_order;
     return tab.list.from_json(root, path);
 }
@@ -382,7 +390,9 @@ bool PresetUi::save_presets(PresetTab which)
     FILE* file = std::fopen(path.c_str(), "wb");
     if (!file) return false;
 
-    tab.list.to_json(root, my_module->device_claim);
+    uint8_t hardware = chem_host->host_matrix()->hardware;
+
+    tab.list.to_json(root, hardware, my_module->device_claim);
     auto e = json_dumpf(root, file, JSON_INDENT(2));
 	std::fclose(file);
     return e >= 0;
@@ -437,11 +447,11 @@ void PresetUi::onSystemComplete()
     if (gathering == PresetTab::System) {
         gathering = PresetTab::Unset;
 
-        auto em = chem_host->host_matrix();
-        system_tab.list.set_device_info(em->firmware_version, em->hardware);
+        //auto em = chem_host->host_matrix();
+        //system_tab.list.set_device_info(em->firmware_version, em->hardware);
         system_tab.list.sort(my_module->system_order);
         save_presets(PresetTab::System);
-
+        system_tab.list.refresh_filter_view();
         if (active_tab_id == PresetTab::System) {
             scroll_to(0);
         }
@@ -469,10 +479,11 @@ void PresetUi::onUserComplete()
     if (gathering == PresetTab::User) {
         gathering = PresetTab::Unset;
 
-        auto em = chem_host->host_matrix();
-        user_tab.list.set_device_info(em->firmware_version, em->hardware);
+        //auto em = chem_host->host_matrix();
+        //user_tab.list.set_device_info(em->firmware_version, em->hardware);
         user_tab.list.sort(my_module->user_order);
         save_presets(PresetTab::User);
+        user_tab.list.refresh_filter_view();
 
         if (active_tab_id == PresetTab::User) {
             scroll_to(0);
@@ -489,11 +500,11 @@ void PresetUi::onPresetChange()
         auto em = chem_host->host_matrix();
         if (em->ready) {
             if (my_module){
-                my_module->firmware = em->firmware_version;
-                my_module->hardware = em->hardware;
+                //my_module->firmware = em->firmware_version;
+                //my_module->hardware = em->hardware;
             }
-            user_tab.list.set_device_info(em->firmware_version, em->hardware);
-            system_tab.list.set_device_info(em->firmware_version, em->hardware);
+            //user_tab.list.set_device_info(em->firmware_version, em->hardware);
+            //system_tab.list.set_device_info(em->firmware_version, em->hardware);
         }
     }
 
@@ -641,40 +652,47 @@ void PresetUi::on_search_text_enter()
 {
 }
 
-void PresetUi::on_cat_filter_change(uint64_t state)
+void PresetUi::on_filter_change(FilterId filter, uint64_t state)
 {
-    if (my_module) {
-        my_module->cat_filter = state;
+    if (!my_module) return;
+    my_module->filters()[filter] = state;
+
+    Tab& tab{active_tab()};
+    PresetId current_id = tab.current_id();
+    PresetId track_id;
+    if (!current_id.valid()) {
+        track_id = tab.list.nth(tab.scroll_top)->id;
     }
+    tab.list.set_filter(filter, state);
+    tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    scroll_to_page_of_index(tab.current_index);
 }
 
-void PresetUi::on_type_filter_change(uint64_t state)
+void PresetUi::clear_filters()
 {
-    if (my_module) {
-        my_module->type_filter = state;
+    Tab& tab{active_tab()};
+    PresetId current_id = tab.current_id();
+    PresetId track_id;
+    if (!current_id.valid()) {
+        track_id = tab.list.nth(tab.scroll_top)->id;
     }
+
+    cat_filter->set_state(0);
+    type_filter->set_state(0);
+    character_filter->set_state(0);
+    matrix_filter->set_state(0);
+    setting_filter->set_state(0);
+
+    active_tab().list.no_filter();
+    tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    scroll_to_page_of_index(tab.current_index);
+
+    if (my_module) {
+        my_module->clear_filters(active_tab_id);
+    }
+
 }
 
-void PresetUi::on_character_filter_change(uint64_t state)
-{
-    if (my_module) {
-        my_module->character_filter = state;
-    }
-}
-
-void PresetUi::on_matrix_filter_change(uint64_t state)
-{
-    if (my_module) {
-        my_module->matrix_filter = state;
-    }
-}
-
-void PresetUi::on_gear_filter_change(uint64_t state)
-{
-    if (my_module) {
-        my_module->gear_filter = state;
-    }
-}
 
 void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 {
@@ -703,7 +721,9 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 
     Tab& tab = active_tab();
     if (fetch && (0 == tab.count()) && host_available()) {
-        if (!load_presets(tab_id)) {
+        if (load_presets(tab_id)) {
+
+        } else {
             request_presets(tab_id);
         }
     }
@@ -736,10 +756,10 @@ void PresetUi::scroll_to(ssize_t index)
 
 void PresetUi::scroll_to_page_of_index(ssize_t index)
 {
-    scroll_to(page_index_of_index(index));
+    scroll_to(page_index(index));
 }
 
-ssize_t PresetUi::page_index_of_index(ssize_t index)
+ssize_t PresetUi::page_index(ssize_t index)
 {
     index = std::max(ssize_t(0), index);
     index = std::min(ssize_t(active_tab().count()), index);
@@ -752,23 +772,7 @@ void PresetUi::scroll_to_live()
     if (!live_id.valid()) return;
     ssize_t index = active_tab().list.index_of_id(live_id);
     if (index < 0) index = 0;
-    scroll_to(PAGE_CAPACITY * (index / PAGE_CAPACITY));
-}
-
-void PresetUi::clear_filters()
-{
-    cat_filter->set_state(0);
-    type_filter->set_state(0);
-    character_filter->set_state(0);
-    matrix_filter->set_state(0);
-    gear_filter->set_state(0);
-    if (my_module) {
-        my_module->cat_filter = 0;
-        my_module->type_filter = 0;
-        my_module->character_filter = 0;
-        my_module->matrix_filter = 0;
-        my_module->gear_filter = 0;
-    }
+    scroll_to(page_index(index));
 }
 
 void PresetUi::page_up(bool ctrl, bool shift)
@@ -792,11 +796,10 @@ void PresetUi::page_down(bool ctrl, bool shift)
         return;
     }
     if (ctrl) {
-        scroll_to((count / PAGE_CAPACITY) * PAGE_CAPACITY);
+        scroll_to(page_index(count));
     } else {
         size_t pos = std::min(count, tab.scroll_top + PAGE_CAPACITY);
-        size_t page = pos / PAGE_CAPACITY;
-        scroll_to(page * PAGE_CAPACITY);
+        scroll_to(page_index(pos));
     }
 }
 

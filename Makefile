@@ -60,6 +60,8 @@ SOURCES += src/widgets/uniform-style.cpp
 ifdef BUILD_DEBUG
 SOURCES += src/modules/_proto/proto.cpp
 SOURCES += src/modules/_proto/proto-ui.cpp
+SOURCES += src/modules/_template/template.cpp
+SOURCES += src/modules/_template/template-ui.cpp
 endif
 
 SOURCES += src/modules/Core/Core.cpp

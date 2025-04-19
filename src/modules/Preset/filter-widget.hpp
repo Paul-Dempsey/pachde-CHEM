@@ -192,6 +192,6 @@ CatFilter* makeCatFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgThe
 TypeFilter* makeTypeFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 CharacterFilter* makeCharacterFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-GearFilter* makeGearFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+GearFilter* makeSettingFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 
 }

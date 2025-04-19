@@ -30,13 +30,7 @@ BitsWidget::BitsWidget(
     addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, theme_engine, theme, title_style));
 
     auto r = exit_box_rect();
-    addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) {
-        setVisible(false);
-        auto p = getParent();
-        if (p) {
-            p->removeChild(this);
-        }
-    }, "option-exit"));
+    addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) { close(); }, "option-exit"));
 
     LabelStyle style{"choice", TextAlignment::Center, 9.f, false};
 
@@ -63,15 +57,7 @@ BitsWidget::BitsWidget(
         Rect r = label->box;
         r.pos.x -= CHECK_DX;
         r.size.x += CHECK_DX;
-        addChild(createHoverClickRegion(RECT_ARGS(r), i, [=](int id, int mods) { 
-            uint64_t bit = uint64_t(1) << id;
-            if (state & bit) {
-                state = state & ~bit;
-            } else {
-                state |= bit;
-            }
-            if (change_fn) change_fn(state);
-        }, "choice-hover"));
+        addChild(createHoverClickRegion(RECT_ARGS(r), i, [=](int id, int mods) { select_item(id, mods); }, "choice-hover"));
 
         if (0 == ((i+1) % rows)) {
             x += label_width + COLUMN_SEP + CHECK_DX;
@@ -133,6 +119,35 @@ Rect BitsWidget::exit_box_rect() {
     return {box.size.x -  MARGIN_DX - 8.f, MARGIN_DY, 8.f, 8.f};
 }
 
+void BitsWidget::close()
+{
+    setVisible(false);
+    auto p = getParent();
+    if (p) {
+        p->removeChild(this);
+    }
+}
+
+void BitsWidget::select_item(int id, int mods)
+{
+    uint64_t bit = uint64_t(1) << id;
+    switch (mods) {
+    case 0:
+        if (state & bit) {
+            state = state & ~bit;
+        } else {
+            state |= bit;
+        }
+        break;
+    case RACK_MOD_CTRL: 
+        state = bit;
+        break;
+    default: 
+        return;
+    }
+    if (change_fn) change_fn(state);
+}
+
 void BitsWidget::onSelectKey(const SelectKeyEvent& e)
 {
     if (APP->event->getSelectedWidget() != this) {
@@ -148,7 +163,7 @@ void BitsWidget::onSelectKey(const SelectKeyEvent& e)
             if (0 == (e.mods & RACK_MOD_MASK))  {
                 APP->event->setSelectedWidget(parent);
                 e.consume(this);
-                setVisible(false);
+                close();
                 return;
             }
             break;

@@ -37,19 +37,19 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     };
 
     std::string device_claim;
-    uint8_t hardware{0};
-    uint16_t firmware{0};
+    //uint8_t hardware{0};
+    //uint16_t firmware{0};
     bool track_live{false};
     bool use_cached_user_presets{false};
+    bool keep_search_filters{true};
     PresetTab active_tab{PresetTab::System};
+
     PresetOrder user_order{PresetOrder::Natural};
     PresetOrder system_order{PresetOrder::Alpha};
 
-    uint64_t cat_filter{0};
-    uint64_t type_filter{0};
-    uint64_t character_filter{0};
-    uint64_t matrix_filter{0};
-    uint64_t gear_filter{0};
+    uint64_t user_filters[5];
+    uint64_t system_filters[5];
+    uint64_t* filters();
 
     PresetModule();
     ~PresetModule() {
@@ -62,7 +62,10 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
-    void set_order(PresetTab tab, PresetOrder order);
+    void clear_filters(PresetTab tab_id);
+    void set_order(PresetTab tab_id, PresetOrder order);
+    //void set_filter(PresetTab tab_id, FilterId which, uint64_t mask);
+
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
     std::string client_claim() override { return device_claim; }
@@ -83,11 +86,18 @@ struct Tab {
     size_t scroll_top{0};
     ssize_t current_index{-1};
     PresetList list;
+
     Tab(const Tab&) = delete;
     Tab(PresetTab id) : list(id) {}
+
     PresetTab id() { return list.tab; }
     size_t count() { return list.count(); }
-    void clear() { list.clear(); }
+    void clear() { list.clear(); scroll_top = 0; current_index = -1; }
+    PresetId current_id() {
+        PresetId id;
+        if (current_index < 0) return id;
+        return list.nth(current_index)->id;
+    }
 };
 
 struct DBBuilder {
@@ -129,11 +139,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
     PresetMenu* menu{nullptr};
+    
     CatFilter* cat_filter{nullptr};
     TypeFilter* type_filter{nullptr};
     CharacterFilter* character_filter{nullptr};
     MatrixFilter* matrix_filter{nullptr};
-    GearFilter* gear_filter{nullptr};
+    GearFilter* setting_filter{nullptr};
 
     std::shared_ptr<PresetDescription> live_preset;
 
@@ -162,12 +173,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
        }
     }
     Tab& active_tab() { return get_tab(active_tab_id); }
-    PresetList& preset_list(PresetTab which) { 
-        return get_tab(which).list;
-    }
-    PresetList& presets() {
-        return preset_list(active_tab_id);
-    }
+    PresetList& preset_list(PresetTab which) { return get_tab(which).list; }
+    PresetList& presets() { return preset_list(active_tab_id); }
     void set_current_index(size_t index);
     bool host_available();
     void start_spinner();
@@ -183,24 +190,19 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void set_tab(PresetTab tab, bool fetch);
     void scroll_to(ssize_t index);
     void scroll_to_page_of_index(ssize_t index);
-    ssize_t page_index_of_index(ssize_t index);
+    ssize_t page_index(ssize_t index);
     void scroll_to_live();
-    void clear_filters();
     void page_up(bool control, bool shift);
     void page_down(bool control, bool shift);
     void update_page_controls();
-
+    
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
-
+    
     void on_search_text_changed();
     void on_search_text_enter();
-
-    void on_cat_filter_change(uint64_t state);
-    void on_type_filter_change(uint64_t state);
-    void on_character_filter_change(uint64_t state);
-    void on_matrix_filter_change(uint64_t state);
-    void on_gear_filter_change(uint64_t state);
+    void clear_filters();
+    void on_filter_change(FilterId id, uint64_t state);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

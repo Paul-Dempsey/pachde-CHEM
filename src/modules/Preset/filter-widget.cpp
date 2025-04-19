@@ -23,19 +23,20 @@ TFilter* makeFilter(
 CatFilter* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
-        "Strings",
-        "Winds",
-        "Vocal",
-        "Keyboard",
         "Classic",
+        "Control Voltage",
+        "Drone",
+        "Keyboard",
+        "Midi",
         "Other",
         "Percussion",
-        "Tuned Percussion",
         "Processor",
-        "Drone",
-        "Midi",
-        "Control Voltage",
-        "Utility"
+        "Tuned Percussion",
+        "Strings",
+        "Utility",
+        "Vocal",
+        "Winds",
+        "(Unknown)"
     };
     return makeFilter<CatFilter>(pos, "Category", 5, 56.f, info, engine, theme, on_change);
 }
@@ -132,7 +133,7 @@ MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<
     return makeFilter<MatrixFilter>(pos, "Matrix", 6, 50.f, info, engine, theme, on_change);
 }
 
-GearFilter* makeGearFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+GearFilter* makeSettingFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Channel 1",
@@ -144,7 +145,7 @@ GearFilter* makeGearFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgT
         "Single Voice",
         "Touch Area"
     };
-    return makeFilter<GearFilter>(pos, "Setting", 4, 60.f, info, engine, theme, on_change);
+    return makeFilter<GearFilter>(pos, "Setting", 4, 64.f, info, engine, theme, on_change);
 }
 
 }

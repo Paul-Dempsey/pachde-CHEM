@@ -7,17 +7,24 @@ using namespace ::rack;
 
 namespace pachde {
 
+
 struct PresetList {
     PresetList(const PresetList&) = delete;
 
     PresetTab tab;
     PresetOrder order{PresetOrder::Natural};
-    uint16_t firmware{0};
-    uint8_t hardware{0};
-    std::vector<std::shared_ptr<PresetInfo>> presets;
+    //uint16_t firmware{0};
+    //uint8_t hardware{0};
+    std::vector<std::shared_ptr<PresetInfo>> preset_list;
 
     std::vector<std::shared_ptr<PresetInfo>> preset_view;
-    uint64_t filter_masks[5];
+    uint64_t filter_masks[5]{0};
+    bool filtering{false};
+    bool filtered() { return filtering; }
+    uint64_t get_filter(FilterId index) { return filter_masks[index]; }
+    void set_filter(FilterId index, uint64_t mask);
+    void init_filters( uint64_t* filters);
+    void no_filter();
 
     bool modified{false};
 
@@ -26,31 +33,38 @@ struct PresetList {
         order(PresetTab::User == id ? PresetOrder::Natural : PresetOrder::Alpha) 
     {}
 
-    bool empty() { return presets.empty(); }
+    bool empty() { return preset_list.empty(); }
     bool dirty() { return modified; }
     void set_dirty() { modified = true; }
-    size_t count() { return presets.size(); }
+    size_t count() { return filtering ? preset_view.size() : preset_list.size(); }
+    ssize_t index_of_id(PresetId id);
+    ssize_t index_of_id_unfiltered(PresetId id);
+    std::vector<std::shared_ptr<PresetInfo>>* presets() { return filtering ? &preset_view : &preset_list; }
 
-    void set_device_info(uint16_t firmware_version, uint8_t hardware_type) {
-        firmware = firmware_version;
-        hardware = hardware_type;
-    }
+    void refresh_filter_view();
+
+    // void set_device_info(uint16_t firmware_version, uint8_t hardware_type) {
+    //     firmware = firmware_version;
+    //     hardware = hardware_type;
+    // }
     void add(const PresetDescription* preset);
+
     void clear() {
         modified = false;
-        firmware = 0;
-        hardware = 0;
-        presets.clear();
+        //firmware = 0;
+        //hardware = 0;
+        preset_view.clear();
+        preset_list.clear();
     }
-    ssize_t index_of_id(PresetId id);
+
     bool load(const std::string& path);
-    bool save(const std::string& path, const std::string& connection_info);
+    bool save(const std::string& path, uint8_t hardware, const std::string& connection_info);
     bool from_json(const json_t* root, const std::string &path);
-    void to_json(json_t* root, const std::string& connection_info);
+    void to_json(json_t* root, uint8_t hardware, const std::string& connection_info);
     void sort(PresetOrder order);
     std::shared_ptr<PresetInfo> nth(ssize_t which) {
         if (which < 0) which = 0;
-        return presets[which];
+        return filtered() ? preset_view[which] : preset_list[which];
     }
 };
 

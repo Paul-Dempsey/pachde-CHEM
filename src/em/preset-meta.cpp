@@ -32,20 +32,20 @@ const HakenMetaCode hakenMetaCode {};
 HakenMetaCode::HakenMetaCode()
 {
     data.reserve(92);
-    data.push_back(std::make_shared<PresetMeta>("ST", PresetGroup::Category, 1, "Strings"));
-    data.push_back(std::make_shared<PresetMeta>("WI", PresetGroup::Category, 2, "Winds"));
-    data.push_back(std::make_shared<PresetMeta>("VO", PresetGroup::Category, 3, "Vocal"));
-    data.push_back(std::make_shared<PresetMeta>("KY", PresetGroup::Category, 4, "Keyboard"));
-    data.push_back(std::make_shared<PresetMeta>("CL", PresetGroup::Category, 5, "Classic"));
-    data.push_back(std::make_shared<PresetMeta>("OT", PresetGroup::Category, 6, "Other"));
-    data.push_back(std::make_shared<PresetMeta>("PE", PresetGroup::Category, 7, "Percussion"));
+    data.push_back(std::make_shared<PresetMeta>("CL", PresetGroup::Category, 0, "Classic"));
+    data.push_back(std::make_shared<PresetMeta>("CV", PresetGroup::Category, 1, "Control Voltage"));
+    data.push_back(std::make_shared<PresetMeta>("DO", PresetGroup::Category, 2, "Drone"));
+    data.push_back(std::make_shared<PresetMeta>("KY", PresetGroup::Category, 3, "Keyboard"));
+    data.push_back(std::make_shared<PresetMeta>("MD", PresetGroup::Category, 4, "Midi"));
+    data.push_back(std::make_shared<PresetMeta>("OT", PresetGroup::Category, 5, "Other"));
+    data.push_back(std::make_shared<PresetMeta>("PE", PresetGroup::Category, 6, "Percussion"));
+    data.push_back(std::make_shared<PresetMeta>("PR", PresetGroup::Category, 7, "Processor"));
     data.push_back(std::make_shared<PresetMeta>("PT", PresetGroup::Category, 8, "Tuned Percussion"));
-    data.push_back(std::make_shared<PresetMeta>("PR", PresetGroup::Category, 9, "Processor"));
-    data.push_back(std::make_shared<PresetMeta>("DO", PresetGroup::Category, 10, "Drone"));
-    data.push_back(std::make_shared<PresetMeta>("MD", PresetGroup::Category, 11, "Midi"));
-    data.push_back(std::make_shared<PresetMeta>("CV", PresetGroup::Category, 12, "Control Voltage"));
-    data.push_back(std::make_shared<PresetMeta>("UT", PresetGroup::Category, 13, "Utility"));
-    data.push_back(std::make_shared<PresetMeta>("ZZ", PresetGroup::Category, 14, "(Unkown)"));
+    data.push_back(std::make_shared<PresetMeta>("ST", PresetGroup::Category, 9, "Strings"));
+    data.push_back(std::make_shared<PresetMeta>("UT", PresetGroup::Category, 10, "Utility"));
+    data.push_back(std::make_shared<PresetMeta>("VO", PresetGroup::Category, 11, "Vocal"));
+    data.push_back(std::make_shared<PresetMeta>("WI", PresetGroup::Category, 12, "Winds"));
+    data.push_back(std::make_shared<PresetMeta>("ZZ", PresetGroup::Category, 13, "(Unkown)"));
     data.push_back(std::make_shared<PresetMeta>("AT", PresetGroup::Type, 0, "Atonal"));
     data.push_back(std::make_shared<PresetMeta>("BA", PresetGroup::Type, 1, "Bass"));
     data.push_back(std::make_shared<PresetMeta>("BO", PresetGroup::Type, 2, "Bowed"));
@@ -176,8 +176,14 @@ bool order_codes(const uint16_t &a, const uint16_t &b)
     return false;
 }
 
+bool order_meta(const std::shared_ptr<PresetMeta> a, const std::shared_ptr<PresetMeta> b)
+{
+    return order_codes(a->code, b->code);
+}
+
 void FillMetaCodeList(const std::string& text, std::vector<uint16_t>& vec)
 {
+    vec.clear();
     if (text.empty()) return;
     foreach_code(text, [&vec](uint16_t code) mutable {
         vec.push_back(code);
@@ -197,11 +203,13 @@ void FillMetaCodeList(const std::string& text, std::vector<uint16_t>& vec)
 
 void FillMetaCodeMasks(const std::vector<uint16_t>& meta_codes, uint64_t* masks)
 {
-    for (uint16_t code : meta_codes) {
+    std::memset(masks, 0, 5 * sizeof(*masks));
+    for (MetaCode code : meta_codes) {
         auto meta = hakenMetaCode.find(code);
         if (meta) {
             size_t g = size_t(meta->group);
-            masks[g] = masks[g] | uint64_t(1) << meta->index;
+            uint64_t bit = (uint64_t(1) << meta->index);
+            masks[g] |= bit;
         }
     }
 }
@@ -210,9 +218,6 @@ std::vector<std::shared_ptr<PresetMeta>> HakenMetaCode::make_category_list(const
 {
     std::vector<std::shared_ptr<PresetMeta>> result;
     if (text.empty()) return result;
-    // BUGBUG: relies on category codes in text to be in PresetGroup + index order.
-    // If this bug shows up (e.g. with Osmose), we can fix it by sorting the codes 
-    // as in FillMetaCodeList.
     foreach_code(text, [this, &result](uint16_t code) mutable { 
         auto item = find(code);
         if (item) {
@@ -220,6 +225,7 @@ std::vector<std::shared_ptr<PresetMeta>> HakenMetaCode::make_category_list(const
         }
         return true;
     });
+    std::sort(result.begin(), result.end(), order_meta);
     return result;
 }
 
