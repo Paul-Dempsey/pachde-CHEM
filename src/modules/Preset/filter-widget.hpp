@@ -8,63 +8,36 @@ using namespace ::rack;
 
 namespace pachde {
 
-template<typename TSvg>
-struct TFilterButton : SvgButton, IApplyTheme
+struct FilterButton : SvgButton, IApplyTheme
 {
     using Base = SvgButton;
     
+    const char * up_svg{nullptr};
+    const char * down_svg{nullptr};
     TipHolder * tip_holder{nullptr};
     BitsWidget* dialog{nullptr};
     std::function<void(uint64_t item)> change_fn{nullptr};
 
-    TFilterButton()
-    {
-        this->shadow->hide();
-    }
+
+    FilterButton(const char * svg_up, const char * svg_down, std::function<void(uint64_t item)> on_change);
     
-    void init(
-        const std::string& name,
-        int rows,
-        float item_width,
+    void init (
+        const std::string& name, int rows, float item_width,
         const std::vector<std::string>& items,
-        SvgThemeEngine& engine,
-        std::shared_ptr<SvgTheme> theme, 
-        std::function<void(uint64_t item)> on_change
-    )
-    {
-        change_fn = on_change;
-
-        if (item_width <= 0.f) item_width = 42;
-        applyTheme(engine, theme);
-
-        const float DIALOG_SEP = 1.5f;
-
-        dialog = new BitsWidget(name, rows, item_width, items, engine, theme,
-            [=](uint64_t state) {
-                describe(dialog->make_summary());
-                if (change_fn) {
-                    change_fn(state);
-                }
-            });
-
-        describe(dialog->make_summary());
-
-        dialog->box.pos.x = box.pos.x - box.size.x*.5 - dialog->box.size.x - DIALOG_SEP;
-        dialog->box.pos.y = box.pos.y - dialog->box.size.y*.5f;
-        dialog->setVisible(false);
-    }
+        SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme);
 
     uint64_t get_state() { return dialog->get_state(); }
     void set_state(uint64_t state) { dialog->set_state(state); }
 
-    virtual ~TFilterButton()
+    virtual ~FilterButton()
     {
         if (tip_holder) {
             delete tip_holder;
             tip_holder = nullptr;
         }
     }
-
+    void close_dialog() { dialog->close(); }
+    
     void describe(std::string text)
     {
         if (!tip_holder) {
@@ -73,29 +46,7 @@ struct TFilterButton : SvgButton, IApplyTheme
         tip_holder->setText(text);
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        bool refresh = frames.size() > 0; 
-        if (refresh) {
-            frames.clear();
-            sw->setSvg(nullptr);
-        }
-
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
-
-        if (refresh) {
-            sw->setSvg(frames[0]);
-            if (fb) {
-                fb->setDirty();
-            }
-        }
-        if (dialog && !dialog->isVisible()) {
-            // dialog is not a child widget when not shown
-            ApplyChildrenTheme(dialog, engine, theme);
-        }
-        return true;
-    }
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
 
     void onHover(const HoverEvent& e) override {
         e.consume(this);
@@ -136,62 +87,14 @@ struct TFilterButton : SvgButton, IApplyTheme
         destroyTip();
     }
 
-    void onAction(const ActionEvent& e) override
-    {
-        destroyTip();
-        if (!dialog->isVisible()) {
-            getParent()->addChild(dialog);
-            dialog->setVisible(true);
-        }
-    }
-
-    void step() override {
-        if (get_state()) {
-            if (sw->svg->handle != frames[1]->handle) {
-                sw->setSvg(frames[1]);
-                fb->setDirty();
-            }
-        } else {
-            if (sw->svg->handle != frames[0]->handle) {
-                sw->setSvg(frames[0]);
-                fb->setDirty();
-            }
-            fb->setDirty();
-        }
-    }
+    void onAction(const ActionEvent& e) override;
+    void step() override;
 };
 
-struct CatButtonSvg {
-    static std::string up() { return "res/widgets/category-button.svg"; }
-    static std::string down() { return "res/widgets/category-button-down.svg"; }
-};
-struct GearButtonSvg {
-    static std::string up() { return "res/widgets/gear-button.svg"; }
-    static std::string down() { return "res/widgets/gear-button-down.svg"; }
-};
-struct TypeButtonSvg {
-    static std::string up() { return "res/widgets/type-button.svg"; }
-    static std::string down() { return "res/widgets/type-button-down.svg"; }
-};
-struct CharacterButtonSvg {
-    static std::string up() { return "res/widgets/character-button.svg"; }
-    static std::string down() { return "res/widgets/character-button-down.svg"; }
-};
-struct MatrixButtonSvg {
-    static std::string up() { return "res/widgets/matrix-button.svg"; }
-    static std::string down() { return "res/widgets/matrix-button-down.svg"; }
-};
-
-using CatFilter = TFilterButton<CatButtonSvg>;
-using TypeFilter = TFilterButton<TypeButtonSvg>;
-using CharacterFilter = TFilterButton<CharacterButtonSvg>;
-using MatrixFilter = TFilterButton<MatrixButtonSvg>;
-using GearFilter = TFilterButton<GearButtonSvg>;
-
-CatFilter* makeCatFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-TypeFilter* makeTypeFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-CharacterFilter* makeCharacterFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-MatrixFilter* makeMatrixFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-GearFilter* makeSettingFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCatFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeTypeFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCharacterFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeMatrixFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeSettingFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 
 }

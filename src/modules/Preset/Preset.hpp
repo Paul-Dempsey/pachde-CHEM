@@ -96,7 +96,7 @@ struct Tab {
     PresetId current_id() {
         PresetId id;
         if (current_index < 0) return id;
-        return list.nth(current_index)->id;
+        return list.count() ? list.nth(current_index)->id : id;
     }
 };
 
@@ -139,13 +139,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
     PresetMenu* menu{nullptr};
-    
-    CatFilter* cat_filter{nullptr};
-    TypeFilter* type_filter{nullptr};
-    CharacterFilter* character_filter{nullptr};
-    MatrixFilter* matrix_filter{nullptr};
-    GearFilter* setting_filter{nullptr};
 
+    std::vector<FilterButton*> filter_buttons;
     std::shared_ptr<PresetDescription> live_preset;
 
     PresetTab active_tab_id{PresetTab::System};
@@ -173,6 +168,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
        }
     }
     Tab& active_tab() { return get_tab(active_tab_id); }
+    void set_tab(PresetTab tab, bool fetch);
     PresetList& preset_list(PresetTab which) { return get_tab(which).list; }
     PresetList& presets() { return preset_list(active_tab_id); }
     void set_current_index(size_t index);
@@ -187,7 +183,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool save_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
-    void set_tab(PresetTab tab, bool fetch);
     void scroll_to(ssize_t index);
     void scroll_to_page_of_index(ssize_t index);
     ssize_t page_index(ssize_t index);

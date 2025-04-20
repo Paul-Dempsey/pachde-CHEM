@@ -115,7 +115,8 @@ Vec BitsWidget::check_pos(int i)
     return pos;
 }
 
-Rect BitsWidget::exit_box_rect() {
+Rect BitsWidget::exit_box_rect()
+{
     return {box.size.x -  MARGIN_DX - 8.f, MARGIN_DY, 8.f, 8.f};
 }
 
@@ -125,6 +126,10 @@ void BitsWidget::close()
     auto p = getParent();
     if (p) {
         p->removeChild(this);
+        p = p->getParent();
+        if (p) {
+            APP->event->setSelectedWidget(p);
+        }
     }
 }
 
@@ -194,6 +199,17 @@ void BitsWidget::draw(const DrawArgs& args)
     auto p = nvgBoxGradient(vg, 12, 12, box.size.x-30.f, box.size.y-24.f, 12.f, 50.f, nvgRGB(0,0,0), nvgRGBAf(0,0,0,0));
     nvgFillPaint(vg, p);
     nvgFill(vg);
+   
+    auto co_border = envelope.nvg_stroke_color();
+    
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, box.size.x, box.size.y * .5f - 3.5f);
+    nvgLineTo(vg, box.size.x + 3.5f, box.size.y*.5f);
+    nvgLineTo(vg, box.size.x, box.size.y*.5f + 3.5f);
+    nvgClosePath(vg);
+    nvgFillColor(vg, co_border);
+    nvgFill(vg);
+
     nvgResetScissor(vg);
     
     FillRect(vg, 0.f, 0.f, box.size.x, box.size.y, envelope.nvg_color());
@@ -201,8 +217,9 @@ void BitsWidget::draw(const DrawArgs& args)
     float y = title->box.pos.y + title->box.size.y + MARGIN_DY*.5;
     Line(vg, 0, y, box.size.x, y, control_frame.nvg_stroke_color(), .5f);
 
-    FittedBoxRect(vg, 0.f, 0.f, box.size.x, box.size.y, envelope.nvg_stroke_color(), Fit::Inside, envelope.width());
-    
+    FittedBoxRect(vg, 0.f, 0.f, box.size.x, box.size.y, co_border, Fit::Inside, envelope.width());
+   
+
     auto r = exit_box_rect();
     BoxRect(vg, RECT_ARGS(r), control_frame.nvg_stroke_color(), .5f);
     r = r.grow({-1.25, -1.25});

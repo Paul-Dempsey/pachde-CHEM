@@ -125,12 +125,22 @@ void PresetList::no_filter()
 
 inline bool zip_any_filter(uint64_t* a, uint64_t* b)
 {
-    if (*a++ & *b++) return true;
-    if (*a++ & *b++) return true;
-    if (*a++ & *b++) return true;
-    if (*a++ & *b++) return true;
-    if (*a++ & *b++) return true;
-    return false;
+    if (bool(*a) && !bool(*a & *b)) return false;
+
+    a++; b++;
+    if (bool(*a) && !bool(*a & *b)) return false;
+
+    a++; b++;
+    if (bool(*a) && !bool(*a & *b)) return false;
+
+    a++; b++;
+    if (bool(*a) && !bool(*a & *b)) return false;
+
+    a++; b++;
+    
+    if (bool(*a) && !bool(*a & *b)) return false;
+
+    return true;
 }
 
 void PresetList::refresh_filter_view()

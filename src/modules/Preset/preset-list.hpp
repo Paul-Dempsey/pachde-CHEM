@@ -64,7 +64,11 @@ struct PresetList {
     void sort(PresetOrder order);
     std::shared_ptr<PresetInfo> nth(ssize_t which) {
         if (which < 0) which = 0;
-        return filtered() ? preset_view[which] : preset_list[which];
+        if (filtering) {
+            return preset_view.empty() ? nullptr : preset_view[which];
+        } else {
+            return preset_list.empty() ? nullptr : preset_list[which];
+        }
     }
 };
 

@@ -196,25 +196,34 @@ PresetUi::PresetUi(PresetModule *module) :
 
     const float FILTER_DY = 20.f;
     y = 168.f;
-    addChild(Center(cat_filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
+    FilterButton* filter{nullptr};
+    
+    addChild(Center(filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
+    filter_buttons.push_back(filter);
+
     y += FILTER_DY;
-    addChild(Center(type_filter = makeTypeFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
+    addChild(Center(filter = makeTypeFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
+    filter_buttons.push_back(filter);
+
     y += FILTER_DY;
-    addChild(Center(character_filter = makeCharacterFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
+    addChild(Center(filter = makeCharacterFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
+    filter_buttons.push_back(filter);
+
     y += FILTER_DY;
-    addChild(Center(matrix_filter = makeMatrixFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
+    addChild(Center(filter = makeMatrixFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
+    filter_buttons.push_back(filter);
+
     y += FILTER_DY;
-    addChild(Center(setting_filter = makeSettingFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
+    addChild(Center(filter = makeSettingFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
+    filter_buttons.push_back(filter);
 
     if (my_module) {
         user_tab.list.init_filters(my_module->user_filters);
         system_tab.list.init_filters(my_module->system_filters);
         auto filters = my_module->filters();
-        cat_filter       -> set_state(filters[FilterId::Category]);
-        type_filter      -> set_state(filters[FilterId::Type]);
-        character_filter -> set_state(filters[FilterId::Character]);
-        matrix_filter    -> set_state(filters[FilterId::Matrix]);
-        setting_filter   -> set_state(filters[FilterId::Setting]);
+        for (auto fb: filter_buttons) {
+            fb->set_state(*filters++);
+        }
     }
 
     // preset grid
@@ -222,9 +231,9 @@ PresetUi::PresetUi(PresetModule *module) :
     x = 9.f; y = PRESET_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
         auto entry = PresetEntry::create(Vec(x,y), preset_grid, this, theme);
+        entry->applyTheme(theme_engine, theme);
         preset_grid.push_back(entry);
         addChild(entry);
-
         y += 16.f;
         if (i == PAGE_CAPACITY/2 - 1) {
             x = 172;
@@ -408,7 +417,7 @@ void PresetUi::sort_presets(PresetOrder order)
     if (0 == tab.count()) return;
 
     PresetId current_id;
-    if (tab.current_index >= 0) {
+    if ((tab.current_index >= 0) && tab.list.count()) {
         current_id = tab.list.nth(tab.current_index)->id;
     }
 
@@ -517,8 +526,10 @@ void PresetUi::onPresetChange()
                 auto n = tab.list.index_of_id(preset->id);
                 if (n >= 0) {
                     auto p = tab.list.nth(n);
-                    p->set_text(preset->text);
-                    tab.list.set_dirty();
+                    if (p) {
+                        p->set_text(preset->text);
+                        tab.list.set_dirty();
+                    }
                 }
                 if (!db_builder->next(chem_host->host_haken())) {
                     save_presets(active_tab_id);
@@ -660,7 +671,7 @@ void PresetUi::on_filter_change(FilterId filter, uint64_t state)
     Tab& tab{active_tab()};
     PresetId current_id = tab.current_id();
     PresetId track_id;
-    if (!current_id.valid()) {
+    if (!current_id.valid() && tab.list.count()) {
         track_id = tab.list.nth(tab.scroll_top)->id;
     }
     tab.list.set_filter(filter, state);
@@ -673,24 +684,21 @@ void PresetUi::clear_filters()
     Tab& tab{active_tab()};
     PresetId current_id = tab.current_id();
     PresetId track_id;
-    if (!current_id.valid()) {
+    if (!current_id.valid() && tab.list.count()) {
         track_id = tab.list.nth(tab.scroll_top)->id;
     }
 
-    cat_filter->set_state(0);
-    type_filter->set_state(0);
-    character_filter->set_state(0);
-    matrix_filter->set_state(0);
-    setting_filter->set_state(0);
-
-    active_tab().list.no_filter();
-    tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
-    scroll_to_page_of_index(tab.current_index);
-
+    for (auto pf: filter_buttons) {
+        pf->close_dialog();
+        pf->set_state(0);
+    }
     if (my_module) {
         my_module->clear_filters(active_tab_id);
     }
+    active_tab().list.no_filter();
 
+    tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    scroll_to_page_of_index(tab.current_index);
 }
 
 
@@ -717,7 +725,11 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 
     if (my_module) {
         my_module->active_tab = tab_id;
-    }
+        auto filters = my_module->filters();
+        for (auto fb: filter_buttons) {
+            fb->set_state(*filters++);
+        }
+   }
 
     Tab& tab = active_tab();
     if (fetch && (0 == tab.count()) && host_available()) {
@@ -871,7 +883,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
 
         case GLFW_KEY_ENTER:
             if (0 == mods)  {
-                if ((tab.current_index >= 0) && host_available()) {
+                if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
                     chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
                 }
             }

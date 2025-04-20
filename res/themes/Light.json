@@ -82,7 +82,7 @@
             "preset-drag" :    { "fill": " #9d9131" },
             "preset-dragcur" : { "fill": " #9d9131"},
             "preset-grip":     { "fill":"#000000", "opacity": 0.4 },
-            "preset-hover":    { "fill": "hsl(0, 0%, 90%)", "stroke": { "color":"g50", "width": 0.5 }},
+            "preset-hover":    { "fill": "hsl(0, 0%, 75%)", "stroke": { "color":"g50", "width": 0.5 }},
             "preset-live":     { "fill": " #250b91" },
             "preset-livetext": { "fill": " #3c2a84" },
             "preset-selected": { "fill": "brand" },
