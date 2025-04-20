@@ -929,7 +929,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
 
         case GLFW_KEY_PAGE_UP:
             if (mods & RACK_MOD_CTRL) {
-                page_up(false, (e.mods & RACK_MOD_SHIFT));
+                page_up(false, (e.mods & GLFW_MOD_SHIFT));
                 e.consume(this);
                 return;
             }
