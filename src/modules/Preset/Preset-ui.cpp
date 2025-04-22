@@ -44,34 +44,37 @@ bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> th
 
 void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
-    menu->addChild(createMenuLabel("— Preset Actions —"));
+    menu->addChild(createMenuLabel<HamburgerTitle>("Preset Actions"));
+
+    NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
 
     auto item = createMenuItem<ColorDotMenuItem>("Sort alphabetically", "",
         [this](){ ui->sort_presets(PresetOrder::Alpha); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Alpha ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    item->color = ui->active_tab().list.order == PresetOrder::Alpha ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by category", "",
         [this](){ ui->sort_presets(PresetOrder::Category); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Category ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    item->color = ui->active_tab().list.order == PresetOrder::Category ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by Natural (system) order", "",
         [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Natural ? nvgHSL(360/200, .5, .5) : RampGray(G_45);
+    item->color = ui->active_tab().list.order == PresetOrder::Natural ? co_dot : RampGray(G_45);
     menu->addChild(item);
+
+    menu->addChild(new MenuSeparator);
+
+    menu->addChild(createMenuItem("Clear filters", "",
+        [this](){ ui->clear_filters(); },
+        !ui->filtering()
+    ));
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuItem("Show live preset", "",
         [this](){ ui->scroll_to_live(); },
         !ui->get_live_id().valid()
     ));
-    menu->addChild(createMenuItem("Clear filters", "",
-        [this](){ ui->clear_filters(); },
-        !ui->my_module
-    ));
-
-    menu->addChild(new MenuSeparator);
     menu->addChild(createCheckMenuItem("Track live preset", "", 
         [this](){ return ui->my_module->track_live; },
         [this](){ ui->set_track_live(!ui->my_module->track_live); },
@@ -106,6 +109,64 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 
 }
 
+struct SearchMenu : PresetMenu
+{
+    void appendContextMenu(ui::Menu* menu) override {
+        menu->addChild(createMenuLabel<HamburgerTitle>("Search Options"));
+
+        menu->addChild(createCheckMenuItem("Search preset Name", "", 
+            [this](){ return ui->my_module->search_name; },
+            [this](){
+                ui->my_module->search_name = !ui->my_module->search_name;
+                if (!ui->my_module->search_name) {
+                    ui->my_module->search_meta = true;
+                }
+                ui->on_search_text_enter();
+            },
+            !ui->my_module
+        ));
+        menu->addChild(createCheckMenuItem("Search preset Metadata", "",
+            [this](){ return ui->my_module->search_meta; },
+            [this](){
+                ui->my_module->search_meta = !ui->my_module->search_meta; 
+                if (!ui->my_module->search_meta) {
+                    ui->my_module->search_name = true;
+                }
+                ui->on_search_text_enter();
+            },
+            !ui->my_module
+        ));
+        menu->addChild(createCheckMenuItem("Match at Word start", "",
+            [this](){ return ui->my_module->search_anchor; },
+            [this](){
+                ui->my_module->search_anchor = !ui->my_module->search_anchor;
+                ui->on_search_text_enter();
+            },
+            !ui->my_module
+        ));
+
+        NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
+        auto item = createMenuItem<ColorDotMenuItem>("Search on ENTER", "",
+            [this](){ ui->my_module->search_incremental = false; }, !ui->my_module);
+        if (ui->my_module) {
+            item->color = (!ui->my_module->search_incremental) ? co_dot : RampGray(G_45);
+        } else {
+            item->color = RampGray(G_45);
+        }
+        menu->addChild(item);
+    
+        item = createMenuItem<ColorDotMenuItem>("Search as you type", "",
+            [this](){ ui->my_module->search_incremental = true; },  !ui->my_module);
+        if (ui->my_module) {
+            item->color = ui->my_module->search_incremental ? co_dot : RampGray(G_45);
+        } else {
+            item->color =  nvgHSL(360/200, .5, .5);
+        }
+        menu->addChild(item);
+    }
+};
+
+
 // PresetUi
 
 constexpr const float PANEL_WIDTH = 360.f;
@@ -123,14 +184,22 @@ PresetUi::PresetUi(PresetModule *module) :
     setPanel(panel);
 
     float x, y;
+
+    x = 23.5f;
+    y = 18.f;
     search_entry = new SearchField();
-    search_entry->box.pos = Vec(23.5f, 18.f);
+    search_entry->box.pos = Vec(x, y);
     search_entry->box.size = Vec(114.f, 14.f);
     search_entry->applyTheme(theme_engine, theme);
     search_entry->placeholder = "preset search";
     search_entry->change_handler = [this](){ this->on_search_text_changed(); };
     search_entry->enter_handler = [this](){ this->on_search_text_enter(); };
     addChild(search_entry);
+
+    menu = Center(createThemedWidget<SearchMenu>(Vec(x + 122.f, y + 7.f), theme_engine, theme));
+    menu->setUi(this);
+    menu->describe("Search options");
+    addChild(menu);
 
     x = 184.f;
     y = 23.75f;
@@ -193,6 +262,8 @@ PresetUi::PresetUi(PresetModule *module) :
     menu->setUi(this);
     menu->describe("Preset actions menu");
     addChild(menu);
+
+    // Filter buttons
 
     const float FILTER_DY = 20.f;
     y = 168.f;
@@ -657,10 +728,32 @@ void PresetUi::set_track_live(bool track)
 
 void PresetUi::on_search_text_changed()
 {
+    if (my_module->search_incremental || search_entry->empty()) {
+        on_search_text_enter();
+    }
 }
 
 void PresetUi::on_search_text_enter()
 {
+    if (!my_module) return;
+    Tab& tab{active_tab()};
+    auto query = search_entry->getText();
+    if (my_module) {
+        my_module->search_query = query;
+    }
+    PresetId current_id = tab.current_id();
+    PresetId track_id;
+    if (!current_id.valid() && tab.list.count()) {
+        track_id = tab.list.nth(tab.scroll_top)->id;
+    }
+    tab.list.set_search_query(query, my_module->search_name, my_module->search_meta, my_module->search_anchor);
+    tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    scroll_to_page_of_index(tab.current_index);
+}
+
+bool PresetUi::filtering()
+{
+    return !search_entry->empty() || active_tab().list.filtered();
 }
 
 void PresetUi::on_filter_change(FilterId filter, uint64_t state)
@@ -688,6 +781,7 @@ void PresetUi::clear_filters()
         track_id = tab.list.nth(tab.scroll_top)->id;
     }
 
+    search_entry->setText("");
     for (auto pf: filter_buttons) {
         pf->close_dialog();
         pf->set_state(0);

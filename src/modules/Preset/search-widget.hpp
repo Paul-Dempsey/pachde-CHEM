@@ -19,6 +19,7 @@ struct SearchField : TextField, IApplyTheme
     std::function<void(void)> enter_handler{nullptr};
 
     SearchField();
+    bool empty() { return text.empty(); }
     bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onChange(const ChangeEvent& e) override;

@@ -302,47 +302,57 @@ std::string HakenMetaCode::make_category_multiline_text(const std::string& text)
 //     return result;
 // }
 
+std::string make_result(const char * start, const char * end) {
+    std::string result;
+    while (start < end) {
+        result.push_back('_' == *start ? ' ' : *start);
+        ++start;
+    }
+    return result;
+}
+
 std::string parse_author(const std::string &text)
 {
     if (text.empty()) return text;
-    enum State { SOI, Text, A };
-    auto scan = text.cbegin();
-    while (is_space(*scan) && scan != text.cend()) scan ++;
-    if (scan == text.cend()) return "";
-    for (State state = SOI; scan != text.cend(); scan++) {
+
+    const char * end{text.c_str() + text.size()};
+    const char * scan{end - 1};
+    const char * data{scan};
+    const char * eq{nullptr};
+    const char * id{nullptr};
+
+    enum State { Data, Id };
+    State state = Data;
+    const char * lim = end - text.size();
+    while (scan >= lim) {
         switch (state) {
-        case SOI:
-            if ('A' == *scan) {
-                state = A;
-            } else {
-                state = Text;
-            }
-            break;
-        case Text:
-            if (is_space(*scan)) {
-                state = SOI;
-            }
-            break;
-        case A:
+        case Data:
             if ('=' == *scan) {
-                scan++;
-                std::string result;
-                result.reserve(text.cend() - scan);
-                while (scan != text.cend()) {
-                    if (is_space(*scan)) break;
-                    if ('_' == *scan) {
-                        result.push_back(' ');
-                    } else {
-                        result.push_back(*scan);
-                    }
-                    scan++;
-                }
-                return result;
+                eq = scan;
+                state = Id;
             } else {
-                state = Text;
+                data = scan;
+            }
+            break;
+        case Id:
+            if (std::isspace(*scan)) {
+                if (!id) return "";
+                if ((1 == (eq - id)) && 'A' == *id) {
+                    return make_result(data, end);
+                } else {
+                    data = scan;
+                    end = scan + 1;
+                    state = Data;
+                }
+            } else {
+                id = scan;
             }
             break;
         }
+        --scan;
+    }
+    if (id && eq && (1 == (eq - id)) && 'A' == *id) {
+        return make_result(data, end);
     }
     return "";
 }

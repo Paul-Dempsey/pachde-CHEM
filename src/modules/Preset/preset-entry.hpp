@@ -21,7 +21,7 @@ struct PresetEntry : OpaqueWidget, IApplyTheme, ILayoutHelp
     ElementStyle preset_element{"preset", "hsl(0, 0%, 55%)"};
     ElementStyle live_element{"preset-live", "hsl(42, 50%, 50%)", "hsl(42, 50%, 50%)", .35f };
     ElementStyle current_element{"preset-current", "hsl(60, 90%, 50%)", "hsl(60, 90%, 50%)", .25f};
-    ElementStyle hover_element{"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 50%)", .25f};
+    ElementStyle hover_element{"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 30%)", .5f};
     ElementStyle category_style{"preset-cat", "hsl(200, 50%, 50%)"};
     PresetUi* ui{nullptr};
 

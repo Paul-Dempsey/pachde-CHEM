@@ -27,7 +27,10 @@ struct FilterButton : SvgButton, IApplyTheme
         SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme);
 
     uint64_t get_state() { return dialog->get_state(); }
-    void set_state(uint64_t state) { dialog->set_state(state); }
+    void set_state(uint64_t state) {
+        dialog->set_state(state);
+        describe(dialog->make_summary());
+    }
 
     virtual ~FilterButton()
     {

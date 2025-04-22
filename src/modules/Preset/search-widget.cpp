@@ -107,7 +107,7 @@ void SearchField:: draw(const DrawArgs& args)
         // draw caret only when active
         if (active) {
             if (text.empty()) {
-                FillRect(vg, 1.5f, .5f, 1.f, box.size.y - .5f, selection_style.nvg_color());
+                FillRect(vg, 1.5f, .5f, 1.f, box.size.y - 2.5f, selection_style.nvg_color());
             } else {
                 NVGglyphPosition glyphs[120];
                 int glyph_count;
@@ -127,6 +127,7 @@ void SearchField:: draw(const DrawArgs& args)
                 for (int i = 0; i < glyph_count; ++i, ++pg) {
                     cx_start = pg->x;
                     if (pg->str == txt + cursor) {
+                    
                         break;
                     }
                     if (pg->str + 1 == txt + cursor) {
@@ -151,7 +152,7 @@ void SearchField:: draw(const DrawArgs& args)
                 float w = std::max(1.f, cx_end - cx_start);
                 float h;
                 nvgTextMetrics(vg, nullptr, nullptr, &h);
-                FillRect(vg, cx_start, 1.f, w, 1.f + h, selection_style.nvg_color());
+                FillRect(vg, cx_start, 1.f, w, 1.f + h - 2.f, selection_style.nvg_color());
             }
         }
         nvgFillColor(vg, text_style.nvg_color());

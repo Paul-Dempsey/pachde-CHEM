@@ -7,6 +7,7 @@ using namespace ::rack;
 
 namespace pachde {
 
+bool search_match(const std::string& query, const std::string& target);
 
 struct PresetList {
     PresetList(const PresetList&) = delete;
@@ -18,15 +19,23 @@ struct PresetList {
     std::vector<std::shared_ptr<PresetInfo>> preset_list;
 
     std::vector<std::shared_ptr<PresetInfo>> preset_view;
+
     uint64_t filter_masks[5]{0};
+    std::string search_query;
+    bool search_name{false};
+    bool search_meta{false};
+    bool search_anchor{false};
+    bool modified{false};
     bool filtering{false};
+    bool mask_filtering{false};
+
     bool filtered() { return filtering; }
+
+    void set_search_query(std::string query, bool name, bool meta, bool anchor);
     uint64_t get_filter(FilterId index) { return filter_masks[index]; }
     void set_filter(FilterId index, uint64_t mask);
     void init_filters( uint64_t* filters);
     void no_filter();
-
-    bool modified{false};
 
     PresetList(PresetTab id):
         tab(id),

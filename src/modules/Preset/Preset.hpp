@@ -47,9 +47,14 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     PresetOrder user_order{PresetOrder::Natural};
     PresetOrder system_order{PresetOrder::Alpha};
 
-    uint64_t user_filters[5];
-    uint64_t system_filters[5];
+    uint64_t user_filters[5]{0};
+    uint64_t system_filters[5]{0};
     uint64_t* filters();
+    std::string search_query;
+    bool search_name{true};
+    bool search_meta{true};
+    bool search_anchor{false};
+    bool search_incremental{false};
 
     PresetModule();
     ~PresetModule() {
@@ -126,23 +131,18 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     IChemHost*  chem_host{nullptr};
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-
     SearchField* search_entry{nullptr};
-
     LabelStyle tab_style{"tab-label", TextAlignment::Right, 16.f};
     LabelStyle current_tab_style{"tab-label-hi", TextAlignment::Right, 16.f, true};
     TextLabel* user_label{nullptr};
     TextLabel* system_label{nullptr};
-    
     TextLabel* page_label{nullptr};
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
     PresetMenu* menu{nullptr};
-
     std::vector<FilterButton*> filter_buttons;
     std::shared_ptr<PresetDescription> live_preset;
-
     PresetTab active_tab_id{PresetTab::System};
     Tab user_tab {PresetTab::User};
     Tab system_tab {PresetTab::System};
@@ -152,7 +152,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool other_system_gather{false};
     bool spinning{false};
     std::vector<PresetEntry*> preset_grid;
-
     DBBuilder* db_builder{nullptr};
 
     PresetUi(PresetModule *module);
@@ -196,6 +195,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     
     void on_search_text_changed();
     void on_search_text_enter();
+    bool filtering();
     void clear_filters();
     void on_filter_change(FilterId id, uint64_t state);
 

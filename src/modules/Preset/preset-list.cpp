@@ -1,8 +1,59 @@
 #include "preset-list.hpp"
 #include "../../services/misc.hpp"
 #include "../../em/em-hardware.h"
+#include "../../em/preset-meta.hpp"
 
 namespace pachde {
+
+inline bool is_break_char(char c)
+{
+    if ('_' == c) return true;
+    if ('.' == c) return true;
+    if ('=' == c) return true;
+    return std::isspace(c);
+}
+
+std::size_t common_prefix_length_insensitive(std::string::const_iterator a, std::string::const_iterator end_a, std::string::const_iterator b, std::string::const_iterator end_b)
+{
+    int common = 0;
+    for (; ((a != end_a) && (b != end_b)) && ((*a == *b) || (std::tolower(*a) == std::tolower(*b)));
+    ++a, ++b, ++common){ 
+        // nothing
+    }
+    return common;
+}
+
+bool search_match(const std::string &query, const std::string &text, bool anchor)
+{
+    if (text.empty()) return query.empty() ? true : false;
+    auto scan = text.cbegin();
+    auto terminus = text.cend();
+    auto q = query.cbegin();
+    if (!anchor) {
+        while (scan != terminus) {
+            if ((*scan == *q) || (std::tolower(*scan) == std::tolower(*q))) {
+                if (query.size() == common_prefix_length_insensitive(q, query.cend(), scan, text.cend())) {
+                    return true;
+                }
+            }
+            scan++;
+        }
+        return false;
+    }
+    while (scan != terminus) {
+        if (scan == text.cbegin() || is_break_char(*(scan - 1))) {
+            if ((*scan == *q) || (std::tolower(*scan) == std::tolower(*q))) {
+                if (query.size() == common_prefix_length_insensitive(q, query.cend(), scan, text.cend())) {
+                    return true;
+                }
+            }
+        }
+        scan++;
+    }
+    return false;
+
+}
+
 
 bool PresetList::load(const std::string &path)
 {
@@ -73,7 +124,8 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
         auto orderfn = getPresetSort(order);
         std::sort(preset_list.begin(), preset_list.end(), orderfn);
     }
-    if (any_filter(filter_masks)) {
+    mask_filtering = any_filter(filter_masks);
+    if (mask_filtering || !search_query.empty()) {
         filtering = true;
         refresh_filter_view();
     }
@@ -99,9 +151,10 @@ void PresetList::set_filter(FilterId index, uint64_t mask)
     if (filter_masks[index] != mask) {
         filter_masks[index] = mask;
         if (mask) {
-            filtering = true;
+            mask_filtering = filtering = true;
         } else {
-            filtering = any_filter(filter_masks);
+            mask_filtering = any_filter(filter_masks);
+            filtering = mask_filtering || !search_query.empty();
         }
         refresh_filter_view();
     }
@@ -109,9 +162,9 @@ void PresetList::set_filter(FilterId index, uint64_t mask)
 
 void PresetList::init_filters(uint64_t *filters)
 {
-    no_filter();
     std::memcpy(filter_masks, filters, sizeof(filter_masks));
-    filtering = any_filter(filter_masks);
+    mask_filtering = any_filter(filter_masks);
+    filtering = mask_filtering || !search_query.empty();
 }
 
 void PresetList::no_filter()
@@ -119,7 +172,22 @@ void PresetList::no_filter()
     if (filtering) {
         filtering = false;
         std::memset(filter_masks, 0, sizeof(filter_masks));
+        search_query = "";
         preset_view.clear();
+    }
+}
+
+void PresetList::set_search_query(std::string query, bool name, bool meta, bool anchor)
+{
+    search_query = query;
+    search_name = name;
+    search_meta = meta;
+    search_anchor = anchor;
+    filtering = mask_filtering || !search_query.empty();
+    if (!filtering) {
+        preset_view.clear();
+    } else {
+        refresh_filter_view();
     }
 }
 
@@ -149,9 +217,25 @@ void PresetList::refresh_filter_view()
     if (filtering) {
         auto inserter = std::back_inserter(preset_view);
         for (auto p: preset_list) {
-            uint64_t preset_masks[5];
-            FillMetaCodeMasks(p->meta, preset_masks);
-            if (zip_any_filter(filter_masks, preset_masks)) {
+            if (mask_filtering) {
+                uint64_t preset_masks[5];
+                FillMetaCodeMasks(p->meta, preset_masks);
+                if (zip_any_filter(filter_masks, preset_masks)) {
+                    if (search_query.empty()) {
+                        *inserter++ = p;
+                        continue;
+                    }
+                }
+            }
+            if (search_query.empty()) continue;
+            bool match{false};
+            if (search_name) {
+                match = search_match(search_query, p->name, search_anchor);
+            }
+            if (!match && search_meta) {
+                match = search_match(search_query, p->text, search_anchor);
+            }
+            if (match) {
                 *inserter++ = p;
             }
         }
@@ -200,5 +284,7 @@ void PresetList::sort(PresetOrder order)
         modified = true;
     }
 }
+
+
 
 }

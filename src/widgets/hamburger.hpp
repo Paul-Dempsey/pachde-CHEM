@@ -1,6 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "../services/colors.hpp"
+#include "../services/text.hpp"
 #include "../services/svgtheme.hpp"
 #include "TipWidget.hpp"
 using namespace ::rack;
@@ -55,6 +56,37 @@ struct HamData : IApplyTheme
         }
     }
 
+};
+
+struct HamburgerTitle : MenuLabel
+{
+    NVGcolor co_bg;
+    NVGcolor co_text;
+
+    HamburgerTitle()
+    {
+        const std::string& theme = ::rack::settings::uiTheme;
+        if (0 == theme.compare("light")) {
+            co_bg = nvgHSL(200.f/360.f,.5,.4);
+            co_text = nvgRGB(250, 250, 250);
+        } else if (0 == theme.compare("hcdark")) {
+            co_bg = nvgRGB(254, 254, 254);
+            co_text = nvgRGB(0,0,0);
+        } else {
+            co_bg = nvgHSL(200.f/360.f,.5,.4);
+            co_text = nvgRGB(250, 250, 250);
+        }
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        auto vg = args.vg;
+        auto font = GetPluginFontSemiBold();
+        if (!FontOk(font)) return;
+        FillRect(vg, 0, 0, box.size.x, box.size.y - 1.f, co_bg);
+        SetTextStyle(vg, font, co_text, 16.f);
+        CenterText(vg, box.size.x*.5, 14.f, text.c_str(), nullptr);
+    }
 };
 
 struct Hamburger : TipWidget, IApplyTheme

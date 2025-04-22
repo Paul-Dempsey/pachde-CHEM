@@ -18,6 +18,11 @@ void PresetModule::dataFromJson(json_t *root)
     user_order = PresetOrder(get_json_int(root, "user-sort-order", int(PresetOrder::Natural)));
     system_order = PresetOrder(get_json_int(root, "system-sort-order", int(PresetOrder::Alpha)));
 
+    json_read_bool(root, "search-name", search_name);
+    json_read_bool(root, "search-text", search_meta);
+    json_read_bool(root, "search-anchored", search_anchor);
+    json_read_bool(root, "search-incremental", search_incremental);
+
     if (keep_search_filters) {
         auto jar = json_object_get(root, "user-filters");
         if (jar) {
@@ -55,6 +60,11 @@ json_t* PresetModule::dataToJson()
     json_object_set_new(root, "tab", json_integer(int(active_tab)));
     json_object_set_new(root, "user-sort-order", json_integer(int(user_order)));
     json_object_set_new(root, "system-sort-order", json_integer(int(system_order)));
+    json_object_set_new(root, "search-name", json_boolean(search_name));
+    json_object_set_new(root, "search-text", json_boolean(search_meta));
+    json_object_set_new(root, "search-anchored", json_boolean(search_anchor));
+    json_object_set_new(root, "search-incremental", json_boolean(search_incremental));
+
     if (keep_search_filters) {
         auto jar = json_array();
         for (int i = 0; i < 5; ++i) {
@@ -129,7 +139,7 @@ void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
     if (((args.frame + id) % 80) == 0) {
-        if (any_filter(filters())) {
+        if (!search_query.empty() || any_filter(filters())) {
             getLight(L_FILTER).setBrightness(1.f);
         } else {
             getLight(L_FILTER).setBrightness(0.f);
