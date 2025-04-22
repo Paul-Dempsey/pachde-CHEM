@@ -56,6 +56,8 @@ struct PresetInfo : PresetDescription {
 
     std::vector<uint16_t> meta;
 
+    PresetInfo() {}
+
     PresetInfo(PresetId id, std::string name, std::string text) :
         PresetDescription(id, name, text)
     {
@@ -79,7 +81,11 @@ struct PresetInfo : PresetDescription {
         meta.clear();
         FillMetaCodeList(text, meta);
     }
-
+    void ensure_meta() {
+        if (meta.empty()) {
+            FillMetaCodeList(text, meta);
+        }
+    }
     void set_text(const std::string & new_text) {
         text = new_text;
         meta.clear();
@@ -87,7 +93,7 @@ struct PresetInfo : PresetDescription {
     }
 
     std::string category_code() {
-        if (meta.empty()) return "OT";
+        if (meta.empty()) return "ZZ";
         return MetaCode(meta[0]).to_string();
     }
 

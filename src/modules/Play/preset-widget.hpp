@@ -1,6 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "../../services/svt_rack.hpp"
+#include "../../widgets/element-style.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../em/preset.hpp"
 
@@ -40,8 +41,9 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
     NVGcolor text_color;
     NVGcolor drag_color;
     NVGcolor drag_current_color;
+    ElementStyle hover_element{"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 30%)", .5f};
 
-    std::deque<std::shared_ptr<PresetDescription>>* preset_list;
+    std::deque<std::shared_ptr<PresetInfo>>* preset_list;
     int preset_index;
     PresetId preset_id;
     IPresetAction* agent;
@@ -51,7 +53,7 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
     bool live;
     bool selected;
     bool current;
-
+    bool hovered;
     bool wire_style;
 
     bool drag_started;
@@ -78,10 +80,10 @@ public:
     bool is_live() { return live; }
     void set_live(bool state) { live = state; }
     PresetId get_preset_id() { return preset_id; }
-    std::shared_ptr<PresetDescription> get_preset();
-    void set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetDescription> preset);
+    std::shared_ptr<PresetInfo> get_preset();
+    void set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetInfo> preset);
     void clear_preset();
-    void set_preset_list(std::deque<std::shared_ptr<PresetDescription>>* presets) {
+    void set_preset_list(std::deque<std::shared_ptr<PresetInfo>>* presets) {
         preset_list = presets;
     }
     void set_agent(IPresetAction* client) { agent = client; }
@@ -99,6 +101,7 @@ public:
     void onHover(const HoverEvent& e) override;
     void onHoverKey(const HoverKeyEvent& e) override;
     void onPathDrop(const PathDropEvent& e) override;
+    void onEnter(const EnterEvent& e) override;
     void onLeave(const LeaveEvent& e) override;
 
     void begin_drag() {
@@ -122,7 +125,7 @@ public:
     void draw(const DrawArgs& args) override;
 };
 
-inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetDescription>>* presets, float x, float y, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetInfo>>* presets, float x, float y, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {
     auto o = createThemedWidget<PresetWidget>(Vec(x,y), engine, theme);
     o->set_agent(agent);

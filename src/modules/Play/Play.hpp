@@ -2,6 +2,7 @@
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
 #include "../../em/em-batch-state.hpp"
+#include "../../em/preset-sort.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/kv-store.hpp"
 #include "../../services/ModuleBroker.hpp"
@@ -107,12 +108,12 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
         blip->set_brightness(modified ? 1.f : 0.f);
     }
 
-    std::shared_ptr<PresetDescription> live_preset;
+    std::shared_ptr<PresetInfo> live_preset;
     PresetId get_live_id() { PresetId id; return live_preset ? live_preset->id : id; }
-    std::shared_ptr<PresetDescription> current_preset;
+    std::shared_ptr<PresetInfo> current_preset;
     ssize_t current_index{-1};
     
-    std::deque<std::shared_ptr<PresetDescription>> presets;
+    std::deque<std::shared_ptr<PresetInfo>> presets;
     ssize_t preset_count() { return static_cast<ssize_t>(presets.size()); }
     
     std::vector<PresetWidget*> preset_widgets;
@@ -138,10 +139,12 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void select_item(int index);
     void unselect_item(int index);
     
-    std::vector<std::shared_ptr<PresetDescription>> extract(const std::vector<int>& list);
+    std::vector<std::shared_ptr<PresetInfo>> extract(const std::vector<int>& list);
+    ssize_t index_of_id(PresetId id);
     void set_track_live(bool track);
     void presets_to_json(json_t* root);
     void presets_from_json(json_t* root);
+    void sort_presets(PresetOrder order);
     void sync_to_presets();
     void update_live();
     void update_up_down();

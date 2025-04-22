@@ -145,6 +145,13 @@ struct SearchMenu : PresetMenu
             !ui->my_module
         ));
 
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuItem("Clear filters", "",
+            [this](){ ui->clear_filters(); },
+            !ui->filtering()
+        ));
+
+        menu->addChild(new MenuSeparator);
         NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
         auto item = createMenuItem<ColorDotMenuItem>("Search on ENTER", "",
             [this](){ ui->my_module->search_incremental = false; }, !ui->my_module);
@@ -635,7 +642,7 @@ void PresetUi::onPresetChange()
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
-            live_preset = std::make_shared<PresetDescription>();
+            live_preset = std::make_shared<PresetInfo>();
             live_preset->init(preset);
             live_preset_label->text(live_preset->name);
             live_preset_label->describe(live_preset->meta_text());
@@ -945,6 +952,18 @@ void PresetUi::update_page_controls()
     }
 }
 
+void PresetUi::send_preset(ssize_t index)
+{
+    if (index < 0) return;
+    Tab& tab = active_tab();
+    if (index >= ssize_t(tab.count())) return;
+    auto preset = tab.list.nth(index);
+    if (preset && host_available()) {
+        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
+    }
+}
+
+
 void PresetUi::next_preset(bool ctrl, bool shift)
 {
     Tab& tab = active_tab();
@@ -968,10 +987,7 @@ void PresetUi::next_preset(bool ctrl, bool shift)
             tab.current_index = 0;
         }
     }
-    auto preset = tab.list.nth(tab.current_index);
-    if (preset && host_available()) {
-        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
-    }
+    send_preset(tab.current_index);
 }
 
 void PresetUi::previous_preset(bool ctrl, bool shift)
@@ -995,10 +1011,7 @@ void PresetUi::previous_preset(bool ctrl, bool shift)
             tab.current_index = tab.count() - 1;
         }
     }
-    auto preset = tab.list.nth(tab.current_index);
-    if (preset && host_available()) {
-        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
-    }
+    send_preset(tab.current_index);
 }
 
 void PresetUi::onButton(const ButtonEvent &e)

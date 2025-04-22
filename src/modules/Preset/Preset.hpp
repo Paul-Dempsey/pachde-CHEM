@@ -190,6 +190,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void page_down(bool control, bool shift);
     void update_page_controls();
     
+    void send_preset(ssize_t index);
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
     

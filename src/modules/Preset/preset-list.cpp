@@ -115,9 +115,10 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
         json_t* jp;
         size_t index;
         json_array_foreach(jar, index, jp) {
-            auto preset = std::make_shared<PresetDescription>();
+            auto preset = std::make_shared<PresetInfo>();
             preset->fromJson(jp);
-            preset_list.push_back(std::make_shared<PresetInfo>(preset));
+            preset->ensure_meta();
+            preset_list.push_back(preset);
         }
     }
     if (order != PresetOrder(get_json_int(root, "order", int(order)))) {
@@ -205,7 +206,6 @@ inline bool zip_any_filter(uint64_t* a, uint64_t* b)
     if (bool(*a) && !bool(*a & *b)) return false;
 
     a++; b++;
-    
     if (bool(*a) && !bool(*a & *b)) return false;
 
     return true;
@@ -217,23 +217,19 @@ void PresetList::refresh_filter_view()
     if (filtering) {
         auto inserter = std::back_inserter(preset_view);
         for (auto p: preset_list) {
+            bool match{true};
             if (mask_filtering) {
                 uint64_t preset_masks[5];
                 FillMetaCodeMasks(p->meta, preset_masks);
-                if (zip_any_filter(filter_masks, preset_masks)) {
-                    if (search_query.empty()) {
-                        *inserter++ = p;
-                        continue;
-                    }
+                match = zip_any_filter(filter_masks, preset_masks);
+            }
+            if (match && !search_query.empty()) {
+                if (search_name) {
+                    match = search_match(search_query, p->name, search_anchor);
                 }
-            }
-            if (search_query.empty()) continue;
-            bool match{false};
-            if (search_name) {
-                match = search_match(search_query, p->name, search_anchor);
-            }
-            if (!match && search_meta) {
-                match = search_match(search_query, p->text, search_anchor);
+                if (!match && search_meta) {
+                    match = search_match(search_query, p->text, search_anchor);
+                }
             }
             if (match) {
                 *inserter++ = p;

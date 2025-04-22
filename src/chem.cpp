@@ -1,4 +1,5 @@
 #include "chem.hpp"
+#include "widgets/hamburger.hpp"
 #include "widgets/logo-widget.hpp"
 #include "widgets/layout-help.hpp"
 #include "widgets/uniform-style.hpp"
@@ -235,7 +236,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 //    bool sync = module ? getChemModule()->sync_theme : true;
 
     menu->addChild(new MenuSeparator);
-    menu->addChild(createMenuLabel("— themes —"));
+    menu->addChild(createMenuLabel<HamburgerTitle>("Themes"));
     AppendThemeMenu(menu, this, theme_engine, follow, this);
 
     menu->addChild(new MenuSeparator);

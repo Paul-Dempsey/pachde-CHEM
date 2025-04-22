@@ -1,6 +1,8 @@
 #include "preset-widget.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/misc.hpp"
+#include "../../widgets/hamburger.hpp"
+
 namespace pachde {
 
 constexpr const double DRAG_DELAY_INTERVAL = 0.35;
@@ -24,6 +26,7 @@ PresetWidget::PresetWidget()
     live(false),
     selected(false),
     current(false),
+    hovered(false),
     wire_style(false),
 
     drag_started(false),
@@ -46,6 +49,7 @@ bool PresetWidget::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgT
     text_color =          fromPacked(theme->getFillColor("preset", true));
     drag_color =          fromPacked(theme->getFillColor("preset-drag", true));
     drag_current_color =  fromPacked(theme->getFillColor("preset-dragcur", true));
+    hover_element.apply_theme(theme);
     return true;
 }
 
@@ -58,7 +62,7 @@ void PresetWidget::clear_preset()
     //preset_name->describe("");
 }
 
-void PresetWidget::set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetDescription> source)
+void PresetWidget::set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetInfo> source)
 {
     preset_index = index;
     live = is_live;
@@ -78,7 +82,7 @@ void PresetWidget::set_selected(bool select)
     selected = select;
 }
 
-std::shared_ptr<PresetDescription> PresetWidget::get_preset()
+std::shared_ptr<PresetInfo> PresetWidget::get_preset()
 {
     if (preset_index < 0) return nullptr;
     auto pit = preset_list->cbegin() + preset_index;
@@ -96,14 +100,21 @@ void PresetWidget::clear_states()
 
 void PresetWidget::onHover(const HoverEvent& e)
 {
-    hover_grip = (preset_index >= 0) && get_preset()->id.valid() && (e.pos.x > box.size.x - GRIP_WIDTH);
+    hover_grip = (preset_index >= 0) && preset_id.valid() && (e.pos.x > box.size.x - GRIP_WIDTH);
     Base::onHover(e);
+}
+
+void PresetWidget::onEnter(const EnterEvent &e)
+{
+    Base::onEnter(e);
+    hovered = preset_id.valid();
 }
 
 void PresetWidget::onLeave(const LeaveEvent& e)
 {
     hover_grip = false;
     button_down = false;
+    hovered = false;
     Base::onLeave(e);
 }
 
@@ -263,9 +274,8 @@ void PresetWidget::onPathDrop(const PathDropEvent& e)
 void PresetWidget::appendContextMenu(ui::Menu* menu)
 {
     bool disable = empty() || !agent;
-    menu->addChild(createMenuLabel(format_string("— %s —", preset_name.c_str())));
+    menu->addChild(createMenuLabel<HamburgerTitle>(preset_name));
     menu->addChild(createMenuItem("Remove", "", [this](){ agent->onDelete(this); }, disable));
-    //menu->addChild(createMenuItem("", "", [this](){  }, !agent));
     if (selected) {
         menu->addChild(createMenuItem("Un-select", "", [this](){ agent->onSetSelection(this, false); }, disable));
     } else {
@@ -280,7 +290,6 @@ void PresetWidget::appendContextMenu(ui::Menu* menu)
         disable
     ));
 }
-
 
 void PresetWidget::render(const DrawArgs& args, bool pre_base)
 {
@@ -299,6 +308,9 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
 
         if (button_down) {
             FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - 1.f, drag_current_color);
+        } else if (hovered) {
+            FillRect(vg, 0, 0, box.size.x, box.size.y, hover_element.nvg_color());
+            FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, hover_element.nvg_stroke_color(), Fit::Inside, hover_element.width());
         }
 
         if (dragging) {

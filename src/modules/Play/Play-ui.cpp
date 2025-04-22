@@ -47,7 +47,7 @@ bool PlayMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> them
 
 void PlayMenu::appendContextMenu(ui::Menu* menu)
 {
-    menu->addChild(createMenuLabel("— Playlist Actions —"));
+    menu->addChild(createMenuLabel<HamburgerTitle>("Playlist Actions"));
     menu->addChild(createMenuItem("Open...", "",    [this](){ ui->open_playlist(); }, false));
     menu->addChild(createMenuItem("Close", "",      [this](){ ui->close_playlist(); }, false));
     menu->addChild(createMenuItem("Save", "",       [this](){ ui->save_playlist(); } , false));
@@ -71,6 +71,10 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
         menu->addChild(createMenuItem("Clear recents", "", [this](){ ui->my_module->clear_mru(); }, false));
     }
     menu->addChild(new MenuSeparator);
+    menu->addChild(createMenuItem("Sort alphabetically", "", [this](){ ui->sort_presets(PresetOrder::Alpha); }, false));
+    menu->addChild(createMenuItem("Sort by category", "", [this](){ ui->sort_presets(PresetOrder::Category); }, false));
+    menu->addChild(createMenuItem("Sort by Natural (system) order", "", [this](){ ui->sort_presets(PresetOrder::Natural); }, false));
+
     menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
         menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
         menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
@@ -81,7 +85,7 @@ void PlayMenu::appendContextMenu(ui::Menu* menu)
     bool no_selection =  ui->selected.empty();
     bool first = (0 == ui->first_selected());
     bool last = (ui->last_selected() == static_cast<int>(ui->presets.size())-1);
-    menu->addChild(createMenuLabel("— Selected —"));
+    menu->addChild(createMenuLabel<HamburgerTitle>("Selected"));
     menu->addChild(createMenuItem("Duplicate", "",     [this](){ ui->clone(); }, no_selection));
     menu->addChild(createMenuItem("Remove", "",        [this](){ ui->remove_selected(); }, no_selection));
     menu->addChild(new MenuSeparator);
@@ -290,17 +294,36 @@ void PlayUi::presets_from_json(json_t * root)
         json_t* jp;
         size_t index;
         json_array_foreach(jar, index, jp) {
-            auto preset = std::make_shared<PresetDescription>();
+            auto preset = std::make_shared<PresetInfo>();
             preset->fromJson(jp);
+            preset->ensure_meta();
             presets.push_back(preset);
         }
     }
 }
 
+void PlayUi::sort_presets(PresetOrder order)
+{
+    PresetId id_restore;
+    if (current_index >= 0) {
+        id_restore = presets[current_index]->id;
+    } else if (live_preset) {
+        id_restore = live_preset->id;
+    }
+    auto orderfn = getPresetSort(order);
+    std::sort(presets.begin(), presets.end(), orderfn);
+    if (id_restore.valid()) {
+        current_index = index_of_id(id_restore);
+    } else {
+        current_index = 0;
+    }
+    make_visible(current_index);
+}
+
 void PlayUi::add_live()
 {
     if (!live_preset) return;
-    auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<pachde::PresetDescription> p){
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<pachde::PresetInfo> p){
         return live_preset->id == p->id;
     });
     if (it == presets.cend()) {
@@ -675,7 +698,7 @@ void PlayUi::scroll_to_live()
 {
     if (!live_preset) return;
     auto id = live_preset->id;
-    auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<pachde::PresetDescription>& p){
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<pachde::PresetInfo>& p){
         return p->id == id;
     });
     if (it != presets.cend()) {
@@ -722,13 +745,21 @@ const std::vector<int>& PlayUi::get_selected_indices()
     return selected;
 }
 
-std::vector<std::shared_ptr<PresetDescription>> PlayUi::extract(const std::vector<int>& list)
+std::vector<std::shared_ptr<PresetInfo>> PlayUi::extract(const std::vector<int>& list)
 {
-    std::vector<std::shared_ptr<PresetDescription>> extracted;
+    std::vector<std::shared_ptr<PresetInfo>> extracted;
     for (int index : list) {
         extracted.push_back(*(presets.begin() + index));
     }
     return extracted;
+}
+
+ssize_t PlayUi::index_of_id(PresetId id)
+{
+    auto key = id.key();
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
+    if (it == presets.cend()) return -1;
+    return it - presets.cbegin();
 }
 
 void PlayUi::clone()
@@ -749,7 +780,7 @@ void PlayUi::clone()
     set_modified(true);
 }
 
-void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetDescription>>& items)
+void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetInfo>>& items)
 {
     auto rit = indices.crbegin();
     while (rit != indices.crend()) {
@@ -824,7 +855,7 @@ void PlayUi::to_n(int dx)
     for (int& i : selected) { i += dx; }
 
     // move presets to temp
-    std::vector<std::shared_ptr<PresetDescription>> new_presets;
+    std::vector<std::shared_ptr<PresetInfo>> new_presets;
     new_presets.reserve(presets.size());
     for (auto p : presets) {
         new_presets.push_back(p);
@@ -869,11 +900,11 @@ void PlayUi::onPresetChange()
         auto preset = chem_host->host_preset();
         if (preset) {
             if (preset->empty()) return;
-            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<pachde::PresetDescription> p){
+            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<pachde::PresetInfo> p){
                 return preset->id.key() == p->id.key();
             });
             if (it == presets.cend()) {
-                auto new_preset = std::make_shared<PresetDescription>();
+                auto new_preset = std::make_shared<PresetInfo>();
                 new_preset->init(preset);
                 presets.push_back(new_preset);
                 set_modified(true);
@@ -887,7 +918,7 @@ void PlayUi::onPresetChange()
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
-            live_preset = std::make_shared<PresetDescription>();
+            live_preset = std::make_shared<PresetInfo>();
             live_preset->init(preset);
         } else {
             live_preset = nullptr;
@@ -1128,7 +1159,7 @@ void PlayUi::onDropPreset(PresetWidget* target)
         remove_items(selected, presets);
         //selected.clear();
 
-        std::vector<std::shared_ptr<PresetDescription>> new_presets;
+        std::vector<std::shared_ptr<PresetInfo>> new_presets;
         new_presets.reserve(presets.size());
         for (auto p : presets) {
             new_presets.push_back(p);

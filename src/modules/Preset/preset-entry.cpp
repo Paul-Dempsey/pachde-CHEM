@@ -2,6 +2,7 @@
 #include "../../em/preset-meta.hpp"
 #include "../../services/misc.hpp"
 #include "../../chem.hpp"
+#include "../../widgets/hamburger.hpp"
 #include "Preset.hpp"
 
 namespace pachde {
@@ -38,6 +39,15 @@ void PresetEntry::set_preset(int index, bool is_current, bool is_live, std::shar
     notifyChange(this);
 }
 
+void PresetEntry::set_current(ssize_t index)
+{
+    for (auto pw: peers) {
+        pw->current = false;
+    }
+    current = true;
+    notifyChange(this);
+}
+
 void PresetEntry::clear_preset()
 {
     preset = nullptr;
@@ -61,32 +71,71 @@ bool PresetEntry::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTh
     return true;
 }
 
+void PresetEntry::appendContextMenu(ui::Menu *menu)
+{
+    menu->addChild(createMenuLabel<HamburgerTitle>(preset->name));
+    menu->addChild(createMenuItem("Send", "", [this](){ send_preset(); }, !preset_id().valid()));
+    menu->addChild(createMenuItem("Set current", "", [this](){
+        for (auto pit = peers.begin(); pit != peers.end(); pit++) {
+            (*pit)->current = false;
+        }
+        current = true;
+        ui->set_current_index(preset_index);
+    }));
+    menu->addChild(createMenuItem("Copy info", "", [this](){
+        auto info = preset->meta_text();
+        glfwSetClipboardString(APP->window->win, info.c_str());
+    }));
+}
+
+void PresetEntry::send_preset()
+{
+    auto id = preset_id();
+    if (!id.valid()) return;
+    if (!ui) return;
+    ui->send_preset(preset_index);
+}
+
 void PresetEntry::onButton(const ButtonEvent &e)
 {
     for (auto pit = peers.begin(); pit != peers.end(); pit++) {
         (*pit)->current = false;
     }
-    if (valid()) {
-        current = true;
-        ui->set_current_index(preset_index);
-    } else if (!peers.empty()){
-        for (auto pit = peers.rbegin(); pit != peers.rend(); pit++) {
-            PresetEntry* pe = *pit;
-            if (pe->valid()) {
-                pe->current = true;
-                ui->set_current_index(pe->preset_index);
-                break;
-            }
-        }
-    }
-    if (current && !live) {
-        if (auto p = dynamic_cast<ChemModuleWidget*>(getParent())) {
-            if (auto m = p->getChemModule()) {
-                if (m->chem_host) {
-                    m->chem_host->host_haken()->select_preset(ChemId::Preset, preset_id());
+
+    auto mod = e.mods & RACK_MOD_MASK;
+    switch (e.button) {
+    case GLFW_MOUSE_BUTTON_LEFT:
+        if (e.action == GLFW_PRESS)
+        {
+            if (valid()) {
+                current = true;
+                ui->set_current_index(preset_index);
+            } else if (!peers.empty()){
+                for (auto pit = peers.rbegin(); pit != peers.rend(); pit++) {
+                    PresetEntry* pe = *pit;
+                    if (pe->valid()) {
+                        pe->current = true;
+                        ui->set_current_index(pe->preset_index);
+                        break;
+                    }
                 }
             }
+            if (current && !live) {
+                send_preset();
+            }
         }
+        break;
+
+    case GLFW_MOUSE_BUTTON_RIGHT:
+        if (0 == mod) {
+            e.consume(this);
+            switch (e.action) {
+                case GLFW_RELEASE: {
+                    createContextMenu();
+                } break;
+            }
+        }
+        break;
     }
     Base::onButton(e);
 }
