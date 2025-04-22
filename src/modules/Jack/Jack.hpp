@@ -82,8 +82,6 @@ struct JackModule : ChemModule, IChemClient
 
 // -- Jack UI -----------------------------------
 
-// TODO: adapt HC 1 PedalParam for better menu
-
 struct JackUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;

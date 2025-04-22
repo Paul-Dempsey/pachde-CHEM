@@ -42,7 +42,7 @@ void EaganMatrix::reset()
     ch2.clear();
     ch16.clear();
     std::memset(macro, 0, sizeof(macro));
-    std::memset(mat, 0, sizeof(mat)); // $TODO: init default? (e.g. mat[idFrontBack] = ccBrightness)
+    std::memset(mat, 0, sizeof(mat));
     notifyHardwareChanged();
     notifyPresetChanged();
 }

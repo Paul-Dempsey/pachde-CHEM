@@ -1,7 +1,6 @@
 # CHEM To-Do
 
 - Overlay macro system modules
-- Preset: next/prev triggers
 - Preset: track live
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - **Play**: sorting: alpha, id, category
@@ -9,7 +8,6 @@
 - Slim Attenuation?
 - Line/Headphone levels?
 - try BloodBat's GH stuff
-- Midi Channel re-mapping for Em->EM control (Music data filter is not enough).
 
 ## Before release
 

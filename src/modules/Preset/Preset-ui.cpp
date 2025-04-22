@@ -645,6 +645,7 @@ void PresetUi::onPresetChange()
                 auto p = tab.list.nth(n);
                 p->set_text(live_preset->text);
                 tab.list.set_dirty();
+                set_current_index(n);
             }
         } else {
             live_preset = nullptr;
@@ -660,6 +661,8 @@ void PresetUi::onPresetChange()
     for (auto pw : preset_grid) {
         if (!pw->valid()) break;
         pw->live = live_preset && live_preset->valid() && (pw->preset_id() == live_preset->id);
+        auto current = active_tab().current_index;
+        pw->current = (current >= 0) && (current == pw->preset_index);
     }
 }
 
@@ -723,7 +726,9 @@ void PresetUi::set_track_live(bool track)
     if (!module) return;
     if (track == my_module->track_live) return;
     my_module->track_live = track;
-    // TODO: track live preset
+    if (track) {
+        scroll_to_live();
+    }
 }
 
 void PresetUi::on_search_text_changed()
@@ -942,10 +947,58 @@ void PresetUi::update_page_controls()
 
 void PresetUi::next_preset(bool ctrl, bool shift)
 {
+    Tab& tab = active_tab();
+    if (tab.current_index < 0) {
+        if (live_preset) {
+            tab.current_index = tab.list.index_of_id(live_preset->id);
+            if (tab.current_index >= 0) {
+                ++tab.current_index;
+                if (tab.current_index >= ssize_t(tab.count())) {
+                    tab.current_index = 0;
+                }
+            } else {
+                return;
+            }
+        } else {
+            tab.current_index = tab.scroll_top;
+        }
+    } else {
+        ++tab.current_index;
+        if (tab.current_index >= ssize_t(tab.count())) {
+            tab.current_index = 0;
+        }
+    }
+    auto preset = tab.list.nth(tab.current_index);
+    if (preset && host_available()) {
+        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
+    }
 }
 
 void PresetUi::previous_preset(bool ctrl, bool shift)
 {
+    Tab& tab = active_tab();
+    if (tab.current_index < 0) {
+        if (live_preset) {
+            tab.current_index = tab.list.index_of_id(live_preset->id);
+            if (tab.current_index >= 0) {
+                --tab.current_index;
+                if (tab.current_index < 0) {
+                    tab.current_index = tab.count() -1;
+                }
+            }
+        } else {
+            tab.current_index = tab.scroll_top;
+        }
+    } else {
+        --tab.current_index;
+        if (tab.current_index < 0) {
+            tab.current_index = tab.count() - 1;
+        }
+    }
+    auto preset = tab.list.nth(tab.current_index);
+    if (preset && host_available()) {
+        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
+    }
 }
 
 void PresetUi::onButton(const ButtonEvent &e)
