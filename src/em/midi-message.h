@@ -45,7 +45,10 @@ inline uint8_t midi_channel(PackedMidiMessage msg) { return msg.bytes.status_byt
 inline uint8_t midi_cc(PackedMidiMessage msg) { return msg.bytes.data1; }
 inline uint8_t midi_cc_value(PackedMidiMessage msg) { return msg.bytes.data2; }
 inline uint8_t midi_tag(PackedMidiMessage msg) { return msg.bytes.tag; }
-
+inline void midi_set_channel(PackedMidiMessage& msg, uint8_t channel) {
+    //assert(0 == (channel & CHANNEL_MASK));
+    msg.bytes.status_byte = ((msg.bytes.status_byte & STATUS_MASK) | channel);
+}
 inline PackedMidiMessage Tag(PackedMidiMessage msg, uint8_t tag) {
     msg.bytes.tag = tag;
     return msg;

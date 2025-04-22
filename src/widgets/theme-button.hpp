@@ -207,6 +207,7 @@ TPButton * createThemedParamLightButton(math::Vec pos, engine::Module* module, i
 
     auto light = createLight<TLight>(Vec(0,0), module, lightId);
     light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));
+    light->box.pos.y += .75f; // compensate for down button surface being slightly offset, making a centered (wrt bounding box) LED look off-center
     o->addChildBottom(light);
     return o;
 }

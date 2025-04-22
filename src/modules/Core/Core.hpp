@@ -134,6 +134,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_C1_MUTE,
         P_C2_MUTE,
         P_NOTHING,
+        P_C1_CHANNEL_MAP,
+        P_C2_CHANNEL_MAP,
         NUM_PARAMS
     };
     enum Inputs {
@@ -157,6 +159,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_C2_MUTE,
         L_OCT_SHIFT_FIRST,
         L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
+        L_C1_CHANNEL_MAP,
+        L_C2_CHANNEL_MAP,
         NUM_LIGHTS
     };
 

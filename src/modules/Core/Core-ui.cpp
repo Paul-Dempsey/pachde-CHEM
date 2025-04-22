@@ -175,6 +175,9 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
+
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+        Vec(121.f, y + 6.f), my_module, CoreModule::P_C1_CHANNEL_MAP, CoreModule::L_C1_CHANNEL_MAP, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
@@ -185,6 +188,8 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+        Vec(121.f, y + 6.f), my_module, CoreModule::P_C2_CHANNEL_MAP, CoreModule::L_C2_CHANNEL_MAP, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         Vec(138.f, y + 6.f), my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER, theme_engine, theme)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(

@@ -29,6 +29,7 @@ struct MidiInput : midi::Input
     MidiLog* log;
     std::string source_name;
     bool music_pass_filter;
+    bool channel_reflect;
     bool mute;
 
     rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
@@ -48,9 +49,10 @@ struct MidiInput : midi::Input
         this->setDeviceId(-1);
         this->channel = -1;
     }
-    void setTarget(IDoMidi* out) { target = out; }
+    void set_target(IDoMidi* out) { target = out; }
     void set_logger(const std::string& source, MidiLog* logger);
-    void setMusicPassFilter(bool pass_music) { music_pass_filter = pass_music; }
+    void set_music_pass(bool pass_music) { music_pass_filter = pass_music; }
+    void set_channel_reflect(bool reflect) { channel_reflect = reflect; }
     void enable(bool enabled = true) { mute = !enabled; }
     void onMessage(const midi::Message& message) override;
 };

@@ -82,8 +82,16 @@ inline bool is_music_message(PackedMidiMessage msg)
     }
     return true;
 }
+
+void reflect_channels(PackedMidiMessage& source)
+{
+    auto channel = midi_channel(source);
+    if (0 == channel || channel > 14) return;
+    midi_set_channel(source, 15 - channel);
+}
     
-void MidiInput::set_logger(const std::string& source, MidiLog* logger) {
+void MidiInput::set_logger(const std::string& source, MidiLog* logger)
+{
     source_name = source;
     log = logger;
 }
@@ -134,6 +142,7 @@ void MidiInput::onMessage(const midi::Message& message)
     if (mute) return;
     auto msg = packedFromRack(message, my_tag);
     if (music_pass_filter && !is_music_message(msg)) return;
+    if (channel_reflect) reflect_channels(msg);
     queueMessage(msg);
 }
 

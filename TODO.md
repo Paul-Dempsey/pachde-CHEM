@@ -9,6 +9,7 @@
 - Slim Attenuation?
 - Line/Headphone levels?
 - try BloodBat's GH stuff
+- Midi Channel re-mapping for Em->EM control (Music data filter is not enough).
 
 ## Before release
 

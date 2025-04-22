@@ -32,6 +32,8 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C2_MUSIC_FILTER, 0.f, 1.f, 0.f, "MIDI filter", { "All data", "Music data only"} );
     configSwitch(Params::P_C1_MUTE, 0.f, 1.f, 0.f, "MIDI 1 data", { "passed", "blocked" } );
     configSwitch(Params::P_C2_MUTE, 0.f, 1.f, 0.f, "MIDI 2 data", { "passed", "blocked" } );
+    configSwitch(Params::P_C1_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 1 Channel map", { "off", "reflect" } );
+    configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", "")->snapEnabled = true;
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
@@ -59,9 +61,9 @@ CoreModule::CoreModule() :
     controller1.init(ChemDevice::Midi1, this);
     controller2.init(ChemDevice::Midi2, this);
 
-    haken_midi_in.setTarget(&midi_relay);
-    controller1_midi_in.setTarget(&midi_relay);
-    controller2_midi_in.setTarget(&midi_relay);
+    haken_midi_in.set_target(&midi_relay);
+    controller1_midi_in.set_target(&midi_relay);
+    controller2_midi_in.set_target(&midi_relay);
 
     auto broker = MidiDeviceBroker::get();
     broker->registerDeviceHolder(&haken_device);
@@ -286,7 +288,10 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     case ChemDevice::Midi1:
         if (source->connection) {
             log_message("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
-            controller1_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
+            bool is_em = is_EMDevice(source->connection->info.input_device_name);
+            controller1_midi_in.set_channel_reflect(is_em);
+            getParam(P_C1_CHANNEL_MAP).setValue(controller1_midi_in.channel_reflect);
+            controller1_midi_in.set_music_pass(is_em);
             getParam(P_C1_MUSIC_FILTER).setValue(controller1_midi_in.music_pass_filter);
         } else {
             log_message("Core", "--- disconnect Midi 1");
@@ -298,7 +303,10 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     case ChemDevice::Midi2:
         if (source->connection) {
             log_message("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
-            controller2_midi_in.setMusicPassFilter(is_EMDevice(source->connection->info.input_device_name));
+            bool is_em = is_EMDevice(source->connection->info.input_device_name);
+            controller2_midi_in.set_channel_reflect(is_em);
+            getParam(P_C2_CHANNEL_MAP).setValue(controller2_midi_in.channel_reflect);
+            controller2_midi_in.set_music_pass(is_em);
             getParam(P_C2_MUSIC_FILTER).setValue(controller2_midi_in.music_pass_filter);
         } else {
             log_message("Core", "--- disconnect Midi 2");
@@ -427,27 +435,36 @@ void CoreModule::processLights(const ProcessArgs &args)
     getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C1_MUTE).setBrightnessSmooth(getParam(P_C1_MUTE).getValue(), 45.f);
     getLight(L_C2_MUTE).setBrightnessSmooth(getParam(P_C2_MUTE).getValue(), 45.f);
+    getLight(L_C1_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C1_CHANNEL_MAP).getValue(), 45.f);
+    getLight(L_C2_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C2_CHANNEL_MAP).getValue(), 45.f);
 }
 
 void CoreModule::process_params(const ProcessArgs &args)
 {
     if (is_controller_1_connected()) {
-        controller1_midi_in.setMusicPassFilter(getParamInt(getParam(P_C1_MUSIC_FILTER)));
+        controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));
+        controller1_midi_in.set_music_pass(getParamInt(getParam(P_C1_MUSIC_FILTER)));
         controller1_midi_in.enable(0 == getParamInt(getParam(P_C1_MUTE)));
     } else {
-        controller1_midi_in.setMusicPassFilter(false);
-        getParam(P_C1_MUTE).setValue(0.f);
+        controller1_midi_in.set_channel_reflect(false);
+        controller1_midi_in.set_music_pass(false);
+        controller1_midi_in.enable(true);
+        getParam(P_C1_CHANNEL_MAP).setValue(0.f);
         getParam(P_C1_MUSIC_FILTER).setValue(0.f);
+        getParam(P_C1_MUTE).setValue(0.f);
     }
 
     if (is_controller_2_connected()) {
-        controller2_midi_in.setMusicPassFilter(getParamInt(getParam(P_C2_MUSIC_FILTER)));
+        controller2_midi_in.set_channel_reflect(getParamInt(getParam(P_C2_CHANNEL_MAP)));
+        controller2_midi_in.set_music_pass(getParamInt(getParam(P_C2_MUSIC_FILTER)));
         controller2_midi_in.enable(0 == getParamInt(getParam(P_C2_MUTE)));
     } else {
-        controller2_midi_in.setMusicPassFilter(false);
+        controller2_midi_in.set_channel_reflect(false);
+        controller2_midi_in.set_music_pass(false);
         controller2_midi_in.enable(true);
-        getParam(P_C2_MUTE).setValue(0.f);
+        getParam(P_C2_CHANNEL_MAP).setValue(0.f);
         getParam(P_C2_MUSIC_FILTER).setValue(0.f);
+        getParam(P_C2_MUTE).setValue(0.f);
     }
 }
 
