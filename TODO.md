@@ -1,11 +1,14 @@
 # CHEM To-Do
 
 - Overlay macro system modules
-- Preset module
+- Preset: next/prev triggers
+- Preset: track live
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - **Play**: sorting: alpha, id, category
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
 - Slim Attenuation?
+- Line/Headphone levels?
+- try BloodBat's GH stuff
 
 ## Before release
 
