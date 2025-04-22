@@ -194,8 +194,8 @@ void FillMetaCodeList(const std::string& text, std::vector<uint16_t>& vec)
     if (vec.empty()) {
         vec.push_back(default_code);
     } else {
-        auto first_code = hakenMetaCode.find(*vec.cbegin());
-        if (!first_code || first_code->group != PresetGroup::Category) {
+        auto first_code_meta = hakenMetaCode.find(*vec.cbegin());
+        if (!first_code_meta || first_code_meta->group != PresetGroup::Category) {
             vec.insert(vec.begin(), default_code);
         }
     }
@@ -353,6 +353,21 @@ std::string parse_author(const std::string &text)
     }
     if (id && eq && (1 == (eq - id)) && 'A' == *id) {
         return make_result(data, end);
+    }
+
+    // Didn't find an Author section (A=). So,
+    // handle observed pattern where the author is simply appended
+    // with a whitespace separator and without the A= section tag
+    auto pos = text.rfind('=');
+    if (std::string::npos != pos) {
+        auto scan = text.cbegin() + pos;
+        while (scan != text.cend() && *scan != ' ') scan++;
+        while (scan != text.cend() && *scan == ' ') scan++;
+        if (scan != text.cend()) {
+            std::string result(scan, text.cend());
+            std::replace(result.begin(), result.end(), '_', ' ');
+            return result;
+        }
     }
     return "";
 }
