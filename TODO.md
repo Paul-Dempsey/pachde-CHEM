@@ -1,11 +1,13 @@
 # CHEM To-Do
 
-- Overlay macro system modules
+- theme Jack bars
+- clear filter button (hotkey?)
+- Attenuation/Line/Headphone level trimpots on core
+- Bug: rounding lights aren't quite right
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
-- Slim Attenuation?
-- Line/Headphone levels?
 - try BloodBat's GH stuff
+- Overlay macro system modules
 
 ## Before release
 
