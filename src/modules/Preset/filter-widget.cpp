@@ -2,8 +2,28 @@
 
 namespace pachde {
 
-///Creation helpers
-          
+// Creation helpers
+
+StateButton* makeFilterStateButton(
+    Vec pos,
+    //std::function<bool()> get_state,
+    SvgThemeEngine &engine,
+    std::shared_ptr<SvgTheme> theme,
+    std::function<void()> on_click
+)
+{
+    StateButton* sb = new StateButton(
+        "res/widgets/filtered-button-up.svg",
+        "res/widgets/filtered-button-down.svg",
+        on_click
+    );
+    sb->box.pos = pos;
+    sb->applyTheme(engine, theme);
+    return sb;
+}
+
+// filter button
+
 FilterButton* makeFilter (
     Vec pos,
     int rows,
@@ -255,20 +275,18 @@ bool FilterButton::applyTheme(SvgThemeEngine &engine, std::shared_ptr<SvgTheme> 
 
 void FilterButton::onAction(const ActionEvent &e)
 {
-    {
-        destroyTip();
-        if (!dialog->isVisible()) {
-            auto parent = getParent();
-            if (parent) {
-                // selfish
-                for (auto child: parent->children) {
-                    auto peer = dynamic_cast<FilterButton*>(child);
-                    if (peer) peer->close_dialog();
-                }
-                parent->addChild(dialog);
-                dialog->setVisible(true);
-                APP->event->setSelectedWidget(dialog);
+    destroyTip();
+    if (!dialog->isVisible()) {
+        auto parent = getParent();
+        if (parent) {
+            // selfish
+            for (auto child: parent->children) {
+                auto peer = dynamic_cast<FilterButton*>(child);
+                if (peer) peer->close_dialog();
             }
+            parent->addChild(dialog);
+            dialog->setVisible(true);
+            APP->event->setSelectedWidget(dialog);
         }
     }
 }

@@ -86,8 +86,8 @@ inline bool is_music_message(PackedMidiMessage msg)
 void reflect_channels(PackedMidiMessage& source)
 {
     auto channel = midi_channel(source);
-    if (0 == channel || channel > 14) return;
-    midi_set_channel(source, 15 - channel);
+    if (0 == channel || 15 == channel) return;
+    midi_set_channel(source, 16 - channel);
 }
     
 void MidiInput::set_logger(const std::string& source, MidiLog* logger)

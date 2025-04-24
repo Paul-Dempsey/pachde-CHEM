@@ -142,6 +142,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     TipLabel* live_preset_label{nullptr};
     PresetMenu* menu{nullptr};
     std::vector<FilterButton*> filter_buttons;
+    StateButton * filter_off_button{nullptr};
     std::shared_ptr<PresetDescription> live_preset;
     PresetTab active_tab_id{PresetTab::System};
     Tab user_tab {PresetTab::User};

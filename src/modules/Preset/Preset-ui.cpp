@@ -208,8 +208,8 @@ PresetUi::PresetUi(PresetModule *module) :
     menu->describe("Search options");
     addChild(menu);
 
-    x = 184.f;
-    y = 23.75f;
+    x = 170.f;
+    y = 25.f;
     addChild(createLightCentered<SmallLight<RedLight>>(Vec(x,y), my_module, PresetModule::L_FILTER));;
 
     // tab labels
@@ -265,7 +265,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(next);
 
-    menu = Center(createThemedWidget<PresetMenu>(Vec(x, 132.f), theme_engine, theme));
+    menu = Center(createThemedWidget<PresetMenu>(Vec(x, 148.f), theme_engine, theme));
     menu->setUi(this);
     menu->describe("Preset actions menu");
     addChild(menu);
@@ -273,7 +273,7 @@ PresetUi::PresetUi(PresetModule *module) :
     // Filter buttons
 
     const float FILTER_DY = 20.f;
-    y = 168.f;
+    y = 205.f;
     FilterButton* filter{nullptr};
     
     addChild(Center(filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
@@ -294,6 +294,14 @@ PresetUi::PresetUi(PresetModule *module) :
     y += FILTER_DY;
     addChild(Center(filter = makeSettingFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
     filter_buttons.push_back(filter);
+
+    y += FILTER_DY + 6.f;
+    addChild(filter_off_button = Center(makeFilterStateButton(Vec(x,y), theme_engine, theme, [=]() {
+        if (filtering()) {
+            clear_filters();
+            filter_off_button->button_down = false;
+        }
+    })));
 
     if (my_module) {
         user_tab.list.init_filters(my_module->user_filters);
@@ -403,11 +411,13 @@ void PresetUi::request_presets(PresetTab which)
     case PresetTab::Unset:
         assert(false);
         break;
+
     case PresetTab::User:
         user_tab.clear();
         gathering = PresetTab::User;
         chem_host->host_haken()->request_user(ChemId::Preset);
         break;
+
     case PresetTab::System:
         system_tab.clear();
         gathering = PresetTab::System;
@@ -1182,9 +1192,14 @@ void PresetUi::step()
 {
     Base::step();
     bind_host(my_module);
-    if (active_tab().list.empty() && host_available()) {
+    Tab& tab = active_tab();
+    if (tab.list.empty() && host_available()) {
         set_tab(active_tab_id, true);
     }
+    if (filtering()) {
+        filter_off_button->button_down = true;
+    }
+
 }
 
 void PresetUi::draw(const DrawArgs &args)

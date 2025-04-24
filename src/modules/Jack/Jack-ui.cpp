@@ -110,8 +110,11 @@ JackUi::JackUi(JackModule *module) :
 
     // outputs
     auto co_port = PORT_ORANGE;
+    
     x = CENTER;
     y = S::PORT_TOP;
+    addChild(level_1 = createWidgetCentered<LevelWidget>(Vec(CENTER - 14.25f, y - 5.f)));
+    addChild(level_2 = createWidgetCentered<LevelWidget>(Vec(CENTER + 14.25f, y - 5.f + S::PORT_DY)));
 
     addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", theme_engine, theme, S::in_port_label));
@@ -222,7 +225,11 @@ void JackUi::step()
     Base::step();
     if (!my_module) return;
     bind_host(my_module);
-
+    if (chem_host) {
+        auto em = chem_host->host_matrix();
+        level_1->level = uint8_t(em->get_jack_1() >> 7);
+        level_2->level = uint8_t(em->get_jack_2() >> 7);
+    }
     sync_labels();
 }
 

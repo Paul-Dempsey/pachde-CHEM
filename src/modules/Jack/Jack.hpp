@@ -5,6 +5,7 @@
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/indicator-widget.hpp"
 #include "../../widgets/label-widget.hpp"
+#include "../../widgets/level-widget.hpp"
 #include "../../widgets/symbol-set.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
@@ -92,11 +93,13 @@ struct JackUi : ChemModuleWidget, IChemClient
     LinkButton*   link_button{nullptr};
     IndicatorWidget* link{nullptr};
 
-    TextLabel* assign_1_label;
-    TextLabel* assign_2_label;
+    TextLabel* assign_1_label{nullptr};
+    TextLabel* assign_2_label{nullptr};
     SymbolProvider symbols;
-    SymbolSetWidget* pedal_image_1;
-    SymbolSetWidget* pedal_image_2;
+    SymbolSetWidget* pedal_image_1{nullptr};
+    SymbolSetWidget* pedal_image_2{nullptr};
+    LevelWidget* level_1{nullptr};
+    LevelWidget* level_2{nullptr};
 
     float last_1, last_2;
     int last_p1, last_p2;

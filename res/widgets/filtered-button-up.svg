@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <g>
+    <path
+       id="ctl-glyph"
+       fill="hsl(0,0%,70%)"
+       d="
+       M 1, 1 h 6 v 1 h -6 z
+       M 1, 5 h 6 v 1 h -6 z
+       M 1, 9 h 6 v 1 h -6 z
+       M 1,13 h 6 v 1 h -6 z
+       M 9, 1 h 6 v 1 h -6 z
+       M 9, 5 h 6 v 1 h -6 z
+       M 9, 9 h 6 v 1 h -6 z
+       M 9,13 h 6 v 1 h -6 z
+
+       " />  </g>
+</svg>
