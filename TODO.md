@@ -1,7 +1,5 @@
 # CHEM To-Do
 
-- theme Jack bars
-- clear filter button (hotkey?)
 - Attenuation/Line/Headphone level trimpots on core
 - Bug: rounding lights aren't quite right
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
