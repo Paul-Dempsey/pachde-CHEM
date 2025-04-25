@@ -61,12 +61,11 @@ void BasicHSlider::onDragMove(const DragMoveEvent& e)
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
+        float thumb = thumb_pos();
         float dx = coord(axis, e.mouseDelta) / APP->scene->rackScroll->getZoom();
-        float sign = (dx < 0) ? -1.f : 1.f;
+        float value = thumb + dx;
         float range = coord(axis, box.size) - coord(axis, thumb_size);
-        dx = sign * rescale(std::abs(dx), 0.f, range, pq->getMinValue(), pq->getMaxValue());
-
-		float value = dx + pq->getValue();
+        value = rescale(value, 0.f, range, pq->getMinValue(), pq->getMaxValue());
 		pq->setValue(value);
     }
     Base::onDragMove(e);

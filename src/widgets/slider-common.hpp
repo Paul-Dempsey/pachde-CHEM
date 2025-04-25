@@ -71,10 +71,12 @@ void onSelectKey(TSelf* self, const rack::widget::Widget::SelectKeyEvent &e)
                     e.consume(self);
                 }
                 break;
+            case GLFW_KEY_RIGHT:
             case GLFW_KEY_UP:
                 pq->setValue(pq->getValue() + self->increment * (shift ? 10.f : 1.f));
                 e.consume(self);
                 break;
+            case GLFW_KEY_LEFT:
             case GLFW_KEY_DOWN:
                 pq->setValue(pq->getValue() - self->increment * (shift ? 10.f : 1.f));
                 e.consume(self);
