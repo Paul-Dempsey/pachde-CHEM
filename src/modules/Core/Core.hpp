@@ -1,6 +1,7 @@
 #include "../../chem.hpp"
 #include "../../chem-core.hpp"
 #include "../../em/EaganMatrix.hpp"
+#include "../../services/em-midi-port.hpp"
 #include "../../services/HakenMidiOutput.hpp"
 #include "../../services/midi-devices.hpp"
 #include "../../services/midi-io.hpp"
@@ -11,6 +12,7 @@
 #include "../../widgets/MidiPicker.hpp"
 #include "../../widgets/slider-h-widget.hpp"
 #include "../../widgets/spinner.hpp"
+#include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "haken-task.hpp"
@@ -21,9 +23,10 @@ using namespace pachde;
 struct CoreModuleWidget;
 struct CoreModule;
 
-struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents
+struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents, IDoMidi
 {
     CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
+    Modulation modulation;
 
     MidiDeviceHolder haken_device;
     MidiDeviceHolder controller1;
@@ -54,7 +57,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool restore_last_preset;
     OctaveShiftLeds octave;
     RoundingLeds round_leds;
-    
+    bool glow_knobs;
+
     // ------------------------------------------
     CoreModule();
     virtual ~CoreModule();
@@ -78,6 +82,11 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void reboot();
     void send_midi_rate(HakenMidiRate rate);
     void restore_midi_rate();
+
+    void update_from_em();
+
+    // IDoMidi
+    void do_message(PackedMidiMessage message) override;
 
     // IMidiDeviceNotify
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
@@ -136,6 +145,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_NOTHING,
         P_C1_CHANNEL_MAP,
         P_C2_CHANNEL_MAP,
+        P_ATTENUATION,
         NUM_PARAMS
     };
     enum Inputs {
@@ -217,6 +227,8 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     //StaticTextLabel* task_status_label = nullptr;
     TextLabel* em_status_label = nullptr;
 
+    TrimPot* attenuation_knob{nullptr};
+
     Blip* blip = nullptr;
     IndicatorWidget* mididevice_indicator = nullptr;
     IndicatorWidget* heartbeat_indicator = nullptr;
@@ -243,6 +255,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     virtual ~CoreModuleWidget();
 
     void show_busy(bool busy);
+    void glowing_knobs(bool glow);
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }

@@ -29,6 +29,12 @@ void CoreModuleWidget::show_busy(bool busy)
     }
 }
 
+void CoreModuleWidget::glowing_knobs(bool glow)
+{
+    attenuation_knob->glowing(glow);
+}
+
+
 using EME = IHandleEmEvents::EventMask;
 
 // Layout
@@ -113,6 +119,10 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     y = 30.f;
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(x, y), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(r_col, y, "EM LED"));
+
+    x = box.size.x - 18.f;
+    y = PICKER_TOP - 18.f;
+    addChild(attenuation_knob = createChemKnob<TrimPot>(Vec(x, y), my_module, CoreModule::P_ATTENUATION, theme_engine, theme));
 
     const NVGcolor co_port = PORT_CORN;
     y = S::PORT_TOP + S::PORT_DY;
@@ -554,6 +564,13 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             [this]() { return my_module->restore_last_preset; },
             [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;}));
 
+        menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+            [this](){ return my_module->glow_knobs; },
+            [this](){
+                my_module->glow_knobs = !my_module->glow_knobs; 
+                glowing_knobs(my_module->glow_knobs);
+            }
+        ));
         menu->addChild(createSubmenuItem("Themes", "", [=](Menu* menu) {
             ChemModuleWidget::appendContextMenu(menu);
         }));

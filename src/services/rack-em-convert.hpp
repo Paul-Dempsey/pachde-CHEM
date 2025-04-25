@@ -46,6 +46,7 @@ inline int getParamInt(Param& p) {
 // cv = bipolar control voltage, -5v to 5v
 // amount = is bipolar amount in percent, -100% to 100%
 inline float modulated_value(float param_value, float cv, float amount) {
+    if (0.f == amount) return param_value;
     return clamp(param_value + (cv * (amount * .01)), 0.f, 10.f);
 }
 

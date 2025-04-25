@@ -2,12 +2,14 @@
 #include "../../em/PresetId.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../services/kv-store.hpp"
+#include "../../services/rack-help.hpp"
 
 using namespace pachde;
 
 using EME = IHandleEmEvents::EventMask;
 
 CoreModule::CoreModule() :
+    modulation(this, ChemId::Core),
     midi_log(nullptr),
     is_busy(false),
     in_reboot(false),
@@ -35,6 +37,8 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C1_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 1 Channel map", { "off", "reflect" } );
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", "")->snapEnabled = true;
+
+    dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
     configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
@@ -71,9 +75,17 @@ CoreModule::CoreModule() :
     broker->registerDeviceHolder(&controller2);
 
     tasks.subscribeChange(this);
+
+    EmccPortConfig cfg[] = {
+        EmccPortConfig::cc(P_ATTENUATION,     -1, -1, Haken::ch1, Haken::ccAtten,     true),
+    };
+    modulation.configure(-1, 1, cfg);
+    chem_host = this;
+    midi_relay.register_target(this);
 }
 
 CoreModule::~CoreModule() {
+    midi_relay.unregister_target(this);
     for (auto client : chem_clients) {
         client->onConnectHost(nullptr);
     }
@@ -188,6 +200,7 @@ void CoreModule::onPresetChanged()
     }
     log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     notify_preset_changed();
+    update_from_em();
 }
 
 void CoreModule::onUserBegin()
@@ -347,6 +360,10 @@ void CoreModule::dataFromJson(json_t *root)
     if (!restore_last_preset) {
         this->tasks.get_task(HakenTask::LastPreset)->not_applicable();
     }
+    json_read_bool(root, "glow-knobs", glow_knobs);
+    // if (!haken_device.get_claim().empty()) {
+    //     modulation.mod_from_json(root);
+    // }
 }
 
 json_t* CoreModule::dataToJson()
@@ -360,7 +377,31 @@ json_t* CoreModule::dataToJson()
     if (!last_preset.empty()) {
         json_object_set_new(root, "last-preset", last_preset.toJson(true, true, false));
     }
+    // if (!haken_device.get_claim().empty()) {
+    //     modulation.mod_to_json(root);
+    // }
     return root;
+}
+
+void CoreModule::update_from_em()
+{
+    if (chem_host && chem_host->host_preset()) {
+        auto em = chem_host->host_matrix();
+        modulation.set_em_and_param_low(0, em->get_attenuation(), true);
+    }
+}
+
+void CoreModule::do_message(PackedMidiMessage message)
+{
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (as_u8(ChemId::Core) == midi_tag(message)) return;
+
+    auto cc = midi_cc(message);
+    switch (cc) {
+    case Haken::ccAtten:
+        modulation.set_em_and_param_low(0, midi_cc_value(message), true);
+        break;
+    }
 }
 
 void CoreModule::register_chem_client(IChemClient* client)
@@ -488,6 +529,10 @@ void CoreModule::process(const ProcessArgs &args)
     if (!haken_midi_out.pending()) {
         tasks.process(args);
     }
+
+    if (modulation.sync_params_ready(args)) {
+        modulation.sync_send();
+    }    
 
     if (getInput(IN_C1_MUTE_GATE).isConnected()) {
         bool mute = getInput(IN_C1_MUTE_GATE).getVoltage() >= 0.8f;
