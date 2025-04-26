@@ -105,8 +105,8 @@ bool BasicHSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgT
 
 void BasicHSlider::draw_feet(const DrawArgs &args)
 {
-    Line(args.vg, 0.f, 0.f, 0.f, box.size.y, foot.nvg_stroke_color(), foot.width());
-    Line(args.vg, box.size.x, 0.f, box.size.x, box.size.y, foot.nvg_stroke_color(), foot.width());
+    Line(args.vg, 0.f, 1.5f, 0.f, box.size.y-1.5f, foot.nvg_stroke_color(), foot.width());
+    Line(args.vg, box.size.x, 1.5f, box.size.x, box.size.y-1.5f, foot.nvg_stroke_color(), foot.width());
 }
 
 void BasicHSlider::draw_stem(const DrawArgs &args)

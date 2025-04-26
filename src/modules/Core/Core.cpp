@@ -119,6 +119,7 @@ void CoreModule::enable_logging(bool enable)
         if (midi_log) {
             midi_log->close();
             delete midi_log;
+            midi_log = nullptr;
         }
     }
 }

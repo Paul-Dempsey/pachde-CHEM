@@ -1,3 +1,4 @@
+// File is "SettingsModule.cpp" to avoid debugger confusion of same file name in Rack
 #include "Settings.hpp"
 #include "../../services/rack-help.hpp"
 #include "../../em/wrap-HakenMidi.hpp"
@@ -8,8 +9,8 @@ SettingsModule::SettingsModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    std::vector<std::string> offon{"off", "on"};
-    std::vector<std::string> onoff{"on", "off"};
+    std::vector<std::string> off_on{"off", "on"};
+    std::vector<std::string> on_off{"on", "off"};
 
     configSwitch(P_SURFACE_DIRECTION, 0.f, 1.f, 0.f, "Surface direction", {"normal", "reversed"});
     configBendParam(this, P_X, "X Bend Range");
@@ -33,9 +34,9 @@ SettingsModule::SettingsModule() :
         "Highest 4 channels",
     });
     configSwitch(P_BASE_POLYPHONY, 0.f, 7.f, 3.f, "Base polyphony", {"0", "1", "2", "3", "4", "5", "6", "7", "8"});
-    configSwitch(P_EXPAND_POLYPHONY, 0.f, 1.f, 0.f, "Expand polyphony", offon);
-    configSwitch(P_DOUBLE_COMPUTATION, 0.f, 1.f, 0.f, "Double computation rate", offon);
-    configSwitch(P_MONO, 0.f, 1.f, 0.f, "Mono", offon);
+    configSwitch(P_EXPAND_POLYPHONY, 0.f, 1.f, 0.f, "Expand polyphony", off_on);
+    configSwitch(P_DOUBLE_COMPUTATION, 0.f, 1.f, 0.f, "Double computation rate", off_on);
+    configSwitch(P_MONO, 0.f, 1.f, 0.f, "Mono", off_on);
     configSwitch(P_MONO_MODE, 0.f, 8.f, 0.f, "Mono mode", {
         "Weighted portamento",
         "Legato to high pressure",
@@ -71,20 +72,39 @@ SettingsModule::SettingsModule() :
         "Y",
         "Reverse Y",
     });
-    configSwitch(P_ROUND_INITIAL, 0.f, 1.f, 0.f, "Round initial", offon);
+    configSwitch(P_ROUND_INITIAL, 0.f, 1.f, 0.f, "Round initial", off_on);
     configParam(P_ROUND_RATE, 0.f, 10.f, 0.f, "Round rate");
+
+    auto pq = configParam(P_TOUCH_AREA, 16.f, 108.f, 16.f, "Touch area", " nn");
+    pq->snapEnabled = true;
+
+    pq = configParam(P_MIDDLE_C, 0.f, 127.f, 60.f, "Middle C", " nn");
+    pq->snapEnabled = true;
+
+    pq = configParam(P_FINE, 4.f, 124.f, 64.f, "Fine tuning", "\u00a2", 0.f, 1.f, -64.f);
+    pq->snapEnabled = true;
+
+    pq = configParam(P_ACTUATION, 0.f, 127.f, 0.f, "Actuation");
+    pq->snapEnabled = true;
+
+    configParam(P_AUDIO_IN, 0.f, 10.f, 0.f, "Audio in level");
 
     configTuningParam(this, P_TUNING);
 
     configParam(P_MIDI_ROUTING, 0.f, Haken::defaultRoute, Haken::defaultRoute, "MIDI Routing");
-    configSwitch(P_MIDI_DSP,     0.f, 1.f, 1.f, "Route Midi to DSP",     offon);
-    configSwitch(P_MIDI_CVC,     0.f, 1.f, 1.f, "Route Midi to CVC",     offon);
-    configSwitch(P_MIDI_MIDI,    0.f, 1.f, 1.f, "Route Midi to MIDI",    offon);
-    configSwitch(P_SURFACE_DSP,  0.f, 1.f, 1.f, "Route Surface to DSP",  offon);
-    configSwitch(P_SURFACE_CVC,  0.f, 1.f, 1.f, "Route Surface to CVC",  offon);
-    configSwitch(P_SURFACE_MIDI, 0.f, 1.f, 1.f, "Route Surface to MIDI", offon);
-    configSwitch(P_KEEP_MIDI,    0.f, 1.f, 0.f, "Keep MIDI settings across preset changes", offon);
-    configSwitch(P_KEEP_SURFACE, 0.f, 1.f, 0.f, "Keep Surface settings across preset changes", offon);
+    configSwitch(P_MIDI_DSP,     0.f, 1.f, 1.f, "Route Midi to DSP",     off_on);
+    configSwitch(P_MIDI_CVC,     0.f, 1.f, 1.f, "Route Midi to CVC",     off_on);
+    configSwitch(P_MIDI_MIDI,    0.f, 1.f, 1.f, "Route Midi to MIDI",    off_on);
+    configSwitch(P_SURFACE_DSP,  0.f, 1.f, 1.f, "Route Surface to DSP",  off_on);
+    configSwitch(P_SURFACE_CVC,  0.f, 1.f, 1.f, "Route Surface to CVC",  off_on);
+    configSwitch(P_SURFACE_MIDI, 0.f, 1.f, 1.f, "Route Surface to MIDI", off_on);
+    configSwitch(P_KEEP_MIDI,    0.f, 1.f, 0.f, "Keep MIDI settings across preset changes", off_on);
+    configSwitch(P_KEEP_SURFACE, 0.f, 1.f, 0.f, "Keep Surface settings across preset changes", off_on);
+    configSwitch(P_AES3, 0.f, 3.f, 0.f, "AES3", {
+        "48k",
+        "96k",
+        "Sync to incoming"
+    });
 
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")); 
 
@@ -155,7 +175,11 @@ void SettingsModule::update_from_em()
     auto em = chem_host->host_matrix();
     if (!em->is_ready()) { return; }
 
+    uint8_t value;
+
     update_from_em(P_SURFACE_DIRECTION, em->is_reverse_surface());
+    update_from_em(P_MIDDLE_C, em->get_middle_c());
+    update_from_em(P_TOUCH_AREA, em->get_touch_area());
     update_from_em(P_X, em->get_bend_range());
     update_from_em(P_Y, em->get_y_assign());
     update_from_em(P_Z, em->get_z_assign());
@@ -171,8 +195,14 @@ void SettingsModule::update_from_em()
     update_from_em(P_ROUND_INITIAL, em->get_round_initial());
     update_from_em(P_KEEP_MIDI, em->is_keep_midi_encoding());
     update_from_em(P_KEEP_SURFACE, em->is_keep_surface_processing());
+    update_from_em(P_ACTUATION, em->get_actuation());
+    update_from_em(P_FINE, em->get_fine_tune());
+    update_from_em(P_AES3, em->get_aes3());
 
-    uint8_t value;
+    value = em->get_audio_in();
+    em_values[P_AUDIO_IN] = value;
+    audio_in_port.set_em_and_param_low(value);
+
     value = em->get_round_rate();
     em_values[P_ROUND_RATE] = value;
     rounding_port.set_em_and_param_low(value);
@@ -213,23 +243,37 @@ uint8_t SettingsModule::get_param_routing()
 void SettingsModule::do_message(PackedMidiMessage message)
 {
     if (as_u8(ChemId::Settings) == message.bytes.tag) return;
-
+    uint8_t value;
     switch (message.bytes.status_byte) {
     case Haken::ccStat1: {
         in_mat_poke = false;
         switch (midi_cc(message)) {
-        case Haken::ccMonoOn:            
-            update_from_em(P_MONO, midi_cc_value(message));
+        case Haken::ccFineTune:
+            update_from_em(P_FINE, midi_cc_value(message));
             break;
 
-        case Haken::ccRndIni: 
-            update_from_em(P_ROUND_INITIAL, midi_cc_value(message));
+        case Haken::ccAudIn:
+            value = midi_cc_value(message);
+            em_values[P_AUDIO_IN] = value;
+            audio_in_port.set_em_and_param_low(value);
             break;
 
-        case Haken::ccRoundRate:
-            auto value = midi_cc_value(message);
+        case Haken::ccRoundRate:    
+            value = midi_cc_value(message);
             em_values[P_ROUND_RATE] = value;
             rounding_port.set_em_and_param_low(value);
+            break;
+    
+        case Haken::ccRndIni:     
+            update_from_em(P_ROUND_INITIAL, midi_cc_value(message));
+            break;
+    
+        case Haken::ccActuation:
+            update_from_em(P_ACTUATION, midi_cc_value(message));
+            break;
+
+        case Haken::ccMonoOn:            
+            update_from_em(P_MONO, midi_cc_value(message));
             break;
         }
     } break;
@@ -254,15 +298,18 @@ void SettingsModule::do_message(PackedMidiMessage message)
                 update_from_em(P_SURFACE_DSP, routing & Haken::bSurfaceDsp);
                 update_from_em(P_SURFACE_CVC, routing & Haken::bMidiInCvc);
                 update_from_em(P_SURFACE_MIDI, routing & Haken::bSurfaceTrad);
-            } break;
+                } break;
             case Haken::idPoly:      param_index = P_BASE_POLYPHONY; break;
             case Haken::idBendRange: param_index = P_X; break;
             case Haken::idFrontBack: param_index = P_Y; break;
             case Haken::idPressure:  param_index = P_Z; break;
+            case Haken::idMiddleC:   param_index = P_MIDDLE_C; break;
+            case Haken::idTArea:     param_index = P_TOUCH_AREA; break;
             case Haken::idMonoFunc:  param_index = P_MONO_MODE; break;
             case Haken::idMonoInt:   param_index = P_MONO_INTERVAL; break;
             case Haken::idPresEnc:   param_index = P_KEEP_MIDI; break;
             case Haken::idPresSurf:  param_index = P_KEEP_SURFACE; break;
+            case Haken::idAes3:      param_index = P_AES3; break;
             default: break;
             }
             if (param_index >= 0) {
@@ -343,6 +390,10 @@ void SettingsModule::process(const ProcessArgs &args)
         rounding_port.send(chem_host, ChemId::Settings);
         em_values[P_ROUND_RATE] = rounding_port.em_low();
 
+        audio_in_port.pull_param_cv(this);
+        audio_in_port.send(chem_host, ChemId::Settings);
+        em_values[P_AUDIO_IN] = audio_in_port.em_low();
+
         if (getInput(IN_ROUND_INITIAL).isConnected()) {
             auto v = getInput(IN_ROUND_INITIAL).getVoltage();
             bool high = v > 9.5f;
@@ -369,6 +420,11 @@ void SettingsModule::process(const ProcessArgs &args)
             haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccMonoOn, U8(mono));
         }
 
+        auto fine = getParamInt(getParam(P_FINE));
+        if (fine != em_values[P_FINE]) {
+            haken->control_change(ChemId::Settings, Haken::ch1, Haken::ccFineTune, U8(fine));
+        }
+
         // s_Mat_Poke
         std::vector<PackedMidiMessage> stream_data;
         
@@ -378,6 +434,8 @@ void SettingsModule::process(const ProcessArgs &args)
             em_values[P_MIDI_ROUTING] = routing;
         }
         build_update(stream_data, P_SURFACE_DIRECTION, Haken::idReverse);
+        build_update(stream_data, P_TOUCH_AREA, Haken::idTArea);
+        build_update(stream_data, P_MIDDLE_C, Haken::idMiddleC);
         build_update(stream_data, P_X, Haken::idBendRange);
         build_update(stream_data, P_Y, Haken::idFrontBack);
         build_update(stream_data, P_Z, Haken::idPressure);
@@ -391,6 +449,7 @@ void SettingsModule::process(const ProcessArgs &args)
         build_update(stream_data, P_MONO_INTERVAL, Haken::idMonoInt);
         build_update(stream_data, P_KEEP_MIDI, Haken::idPresEnc);
         build_update(stream_data, P_KEEP_SURFACE, Haken::idPresSurf);
+        build_update(stream_data, P_AES3, Haken::idAes3);
 
         if (!stream_data.empty()) {
             haken->begin_stream(ChemId::Settings, Haken::s_Mat_Poke);

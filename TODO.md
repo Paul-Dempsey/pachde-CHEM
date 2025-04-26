@@ -1,6 +1,6 @@
 # CHEM To-Do
 
-- Attenuation/Line/Headphone level trimpots on core
+- BIG volume knob
 - Bug: rounding lights aren't quite right
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)?

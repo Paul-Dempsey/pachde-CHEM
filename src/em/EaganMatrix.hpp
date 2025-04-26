@@ -116,6 +116,7 @@ struct EaganMatrix
 
     // simple cc value retreival
     uint8_t get_led() { return ch16.cc[Haken::ccEdState] & Haken::sLedBits; }
+    uint8_t get_aes_detect() { return ((ch16.cc[Haken::ccEdState] & Haken::sAesBits) >> Haken::sAesShift); }
     uint8_t get_actuation() { return ch16.cc[Haken::ccActuation]; }
     uint8_t get_traditional_polyphony() { return ch16.cc[Haken::ccPolyTrad]; }
     uint8_t get_dsp_polyphony() { return ch16.cc[Haken::ccPolyDsp]; }
@@ -127,7 +128,7 @@ struct EaganMatrix
     uint8_t get_mono_on() { return ch1.cc[Haken::ccMonoOn]; }
     bool is_mono() { return ch1.cc[Haken::ccMonoOn]; }
     uint8_t get_fine_tune() { return ch1.cc[Haken::ccFineTune]; }
-
+    uint8_t get_audio_in()  { return ch1.cc[Haken::ccAudIn]; }
     uint8_t get_pre() { return ch1.cc[Haken::ccPre]; } // 14-bit?
     uint8_t get_attenuation() { return ch1.cc[Haken::ccAtten]; }
 

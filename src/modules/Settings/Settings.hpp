@@ -22,14 +22,23 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 {
     enum Params {
         P_SURFACE_DIRECTION,
+
+        P_TOUCH_AREA,
+        P_MIDDLE_C,
+
         P_X,
         P_Y,
         P_Z,
+
         P_NOTE_PROCESSING,
         P_NOTE_PRIORITY,
         P_BASE_POLYPHONY,
         P_EXPAND_POLYPHONY,
         P_DOUBLE_COMPUTATION,
+
+        P_FINE,
+        P_ACTUATION,
+        P_AUDIO_IN,
 
         P_MONO,
         P_MONO_MODE,
@@ -50,6 +59,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
         P_KEEP_MIDI,
         P_KEEP_SURFACE,
+        P_AES3,
         
         P_MOD_AMOUNT,
         NUM_PARAMS,
@@ -88,6 +98,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
     uint8_t em_values[NUM_EM_VALUES];
     EmControlPort rounding_port;
+    EmControlPort audio_in_port;
     rack::dsp::Timer midi_timer;
 
     // passive leds that show current em status
@@ -144,6 +155,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
 
+    TextLabel* middle_c_value{nullptr};
+    TextLabel* touch_area_value{nullptr};
     TextLabel* x_value{nullptr};
     TextLabel* y_value{nullptr};
     TextLabel* z_value{nullptr};
