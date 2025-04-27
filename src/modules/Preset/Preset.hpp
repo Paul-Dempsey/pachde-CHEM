@@ -9,14 +9,19 @@
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/uniform-style.hpp"
 #include "preset-common.hpp"
-#include "preset-entry.hpp"
 #include "preset-list.hpp"
-#include "filter-widget.hpp"
-#include "search-widget.hpp"
+#include "./widgets/filter-widget.hpp"
+#include "./widgets/preset-entry.hpp"
+#include "./widgets/search-widget.hpp"
 
 using namespace pachde;
 struct PresetUi;
+
+namespace S = pachde::style;
+constexpr const float PANEL_WIDTH = 360.f;
+constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 
 struct PresetModule : ChemModule, IChemClient, IDoMidi
 {
@@ -69,7 +74,6 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
 
     void clear_filters(PresetTab tab_id);
     void set_order(PresetTab tab_id, PresetOrder order);
-    //void set_filter(PresetTab tab_id, FilterId which, uint64_t mask);
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }

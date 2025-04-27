@@ -227,7 +227,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     //StaticTextLabel* task_status_label = nullptr;
     TextLabel* em_status_label = nullptr;
 
-    TrimPot* attenuation_knob{nullptr};
+    BlueKnob* attenuation_knob{nullptr};
 
     Blip* blip = nullptr;
     IndicatorWidget* mididevice_indicator = nullptr;

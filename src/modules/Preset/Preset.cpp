@@ -12,8 +12,6 @@ void PresetModule::dataFromJson(json_t *root)
     json_read_bool(root, "track-live", track_live);
     json_read_bool(root, "cache_user", use_cached_user_presets);
     json_read_bool(root,"keep-search", keep_search_filters);
-    //hardware = get_json_int(root, "hardware", 0);
-    //firmware = get_json_int(root, "firmware", 0);
     active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
     user_order = PresetOrder(get_json_int(root, "user-sort-order", int(PresetOrder::Natural)));
     system_order = PresetOrder(get_json_int(root, "system-sort-order", int(PresetOrder::Alpha)));
@@ -55,8 +53,6 @@ json_t* PresetModule::dataToJson()
     json_object_set_new(root, "track-live", json_boolean(track_live));
     json_object_set_new(root, "cache_user", json_boolean(use_cached_user_presets));
     json_object_set_new(root, "keep-search", json_boolean(keep_search_filters));
-    //json_object_set_new(root, "hardware", json_integer(hardware));
-    //json_object_set_new(root, "firmware", json_integer(firmware));
     json_object_set_new(root, "tab", json_integer(int(active_tab)));
     json_object_set_new(root, "user-sort-order", json_integer(int(user_order)));
     json_object_set_new(root, "system-sort-order", json_integer(int(system_order)));
@@ -106,15 +102,6 @@ void PresetModule::set_order(PresetTab tab, PresetOrder order)
     default: break;
     }
 }
-
-// void PresetModule::set_filter(PresetTab tab_id, FilterId which, uint64_t mask)
-// {
-//     switch (tab_id) {
-//     case PresetTab::User: user_filters[which] = mask; return;
-//     case PresetTab::System: system_filters[which] = mask; return;
-//     default: assert(false); break;
-//     }
-// }
 
 // IChemClient
 

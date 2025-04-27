@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/element-style.hpp"
-#include "../../em/preset.hpp"
+#include "../../../widgets/tip-label-widget.hpp"
+#include "../../../widgets/element-style.hpp"
+#include "../../../em/preset.hpp"
 
 struct PresetUi;
 

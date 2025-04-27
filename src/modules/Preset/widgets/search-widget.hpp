@@ -2,8 +2,8 @@
 #include <rack.hpp>
 using namespace ::rack;
 
-#include "../../widgets/element-style.hpp"
-#include "../../services/text.hpp"
+#include "../../../widgets/element-style.hpp"
+#include "../../../services/text.hpp"
 
 namespace pachde {
 

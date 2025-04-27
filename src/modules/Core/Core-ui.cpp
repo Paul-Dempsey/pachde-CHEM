@@ -16,11 +16,13 @@ CoreModuleWidget::~CoreModuleWidget()
     }
 }
 
+constexpr const float LOGO_CENTER{62.f};
+
 void CoreModuleWidget::show_busy(bool busy)
 {
     if (busy) {
         if (!spinning) {
-            startSpinner(this, Vec(box.size.x*.5, 70.f));
+            startSpinner(this, Vec(box.size.x*.5, LOGO_CENTER));
         }
         spinning = true;
     } else {
@@ -40,11 +42,11 @@ using EME = IHandleEmEvents::EventMask;
 // Layout
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
-constexpr const float NAV_ROW = 154.f;
-constexpr const float PICKER_TOP = 200.f;
-constexpr const float PICKER_INTERVAL = 42.f;
-constexpr const float PICKER_LABEL_OFFSET = 14.f;
-constexpr const float MIDI_ANIMATION_OFFSET = 30.f;
+constexpr const float NAV_ROW = 144.f;
+constexpr const float PICKER_TOP = 222.f;
+constexpr const float PICKER_INTERVAL = 36.5f;
+constexpr const float PICKER_LABEL_OFFSET = 12.5f;
+constexpr const float MIDI_ANIMATION_OFFSET = 27.75f;
 constexpr const float ROUND_LIGHT_SPREAD = 6.f;
 constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
 namespace S = pachde::style;
@@ -81,18 +83,18 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     createMidiPickers(theme);
     float r_col = box.size.x - RACK_GRID_WIDTH * 1.5f;
 
-    auto useless = createChemKnob<UselessKnob>(Vec(CENTER, 70.f), my_module, CoreModule::P_NOTHING, theme_engine, theme);
+    auto useless = createChemKnob<UselessKnob>(Vec(CENTER, LOGO_CENTER), my_module, CoreModule::P_NOTHING, theme_engine, theme);
     useless->speed = .5f;
     useless->bright = true;
     useless->minAngle = 0;
     useless->maxAngle = 2*M_PI;
     addChild(useless);
 
-    createIndicatorsCentered(CENTER, PICKER_TOP - 18.f, 9.f);
+    createIndicatorsCentered(CENTER, PICKER_TOP - 10.f, 9.f);
 
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createLabel<TipLabel>(
-        Vec(CENTER, 126.f), box.size.x, "[preset]", theme_engine, theme, style));
+        Vec(CENTER, 118.f), box.size.x, "[preset]", theme_engine, theme, style));
     preset_label->glowing(true);
 
     createRoundingLeds(CENTER + 40.f, NAV_ROW, ROUND_LIGHT_SPREAD);
@@ -120,9 +122,13 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(x, y), my_module, CoreModule::L_READY));
     addChild(blip = createBlipCentered(r_col, y, "EM LED"));
 
-    x = box.size.x - 18.f;
-    y = PICKER_TOP - 18.f;
-    addChild(attenuation_knob = createChemKnob<TrimPot>(Vec(x, y), my_module, CoreModule::P_ATTENUATION, theme_engine, theme));
+    x = CENTER;
+    y = 178.f;
+    addChild(attenuation_knob = createChemKnob<BlueKnob>(Vec(x, y), my_module, CoreModule::P_ATTENUATION, theme_engine, theme));
+
+    y += 18.f;
+    LabelStyle status_style{"brand", TextAlignment::Center, 10.f, false};
+    addChild(em_status_label = createLabel<TextLabel>(Vec(CENTER, y), box.size.x - 15.f, "", theme_engine, theme, status_style));
 
     const NVGcolor co_port = PORT_CORN;
     y = S::PORT_TOP + S::PORT_DY;
@@ -135,15 +141,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     x += 25.f;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, "M2", theme_engine, theme, S::in_port_label));
-
-    style.key = "brand";
-    style.align = TextAlignment::Center;
-    style.height = 10.f;
-    style.bold = false;
-
-    y = 165.f;
-    addChild(em_status_label = createLabel<TextLabel>(
-        Vec(CENTER, y), box.size.x - 15.f, "", theme_engine, theme, style));
 
     if (my_module) {
         my_module->set_chem_ui(this);
@@ -167,21 +164,21 @@ void CoreModuleWidget::createScrews(std::shared_ptr<SvgTheme> theme)
 
 void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
 {
-    float y = PICKER_TOP;
-    haken_picker = createMidiPicker(S::UHALF, y, "Choose HAKEN device", &my_module->haken_device, &my_module->haken_device, theme);
     LabelStyle style{"dytext", TextAlignment::Center, 10.f};
     addChild(firmware_label = createLabel<TextLabel>(
         Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", theme_engine,
         theme, style));
 
-    LabelStyle midi_style{"midi-name", TextAlignment::Left, 14.f};
-
+    const float midi_x = 7.5f;
+    LabelStyle midi_style{"midi-name", TextAlignment::Left, 12.f};
+    float y = PICKER_TOP;
+    haken_picker = createMidiPicker(midi_x, y, "HAKEN device", &my_module->haken_device, &my_module->haken_device, theme);
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
     addChild(haken_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
 
     y += PICKER_INTERVAL;
-    controller1_picker = createMidiPicker(S::UHALF, y, "Choose MIDI controller #1", &my_module->controller1, &my_module->haken_device, theme);
+    controller1_picker = createMidiPicker(midi_x, y, "MIDI controller #1", &my_module->controller1, &my_module->haken_device, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
@@ -194,7 +191,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         Vec(155.f, y + 6.f), my_module, CoreModule::P_C1_MUTE, CoreModule::L_C1_MUTE, theme_engine, theme)));
 
     y += PICKER_INTERVAL;
-    controller2_picker = createMidiPicker(S::UHALF, y, "Choose MIDI controller #2", &my_module->controller2, &my_module->haken_device, theme);
+    controller2_picker = createMidiPicker(midi_x, y, "MIDI controller #2", &my_module->controller2, &my_module->haken_device, theme);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createLabel<TextLabel>(
         Vec(S::UHALF, y + PICKER_LABEL_OFFSET), MODULE_WIDTH - S::UHALF, text, theme_engine, theme, midi_style));
@@ -206,7 +203,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         Vec(155.f, y + 6.f), my_module, CoreModule::P_C2_MUTE, CoreModule::L_C2_MUTE, theme_engine, theme)));
         
     float x = 18.f;
-    y = PICKER_TOP - 18.f;
+    y = PICKER_TOP - 14.f;
     auto w = Center(createThemedButton<SmallRoundButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(Ctrl+Click to clear)"));
     if (my_module) {
         w->setHandler([=](bool ctrl, bool shift) {

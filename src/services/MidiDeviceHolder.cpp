@@ -4,8 +4,8 @@ namespace pachde {
 
 void MidiDeviceHolder::clear()
 {
-    device_claim.clear();
     connection = nullptr;
+    device_claim.clear();
     notifyChanged();
 }
 
@@ -19,6 +19,7 @@ void MidiDeviceHolder::notifyChanged()
 void MidiDeviceHolder::connect(std::shared_ptr<MidiDeviceConnection> connection)
 {
     assert(ChemDevice::Unknown != device_role);
+    this->connection = nullptr;
     this->connection = connection;
     if (connection) {
         // always override claim on connection

@@ -10,10 +10,10 @@
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/slider-h-widget.hpp"
-#include "tuning.hpp"
-#include "x-param.hpp"
-#include "y-param.hpp"
-#include "z-param.hpp"
+#include "./widgets/tuning.hpp"
+#include "./widgets/x-param.hpp"
+#include "./widgets/y-param.hpp"
+#include "./widgets/z-param.hpp"
 using namespace pachde;
 
 struct SettingsUi;

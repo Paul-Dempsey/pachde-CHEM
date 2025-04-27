@@ -302,7 +302,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     if (browsing) {
         auto logo = new Logo(0.8f);
-        logo->box.pos = Vec(CENTER, 80.f);
+        logo->box.pos = Vec(CENTER, 144.f);
         addChild(logo);
     }
 

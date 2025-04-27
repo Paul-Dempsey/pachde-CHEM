@@ -14,8 +14,6 @@ struct PresetList {
 
     PresetTab tab;
     PresetOrder order{PresetOrder::Natural};
-    //uint16_t firmware{0};
-    //uint8_t hardware{0};
     std::vector<std::shared_ptr<PresetInfo>> preset_list;
 
     std::vector<std::shared_ptr<PresetInfo>> preset_view;
@@ -52,16 +50,10 @@ struct PresetList {
 
     void refresh_filter_view();
 
-    // void set_device_info(uint16_t firmware_version, uint8_t hardware_type) {
-    //     firmware = firmware_version;
-    //     hardware = hardware_type;
-    // }
     void add(const PresetDescription* preset);
 
     void clear() {
         modified = false;
-        //firmware = 0;
-        //hardware = 0;
         preset_view.clear();
         preset_list.clear();
     }

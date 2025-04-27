@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
-#include "../../services/misc.hpp"
-#include "../../widgets/hamburger.hpp"
+#include "../../../services/misc.hpp"
+#include "../../../widgets/hamburger.hpp"
 using namespace ::rack;
 namespace pachde {
 

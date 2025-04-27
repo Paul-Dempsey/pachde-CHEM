@@ -12,7 +12,7 @@ struct GlowKnob : rack::RoundKnob {
     bool enabled{true};
     bool bright{false};
     bool wire{false};
-    NVGcolor disabled_screen{nvgRGBAf(0x80, 0x80, 0x80, .6f)};
+    NVGcolor disabled_screen{nvgRGBAf(.4, .4, .4, .6f)};
 
     GlowKnob() {
         box.size.x = 32.f;
@@ -88,7 +88,7 @@ struct TKnob : GlowKnob, IApplyTheme
         if (isVisibleColor(screen)) {
             disabled_screen = fromPacked(screen);
         } else {
-            disabled_screen = nvgRGBAf(0x80, 0x80, 0x80, .6f);
+            disabled_screen = nvgRGBAf(.4, .4, .4, .6f);
         }
         return true;
     }

@@ -9,8 +9,8 @@
 #include "../../widgets/symbol-set.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/tip-label-widget.hpp"
-#include "jack-param.hpp"
-#include "shift-param.hpp"
+#include "./widgets/jack-param.hpp"
+#include "./widgets/shift-param.hpp"
 
 using namespace pachde;
 

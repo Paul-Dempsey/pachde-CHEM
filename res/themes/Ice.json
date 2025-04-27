@@ -35,6 +35,7 @@
             "grid-bg":         { "fill": "hsl(190, 50%, 15%)" },
             "grid-line":       { "stroke": "hsl(200, 35.80%, 21.40%)" },
             "grid-new":        { "fill": "hsl(206, 40%, 30%)" },
+            "haken": { "fill": "hsl(216, 50%, 50%)"},
             "haken-in": { "fill": "#54a754" },
             "haken-out": { "fill": "#4556e7" },
             "hexoid": { "fill": "brand" },

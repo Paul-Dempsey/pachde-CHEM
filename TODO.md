@@ -1,11 +1,9 @@
 # CHEM To-Do
 
-- BIG volume knob
+- Overlay macros
 - Bug: rounding lights aren't quite right
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
-- Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
 - try BloodBat's GH stuff
-- Overlay macro system modules
 
 ## Before release
 
@@ -22,6 +20,7 @@
 
 ## Consider
 
+- Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
 - Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)
 - Blinking or highlighted link button when not connected
 - Setting files (surface, rounding, polyphony) (Rack presets sufficient?)

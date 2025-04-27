@@ -17,7 +17,7 @@ std::size_t common_prefix_length_insensitive(std::string::const_iterator a, std:
 {
     int common = 0;
     for (; ((a != end_a) && (b != end_b)) && ((*a == *b) || (std::tolower(*a) == std::tolower(*b)));
-    ++a, ++b, ++common){ 
+        ++a, ++b, ++common) { 
         // nothing
     }
     return common;
@@ -103,13 +103,6 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
 {
     clear();
 
-    // uint16_t ver = get_json_int(root, "firmware", 0);
-    // auto hw = get_json_int(root, "hardware", 0);
-    // if ((ver != firmware) || (hw != hardware)) {
-	// 	WARN("Mismatched hardware/firmware in %s L(%d:%d) /J(%d:%d)", system::getStem(path).c_str(), hardware, firmware, hw, ver);
-    //     return false;
-    // }
-
     auto jar = json_object_get(root, "presets");
     if (jar) {
         json_t* jp;
@@ -135,8 +128,6 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
 
 void PresetList::to_json(json_t* root, uint8_t hardware, const std::string& connection_info)
 {
-    // json_object_set_new(root, "hardware", json_integer(hardware));
-    // json_object_set_new(root, "firmware", json_integer(firmware));
     json_object_set_new(root, "connection", json_string(connection_info.c_str()));
     json_object_set_new(root, "preset-class", json_string(PresetClassName(hardware))); // human-readable
     json_object_set_new(root, "order", json_integer(int(order)));

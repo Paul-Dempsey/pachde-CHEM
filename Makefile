@@ -70,6 +70,8 @@ SOURCES += src/modules/Core/haken-task.cpp
 
 SOURCES += src/modules/Play/Play.cpp
 SOURCES += src/modules/Play/Play-ui.cpp
+SOURCES += src/modules/Play/Play-ui-create.cpp
+SOURCES += src/modules/Play/Play-ui-file.cpp
 SOURCES += src/modules/Play/preset-widget.cpp
 
 SOURCES += src/modules/Macro/Macro.cpp
@@ -96,14 +98,16 @@ SOURCES += src/modules/Sustain/Sustain-ui.cpp
 
 SOURCES += src/modules/Settings/SettingsModule.cpp
 SOURCES += src/modules/Settings/Settings-ui.cpp
-SOURCES += src/modules/Settings/tuning.cpp
+SOURCES += src/modules/Settings/widgets/tuning.cpp
 
 SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
-SOURCES += src/modules/Preset/preset-entry.cpp
+SOURCES += src/modules/Preset/Preset-ui-create.cpp
+SOURCES += src/modules/Preset/Preset-ui-events.cpp
 SOURCES += src/modules/Preset/preset-list.cpp
-SOURCES += src/modules/Preset/search-widget.cpp
-SOURCES += src/modules/Preset/filter-widget.cpp
+SOURCES += src/modules/Preset/widgets/filter-widget.cpp
+SOURCES += src/modules/Preset/widgets/preset-entry.cpp
+SOURCES += src/modules/Preset/widgets/search-widget.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

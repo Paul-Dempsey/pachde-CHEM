@@ -1,14 +1,13 @@
 #pragma once
 #include <rack.hpp>
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/bits-widget.hpp"
-#include "../../widgets/TipWidget.hpp"
+#include "../../../widgets/theme-button.hpp"
+#include "../../../widgets/bits-widget.hpp"
+#include "../../../widgets/TipWidget.hpp"
 
 using namespace ::rack;
 
 namespace pachde {
 
-// like CheckMenu
 struct StateButton : SvgButton, IApplyTheme
 {
     using Base = SvgButton;
@@ -18,18 +17,15 @@ struct StateButton : SvgButton, IApplyTheme
     bool button_down{false};
     bool last_button_down{false};
 
-    //std::function<bool()> get_fn{nullptr};
     std::function<void()> click_fn{nullptr};
 
     StateButton (
         const char * svg_up,
         const char * svg_down, 
-        //std::function<bool()> get_state,
         std::function<void()> on_click
     ) :
         up_svg(svg_up),
         down_svg(svg_down),
-        //get_fn(get_state),
         click_fn(on_click)
     {
     };
@@ -134,7 +130,6 @@ struct StateButton : SvgButton, IApplyTheme
 
 StateButton* makeFilterStateButton(
     Vec pos,
-    //std::function<bool()> get_state,
     SvgThemeEngine &engine,
     std::shared_ptr<SvgTheme> theme,
     std::function<void()> on_click

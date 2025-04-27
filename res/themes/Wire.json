@@ -35,6 +35,7 @@
             "grid-bg":   { "fill": "none", "stroke":"g50" },
             "grid-line": { "stroke": { "color":"g40", "width":0.5 }},
             "grid-new":  { "fill": "none", "stroke":"#5a4f8a" },
+            "haken": { "fill": "hsl(216, 50%, 50%)"},
             "haken-in": { "fill": "#54a754" },
             "haken-out": { "fill": "#4556e7" },
             "heart-fill": { "fill": "none" },

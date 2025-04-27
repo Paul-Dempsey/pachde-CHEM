@@ -37,6 +37,7 @@
             "grid-bg":   { "fill": "g20" },
             "grid-line": { "stroke": "dark-panel" },
             "grid-new":  { "fill": "#464060" },
+            "haken": { "fill": "hsl(216, 50%, 50%)"},
             "haken-in": { "fill": "#54a754" },
             "haken-out": { "fill": "#4556e7" },
             "heart-fill": { "fill": "#bd0808" },

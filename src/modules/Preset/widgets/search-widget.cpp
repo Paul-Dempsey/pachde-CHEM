@@ -1,5 +1,6 @@
 #include "search-widget.hpp"
-#include "../../services/misc.hpp"
+#include "../../../services/misc.hpp"
+
 namespace pachde {
 
 SearchField::SearchField()

@@ -6,7 +6,6 @@ namespace pachde {
 
 StateButton* makeFilterStateButton(
     Vec pos,
-    //std::function<bool()> get_state,
     SvgThemeEngine &engine,
     std::shared_ptr<SvgTheme> theme,
     std::function<void()> on_click
