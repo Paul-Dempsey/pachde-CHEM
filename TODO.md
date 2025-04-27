@@ -2,6 +2,7 @@
 
 - Overlay macros
 - Bug: rounding lights aren't quite right
+- Option to shut off looking for hardware (so that you can jump into the HE without issues).
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - try BloodBat's GH stuff
 
