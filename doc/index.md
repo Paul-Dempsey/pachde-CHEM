@@ -3,7 +3,9 @@
 ![CHEM banner](./image/repo-banner.svg)
 
 To get started, you must have installed VCV Rack and download the CHEM `.vcvplugin` file from GitHub.
-To download and install the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
+To download and install the latest build of **#d CHEM**, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
+
+When CHEM is released (coming soon), you will be able to subscribe to the **#d CHEM** plugin in the VCV Rack library. A subscription is recommended so that you are automatically updated when the plugin is revised with new modules, features, or bug fixes.
 
 Start with the [**Core**](./core.md#chem-core) module.
 
@@ -12,8 +14,8 @@ Start with the [**Core**](./core.md#chem-core) module.
 | Module | Description |
 | -- | -- |
 | [**Core**](./core.md#chem-core)  | An instance of Core must exist in the patch. It provides the connection to an EaganMatrix device for the rest of the modules. Certain Eagan Matrix utility functions are available in the right-click menu. |
-| [**Play**](./play.md#chem-play)  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
 | [**Preset**](./preset.md#chem-preset) | Access to User and System presets on your device. |
+| [**Play**](./play.md#chem-play)  | Manages playlists -- files of shortcuts to your favorite presets. Each playlist is for a specific device, so take care when you own more than one. |
 | [**Macro**](./macro.md#chem-macro) | Tha main i-vi macro controls. |
 | [**Pre**](./pre.md#chem-pre)   | The pre-master section controls, with general pre-effects level, and controls for the Compressor/Tanh. Pre-section convolution controls are in the Convolution module. |
 | [**Fx**](./fx.md#chem-fx)    | The "effects", a.k.a. Recirculator section. |
@@ -23,7 +25,7 @@ Start with the [**Core**](./core.md#chem-core) module.
 | [**Sustain**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sustain |
 | [**Sostenuto**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto |
 | [**Sostenuto 2**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto 2 |
-| [**Settings**](./settings.md#chem-settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing. |
+| [**Settings**](./settings.md#chem-settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing, and more. |
 
 More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
 
@@ -50,6 +52,10 @@ If you want something more private, you can also get my email contact from the r
 The user interface for modulation using voltage control works the same across all the CHEM modules.
 See [**CHEM Modulation**](./modulation.md#chem-modulation-voltage-control) for details on using CV with CHEM.
 
+If you're new to modular, and want to take advantage of the exciting possibilities for enhanced control of your instrument, take some time to learn about CV control and the vast variety of Rack modules for working with it.
+I'm not going to teach patching here, so join the communities.
+The forums are fully of knowledgable and helpful perople, and these communities are mostly free of the toxicity you find elsewhere on the internet.
+
 ## Themes
 
 **CHEM** is thoroughly themeable, and comes with the following themes, selectable by right click in the module menu.
@@ -64,7 +70,7 @@ Here, we show the **Pre** module modeling the themes against a Light-themed Rack
 \* The setting **Follow Rack theme** in the module menu does just that: follows the Rack panel preference setting with the **Dark** and **Light** themes.
 
 Somewhat related to themes, is that CHEM offers optional screws.
-The presence or absence of visible screws is selected in the module menu.
+You may choose to **Banish screws** in the module menu.
 This setting applies to all CHEM modules as a whole.
 It isn't selectable per module.
 Some CHEM modules don't have room for visible screws, so you have to wedge them in place or use glue or something.

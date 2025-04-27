@@ -12,7 +12,7 @@ To download the latest build, see the [Nightly Release](https://github.com/Paul-
 
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
-At this point (April 1 2025 -- *no fooling*!), CHEM is Beta quality, and I think more reliable and usable than HC One (not to mention better looking :-)
+At this point (April 26 2025), CHEM is very close to release quality, and I think more reliable and usable than HC One (not to mention better looking :-)
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
@@ -30,8 +30,6 @@ And thanks everyone (you know who you are) for all the support and encouragement
 The pachde line of software for Eagan Matrix devices is a labor of love. The products are free to use.
 Creating them requires an large investment of time and $$.
 You can show appreciation for the value these tools bring to your music-making, buy making a donation or leaving a tip.
-
-I dream of making standalone versions with responsive touch controls suitable for live performance, available for the major platforms with touch support, such as iOS, Android, and Windows. This requires an investment in $$ for the hardware, tools, and SDK licensing. Any donations you make go towards funding these prerequisites.
 
 [Click to Show appreciation (VenMo)](https://venmo.com/u/pcdempsey). \
 Thank you!
