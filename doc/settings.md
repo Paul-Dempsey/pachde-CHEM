@@ -6,6 +6,10 @@ Use **Settings** to control Eagan Matrix settings not available in the other CHE
 
 Click the **fingerboard** to reverse the direction of the playing surface.
 
+For **Middle C**, Turn the knob or right click to enter the MIDI note number (nn) that has the frequency of Middle C. In other words, transpose the surface.
+
+**Touch Area** is the MIDI Note number for the center of the touch area, from 16 to 108. A number <= 16 means there is no touch area. Turn the knob or right click to enter the MIDI note number.
+
 Next select the **X** (bend range), and the **Y** (front-back) and **Z** (pressure) MIDI cc assiignments. The last section for **X** is a combination with MPE (96) for MPE channels 2+, and a selected range on Channel 1.
 
 **Note processing** lets you determine how notes are processed, including the MIDI *Note On* velocity:
@@ -43,7 +47,11 @@ The **Keep MIDI** check box is the equivalent of *Preserve MIDI* in the Haken Ed
 
 The **Keep Surface** check box is the equivalent of *Preserve Surface* in the Haken Editor.
 
-The equivalent to the HE *Preserve Pedals* setting is on the [**Jack** module](./jack.md).
+The equivalent to the Haken Editor's *Preserve Pedals* setting is on the [**Jack** module](./jack.md).
+
+The **MIDI routing** diagram is above the inputs sections. Click a light to disable/enable routing from the input on the left (*MIDI* or **Surface*) to the output on the bottom (*DSP*, *CVC*, and *MIDI*).
+
+The AES menu provides access to AES audio input settings, when available for a device.
 
 ## Inputs
 
