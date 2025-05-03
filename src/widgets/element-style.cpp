@@ -10,7 +10,7 @@ ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
         case '#': fill_color = parseHexColor(color_spec); break;
         case 'r': fill_color = parseRgbColor(color_spec); break;
         case 'h': fill_color = parseHslaColor(color_spec); break;
-        default: break;
+        default: fill_color = 0; break;
     }
 }
 
@@ -22,14 +22,14 @@ ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *
     case '#': fill_color = parseHexColor(color_spec); break;
     case 'r': fill_color = parseRgbColor(color_spec); break;
     case 'h': fill_color = parseHslaColor(color_spec); break;
-    default: break;
+    default: fill_color = 0; break;
     }
 
     switch (*stroke_spec) {
     case '#': stroke_color = parseHexColor(stroke_spec); break;
     case 'r': stroke_color = parseRgbColor(stroke_spec); break;
     case 'h': stroke_color = parseHslaColor(stroke_spec); break;
-    default: break;
+    default: stroke_color = 0; break;
     }
 }
 
@@ -46,9 +46,9 @@ void ElementStyle::apply_theme(std::shared_ptr<SvgTheme> theme)
             fill_color = style->fill_color();
         }
     }
-    if (!isVisibleColor(fill_color) && isVisibleColor(stroke_color)) {
-        fill_color = stroke_color;
-    }
+    // if (!isVisibleColor(fill_color) && isVisibleColor(stroke_color)) {
+    //     fill_color = stroke_color;
+    // }
 }
 
 }

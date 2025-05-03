@@ -119,13 +119,9 @@ PreUi::PreUi(PreModule *module) :
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
-
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
-            ui::Menu* menu = createMenu();
-            menu->addChild(createMenuLabel("— Link to Core Module —"));
-            auto broker = ModuleBroker::get();
-            broker->addHostPickerMenu(menu, my_module);
+            ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }
     addChild(link_button);

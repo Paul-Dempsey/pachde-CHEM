@@ -189,13 +189,12 @@ PresetUi::PresetUi(PresetModule *module) :
 
     x = 23.5f;
     y = 18.f;
-    search_entry = new SearchField();
-    search_entry->box.pos = Vec(x, y);
+    search_entry = createWidget<TextInput>(Vec(x, y));
     search_entry->box.size = Vec(114.f, 14.f);
     search_entry->applyTheme(theme_engine, theme);
     search_entry->placeholder = "preset search";
-    search_entry->change_handler = [this](){ this->on_search_text_changed(); };
-    search_entry->enter_handler = [this](){ this->on_search_text_enter(); };
+    search_entry->set_on_change([=](std::string text){ on_search_text_changed(text); });
+    search_entry->set_on_enter([=](std::string text){ on_search_text_enter(); });
     addChild(search_entry);
 
     menu = Center(createThemedWidget<SearchMenu>(Vec(x + 122.f, y + 7.f), theme_engine, theme));
@@ -326,10 +325,7 @@ PresetUi::PresetUi(PresetModule *module) :
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), theme_engine, theme, "Core link");
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
-            ui::Menu* menu = createMenu();
-            menu->addChild(createMenuLabel("— Link to Core Module —"));
-            auto broker = ModuleBroker::get();
-            broker->addHostPickerMenu(menu, my_module);
+            ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }
     addChild(link_button);

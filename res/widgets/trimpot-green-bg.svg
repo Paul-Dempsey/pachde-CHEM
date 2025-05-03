@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" 
+  xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-face" 
+      x1="5.5" y1=".5" x2="9" y2="16" gradientUnits="userSpaceOnUse">
+         <stop stop-color="#82c982" offset="0" />
+         <stop stop-color="#133913" offset="1" />
+    </linearGradient>
+  </defs>
+  <circle id="tg-flat-face" opacity="0" cx="8" cy="8" r="7" fill="#82c982" />
+  <circle id="tg-face"      opacity="1" cx="8" cy="8" r="7" fill="url(#g-face)" />
+</svg>

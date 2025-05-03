@@ -94,7 +94,7 @@ void SelectorWidget::create_tip()
 void SelectorWidget::onHover(const HoverEvent& e) {
     Base::onHover(e);
     
-    int item = indexOfPos(e.pos);
+    int item = index_of_pos(e.pos);
     if (item != hovered_item) {
         hovered_item = item;
         if (hovered_item >= 0) {
@@ -149,7 +149,7 @@ void SelectorWidget::onButton(const ButtonEvent& e)
         if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
             destroy_tip();
             hovered_item = -1;
-            int item = indexOfPos(e.pos);
+            int item = index_of_pos(e.pos);
             if (item >= 0) {
                 auto pq = getParamQuantity();
                 if (pq) {
@@ -201,7 +201,7 @@ void SelectorWidget::drawLayer(const DrawArgs& args, int layer)
     Line(vg, x, y, x, y + radius + radius, stem, stem_width);
 }
 
-int SelectorWidget::indexOfPos(Vec(pos))
+int SelectorWidget::index_of_pos(Vec pos)
 {
     if (pos.x < 0 ||pos.x > box.size.x) return -1;
     float top = radius * 1.8f;

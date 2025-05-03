@@ -28,6 +28,7 @@ SOURCES += src/em/preset-sort.cpp
 
 # services
 SOURCES += src/services/colors.cpp
+SOURCES += src/services/color-help.cpp
 SOURCES += src/services/em-midi-port.cpp
 SOURCES += src/services/haken-midi.cpp
 SOURCES += src/services/HakenMidiOutput.cpp
@@ -46,13 +47,17 @@ SOURCES += src/services/text.cpp
 # widgets
 SOURCES += src/widgets/blip-widget.cpp
 SOURCES += src/widgets/bits-widget.cpp
+SOURCES += src/widgets/color-picker.cpp
 SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
+SOURCES += src/widgets/pic.cpp
 SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/slider-widget.cpp
 SOURCES += src/widgets/slider-h-widget.cpp
+SOURCES += src/widgets/tab-header.cpp
+SOURCES += src/widgets/text-input.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
@@ -107,7 +112,15 @@ SOURCES += src/modules/Preset/Preset-ui-events.cpp
 SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
-SOURCES += src/modules/Preset/widgets/search-widget.cpp
+
+SOURCES += src/modules/Overlay/Overlay.cpp
+SOURCES += src/modules/Overlay/Overlay-ui.cpp
+
+SOURCES += src/modules/XM/XM.cpp
+SOURCES += src/modules/XM/XM-ui.cpp
+
+SOURCES += src/modules/XM-Edit/XM-Edit.cpp
+SOURCES += src/modules/XM-Edit/XM-Edit-ui.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

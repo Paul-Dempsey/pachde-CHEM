@@ -4,6 +4,7 @@
 #include "../../widgets/click-region-widget.hpp"
 #include "../../widgets/logo-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
+#include "../../widgets/hamburger.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
@@ -104,10 +105,7 @@ ProtoUi::ProtoUi(ProtoModule *module) :
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
-            ui::Menu* menu = createMenu();
-            menu->addChild(createMenuLabel("— Link to Core Module —"));
-            auto broker = ModuleBroker::get();
-            broker->addHostPickerMenu(menu, my_module);
+            ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }
     addChild(link_button);

@@ -318,12 +318,12 @@ void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& st
     nvgStroke(vg);
 }
 
-void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled, float radius)
+void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled, float radius, float stroke_width)
 {
     if (filled) {
         Circle(vg, x, y, radius, co);
     } else {
-        OpenCircle(vg, x, y, radius - .25f, co, .5f);
+        OpenCircle(vg, x, y, radius - stroke_width*.5f, co, stroke_width);
     }
 }
 

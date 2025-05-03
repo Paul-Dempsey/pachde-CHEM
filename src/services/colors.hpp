@@ -121,6 +121,11 @@ inline PackedColor PackRGB(uint32_t r, uint32_t g, uint32_t b) {
     return PackRGBA(r, g, b, 255u);
 }
 
+inline uint32_t Red(PackedColor co) { return co & 0xff; }
+inline uint32_t Green(PackedColor co) { return (co >> 8) & 0xff; }
+inline uint32_t Blue(PackedColor co) { return (co >> 16u) & 0xff; }
+inline uint32_t Alpha(PackedColor co) { return (co >> 24u) & 0xff; }
+
 inline NVGcolor fromPacked(PackedColor co)
 {
     return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
@@ -313,10 +318,13 @@ enum class StockColor {
     Yellow_green,
     STOCK_COLOR_COUNT
 };
-inline NVGcolor GetStockColor(StockColor id)
-{
+inline NVGcolor GetStockColor(StockColor id) {
     if (static_cast<int>(id) < 0 || id > StockColor::STOCK_COLOR_COUNT) return COLOR_NONE;
 	return fromPacked(stock_colors[static_cast<int>(id)].color);
+}
+inline PackedColor GetPackedStockColor(StockColor id) {
+    if (static_cast<int>(id) < 0 || id > StockColor::STOCK_COLOR_COUNT) return 0;
+	return stock_colors[static_cast<int>(id)].color;
 }
 
 // https://en.wikipedia.org/wiki/HSL_and_HSV
@@ -381,7 +389,7 @@ void Line(NVGcontext * vg, float x1, float y1, float x2, float y2, const NVGcolo
 void CircleGradient(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& top, const NVGcolor& bottom);
 void Circle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& fill);
 void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& stroke, float stroke_width = 1.f);
-void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f);
+void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f, float stroke_width = .5f);
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
 void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
 

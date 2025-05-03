@@ -140,7 +140,7 @@ std::string hex_string(PackedColor co)
     uint8_t g = co & 0xff; co = co >> 8;
     uint8_t b = co & 0xff; co = co >> 8;
     uint8_t a = co & 0xff;
-    auto result = format_string("#%2x%2x%2x%2x", r, g, b, a);
+    auto result = format_string("#%02x%02x%02x%02x", r, g, b, a);
     if (0xff == a) result.resize(7);
     assert(isValidHexColor(result));
     return result;
@@ -254,31 +254,31 @@ PackedColor PackedFromHSLA(float h, float s, float l, float a)
     return PackRGBA(r,g,b,A);
 }
 
-PackedColor parseRgbColor(const std::string& text)
+PackedColor parseRgbColor(const std::string& text, PackedColor error_color)
 {
-    if (!is_rgb(text)) return OPAQUE_BLACK;
+    if (!is_rgb(text)) return error_color;
     auto it = text.cbegin() + 4;
 
     auto val = parse_uint64(it, text.cend());
-    if (val > 255) return OPAQUE_BLACK;
+    if (val > 255) return error_color;
     uint8_t r = val;
     while (it != text.cend() && is_number_sep(*it)) it++;
 
     val = parse_uint64(it, text.cend());
-    if (val > 255) return OPAQUE_BLACK;
+    if (val > 255) return error_color;
     uint8_t g = val;
     while (it != text.cend() && is_number_sep(*it)) it++;
 
     val = parse_uint64(it, text.cend());
-    if (val > 255) return OPAQUE_BLACK;
+    if (val > 255) return error_color;
     uint8_t b = val;
     while (it != text.cend() && ')' != *it) it++;
-    return (it == text.cend()) ? OPAQUE_BLACK: PackRGB(r, g, b);
+    return (it == text.cend()) ? error_color: PackRGB(r, g, b);
 }
 
-PackedColor parseHslaColor(const std::string& text)
+PackedColor parseHslaColor(const std::string& text, PackedColor error_color)
 {
-    if (!is_hsl(text)) return OPAQUE_BLACK;
+    if (!is_hsl(text)) return error_color;
     auto it = text.cbegin() + 3;
     bool is_alpha = ('a' == *it++);
     if (is_alpha) it++;
@@ -291,23 +291,23 @@ PackedColor parseHslaColor(const std::string& text)
     while (it != text.cend() && is_number_sep(*it)) it++;
 
     auto s = parse_float(it, text.cend());
-    if ((s < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    if ((s < 0) || ('%' != *it++)) return error_color;
     while (it != text.cend() && is_number_sep(*it)) it++;
 
     auto l = parse_float(it, text.cend());
-    if ((l < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+    if ((l < 0) || ('%' != *it++)) return error_color;
     while (it != text.cend() && is_number_sep(*it)) it++;
 
     float alpha = 100.f;
     if (is_alpha) {
         alpha = parse_float(it, text.cend());
-        if ((alpha < 0) || ('%' != *it++)) return OPAQUE_BLACK;
+        if ((alpha < 0) || ('%' != *it++)) return error_color;
     }
     while (it != text.cend() && ')' != *it) it++;
-    return (it == text.cend()) ? OPAQUE_BLACK: PackedFromHSLA(h, s/100.f, l/100.f, alpha/100.f);
+    return (it == text.cend()) ? error_color: PackedFromHSLA(h, s/100.f, l/100.f, alpha/100.f);
 }
 
-PackedColor parseHexColor(const std::string& text)
+PackedColor parseHexColor(const std::string& text, PackedColor error_color)
 {
     auto parts = ParseHex(text);
     if (parts.size() == 3) {
@@ -317,7 +317,7 @@ PackedColor parseHexColor(const std::string& text)
         return PackRGBA(parts[0], parts[1], parts[2], parts[3]);
     }
     // user error coding the color
-    return OPAQUE_BLACK;
+    return error_color;
 }
 
 float getNumber(json_t * j)

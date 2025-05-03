@@ -252,6 +252,19 @@ struct CheckButtonSvg {
     static std::string down() { return "res/widgets/check-button-down.svg"; }
 };
 
+struct Palette1ButtonSvg {
+    static std::string up() { return "res/widgets/palette-1.svg"; }
+    static std::string down() { return "res/widgets/palette-down.svg"; }
+};
+struct Palette2ButtonSvg {
+    static std::string up() { return "res/widgets/palette-2.svg"; }
+    static std::string down() { return "res/widgets/palette-down.svg"; }
+};
+struct Palette3ButtonSvg {
+    static std::string up() { return "res/widgets/palette-3.svg"; }
+    static std::string down() { return "res/widgets/palette-down.svg"; }
+};
+
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
@@ -259,6 +272,9 @@ using LinkButton = TButton<LinkButtonSvg>;
 using HeartButton = TButton<HeartButtonSvg>;
 using CheckButton = TButton<CheckButtonSvg>;
 using DotButton = TButton<DotButtonSvg>;
+using Palette1Button = TButton<Palette1ButtonSvg>;
+using Palette2Button = TButton<Palette2ButtonSvg>;
+using Palette3Button = TButton<Palette3ButtonSvg>;
 
 using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
 using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;

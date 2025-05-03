@@ -23,6 +23,10 @@ extern Model* modelSostenuto;
 extern Model* modelSostenuto2;
 extern Model* modelSettings;
 extern Model* modelPreset;
+extern Model* modelPreset;
+extern Model* modelOverlay;
+extern Model* modelXM;
+extern Model* modelXMEdit;
 //extern Model* modelProto;
 
 // Theming

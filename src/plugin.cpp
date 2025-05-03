@@ -18,6 +18,9 @@ void init(Plugin *p)
 	p->addModel(modelSostenuto2);
 	p->addModel(modelSettings);
 	p->addModel(modelPreset);
+	p->addModel(modelOverlay);
+	p->addModel(modelXM);
+	p->addModel(modelXMEdit);
 	//p->addModel(modelProto);
 }
 
@@ -38,6 +41,7 @@ bool isChemModule(Module* candidate)
         || (model == modelSostenuto2)
         || (model == modelSettings)
         || (model == modelPreset)
+        || (model == modelOverlay)
         //|| (model == modelProto)
         // add new models here
 	);

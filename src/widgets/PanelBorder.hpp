@@ -10,7 +10,8 @@ bool isPeerModule(Module* me, Module* candidate);
 
 namespace pachde {
     
-struct PartnerPanelBorder : PanelBorder, IApplyTheme {
+struct PartnerPanelBorder : PanelBorder, IApplyTheme
+{
     bool left{false};
     bool right{false};
 

@@ -8,13 +8,13 @@
 #include "../../widgets/bits-widget.hpp"
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/theme-button.hpp"
+#include "../../widgets/text-input.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/uniform-style.hpp"
 #include "preset-common.hpp"
 #include "preset-list.hpp"
 #include "./widgets/filter-widget.hpp"
 #include "./widgets/preset-entry.hpp"
-#include "./widgets/search-widget.hpp"
 
 using namespace pachde;
 struct PresetUi;
@@ -135,7 +135,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     IChemHost*  chem_host{nullptr};
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-    SearchField* search_entry{nullptr};
+    TextInput* search_entry{nullptr};
     LabelStyle tab_style{"tab-label", TextAlignment::Right, 16.f};
     LabelStyle current_tab_style{"tab-label-hi", TextAlignment::Right, 16.f, true};
     TextLabel* user_label{nullptr};
@@ -199,7 +199,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
     
-    void on_search_text_changed();
+    void on_search_text_changed(std::string text);
     void on_search_text_enter();
     bool filtering();
     void clear_filters();

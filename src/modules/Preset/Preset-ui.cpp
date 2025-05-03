@@ -366,9 +366,9 @@ void PresetUi::set_track_live(bool track)
     }
 }
 
-void PresetUi::on_search_text_changed()
+void PresetUi::on_search_text_changed(std::string text)
 {
-    if (my_module->search_incremental || search_entry->empty()) {
+    if (my_module->search_incremental || text.empty()) {
         on_search_text_enter();
     }
 }

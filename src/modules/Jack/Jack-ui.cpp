@@ -129,10 +129,7 @@ JackUi::JackUi(JackModule *module) :
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
-            ui::Menu* menu = createMenu();
-            menu->addChild(createMenuLabel("— Link to Core Module —"));
-            auto broker = ModuleBroker::get();
-            broker->addHostPickerMenu(menu, my_module);
+            ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }
     addChild(link_button);

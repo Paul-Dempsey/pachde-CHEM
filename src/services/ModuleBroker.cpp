@@ -1,7 +1,7 @@
 #include <rack.hpp>
 #include "ModuleBroker.hpp"
 #include "midi-devices.hpp"
-
+#include "../widgets/hamburger.hpp"
 using namespace ::rack;
 namespace pachde {
 
@@ -76,6 +76,7 @@ IChemHost* ModuleBroker::get_host(const std::string& claim)
 
 void ModuleBroker::addHostPickerMenu(ui::Menu* menu, IChemClient* client)
 {
+    menu->addChild(createMenuLabel<HamburgerTitle>("Link to Core Module"));
     if (hosts.empty()) {
         menu->addChild(createMenuLabel("[no Core modules available]"));
         return;

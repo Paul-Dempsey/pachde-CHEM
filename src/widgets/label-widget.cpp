@@ -13,9 +13,10 @@ BasicTextLabel::BasicTextLabel() :
 // IApplyTheme
 bool BasicTextLabel::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
 {
-    _color = fromPacked(theme_engine.getFillColor(theme->name, this->_style.key, true));
+    if (0 == *_style.key || !theme) return false;
+    _color = fromPacked(theme_engine.getFillColor(theme->name, _style.key, true));
     if (!isColorVisible(_color)) {
-        _color = RampGray(G_85);
+        _color = RampGray(G_65);
     }
     return true;
 }

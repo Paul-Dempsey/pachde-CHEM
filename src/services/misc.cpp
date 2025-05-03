@@ -25,6 +25,54 @@ size_t format_buffer(char * buffer, size_t length, const char* fmt, ...)
     return r;
 }
 
+std::string hsl_string(float hue, float saturation, float lightness, float alpha)
+{
+    char buffer[25];
+     std::string result{"hsl"};
+     int ihue = static_cast<int>(hue * 360.f);
+     if (alpha < 1.0f) {
+        result.append("a(");
+        auto len = format_buffer(buffer, sizeof(buffer), "%d,", ihue);
+        result.append(buffer, len);
+        if (saturation > .01f) {
+            len = format_buffer(buffer, sizeof(buffer), "%.2f%%,", saturation * 100.f);
+            result.append(buffer, len);
+        } else {
+            result.append("0%");
+        }
+        if (lightness > .01f) {
+            len = format_buffer(buffer, sizeof(buffer), "%.2f%%,", lightness * 100.f);
+            result.append(buffer, len);
+        } else {
+            result.append("0%,");
+        }
+        if (alpha > .01f) {
+            len = format_buffer(buffer, sizeof(buffer), "%.2f%%)", alpha * 100.f);
+            result.append(buffer, len);
+        } else {
+            result.append("0%)");
+        }
+     } else {
+        result.push_back('(');
+        auto len = format_buffer(buffer, sizeof(buffer), "%d,", ihue);
+        result.append(buffer, len);
+        if (saturation > .01f) {
+            len = format_buffer(buffer, sizeof(buffer), "%.2f%%,", saturation * 100.f);
+            result.append(buffer, len);
+        } else {
+            result.append("0%,");
+        }
+        if (lightness > .01f) {
+            len = format_buffer(buffer, sizeof(buffer), "%.2f%%)", lightness * 100.f);
+            result.append(buffer, len);
+        } else {
+            result.append("0%)");
+        }
+     }
+     return result;
+}
+
+
 uint64_t parse_hex_u64(const std::string& str)
 {
     if (str.empty()) return 0;

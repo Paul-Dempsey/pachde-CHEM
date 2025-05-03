@@ -21,6 +21,10 @@ const PackedColor NoColor = 0;
 bool isVisibleColor(PackedColor co);
 PackedColor applyOpacity(PackedColor color, float alpha);
 std::string hex_string(PackedColor co);
+bool isValidHexColor(std::string hex);
+bool is_hsl(const std::string& text); // checks only that prefix is [<white>*]hsl( or [<white>*]hsla(
+bool is_rgb(const std::string& text); // checks only that prefix is [<white>*]rgb(
+
 inline PackedColor PackRGB(unsigned int r, unsigned int g, unsigned int b) {
     return r | (g << 8) | (b << 16) | (255 << 24);
 }
@@ -32,16 +36,16 @@ inline float Alpha(PackedColor co) {
 }
 PackedColor PackedFromHSLA(float h, float s, float l, float a);
 
+constexpr const PackedColor OPAQUE_BLACK = 255 << 24; // returned for errors on error (maybe this should be NoColor, or just something obnoxious)
+
 // rgb(r,b,g)
-PackedColor parseRgbColor(const std::string& text);
+PackedColor parseRgbColor(const std::string& text, PackedColor error_color = OPAQUE_BLACK);
 
 // hsla(hue[deg], s%, l%, a%)
-PackedColor parseHslaColor(const std::string& text);
+PackedColor parseHslaColor(const std::string& text, PackedColor error_color = OPAQUE_BLACK);
 
 // #rrggbbaa #rgb #rrggbb
-PackedColor parseHexColor(const std::string& text);
-
-constexpr const PackedColor OPAQUE_BLACK = 255 << 24; // returned for errors (maybe this should be NoColor, or just something obnoxious)
+PackedColor parseHexColor(const std::string& text, PackedColor error_color = OPAQUE_BLACK);
 
 enum Severity { Info, Warn, Error, Critical };
 const char * SeverityName(Severity sev);

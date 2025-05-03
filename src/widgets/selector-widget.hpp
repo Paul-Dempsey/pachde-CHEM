@@ -35,7 +35,7 @@ struct SelectorWidget: rack::app::ParamWidget, IApplyTheme
     // ParamWidget
     void initParamQuantity() override;
 
-    int indexOfPos(Vec(pos));
+    int index_of_pos(Vec pos);
     void ensure_tip_holder();
     void set_tip_text(std::string text);
     void destroy_tip();

@@ -1,14 +1,14 @@
-#include "search-widget.hpp"
-#include "../../../services/misc.hpp"
+#include "text-input.hpp"
+#include "../services/misc.hpp"
 
 namespace pachde {
 
-SearchField::SearchField()
+TextInput::TextInput()
 {
     multiline = false;
 }
 
-bool SearchField::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool TextInput::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     bg_style.apply_theme(theme);
     text_style.apply_theme(theme);
@@ -17,12 +17,15 @@ bool SearchField::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::share
     return true;
 }
 
-void SearchField::onSelectKey(const SelectKeyEvent &e)
+void TextInput::onSelectKey(const SelectKeyEvent &e)
 {
     if (e.action == GLFW_PRESS) {
         if (GLFW_KEY_TAB == e.key) {
             APP->event->setSelectedWidget(getParent());
             e.consume(this);
+            if (tab_handler) {
+                tab_handler(0 != (e.mods & RACK_MOD_CTRL), 0 != (e.mods & RACK_MOD_SHIFT));
+            }
             return;
         }
 
@@ -38,17 +41,17 @@ void SearchField::onSelectKey(const SelectKeyEvent &e)
     Base::onSelectKey(e);
 }
 
-void SearchField::onChange(const ChangeEvent &e)
+void TextInput::onChange(const ChangeEvent &e)
 {
-    if (change_handler) change_handler();
+    if (change_handler) change_handler(text);
 }
 
-void SearchField::onAction(const ActionEvent &e)
+void TextInput::onAction(const ActionEvent &e)
 {
-    if (enter_handler) enter_handler();
+    if (enter_handler) enter_handler(text);
 }
 
-int SearchField::getTextPosition(math::Vec mousePos)
+int TextInput::getTextPosition(math::Vec mousePos)
 {
     if (text.empty()) return 0.f;
 
@@ -66,7 +69,7 @@ int SearchField::getTextPosition(math::Vec mousePos)
     nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
     nvgFontFaceId(vg, font->handle);
     nvgTextLetterSpacing(vg, 0.f);
-    nvgFontSize(vg, 12.f);
+    nvgFontSize(vg, text_height);
 
     float x = 1.5f;
     glyph_count = nvgTextGlyphPositions(vg, x, 1.f, txt, nullptr, glyphs, 120);
@@ -81,7 +84,7 @@ int SearchField::getTextPosition(math::Vec mousePos)
     return text.size();
 }
 
-void SearchField:: draw(const DrawArgs& args)
+void TextInput:: draw(const DrawArgs& args)
 {
     auto font = GetPluginFontRegular();
     if (!FontOk(font)) return;
@@ -102,7 +105,7 @@ void SearchField:: draw(const DrawArgs& args)
 
     bool active = (this == APP->event->selectedWidget);
     if (active || !text.empty()) {
-        SetTextStyle(vg, font, text_style.nvg_color(), 12.f);
+        SetTextStyle(vg, font, text_style.nvg_color(), text_height);
         const char * txt = text.c_str();
 
         // draw caret only when active
