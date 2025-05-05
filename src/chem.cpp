@@ -43,12 +43,12 @@ IChemHost *ChemModule::find_expander_host()
 {
     Module* scan = this;
     for (scan = leftExpander.module; nullptr != scan; scan = scan->leftExpander.module) {
-        if (!isPeerModule(this, scan)) break;
+        if (!isChemModule(scan)) break;
         auto host = static_cast<ChemModule*>(scan)->get_host();
         if (host) return host;
     }
     for (scan = rightExpander.module; nullptr != scan; scan = scan->rightExpander.module) {
-        if (!isPeerModule(this, scan)) return nullptr;
+        if (!isChemModule(scan)) return nullptr;
         auto host = static_cast<ChemModule*>(scan)->get_host();
         if (host) return host;
     }
@@ -57,8 +57,7 @@ IChemHost *ChemModule::find_expander_host()
 
 void ChemModule::process(const ProcessArgs &args)
 {
-    //if (modelCore == this->model) return;
-    if (!get_host() && ((args.frame + id) % 80) == 0) {
+    if (!seek_host && !get_host() && ((args.frame + id) % 80) == 0) {
         seek_host = true;
     }    
 }

@@ -12,16 +12,17 @@ constexpr const float CENTER        = PANEL_WIDTH*.5f;
 constexpr const float KNOBS_TOP     = 28;
 constexpr const float KNOB_DY       = 32;
 constexpr const float KNOB_LABEL_DY = 9;
+constexpr const float PORT_TOP_CY   = 286;
+constexpr const float PORT_DY       = 19.f;
+constexpr const float PORT_MOD_DX   = 10.F;
+constexpr const float PORT_MOD_DY   = 8.F;
+constexpr const float PORT_OFFSET   = 9.f;
 
 XMUi::XMUi(XMModule *module) :
     my_module(module)
 {
     setModule(module);
-    macro_data = my_module ? &my_module->macros : new MacroData();
-    if (macro_data->empty()) {
-        macro_data->init(8);
-    }
-    title_bg = my_module ? my_module->title_bg : GetPackedStockColor(StockColor::pachde_blue_dark);
+    title_bg = my_module ? my_module->title_bg : GetPackedStockColor(StockColor::pachde_blue_medium);
     title_fg = my_module ? my_module->title_fg : GetPackedStockColor(StockColor::Gray_65p);
 
     initThemeEngine();
@@ -29,7 +30,12 @@ XMUi::XMUi(XMModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-    
+
+    macro_data = my_module ? &my_module->macros : new MacroData();
+    if (macro_data->empty()) {
+        macro_data->init(8);
+    }
+
 //    float x, y;
     bool browsing = !module;
 
@@ -38,42 +44,48 @@ XMUi::XMUi(XMModule *module) :
     title_bar->color = title_bg;
     addChild(title_bar);
     LabelStyle no_style{"", TextAlignment::Center, 12.f, true};
-    addChild(title = createLabel(Vec(CENTER, 1.5), PANEL_WIDTH, my_module ? my_module->title : "", theme_engine, nullptr, no_style));
+    addChild(title = createLabel(Vec(CENTER, 1.5), PANEL_WIDTH, my_module ? my_module->title : "XM", theme_engine, nullptr, no_style));
     title->color(fromPacked(title_fg));
 
     LabelStyle macro_label_style{"ctl--label", TextAlignment::Center, 10.f, false};
     for (int i = 0; i < 8; ++i) {
         MacroUi& macro = macro_ui[i];
         auto pos = knob_center(i);
-        macro.knob = createChemKnob<TrimPot>(pos, my_module, i, theme_engine, theme);
+        macro.knob = createChemKnob<GreenTrimPot>(pos, my_module, i, theme_engine, theme);
         addChild(macro.knob);
 
+        macro.track = createTrackWidget(macro.knob, theme_engine, theme);
+        addChild(macro.track);
+
         pos.y += KNOB_LABEL_DY;
-        auto pq = my_module ? my_module->getParamQuantity(i) : nullptr;
-        macro.label = createLabel(pos, 45, pq ? pq->getLabel() : "", theme_engine, theme, macro_label_style);
+        auto md = macro_data->get_macro(i);
+        macro.label = createLabel(pos, 45, md ? md->name : "", theme_engine, theme, macro_label_style);
         addChild(macro.label);
-        //TODO: track
     }
 
     // inputs
+    const NVGcolor co_port = PORT_CORN;
+    float y = PORT_TOP_CY;
+    addChild(createChemKnob<TrimPot>(Vec(CENTER, y), module, XMModule::P_MODULATION, theme_engine, theme));
 
-    // footer
-
-    // addChild(warn = createLabel<TipLabel>(
-    //     Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    // warn->describe("[warning/status]");
-    // warn->glowing(true);
-
-    // addChild(haken_device_label = createLabel<TipLabel>(
-    //     Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
-
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Overlay link");
-    if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
-            ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
-        });
+    y += PORT_DY;
+    float top = y;
+    float x = CENTER - PORT_OFFSET;
+    float axis = -1.f;
+    for (int i = 0; i < 8; ++i) {
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
+        addChild(Center(createLight<TinySimpleLight<GreenLight>>(Vec(x + (axis*PORT_MOD_DX), y - PORT_MOD_DY), my_module, i)));
+        if (my_module) {
+            addChild(Center(createClickRegion(x + 2*axis, y - .5f, 21.75f, 19.f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
+        }
+        if (i == 3) {
+            axis = 1.f;
+            x = CENTER + PORT_OFFSET;
+            y = top;
+        } else {
+            y += PORT_DY;
+        }
     }
-    addChild(link_button);
 
     // Browsing UI
 
@@ -87,7 +99,7 @@ XMUi::XMUi(XMModule *module) :
 
     if (my_module) {
         my_module->set_chem_ui(this);
-        onConnectHost(my_module->chem_host);
+//        onConnectHost(my_module->chem_host);
     }
 }
 
@@ -234,14 +246,15 @@ void XMUi::on_macro_change(int index)
     MacroUi& macro = macro_ui[index];
     auto data = get_macro(index);
     macro.label->text(data->name);
-    
+
 }
 
 void XMUi::step()
 {
     Base::step();
     if (!my_module) return;
-    bind_host(my_module);
+    //bind_host(my_module);
+
     bool left = panelBorder->left;
     bool right = panelBorder->right;
     if (!left) {
@@ -273,11 +286,18 @@ void XMUi::draw(const DrawArgs& args)
         auto pos = knob_center(edit_item);
         auto co = current_style.nvg_color();
 
+        float stroke_width = current_style.width();
+        float half_width = stroke_width*.5f;
         float y = pos.y - 12.5f;
-        Line(vg, 0, y, box.size.x, y, co, 1.25f);
+        float y2 = pos.y + KNOB_LABEL_DY + 11.5f;
+        float right = box.size.x;
 
-        y = pos.y + KNOB_LABEL_DY + 11.5f;
-        Line(vg, 0, y, box.size.x, y, co, 1.25f);
+        Line(vg, 0, y, right, y, co, stroke_width);
+        Line(vg, 0, y2, right, y2, co, stroke_width);
+        Line(vg, half_width, y, half_width, y2, co, stroke_width);
+        right -= half_width;
+        Line(vg, right, y, right, y + 10.f, co, stroke_width);
+        Line(vg, right, y2 - 10.f, right, y2, co, stroke_width);
     }
 }
 

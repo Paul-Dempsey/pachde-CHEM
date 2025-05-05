@@ -100,6 +100,14 @@ void HakenMidi::request_configuration(ChemId tag) {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi), tag));
 }
 
+void HakenMidi::request_archive_0(ChemId tag)
+{
+    if (log) {
+        log->log_message(">>H", "---- Request Archive 0");
+    }
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::cfCreateArch0), tag));
+}
+
 void HakenMidi::request_con_text(ChemId tag) {
     if (log) {
         log->log_message(">>H", "---- RequestConText");
@@ -118,9 +126,10 @@ void HakenMidi::request_updates(ChemId tag)
     // control_change(Haken::ch16, 55, 1); // bit 1 means request config
 
     // firmware > 1009
-    begin_stream(tag, Haken::s_Mat_Poke);
-    key_pressure(tag, Haken::ch16, Haken::idCfgOut, 1);
-    end_stream(tag);
+    // begin_stream(tag, Haken::s_Mat_Poke);
+    // key_pressure(tag, Haken::ch16, Haken::idCfgOut, 1);
+    // end_stream(tag);
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::loadsToMidi), tag));
 }
 
 void HakenMidi::request_user(ChemId tag)

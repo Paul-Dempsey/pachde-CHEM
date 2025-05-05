@@ -1,16 +1,14 @@
 #include "Overlay.hpp"
 #include "../../services/colors.hpp"
 #include "../../em/em-hardware.h"
-#include "../../widgets/click-region-widget.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/text-input.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "../../widgets/widgets.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
 
 // -- UI --------------------------------------
+static const char * DEFAULT_TITLE{"Overlay Synth"};
 
 OverlayUi::OverlayUi(OverlayModule *module) :
     my_module(module)
@@ -21,7 +19,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
-    
+
     bool browsing = !module;
 
     bg_widget = createWidget<Swatch>(Vec(0.f, 15.f));
@@ -39,16 +37,18 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     addChild(title_widget);
     if (my_module) {
         title_widget->set_text_color(my_module->fg_color);
-        title_widget->set_text(my_module->title);
+        title_widget->set_text(my_module->title.empty() ? DEFAULT_TITLE : my_module->title);
     } else {
-        title_widget->set_text_color(parse_color("hsl(0,0%,65%)"));
+        title_widget->set_text(DEFAULT_TITLE);
+        title_widget->set_text_color(0xffe6e6e6);
     }
 
-    // inputs
+    auto set_preset_button = Center(createThemedButton<SquareButton>(Vec(box.size.x*.5f, box.size.y - 30.f), theme_engine, theme, "Set overlay preset"));
+    set_preset_button->setHandler([=](bool c, bool f) {
+    });
+    addChild(set_preset_button);
 
     // footer
-
-
     link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-15.f), theme_engine, theme, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
@@ -139,12 +139,6 @@ void OverlayUi::set_title(std::string text)
     my_module->title = text;
 }
 
-void OverlayUi::set_preset(std::string preset)
-{
-    if (!my_module) return;
-    my_module->overlay_preset = preset;
-}
-
 void OverlayUi::onHoverKey(const HoverKeyEvent &e)
 {
     if (my_module) {
@@ -169,6 +163,7 @@ void OverlayUi::step()
     Base::step();
     if (!my_module) return;
     bind_host(my_module);
+
     bool left = panelBorder->left;
     bool right = panelBorder->right;
     if (!right) {
@@ -189,25 +184,36 @@ void OverlayUi::step()
 void OverlayUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
-    menu->addChild(new MenuSeparator);
-    menu->addChild(createSubmenuItem("Preset", "", 
+
+    menu->addChild(createMenuLabel<HamburgerTitle>("Overlay"));
+
+    std::string label{"Overlay preset: "};
+    auto over = my_module ? my_module->overlay_preset : nullptr;
+    label.append(over ? over->name : "<not configured>");
+    menu->addChild(createMenuLabel(label));
+
+    auto preset = my_module ? my_module->live_preset : nullptr;
+    menu->addChild(createMenuItem("Use live preset", preset ? preset->name : "<none>", [=](){
+       my_module->overlay_preset = my_module->live_preset;
+       // TODO: notify clients
+    }, !preset));
+
+    menu->addChild(createMenuItem("Reset", "", [=](){
+        if (module) my_module->reset();
+        bg_widget->color = 0;
+        title_widget->set_text_color(0xffe6e6e6);
+        title_widget->set_text(DEFAULT_TITLE);
+    }));
+
+    menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>", 
         [=](Menu *menu) {
-            TextInputMenu *editField = new TextInputMenu();
-            editField->box.size.x = 150;
-            editField->setText(my_module ? my_module->overlay_preset : "<preset>");
-            editField->set_on_change([=](std::string text) { set_preset(text); });
-            menu->addChild(editField);
-        }));
-    menu->addChild(createSubmenuItem("Title", "", 
-        [=](Menu *menu) {
-            TextInputMenu *editField = new TextInputMenu();
-            editField->box.size.x = 150;
-            editField->setText(my_module ? my_module->title : "<title>");
-            editField->set_on_change([=](std::string text) { set_title(text); });
-            menu->addChild(editField);
+            TextInputMenu *edit = new TextInputMenu();
+            edit->box.size.x = 150;
+            edit->setText(my_module ? my_module->title : "<title>");
+            edit->set_on_change([=](std::string text) { set_title(text); });
+            menu->addChild(edit);
         }));
 
-    menu->addChild(new MenuSeparator);
 
     menu->addChild(createSubmenuItem("Background", "", [=](Menu* menu) {
         auto picker = new ColorPickerMenu();
@@ -227,19 +233,5 @@ void OverlayUi::appendContextMenu(Menu *menu)
         menu->addChild(picker);
     }));
 
-    // bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
-    // menu->addChild(createMenuItem("Zero modulation", "0", [this](){
-    //     my_module->modulation.zero_modulation();
-    // }, unconnected));
-
-    // menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
-
-    // menu->addChild(createCheckMenuItem("Glowing knobs", "", 
-    //     [this](){ return my_module->glow_knobs; },
-    //     [this](){
-    //         my_module->glow_knobs = !my_module->glow_knobs; 
-    //         glowing_knobs(my_module->glow_knobs);
-    //     }
-    // ));
     Base::appendContextMenu(menu);
 }

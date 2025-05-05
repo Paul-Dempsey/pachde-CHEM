@@ -193,6 +193,8 @@ class SvgThemeEngine
 {
 public:
 
+    bool isLogging() { return log != nullptr; }
+
     // Set a logging callback to receive more detailed information, warnings,
     // and errors when working with svg themes.
     void setLog(LogCallback log) { this->log = log; }
@@ -255,22 +257,19 @@ public:
     void showCache();
 
 private:
-
-    static void LogNothing(Severity severity, ErrorCode code, std::string info) {}
-
     std::vector<std::shared_ptr<SvgTheme>> themes;
     std::map<std::string, PackedColor> colors;
     std::map<std::string, std::shared_ptr<::rack::window::Svg>> svgs;
-    LogCallback log = LogNothing;
+    LogCallback log{nullptr};
 
     void logInfo(std::string info) {
-        log(Severity::Info, ErrorCode::NoError, info);
+        if (log) log(Severity::Info, ErrorCode::NoError, info);
     }
     void logError(ErrorCode code, std::string info) {
-        log(Severity::Error, code, info);
+        if (log) log(Severity::Error, code, info);
     }
     void logWarning(ErrorCode code, std::string info) {
-        log(Severity::Warn, code, info);
+        if (log) log(Severity::Warn, code, info);
     }
     bool requireValidColor(const std::string& spec, const char * name);
     bool requireArray(json_t* j, const char * name);

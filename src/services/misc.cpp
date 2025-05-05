@@ -6,13 +6,16 @@ namespace pachde {
 std::string format_string(const char *fmt, ...)
 {
     const int len = 512;
-    std::string s(len, '\0');
+    char buf[len];
+
     va_list args;
     va_start(args, fmt);
-    auto r = std::vsnprintf(&s[0], len, fmt, args);
+    int r = std::vsnprintf(buf, len, fmt, args);
     va_end(args);
+
     if (r < 0) return "??";
-    s.resize(std::min(r, len));
+
+    auto s = std::string{buf, size_t(r)};
     return s;
 }
 

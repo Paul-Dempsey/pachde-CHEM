@@ -45,7 +45,7 @@ NamedColor stock_colors[] = {
     { "#d blue medium", PackRGB(0x4e, 0x8b, 0xbf) },
     { "#d blue light", PackRGB(0xbd,0xd6,0xfc) },
     { "#d default port", toPacked(nvgHSL(210.f/360.f, 0.5f, 0.65f)) },
-    { "None", PackRGBA( 0, 0, 0, 0) },
+    { "None", 0 },
     { "Black", PackRGB( 0, 0, 0) },
     { "5% Gray", PackRGB(0x0d, 0x0d, 0x0d) },
     { "10% Gray", PackRGB(0x1a, 0x1a, 0x1a) },

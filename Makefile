@@ -113,14 +113,18 @@ SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
 
-SOURCES += src/modules/Overlay/Overlay.cpp
-SOURCES += src/modules/Overlay/Overlay-ui.cpp
+SOURCES += src/modules/XM-shared/macro-usage.cpp
+SOURCES += src/modules/XM-shared/xm-overlay.cpp
+
+SOURCES += src/modules/XM-Overlay/Overlay.cpp
+SOURCES += src/modules/XM-Overlay/Overlay-ui.cpp
 
 SOURCES += src/modules/XM/XM.cpp
 SOURCES += src/modules/XM/XM-ui.cpp
 
-SOURCES += src/modules/XM-Edit/XM-Edit.cpp
-SOURCES += src/modules/XM-Edit/XM-Edit-ui.cpp
+SOURCES += src/modules/XM-Edit/Edit.cpp
+SOURCES += src/modules/XM-Edit/Edit-ui.cpp
+
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets

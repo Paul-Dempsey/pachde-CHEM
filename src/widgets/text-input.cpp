@@ -24,7 +24,7 @@ void TextInput::onSelectKey(const SelectKeyEvent &e)
             APP->event->setSelectedWidget(getParent());
             e.consume(this);
             if (tab_handler) {
-                tab_handler(0 != (e.mods & RACK_MOD_CTRL), 0 != (e.mods & RACK_MOD_SHIFT));
+                tab_handler(0 != (e.mods & RACK_MOD_CTRL), 0 != (e.mods & GLFW_MOD_SHIFT));
             }
             return;
         }
@@ -66,7 +66,7 @@ int TextInput::getTextPosition(math::Vec mousePos)
     const char * txt = text.c_str();
 
     nvgSave(vg);
-    nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+    nvgTextAlign(vg, NVG_ALIGN_MIDDLE|NVG_ALIGN_LEFT);
     nvgFontFaceId(vg, font->handle);
     nvgTextLetterSpacing(vg, 0.f);
     nvgFontSize(vg, text_height);
@@ -92,7 +92,7 @@ void TextInput:: draw(const DrawArgs& args)
 
     nvgScissor(vg, RECT_ARGS(args.clipBox));
     nvgSave(vg);
-    nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_LEFT);
+    nvgTextAlign(vg, NVG_ALIGN_MIDDLE|NVG_ALIGN_LEFT);
 
     auto bg_fill = bg_style.nvg_color();
     if (bg_fill.a > 0.f) {
@@ -160,10 +160,10 @@ void TextInput:: draw(const DrawArgs& args)
             }
         }
         nvgFillColor(vg, text_style.nvg_color());
-        nvgText(vg, 1.5f, 1.f, txt, nullptr);
+        nvgText(vg, 1.5f, box.size.y*.5f, txt, nullptr);
     } else if (!placeholder.empty() && (this == APP->event->hoveredWidget)) {
-        SetTextStyle(vg, font, prompt_style.nvg_color(), 10.f);
-        nvgText(vg, 1.5f, 1.f, placeholder.c_str(), nullptr);
+        SetTextStyle(vg, font, prompt_style.nvg_color(), text_height-2.f);
+        nvgText(vg, 1.5f, box.size.y*.5f, placeholder.c_str(), nullptr);
     }
 
     nvgRestore(vg);

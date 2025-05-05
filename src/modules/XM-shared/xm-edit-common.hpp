@@ -3,9 +3,11 @@
 using namespace ::rack;
 #include "../../em/wrap-HakenMidi.hpp"
 #include "../../services/colors.hpp"
+#include "../../services/misc.hpp"
 #include "../../services/svt_rack.hpp"
 
-using namespace pachde;
+namespace pachde {
+
 enum MacroRange{ Bipolar, Unipolar, Custom };
 const uint8_t INVALID_MACRO{0};
 
@@ -74,3 +76,5 @@ struct IExtendedMacro
     virtual void remove_macro(int index) = 0;
     virtual void on_macro_change(int index) = 0;
 };
+
+}

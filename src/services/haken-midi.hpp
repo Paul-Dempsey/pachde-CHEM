@@ -37,6 +37,7 @@ struct HakenMidi
     void select_preset(ChemId tag, PresetId id);
     void editor_present(ChemId tag);
     void request_configuration(ChemId tag);
+    void request_archive_0(ChemId tag);
     void request_con_text(ChemId tag);
     void request_updates(ChemId tag);
     void request_user(ChemId tag);

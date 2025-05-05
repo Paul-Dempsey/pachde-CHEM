@@ -20,6 +20,9 @@ enum class ChemId : uint8_t {
     Sostenuto2,
     Settings,
     Preset,
+    Overlay,
+    XM,
+    XMEdit,
     Proto
 };
 

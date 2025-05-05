@@ -10,32 +10,33 @@ XMModule::XMModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(P_1, -5.f, 5.f, 0.f, "");
-    configParam(P_2, -5.f, 5.f, 0.f, "");
-    configParam(P_3, -5.f, 5.f, 0.f, "");
-    configParam(P_4, -5.f, 5.f, 0.f, "");
-    configParam(P_5, -5.f, 5.f, 0.f, "");
-    configParam(P_6, -5.f, 5.f, 0.f, "");
-    configParam(P_7, -5.f, 5.f, 0.f, "");
-    configParam(P_8, -5.f, 5.f, 0.f, "");
+    configParam(P_1, -5.f, 5.f, 0.f, "#1");
+    configParam(P_2, -5.f, 5.f, 0.f, "#2");
+    configParam(P_3, -5.f, 5.f, 0.f, "#3");
+    configParam(P_4, -5.f, 5.f, 0.f, "#4");
+    configParam(P_5, -5.f, 5.f, 0.f, "#5");
+    configParam(P_6, -5.f, 5.f, 0.f, "#6");
+    configParam(P_7, -5.f, 5.f, 0.f, "#7");
+    configParam(P_8, -5.f, 5.f, 0.f, "#8");
+    configParam(P_MODULATION, -5.f, 5.f, 0.f, "Mod amount");
 
-    configInput(IN_1, "Macro a modulation");
-    configInput(IN_2, "Macro b modulation");
-    configInput(IN_3, "Macro c modulation");
-    configInput(IN_4, "Macro d modulation");
-    configInput(IN_5, "Macro e modulation");
-    configInput(IN_6, "Macro f modulation");
-    configInput(IN_7, "Macro g modulation");
-    configInput(IN_8, "Macro h modulation");
+    configInput(IN_1, "in-1");
+    configInput(IN_2, "in-2");
+    configInput(IN_3, "in-3");
+    configInput(IN_4, "in-4");
+    configInput(IN_5, "in-5");
+    configInput(IN_6, "in-6");
+    configInput(IN_7, "in-7");
+    configInput(IN_8, "in-8");
 
-    configLight(L_IN_1, "Mod knob on Macro a");
-    configLight(L_IN_2, "Mod knob on Macro b");
-    configLight(L_IN_3, "Mod knob on Macro c");
-    configLight(L_IN_4, "Mod knob on Macro d");
-    configLight(L_IN_5, "Mod knob on Macro e");
-    configLight(L_IN_6, "Mod knob on Macro f");
-    configLight(L_IN_7, "Mod knob on Macro g");
-    configLight(L_IN_8, "Mod knob on Macro h");
+    // configLight(L_IN_1, "Mod knob on Macro a");
+    // configLight(L_IN_2, "Mod knob on Macro b");
+    // configLight(L_IN_3, "Mod knob on Macro c");
+    // configLight(L_IN_4, "Mod knob on Macro d");
+    // configLight(L_IN_5, "Mod knob on Macro e");
+    // configLight(L_IN_6, "Mod knob on Macro f");
+    // configLight(L_IN_7, "Mod knob on Macro g");
+    // configLight(L_IN_8, "Mod knob on Macro h");
 //    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     // EmccPortConfig cfg[] =         {
@@ -63,6 +64,18 @@ void XMModule::dataFromJson(json_t* root)
         title_fg = GetPackedStockColor(StockColor::Gray_65p);
     }
     macros.from_json(root);
+
+    for (int i = 0; i < 8; ++i) {
+        auto md = macros.get_macro(i);
+        auto pq = getParamQuantity(i);
+        if (pq) {
+            pq->name = md->name;
+        }
+        auto ininfo = getInputInfo(i);
+        if (ininfo) {
+            ininfo->name = md->name;
+        }
+    }
 
     ModuleBroker::get()->try_bind_client(this);
 }
@@ -176,6 +189,29 @@ void XMModule::do_message(PackedMidiMessage message)
 
 }
 
+// void XMModule::onExpanderChange(const ExpanderChangeEvent& e)
+// {
+//     if (e.side) return; // only care about left expanders
+
+// }
+
+void XMModule::onPortChange(const PortChangeEvent& e)
+{
+    if (e.connecting) {
+        mod_target = e.portId;
+    } else {
+        if (mod_target == e.portId) {
+            mod_target = -1;
+            for (int i = 0; i < 8; ++i) {
+                if ((i != e.portId) && getInput(i).isConnected()) {
+                    mod_target = i;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void XMModule::process_params(const ProcessArgs& args)
 {
     //modulation.pull_mod_amount();
@@ -190,12 +226,20 @@ void XMModule::process(const ProcessArgs& args)
         process_params(args);
     }
 
-    // if (modulation.sync_params_ready(args)) {
-    //     modulation.sync_send();
-    // }    
+    if (!overlay && (0 == ((args.frame + id) % 120))) {
+        overlay = find_adjacent_overlay(this);
+        if (!overlay) {
+            overlay = find_an_overlay(this, device_claim, "");
+        }
+    }
 
     if (0 == ((args.frame + id) % 47)) {
-        //modulation.update_mod_lights();
+        if (last_mod_target != mod_target) {
+            for (int i = 0; i < 8; ++i) {
+                getLight(i).setSmoothBrightness((i == mod_target) ? 1.f : 0.f, 90);
+            }
+            last_mod_target = mod_target;
+        }
     }
 }
 

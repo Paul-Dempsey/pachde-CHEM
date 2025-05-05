@@ -4,22 +4,15 @@
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/indicator-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/selector-widget.hpp"
-#include "../../widgets/tab-header.hpp"
-#include "../../widgets/text-input.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
-#include "xm-edit-common.hpp"
+#include "../../widgets/widgets.hpp"
+#include "../XM-shared/xm-edit-common.hpp"
+#include "../XM-shared/xm-overlay.hpp"
 
 using namespace pachde;
 
 struct XMEditUi;
 
-struct XMEditModule : ChemModule, IChemClient, IDoMidi
+struct XMEditModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 {
     enum Params {
         P_ADD_REMOVE,
@@ -37,14 +30,19 @@ struct XMEditModule : ChemModule, IChemClient, IDoMidi
     };
     enum Lights {
         L_XM,
+        L_OVERLAY,
+        L_CORE,
         NUM_LIGHTS
     };
 
     std::string device_claim;
-    bool in_mat_poke;
-    
+    IOverlay* overlay{nullptr};
+
     XMEditModule();
     ~XMEditModule() {
+        if (overlay) {
+            overlay->overlay_unregister_client(this);
+        }
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
@@ -52,13 +50,17 @@ struct XMEditModule : ChemModule, IChemClient, IDoMidi
 
     XMEditUi* ui() { return reinterpret_cast<XMEditUi*>(chem_ui); };
 
-    // IDoMidi
-    void do_message(PackedMidiMessage msg) override;
+    Module* get_xm_module();
+    IExtendedMacro* get_xm_client();
+
+    // IOverlayClient
+    void on_overlay_change(IOverlay* host) override { overlay = host; }
+    IOverlay* get_overlay() override { return overlay; }
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
     std::string client_claim() override { return device_claim; }
-    IDoMidi* client_do_midi() override { return this; }
+    //IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
@@ -79,8 +81,8 @@ struct XMEditUi : ChemModuleWidget, IChemClient
 
     IChemHost*  chem_host{nullptr};
     XMEditModule* my_module{nullptr};
-    IndicatorWidget* link{nullptr};
-    LinkButton* link_button{nullptr};
+    //IndicatorWidget* link{nullptr};
+    //LinkButton* link_button{nullptr};
     TextLabel* status{nullptr};
     TabHeader* tab_header{nullptr};
     TextLabel* macro_number{nullptr};
@@ -91,7 +93,6 @@ struct XMEditUi : ChemModuleWidget, IChemClient
 
     std::vector<StateIndicatorWidget*> range_options;
     ElementStyle current_style{"xm-current", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .25f};
-    IExtendedMacro * client{nullptr};
 
     int knob_index{0};
     std::string title;
@@ -108,7 +109,8 @@ struct XMEditUi : ChemModuleWidget, IChemClient
     
     Module* get_xm_module();
     bool connected() { return nullptr != get_xm_module(); }
-    
+    IExtendedMacro* get_client() { return my_module ? my_module->get_xm_client() : nullptr; }
+
     void on_client_change();
     void on_item_change(int item);
     void refresh_macro_controls();
@@ -118,6 +120,7 @@ struct XMEditUi : ChemModuleWidget, IChemClient
     void set_title_text_color(PackedColor color);
     void set_range(MacroRange range);
     void set_range_ui(MacroRange range);
+    void set_macro_number(uint8_t num);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

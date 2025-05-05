@@ -6,8 +6,6 @@ using namespace ::rack;
 
 namespace pachde {
 
-constexpr const uint8_t PKP16 = Haken::polyKeyPres + Haken::ch16;
-
 struct ConvolutionParams
 {
     uint8_t data[30];

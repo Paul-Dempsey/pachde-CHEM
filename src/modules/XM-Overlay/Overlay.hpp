@@ -13,13 +13,15 @@
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
+#include "../XM-shared/macro-usage.hpp"
+#include "../XM-shared/xm-overlay.hpp"
 #include "v-text.hpp"
 
 using namespace pachde;
 
 struct OverlayUi;
 
-struct OverlayModule : ChemModule, IChemClient, IDoMidi
+struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 {
     enum Params {
         NUM_PARAMS
@@ -35,22 +37,42 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi
         NUM_LIGHTS
     };
 
-    bool in_mat_poke{false};
     bool preset_connected{false};
     std::string device_claim;
-    std::string overlay_preset;
+    std::shared_ptr<PresetInfo> overlay_preset{nullptr};
+    std::shared_ptr<PresetInfo> live_preset{nullptr};
     std::string title;
     PackedColor bg_color{0};
-    PackedColor fg_color;
+    PackedColor fg_color{0xffe6e6e6};
+
+    std::vector<IOverlayClient*> clients;
+    std::vector<MacroUsage> macros;
+    MacroUsageBuilder mac_build{macros};
 
     OverlayModule();
     ~OverlayModule() {
+        if (!clients.empty()) {
+            for (auto client: clients) {
+                client->on_overlay_change(nullptr);
+            }
+        }
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
     }
 
     OverlayUi* ui() { return reinterpret_cast<OverlayUi*>(chem_ui); };
+
+    void reset();
+    void on_macro_request_complete();
+
+    // IOverlay
+    void overlay_register_client(IOverlayClient* client) override;
+    void overlay_unregister_client(IOverlayClient* client) override;
+    std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
+    std::shared_ptr<PresetInfo> overlay_configured_preset() override { return overlay_preset; }
+    void overlay_request_macros() override;
+    std::vector<MacroUsage>& overlay_macro_usage() override { return macros; }
 
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;
@@ -92,7 +114,6 @@ struct OverlayUi : ChemModuleWidget, IChemClient
 
     bool connected();
     void set_title(std::string text);
-    void set_preset(std::string preset);
     void set_bg_color(PackedColor color);
     void set_fg_color(PackedColor color);
     PackedColor get_bg_color() { return my_module ? my_module->bg_color : 0; }

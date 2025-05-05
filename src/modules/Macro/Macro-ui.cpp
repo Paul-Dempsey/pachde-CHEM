@@ -96,6 +96,9 @@ MacroUi::MacroUi(MacroModule *module) :
     x += INPUT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= M6; ++i) {
+        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
+        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         if (my_module) {
             float xoff {0.f};
             float w {29.25f};
@@ -105,9 +108,6 @@ MacroUi::MacroUi(MacroModule *module) :
             }
             addChild(Center(createClickRegion(x + xoff, y -14.f, w, 21.f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), theme_engine, theme, S::in_port_label));
         x += INPUT_DX;
         if (i == 2) {
             y += S::PORT_DY;

@@ -38,7 +38,11 @@ struct TextInput : TextField, IApplyTheme
 struct TextInputMenu : TextInput
 {
     using Base = TextInput;
-    
+
+    TextInputMenu() {
+        text_height = 18.f;
+    }
+
     void setText(const std::string& text) {
         this->text = text;
         selectAll();

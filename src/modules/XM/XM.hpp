@@ -5,16 +5,10 @@
 #include "../../services/color-help.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/color-picker.hpp"
-#include "../../widgets/element-style.hpp"
-#include "../../widgets/indicator-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/selector-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../XM-Edit/xm-edit-common.hpp"
+#include "../../widgets/widgets.hpp"
+#include "../XM-shared/xm-edit-common.hpp"
+#include "../XM-shared/xm-overlay.hpp"
+#include "macro-data.hpp"
 
 using namespace pachde;
 
@@ -25,60 +19,9 @@ struct MacroUi {
     TextLabel * label{nullptr};
 };
 
-struct MacroData
-{
-    std::vector<std::shared_ptr<MacroDescription>> data;
-    MacroData() {}
-    bool empty() { return data.empty(); }
-    size_t size() { return data.size(); }
-
-    void init(ssize_t count) {
-        data.clear();
-        for (ssize_t i = 0; i < count; ++i) {
-            auto p = std::make_shared<MacroDescription>();
-            p->index = i;
-            add(p);
-        }
-    }
-    void add(std::shared_ptr<MacroDescription> macro) {
-        if (-1 == macro->index) {
-            macro->index = ssize_t(data.size());
-        }
-        data.push_back(macro);
-    }
-
-    std::shared_ptr<MacroDescription> get_macro(ssize_t index) {
-        return in_range(index, ssize_t(0), ssize_t(data.size()))
-            ? data[index] : nullptr;
-    }
-
-    void from_json(json_t* root) {
-        data.clear();
-        auto jar = json_object_get(root, "macros");
-        if (jar) {
-            json_t* jp;
-            size_t index;
-            json_array_foreach(jar, index, jp) {
-                auto macro = std::make_shared<MacroDescription>();
-                macro->from_json(jp);
-                data.push_back(macro);
-            }
-        }
-    }
-
-    void to_json(json_t* root) {
-        auto jar = json_array();
-        for (auto macro: data) {
-            json_array_append_new(jar, macro->to_json());
-        }
-        json_object_set_new(root, "macros", jar);
-    }
-};
-
-
 struct XMUi;
 
-struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro
+struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClient
 {
     enum Params {
         P_1,
@@ -89,6 +32,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro
         P_6,
         P_7,
         P_8,
+        P_MODULATION,
         NUM_PARAMS
     };
     enum Inputs {
@@ -117,27 +61,40 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro
         NUM_LIGHTS
     };
 
-    //Modulation modulation;
     std::string device_claim;
-    bool glow_knobs;
-    bool in_mat_poke;
-
+    
     std::string title;
     PackedColor title_bg;
     PackedColor title_fg;
     MacroData macros;
+    int mod_target{-1};
+    int last_mod_target{-2};
+    bool glow_knobs;
+    bool in_mat_poke;
+
+    IOverlay* overlay{nullptr};
 
     XMModule();
     ~XMModule() {
+        if (overlay) {
+            overlay->overlay_unregister_client(this);
+        }
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
     }
 
     XMUi* ui() { return reinterpret_cast<XMUi*>(chem_ui); };
-    // void set_modulation_target(int id) {
-    //     modulation.set_modulation_target(id);
-    // }
+
+    void set_modulation_target(int id) {
+        if (getInput(id).isConnected()) {
+            mod_target = id;
+        }
+    }
+
+    // IOverlayClient
+    void on_overlay_change(IOverlay* host) override { overlay = host; }
+    IOverlay* get_overlay() override { return overlay; }
 
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;
@@ -166,9 +123,8 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-    void onPortChange(const PortChangeEvent& e) override {
-        //modulation.onPortChange(e);
-    }
+    //void onExpanderChange(const ExpanderChangeEvent& e) override;
+    void onPortChange(const PortChangeEvent& e) override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -186,9 +142,9 @@ struct XMUi : ChemModuleWidget, IChemClient, IExtendedMacro
 
     LinkButton* link_button{nullptr};
     IndicatorWidget* link{nullptr};
-    ElementStyle current_style{"xm-current", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .25f};
+    ElementStyle current_style{"xm-current", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
 
-    int edit_item = -1;
+    int edit_item{0};
     Swatch* title_bar{nullptr};
     TextLabel * title{nullptr};
     PackedColor title_bg;
@@ -202,7 +158,7 @@ struct XMUi : ChemModuleWidget, IChemClient, IExtendedMacro
     void glowing_knobs(bool glow);
     void center_knobs();
 
-    bool editing() { return nullptr != get_edit_module(); }
+    bool editing() { return (edit_item >= 0) && (nullptr != get_edit_module()); }
     Module * get_edit_module();
 
     Vec knob_center(int index);

@@ -42,6 +42,8 @@ bool isChemModule(Module* candidate)
         || (model == modelSettings)
         || (model == modelPreset)
         || (model == modelOverlay)
+		|| (model == modelXM)
+		|| (model == modelXMEdit)
         //|| (model == modelProto)
         // add new models here
 	);
@@ -51,7 +53,19 @@ bool isPeerModule(Module* me, Module* candidate)
 {
     if (!candidate) return false;
 	if (me == candidate) return false;
+	if ((modelXM == candidate->model) 
+	|| (modelXMEdit == candidate->model)) return false;
 	return isChemModule(candidate);
+}
+
+bool isOverlayModule(Module* me, Module* candidate)
+{
+    if (!candidate) return false;
+	if (me == candidate) return false;
+	return ((modelXM == candidate->model)
+		|| (modelOverlay == candidate->model)
+		|| (modelXMEdit == candidate->model));
+
 }
 
 // Theming

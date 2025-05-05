@@ -2,10 +2,9 @@
 
 - Overlay macros
   - macro picker
-  - inputs
-  - modulation
   - add/remove
-  - XM missing connection indicator
+  - sort out XM host connections
+  - separate Overlay theming?
 - Bug: rounding lights aren't quite right
 - Option to shut off looking for hardware (so that you can jump into the HE without issues).
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)

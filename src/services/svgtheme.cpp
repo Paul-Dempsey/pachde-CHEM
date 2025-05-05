@@ -9,13 +9,13 @@ constexpr const uint32_t ALPHA_MASK = 0xff000000;
 std::string format_string(const char *fmt, ...)
 {
     const int len = 512;
-    std::string s(len, '\0');
+    char buf[len];
     va_list args;
     va_start(args, fmt);
-    auto r = std::vsnprintf(&s[0], len, fmt, args);
+    int r = std::vsnprintf(buf, len, fmt, args);
     va_end(args);
     if (r < 0) return "??";
-    s.resize(std::min(r, len));
+    auto s = std::string{buf, size_t(r)};
     return s;
 }
 
@@ -348,43 +348,43 @@ bool SvgThemeEngine::requireValidColor(const std::string& spec, const char * nam
     if (isValidHexColor(spec)) return true;
     if (is_rgb(spec)) return true; 
     if (is_hsl(spec)) return true; 
-    logError(ErrorCode::InvalidColor, format_string("'%s': invalid hex/rgb color: '%s'", name, spec.c_str()));
+    if (isLogging()) logError(ErrorCode::InvalidColor, format_string("'%s': invalid hex/rgb color: '%s'", name, spec.c_str()));
     return false;
 }
 bool SvgThemeEngine::requireArray(json_t* j, const char * name)
 {
     if (json_is_array(j)) return true;
-    logError(ErrorCode::ArrayExpected, format_string("'%s': array expected", name));
+    if (isLogging()) logError(ErrorCode::ArrayExpected, format_string("'%s': array expected", name));
     return false;
 }
 bool SvgThemeEngine::requireObject(json_t* j, const char * name)
 {
     if (json_is_object(j)) return true;
-    logError(ErrorCode::ObjectExpected, format_string("'%s': object expected", name));
+    if (isLogging()) logError(ErrorCode::ObjectExpected, format_string("'%s': object expected", name));
     return false;
 }
 bool SvgThemeEngine::requireObjectOrString(json_t* j, const char * name)
 {
     if (json_is_object(j) || json_is_string(j)) return true;
-    logError(ErrorCode::ObjectOrStringExpected, format_string("'%s': Object or string expected", name));
+    if (isLogging()) logError(ErrorCode::ObjectOrStringExpected, format_string("'%s': Object or string expected", name));
     return false;
 }
 bool SvgThemeEngine::requireString(json_t* j, const char * name)
 {
     if (json_is_string(j)) return true;
-    logError(ErrorCode::StringExpected, format_string("'%s': String expected", name));
+    if (isLogging()) logError(ErrorCode::StringExpected, format_string("'%s': String expected", name));
     return false;
 }
 bool SvgThemeEngine::requireNumber(json_t* j, const char * name)
 {
     if (json_is_number(j)) return true;
-    logError(ErrorCode::NumberExpected, format_string("'%s': Number expected", name));
+    if (isLogging()) logError(ErrorCode::NumberExpected, format_string("'%s': Number expected", name));
     return false;
 }
 bool SvgThemeEngine::requireInteger(json_t* j, const char * name)
 {
     if (json_is_integer(j)) return true;
-    logError(ErrorCode::IntegerExpected, format_string("'%s': Integer expected", name));
+    if (isLogging()) logError(ErrorCode::IntegerExpected, format_string("'%s': Integer expected", name));
     return false;
 }
 
@@ -398,7 +398,7 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
         PackedColor r = parseRgbColor(spec);
         *result = r;
         if (OPAQUE_BLACK == r) {
-            logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+            if (isLogging()) logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
             return false;
         }
         return true;
@@ -407,7 +407,7 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
         PackedColor r = parseHslaColor(spec);
         *result = r;
         if (OPAQUE_BLACK == r) {
-            logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+            if (isLogging()) logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
             return false;
         }
         return true;
@@ -420,7 +420,7 @@ bool SvgThemeEngine::parseColor(const std::string& spec, const char *name, Packe
     }
 
     *result = OPAQUE_BLACK;
-    logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
+    if (isLogging()) logError(ErrorCode::InvalidColor, format_string("'%s': Invalid color: '%s'", name, spec.c_str()));
     return false;
 }
 
@@ -447,7 +447,7 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
         size_t n;
         json_array_foreach(ogradient, n, item) {
             if (n > 1) {
-                logError(ErrorCode::TwoGradientStopsMax, "A maximum of two gradient stops is allowed");
+                if (isLogging()) logError(ErrorCode::TwoGradientStopsMax, "A maximum of two gradient stops is allowed");
                 return false;
             }
             auto oindex = json_object_get(item, "index");
@@ -455,7 +455,7 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
                 if (requireInteger(oindex, "index")) {
                     stop.index = json_integer_value(oindex);
                     if (!(0 == stop.index || 1 == stop.index)) {
-                        logError(ErrorCode::GradientStopIndexZeroOrOne, "Gradient stop index must be 0 or 1");
+                        if (isLogging()) logError(ErrorCode::GradientStopIndexZeroOrOne, "Gradient stop index must be 0 or 1");
                         ok = false;
                     } 
                 } else {
@@ -526,7 +526,7 @@ bool SvgThemeEngine::parseFill(json_t* root, std::shared_ptr<Style> style)
         auto ogradient = json_object_get(ofill, "gradient");
         if (ogradient) {
             if (ocolor) {
-                logError(ErrorCode::OneOfColorOrGradient, "'fill': Only one of 'color' or 'gradient' allowed");
+                if (isLogging()) logError(ErrorCode::OneOfColorOrGradient, "'fill': Only one of 'color' or 'gradient' allowed");
                 return false;
             }
             Gradient gradient;
@@ -610,7 +610,7 @@ bool SvgThemeEngine::parseTheme(json_t* root, std::shared_ptr<SvgTheme> theme)
         if (json_is_object(j)) {
             if (!parseStyle(key, j, theme)) return false;
         } else {
-            logError(ErrorCode::ObjectExpected, format_string("Theme '%s': Each style must be an object", theme->name.c_str()));
+            if (isLogging()) logError(ErrorCode::ObjectExpected, format_string("Theme '%s': Each style must be an object", theme->name.c_str()));
             return false;
         }
     }
@@ -630,7 +630,7 @@ bool SvgThemeEngine::parseColors(json_t* root) {
             if (!parseColor(value, key, &color)) return false;
             this->colors.insert(std::make_pair(std::string(key), color));
         } else {
-            logError(ErrorCode::StringExpected, "Expected a named color, e.g. \"Aqua\" : \"#00ffff\",");
+            if (isLogging()) logError(ErrorCode::StringExpected, "Expected a named color, e.g. \"Aqua\" : \"#00ffff\",");
         }
     }
     return true;
@@ -641,7 +641,7 @@ bool SvgThemeEngine::load(const std::string& filename)
     bool ok = true;
 	FILE* file = std::fopen(filename.c_str(), "r");
 	if (!file) {
-        log(Severity::Critical, ErrorCode::CannotOpenJsonFile, filename.c_str());
+        if (isLogging()) log(Severity::Critical, ErrorCode::CannotOpenJsonFile, filename.c_str());
         return false;
     }
 
@@ -649,7 +649,7 @@ bool SvgThemeEngine::load(const std::string& filename)
 	json_t* root = json_loadf(file, 0, &error);
 	if (!root)
     {
-        logError(ErrorCode::JsonParseFailed, format_string("Parse error - %s %d:%d %s",
+        if (isLogging()) logError(ErrorCode::JsonParseFailed, format_string("Parse error - %s %d:%d %s",
             error.source, error.line, error.column, error.text));
         std::fclose(file);
         return false;
@@ -690,23 +690,23 @@ bool SvgThemeEngine::load(const std::string& filename)
                             break;
                         }
                     } else {
-                        logError(ErrorCode::ThemeExpected, "Expected a 'theme' object");
+                        if (isLogging()) logError(ErrorCode::ThemeExpected, "Expected a 'theme' object");
                         ok = false;
                         break;
                     }
                 } else {
-                    logError(ErrorCode::NameExpected, "Each theme must have a non-empty name");
+                    if (isLogging()) logError(ErrorCode::NameExpected, "Each theme must have a non-empty name");
                     ok = false;
                     break;
                 }
             } else {
-                logError(ErrorCode::ObjectExpected, "Expected a named 'theme' object");
+                if (isLogging()) logError(ErrorCode::ObjectExpected, "Expected a named 'theme' object");
                 ok = false;
                 break;
             }
         }
     } else {
-        logError(ErrorCode::ArrayExpected, "The top level element must be an array");
+        if (isLogging()) logError(ErrorCode::ArrayExpected, "The top level element must be an array");
         ok = false;
     }
 
@@ -762,7 +762,7 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
 
                 if (!((target.type == NSVG_PAINT_RADIAL_GRADIENT)
                     || (target.type == NSVG_PAINT_LINEAR_GRADIENT))) {
-                    logWarning(ErrorCode::GradientNotPresent, 
+                    if (isLogging()) logWarning(ErrorCode::GradientNotPresent, 
                         format_string("'%s': Skipping SVG element without a gradient", tag.c_str()));
                     return false;
                 }
@@ -771,7 +771,7 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
                 for (auto n = 0; n < gradient->nstops; ++n) {
                     const GradientStop& stop = gradient->stops[n];
                     if (stop.index > target.gradient->nstops) {
-                        logWarning(ErrorCode::GradientStopNotPresent, 
+                        if (isLogging()) logWarning(ErrorCode::GradientStopNotPresent, 
                             format_string("'%s': Gradient stop %d not present in SVG", tag.c_str()));
                     } else {
                         NSVGgradientStop& target_stop = target.gradient->stops[stop.index];
