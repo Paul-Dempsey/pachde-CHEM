@@ -160,13 +160,13 @@ void XMModule::do_message(PackedMidiMessage message)
     case Haken::ccStat1: {
         in_mat_poke = false;
 
-        int param = -1;
+        //int param = -1;
         switch (midi_cc(message)) {
 //        case Haken::ccReci1: param = P_R1; break;
 
         default: return;
         };
-        assert(param != -1);
+        //assert(param != -1);
 //        modulation.set_em_and_param_low(param, midi_cc_value(message), true);
     } break;
 

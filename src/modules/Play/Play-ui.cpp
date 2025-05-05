@@ -10,8 +10,6 @@ using namespace pachde;
 
 // -- Play UI -----------------------------------
 
-constexpr const float ONEU = 15.f;
-constexpr const float RIGHT_MARGIN_CENTER = 186.f;
 constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float PRESETS_TOP = 32.f;
 constexpr const float PRESETS_LEFT = 12.f;
