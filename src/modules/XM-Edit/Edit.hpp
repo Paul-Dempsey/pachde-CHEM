@@ -110,6 +110,7 @@ struct XMEditUi : ChemModuleWidget, IChemClient
     Module* get_xm_module();
     bool connected() { return nullptr != get_xm_module(); }
     IExtendedMacro* get_client() { return my_module ? my_module->get_xm_client() : nullptr; }
+    IOverlay* get_overlay() { return my_module ? my_module->get_overlay() : nullptr; }
 
     void on_client_change();
     void on_item_change(int item);

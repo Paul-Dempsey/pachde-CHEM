@@ -6,6 +6,7 @@ namespace pachde {
 
 struct IOverlayClient;
 
+enum MacroReadyState { Unavailable, InProgress, Available };
 struct IOverlay
 {
     //virtual IChemHost* get_host() = 0;
@@ -14,6 +15,7 @@ struct IOverlay
     virtual std::shared_ptr<PresetInfo> overlay_live_preset() = 0;
     virtual std::shared_ptr<PresetInfo> overlay_configured_preset() = 0;
     virtual void overlay_request_macros() = 0;
+    virtual MacroReadyState overlay_macros_ready() = 0;
     virtual std::vector<MacroUsage>& overlay_macro_usage() = 0;
 };
 

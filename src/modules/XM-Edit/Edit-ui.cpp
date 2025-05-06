@@ -28,26 +28,47 @@ struct MacroMenu: Hamburger
     void appendContextMenu(ui::Menu* menu) override
     {
         menu->addChild(createMenuLabel<HamburgerTitle>("Macros"));
-        if (!ui) return;
         if (!ui->my_module) return;
-        //std::vector<MacroUsage>& macros = ui->my_module->macros;
+        auto overlay = ui->get_overlay();
+        if (overlay) {
+            auto conf = overlay->overlay_configured_preset();
+            if (!conf) {
+                menu->addChild(createMenuLabel("Overlay has no configured preset"));
+                return;
+            }
+            auto live = overlay->overlay_live_preset();
+            if (!live || conf->name.compare(live->name)) {
+                menu->addChild(createMenuLabel("Live preset is not the configured preset"));
+                return;
+            }
+            std::string text = "Preset ";
+            text.append(live->name);
+            menu->addChild(createMenuLabel(text));
 
-        // std::string text = "Preset ";
-        // text.append(ui->my_module->mac_build.preset_name);
-        // menu->addChild(createMenuLabel(text));
-
-        // if (macros.empty()) {
-        //     menu->addChild(createMenuItem("Load preset macros", "", [=]() {
-        //         ui->request_archive();
-        //     }));
-        // } else {
-        //     for (const MacroUsage& mu: macros) {
-        //         auto num = mu.macro_number;
-        //         menu->addChild(createMenuItem(mu.to_string(), "", [=](){
-        //             ui->set_macro_number(num);
-        //         }));
-        //     }
-        // }
+            switch (overlay->overlay_macros_ready()) {
+            case MacroReadyState::Available: {
+                auto macros{overlay->overlay_macro_usage()};
+                if (macros.empty()) goto NO_MACROS;
+                for (const MacroUsage& mu: macros) {
+                    auto num = mu.macro_number;
+                    menu->addChild(createMenuItem(mu.to_string(), "", [=](){
+                        ui->set_macro_number(num);
+                    }));
+                }
+                } break;
+            case MacroReadyState::Unavailable:
+NO_MACROS:
+                menu->addChild(createMenuItem("Load preset macros", "", [=]() {
+                    overlay->overlay_request_macros();
+                }));
+                break;
+            case MacroReadyState::InProgress:
+                menu->addChild(createMenuLabel("Gathering macros...please wait"));
+                break;
+            }
+        } else {
+            menu->addChild(createMenuLabel("Overlay not connected"));
+        }
     }
 };
 
@@ -74,9 +95,9 @@ XMEditUi::XMEditUi(XMEditModule *module) :
     const float PALETTE_DX{15.f};
     const float MINMAX_DX{13.f};
 
-    addChild(createLightCentered<SmallLight<GreenLight>>(Vec(CENTER-6.f, 15.5), my_module, MOD::L_XM));
+    addChild(createLightCentered<SmallLight<GreenLight>>(Vec(CENTER-8.f, 15.5), my_module, MOD::L_XM));
     addChild(createLightCentered<SmallLight<WhiteLight>>(Vec(CENTER, 15.5), my_module, MOD::L_OVERLAY));
-    addChild(createLightCentered<SmallLight<BlueLight>>(Vec(CENTER+6.f, 15.5), my_module, MOD::L_CORE));
+    addChild(createLightCentered<SmallLight<BlueLight>>(Vec(CENTER+8.f, 15.5), my_module, MOD::L_CORE));
 
     x = LEFT_AXIS;
     y = 20;

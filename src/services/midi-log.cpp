@@ -118,6 +118,9 @@ std::string tag_prefix(uint8_t tag) {
     case ChemId::Convo:    return "Convo";
     case ChemId::Jack:     return "Jack";
     case ChemId::Play:     return "Play";
+    case ChemId::Sustain:    return "Sustain";
+    case ChemId::Sostenuto:  return "Sostenuto";
+    case ChemId::Sostenuto2: return "Sostenuto2";
     case ChemId::Settings: return "Settings";
     case ChemId::Preset:   return "Preset";
     case ChemId::Overlay:  return "Overlay";

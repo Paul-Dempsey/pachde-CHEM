@@ -72,6 +72,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
     std::shared_ptr<PresetInfo> overlay_configured_preset() override { return overlay_preset; }
     void overlay_request_macros() override;
+    MacroReadyState overlay_macros_ready() override;
     std::vector<MacroUsage>& overlay_macro_usage() override { return macros; }
 
     // IDoMidi

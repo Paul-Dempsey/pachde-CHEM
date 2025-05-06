@@ -72,8 +72,6 @@ void HakenMidi::select_preset(ChemId tag, PresetId id)
         log->log_message(">>H", "---- Select Preset");
     }
     assert(id.valid());
-    //send_message(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42)); tick_tock = !tick_tock;
-    //send_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccBankH, id.bank_hi()), tag));
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccBankL, id.bank_lo()), tag));
     send_message(Tag(MakeProgramChange(Haken::ch16, id.number()), tag));
@@ -96,7 +94,6 @@ void HakenMidi::request_configuration(ChemId tag) {
     if (log) {
         log->log_message(">>H", "---- RequestConfiguration");
     }
-    //do_message(MakeCC(Haken::ch16, Haken::ccTask, Haken::gridToFlash)); //is this still necessary to get pedals?
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::configToMidi), tag));
 }
 
@@ -105,7 +102,8 @@ void HakenMidi::request_archive_0(ChemId tag)
     if (log) {
         log->log_message(">>H", "---- Request Archive 0");
     }
-    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::cfCreateArch0), tag));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::createLed), tag));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccDInfo, Haken::cfCreateArch0), tag));
 }
 
 void HakenMidi::request_con_text(ChemId tag) {

@@ -16,15 +16,6 @@ void OverlayModule::reset() {
     bg_color = 0;
 }
 
-void OverlayModule::on_macro_request_complete()
-{
-    if (!overlay_preset) {
-        assert(false);
-        return;
-    }
-    chem_host->host_haken()->select_preset(ChemId::Overlay, overlay_preset->id);
-}
-
 void OverlayModule::overlay_register_client(IOverlayClient *client)
 {
     auto it = std::find(clients.cbegin(), clients.cend(), client);
@@ -48,6 +39,52 @@ void OverlayModule::overlay_request_macros()
     auto haken = chem_host->host_haken();
     mac_build.haken = haken;
     haken->request_archive_0(ChemId::Overlay);
+}
+
+void send_store_preset(ChemId tag, HakenMidi* haken, std::shared_ptr<PresetInfo> preset)
+{
+    haken->begin_stream(tag, Haken::s_Name);
+
+    PackedMidiMessage msg = Tag(MakePolyKeyPressure(Haken::ch16, 0, 0), tag);
+    bool odd = true;
+    for (auto ch: preset->name) {
+        if (odd) {
+            msg.bytes.data1 = ch;
+        } else {
+            msg.bytes.data2 = ch;
+            haken->send_message(msg);
+        }
+        odd = !odd;
+    }
+    if (!odd) {
+        msg.bytes.data2 = 0;
+        haken->send_message(msg);
+    }
+    haken->end_stream(tag);
+
+    haken->control_change(tag, Haken::ch16, Haken::ccBankH, 126);
+    haken->control_change(tag, Haken::ch16, Haken::ccBankL, 0);
+    haken->control_change(tag, Haken::ch16, Haken::ccStore, 0);
+    haken->control_change(tag, Haken::ch16, Haken::ccTask, Haken::curGloToFlash);
+}
+
+void OverlayModule::on_macro_request_complete()
+{
+    if (!overlay_preset) {
+        assert(false);
+        return;
+    }
+    auto haken = chem_host->host_haken();
+    send_store_preset(ChemId::Overlay, haken, overlay_preset);
+
+    haken->select_preset(ChemId::Overlay, overlay_preset->id);
+}
+
+MacroReadyState OverlayModule::overlay_macros_ready()
+{
+    if (mac_build.in_archive) return MacroReadyState::InProgress;
+    if (macros.empty()) return MacroReadyState::Unavailable;
+    return MacroReadyState::Available;
 }
 
 void OverlayModule::dataFromJson(json_t* root)

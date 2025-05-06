@@ -1,7 +1,6 @@
 # CHEM To-Do
 
 - Overlay macros
-  - macro picker
   - add/remove
   - sort out XM host connections
   - separate Overlay theming?

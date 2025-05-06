@@ -3,7 +3,7 @@
 #include "../../chem-id.hpp"
 
 namespace pachde {
-    
+
 std::string MacroFormUsage::to_string() const
 {
     std::string result;
@@ -48,7 +48,6 @@ bool mu_order(const MacroUsage& a, const MacroUsage& b) {
 void MacroUsageBuilder::do_message(PackedMidiMessage msg)
 {
     if (as_u8(ChemId::Haken) != msg.bytes.tag) return;
-
     switch (msg.bytes.status_byte) {
     case Haken::ccStat1:
         in_form_poke = false;
@@ -84,13 +83,17 @@ void MacroUsageBuilder::do_message(PackedMidiMessage msg)
                 if (it == macros.end()) {
                     macros.push_back(MacroUsage{number, form});
                 } else {
+                    bool found{false};
                     for (MacroFormUsage& fu : it->forms) {
                         if (form.formula == fu.formula) {
                             form.elements |= form.elements;
-                            return;
+                            found = true;
+                            break;
                         }
                     }
-                    it->forms.push_back(form);
+                    if (!found) {
+                        it->forms.push_back(form);
+                    }
                 }
             }
         }
@@ -100,16 +103,16 @@ void MacroUsageBuilder::do_message(PackedMidiMessage msg)
         switch (midi_cc(msg)) {
         case Haken::ccDInfo:
             switch (midi_cc_value(msg)) {
-            case Haken::edRecordArchive: 
+            case Haken::edRecordArchive:
                 macros.clear();
-                in_archive = true; 
-                if (haken) haken->send_message(Tag(MakeCC(Haken::ch16, Haken::ccDInfo, Haken::cfRetrieveArch), as_u8(client_id)));
+                in_archive = true;
                 break;
+
             case Haken::archiveEof:
-                in_archive = false; 
                 break;
-            
+
             case Haken::archiveToFile:
+                in_archive = false;
                 std::sort(macros.begin(), macros.end(), mu_order);
                 if (on_complete) on_complete();
                 break;
