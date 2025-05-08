@@ -91,7 +91,7 @@ JackUi::JackUi(JackModule *module) :
         pedal_image_2->set_index(0);
         addChild(Center(pedal_image_2));
     } else {
-        auto logo = new Logo(.35f);
+        auto logo = new OpaqueLogo(.35f);
         logo->box.pos = Vec(CENTER, y);
         addChild(Center(logo));
     }

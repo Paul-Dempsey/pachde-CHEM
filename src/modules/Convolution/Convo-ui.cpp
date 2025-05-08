@@ -166,7 +166,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     // Browsing UI
 
     if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(CENTER, 136)));
+        addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 136)));
     }
 
     // init

@@ -8,19 +8,11 @@ struct TSymbolWidget: OpaqueWidget
 {
     using Base = OpaqueWidget;
 
-    widget::FramebufferWidget* fb;
-	widget::SvgWidget* sw;
+    widget::FramebufferWidget* fb{nullptr};
+	widget::SvgWidget* sw{nullptr};
     float scale;
 
-    TSymbolWidget() : scale(1.0f) {
-        fb = new widget::FramebufferWidget;
-        addChild(fb);
-        sw = new widget::SvgWidget;
-        fb->addChild(sw);
-        setSvg(Svg::load(asset::plugin(pluginInstance, TSymbol::symbol()))); 
-    }
-
-    TSymbolWidget(float scale) : scale(scale) {
+    TSymbolWidget(float scale = 1.0f) : scale(scale) {
         fb = new widget::FramebufferWidget;
         addChild(fb);
         sw = new widget::SvgWidget;
@@ -69,11 +61,17 @@ struct TSymbolWidget: OpaqueWidget
 struct LogoSvg {
     static std::string symbol() { return "res/logo/CHEM-logo.svg"; }
 };
+
+struct OpaqueLogoSvg {
+    static std::string symbol() { return "res/logo/CHEM-logo-opaque.svg"; }
+};
+
 struct LogoWatermarkSvg {
     static std::string symbol() { return "res/logo/CHEM-logo-watermark.svg"; }
 };
 
 using Logo = TSymbolWidget<LogoSvg>;
+using OpaqueLogo = TSymbolWidget<OpaqueLogoSvg>;
 using WatermarkLogo = TSymbolWidget<LogoWatermarkSvg>;
 
 }

@@ -73,12 +73,6 @@ PostUi::PostUi(PostModule *module) :
     addChild(mid_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 60.f, "Frequency", theme_engine, theme, knob_label_style));
     y += PARAM_DY;
 
-    // if (browsing) {
-    //     auto logo = new Logo(0.35f);
-    //     logo->box.pos = Vec(CENTER - logo->box.size.x*.5, y - 16.f);
-    //     addChild(logo);
-    // }
-
     // inputs
     const NVGcolor co_port = PORT_CORN;
     const float label_width = 20.f;
@@ -130,7 +124,7 @@ PostUi::PostUi(PostModule *module) :
     addChild(link_button);
 
     if (!module) {
-        auto logo = new Logo(0.75f);
+        auto logo = new OpaqueLogo(0.75f);
         logo->box.pos = Vec(CENTER, box.size.y*.5);
         addChild(Center(logo));
     }

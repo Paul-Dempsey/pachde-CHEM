@@ -117,7 +117,7 @@ FxUi::FxUi(FxModule *module) :
     // Browsing UI
 
     if (browsing) {
-        addChild(createWidgetCentered<Logo>(Vec(CENTER, 150.f)));
+        addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 150.f)));
     }
 
     // init

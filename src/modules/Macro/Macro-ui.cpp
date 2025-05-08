@@ -141,7 +141,7 @@ MacroUi::MacroUi(MacroModule *module) :
         m1_ped_label->text("p1");
         m3_ped_label->text("p2");
 
-        addChild(createWidgetCentered<Logo>(Vec(68, box.size.y*.25)));
+        addChild(createWidgetCentered<OpaqueLogo>(Vec(68, box.size.y*.25)));
     }
 
     // init

@@ -21,7 +21,10 @@ void TextInput::onSelectKey(const SelectKeyEvent &e)
 {
     if (e.action == GLFW_PRESS) {
         if (GLFW_KEY_TAB == e.key) {
-            APP->event->setSelectedWidget(getParent());
+            Base::onSelectKey(e);
+            if (!e.isConsumed()) {
+                APP->event->setSelectedWidget(getParent());
+            }
             e.consume(this);
             if (tab_handler) {
                 tab_handler(0 != (e.mods & RACK_MOD_CTRL), 0 != (e.mods & GLFW_MOD_SHIFT));

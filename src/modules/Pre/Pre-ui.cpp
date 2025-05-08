@@ -129,7 +129,7 @@ PreUi::PreUi(PreModule *module) :
     // Browsing UI
 
     if (browsing) {
-        auto logo = new Logo(0.75f);
+        auto logo = new OpaqueLogo(0.75f);
         logo->box.pos = Vec(CENTER, box.size.y*.5);
         addChild(Center(logo));
     }
