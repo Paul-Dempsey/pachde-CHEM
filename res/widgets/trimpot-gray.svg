@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" 
+xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+
+  <circle id="k-rim"     opacity="1" cx="8" cy="8" r="7" fill="none" stroke="#737373" stroke-width="1" />
+  <circle id="k-wire"    opacity="0" cx="8" cy="8" r="7.3" fill="none" stroke="#e6e6e6" stroke-width=".5" />
+  <g transform="scale(.5,.5)">
+    <path id="k-gnomeno" opacity="0" fill="none" stroke="#ebebe0" stroke-width=".25" d="m 15.142877,3 v 12.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 3 Z" />
+    <path id="k-taper"   opacity="1" fill="#ebebe0" stroke="none" stroke-width=".25" d="m 14.855469,1.0524375 c 0,0 0.286732,-0.05229 1.14455,-0.052437 0.857819,-1.4744e-4 1.164043,0.052437 1.164043,0.052437 l -0.344751,2.1706802 -0.811499,-0.015305 -0.825568,0.022273 z" />
+    <path id="k-gnomen"  opacity="1" fill="#f5f5ef" d="m 15.142877,3 v 12.384187 c 0,0 0.403307,-0.404948 0.857142,-0.41276 0.453835,-0.0078 0.857143,0.41276 0.857143,0.41276 V 3 Z" />
+  </g>
+  <circle id="k-pin"     opacity="1" cx="8" cy="8" r=".5" fill="none" stroke="#202020" stroke-width=".3" />
+</svg>

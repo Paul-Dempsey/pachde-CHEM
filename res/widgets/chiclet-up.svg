@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="12"
+   height="6.75"
+   viewBox="0 0 12 6.75"
+   version="1.1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bezel" x1="0" y1="0" x2="0.5" y2="6" gradientUnits="userSpaceOnUse" gradientTransform="matrix(0.75862069,0,0,0.39655172,-0.0689655,0.20258626)">
+      <stop stop-color="#808080" offset="0" />
+      <stop stop-color="#333333" offset="1" />
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0.4" y2="5" gradientUnits="userSpaceOnUse" >
+      <stop stop-color="#d6d6d6" offset="0" />
+      <stop stop-color="#404040" offset="1" />
+    </linearGradient>
+    <linearGradient id="g-bezel" xlink:href="#bezel" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.0454545,0,0,1.0869565,-0.27272727,-0.29347823)" />
+    <linearGradient id="g-face" xlink:href="#face" gradientUnits="userSpaceOnUse" gradientTransform="matrix(1.0454545,0,0,1.0869565,-0.27272727,-0.29347823)" />
+  </defs>
+  <rect id="qbtn-punch" fill="#000000" width="12" height="6.75" x="0" y="0" rx="0.5" ry="0.5" />
+  <rect id="qbtn-bezel" fill="url(#g-bezel)" x="0.25" y="0.25" height="6.25" width="11.5" rx="0.5" ry="0.5" />
+  <path id="qbtn-hi-t" opacity="0.4" fill="#d9d9d9" d="m 0.77272723,0.25000002 c -0.14479545,0 -0.27510155,0.0609885 -0.3695845,0.15922215 L 3.2556817,3.3983526 8.7443178,3.4110903 11.596857,0.40922217 C 11.502374,0.31098846 11.372068,0.25000002 11.227272,0.25000002 H 6.2613634 5.7386361 Z" />
+  <path id="qbtn-hi-l" opacity="0.4" fill="#8c8c8c" d="m 0.40314273,0.40922217 c -0.094483,0.0982337 -0.15314275,0.23371262 -0.15314275,0.3842561 V 5.9565216 c 0,0.1505435 0.0586598,0.2860224 0.15314275,0.3842561 L 3.2556817,3.4110903 Z" />
+  <path id="qbtn-hi-r" opacity="0.4" fill="#666666" d="m 11.596857,0.40922217 c 0.09448,0.0982337 0.153142,0.23371262 0.153142,0.3842561 V 5.9565216 c 0,0.1505435 -0.05866,0.2860224 -0.153142,0.3842561 L 8.7443178,3.4110903 Z" />
+  <path id="qbtn-hi-b" opacity="0.4" fill="fill:#343434" d="m 0.77272723,6.4999999 c -0.14479545,0 -0.27510155,-0.060988 -0.3695845,-0.1592222 L 3.2556817,3.3516473 8.7443178,3.3389093 11.596857,6.3407774 c -0.09448,0.098234 -0.224789,0.1592225 -0.369585,0.1592225 H 6.2613634 5.7386361 Z" />
+  <rect fill="url(#g-face)" id="qbtn-face" x="0.77272725" y="0.65760869" height="5.4" width="10.5" rx="0.5" ry="0.5" />
+</svg>

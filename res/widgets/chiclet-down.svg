@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="12" height="6.75" viewBox="0 0 12 6.75" version="1.1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-bezel" x1="0" y1="0" x2="0.5" y2="6.75" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#333333" offset="0" />
+      <stop stop-color="#454545" offset="1" />
+    </linearGradient>
+    <linearGradient id="g-face" x1="0" y1="0" x2="0.5" y2="5.4" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9f9d9d" offset="0" />
+      <stop stop-color="#353535" offset="1" />
+    </linearGradient>
+  </defs>
+  <rect id="qbtn-punch" fill="#000000" x="0" y="0" height="6.75" width="12" rx="0.5" ry="0.5" />
+  <rect id="qbtn-dn-bezel" fill="url(#g-bezel)" x="0.25" y="0.25" width="11.5" height="6.25" rx="0.52272725" ry="0.54347825" />
+  <path id="qbtn-dn-hi-t" opacity="0.16" fill="#d9d9d9" d="M 0.77272723,6.5 C 0.62793178,6.5 0.49762568,6.4390115 0.40314273,6.3407779 L 3.2556817,3.3516474 8.7443178,3.3389097 11.596857,6.3407779 C 11.502374,6.4390116 11.372068,6.5 11.227272,6.5 H 6.2613634 5.7386361 Z" />
+  <path id="qbtn-dn-hi-l" opacity="0.16" fill="#8c8c8c" d="M 0.40314273,6.3407779 C 0.30865973,6.2425442 0.24999998,6.1070653 0.24999998,5.9565218 V 0.79347845 c 0,-0.1505435 0.0586598,-0.2860224 0.15314275,-0.3842561 L 3.2556817,3.3389097 Z" />
+  <path id="qbtn-dn-hi-r" opacity="0.16" fill="#666666" d="m 11.596857,6.3407779 c 0.09448,-0.098234 0.153142,-0.2337126 0.153142,-0.3842561 V 0.79347845 c 0,-0.1505435 -0.05866,-0.2860224 -0.153142,-0.3842561 L 8.7443178,3.3389097 Z" />
+  <path id="qbtn-dn-hi-b" opacity="0.16" fill="#343434" d="m 0.77272723,0.25000015 c -0.14479545,0 -0.27510155,0.060988 -0.3695845,0.1592222 L 3.2556817,3.3983527 8.7443178,3.4110907 11.596857,0.40922265 c -0.09448,-0.098234 -0.224789,-0.1592225 -0.369585,-0.1592225 H 6.2613634 5.7386361 Z" />
+  <rect id="qbtn-dn-face" fill="url(#g-face)" x="0.75" y=".75" width="10.4" height="5.4" rx="0.5" ry="0.5" />
+</svg>

@@ -144,6 +144,10 @@ struct GreenTrimPotSvg {
     static std::string bg() { return "res/widgets/trimpot-green-bg.svg"; }
     static std::string knob() { return "res/widgets/trimpot-green.svg"; }
 };
+struct GrayTrimPotSvg {
+    static std::string bg() { return "res/widgets/trimpot-gray-bg.svg"; }
+    static std::string knob() { return "res/widgets/trimpot-gray.svg"; }
+};
 struct UselessSvg {
     static std::string bg() { return "res/widgets/useless-knob-bg.svg"; }
     static std::string knob() { return "res/widgets/useless-knob.svg"; }
@@ -159,6 +163,7 @@ using VioletKnob = TKnob<VioletKnobSvg>;
 
 using TrimPot = TKnob<TrimPotSvg>;
 using GreenTrimPot = TKnob<GreenTrimPotSvg>;
+using GrayTrimPot = TKnob<GrayTrimPotSvg>;
 
 template <typename TKnob>
 TKnob* createChemKnob(Vec pos, Module * module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)

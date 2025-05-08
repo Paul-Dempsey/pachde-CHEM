@@ -55,7 +55,7 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
     {
         addColor("ctl-frame", ColorKind::Stroke, RampGray(Ramp::G_50));
         addColor("ctl-glyph", ColorKind::Stroke, RampGray(Ramp::G_70));
-        addColor("ctl-hovered", ColorKind::Fill, GetStockColor(StockColor::Coral));
+        addColor("ctl-hovered", ColorKind::Fill, GetStockColor(StockColor::pachde_blue_medium));
         addColor("ctl-disabled", ColorKind::Stroke, RampGray(Ramp::G_50));
     }
 
@@ -138,7 +138,6 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         Base::onButton(e);
 
         if (!enabled) return;
-        // Dispatch ActionEvent on left click
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
             key_ctrl = e.mods & RACK_MOD_CTRL;
             key_shift = e.mods & GLFW_MOD_SHIFT;
@@ -189,15 +188,9 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         return true;
     }
 
-    //virtual void appendContextMenu(ui::Menu* menu) {}
-
-    // void createContextMenu() {
-    //     ui::Menu* menu = createMenu();
-    // 	appendContextMenu(menu);
-    // }
 };
 
-struct CtlBase: DrawButtonBase
+struct DrawButtonCtlBase: DrawButtonBase
 {
     using Base = DrawButtonBase;
 
@@ -209,23 +202,23 @@ struct CtlBase: DrawButtonBase
     NVGcolor glyph_color_for_state(bool enabled, bool down)
     {
         if (!enabled) return color_styles[ColorIndex::Disabled].color;
-        if (down) return nvgTransRGBAf(color_styles[ColorIndex::Glyph].color, .5f);
-        return color_styles[ColorIndex::Glyph].color;
+        auto co = color_styles[ColorIndex::Glyph].color;
+        if (down) return nvgTransRGBAf(co, .5f);
+        return co;
     }
 
-    CtlBase()
-    {
-    }
+    // DrawButtonCtlBase()
+    // {
+    // }
 };
 
-struct UpButton: CtlBase
+struct UpButton: DrawButtonCtlBase
 {
-    using Base = CtlBase;
+    using Base = DrawButtonCtlBase;
 
     UpButton()
     {
-        box.size.x = 15.f;
-        box.size.y = 15.f;
+        box.size = Vec{15.f, 15.f};
     }
     bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
     {
@@ -240,7 +233,7 @@ struct UpButton: CtlBase
         BoxRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Frame].color, .75f);
 
         if (hovered && enabled && !button_down) {
-            Halo(vg, 7.5f, 7.5f, 0.1f, 9.5f, color_styles[ColorIndex::Hovered].color, HALO_FADE);
+            FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Hovered].color);
         }
 
         nvgBeginPath(vg);
@@ -254,9 +247,9 @@ struct UpButton: CtlBase
     }
 };
 
-struct DownButton: CtlBase
+struct DownButton: DrawButtonCtlBase
 {
-    using Base = CtlBase;
+    using Base = DrawButtonCtlBase;
     DownButton()
     {
         box.size.x = 15.f;
@@ -276,7 +269,7 @@ struct DownButton: CtlBase
         BoxRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Frame].color, .75f);
 
         if (hovered && enabled && !button_down) {
-            Halo(vg, 7.5f, 7.5f, 0.1f, 9.5, color_styles[ColorIndex::Hovered].color, HALO_FADE);
+            FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Hovered].color);
         }
 
         nvgBeginPath(vg);
@@ -289,9 +282,9 @@ struct DownButton: CtlBase
     }
 };
 
-struct PrevButton: CtlBase
+struct PrevButton: DrawButtonCtlBase
 {
-    using Base = CtlBase;
+    using Base = DrawButtonCtlBase;
 
     PrevButton()
     {
@@ -312,21 +305,20 @@ struct PrevButton: CtlBase
         BoxRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Frame].color, .75f);
 
         if (hovered && enabled && !button_down) {
-            Halo(vg, 7.5f, 7.5f, 0.1f, 9.5f, color_styles[ColorIndex::Hovered].color, HALO_FADE);
+            FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Hovered].color);
         }
 
         Line(vg, 3.f, 7.5f, 12.f, 7.5f, glyph_color_for_state(enabled, button_down), 1.5f);
     }
 };
 
-struct NextButton: CtlBase
+struct NextButton: DrawButtonCtlBase
 {
-    using Base = CtlBase;
+    using Base = DrawButtonCtlBase;
     NextButton()
     {
         box.size.x = 15.f;
         box.size.y = 15.f;
-        //addColor("ctl-glyph-dn", RampGray(Ramp::G_50));
     }
 
     bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
@@ -341,7 +333,7 @@ struct NextButton: CtlBase
 
         BoxRect(vg, .5f, .5f, 14.25f, 14.25f, color_styles[ColorIndex::Frame].color, .75f);
         if (hovered && enabled && !button_down) {
-            Halo(vg, 7.5f, 7.5f, 0.1f, 9.5f, color_styles[ColorIndex::Hovered].color, HALO_FADE);
+            FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Hovered].color);
         }
 
         auto co_glyph = glyph_color_for_state(enabled, button_down);
