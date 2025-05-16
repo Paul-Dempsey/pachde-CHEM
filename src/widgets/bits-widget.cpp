@@ -27,6 +27,7 @@ BitsWidget::BitsWidget(
     box.size.x = (MARGIN_DX * 2) + (cols * (label_width + CHECK_DX)) + ((cols-1) * COLUMN_SEP);
     float x, y;
 
+    LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
     addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, theme_engine, theme, title_style));
 
     auto r = exit_box_rect();

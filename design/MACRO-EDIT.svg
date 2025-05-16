@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="150"
+   height="186"
+   viewBox="0 0 150 186.00001"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="MACRO-EDIT.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#181818"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#4d4d4d"
+     inkscape:document-units="px"
+     inkscape:zoom="6.5389153"
+     inkscape:cx="40.755995"
+     inkscape:cy="98.640213"
+     inkscape:window-width="3840"
+     inkscape:window-height="2126"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <sodipodi:guide
+       position="7.5127142,207.77349"
+       orientation="1,0"
+       id="guide20"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient38"
+       id="linearGradient26"
+       gradientUnits="userSpaceOnUse"
+       x1="731.81195"
+       y1="78.518806"
+       x2="740.8045"
+       y2="109.22913" />
+    <linearGradient
+       id="linearGradient38"
+       inkscape:collect="always">
+         <stop
+   style="stop-color:#41bf73;stop-opacity:1;"
+   offset="0"
+   id="stop37" />
+
+         <stop
+   style="stop-color:#18482a;stop-opacity:1;"
+   offset="1"
+   id="stop38" />
+
+      </linearGradient>
+    <linearGradient
+       id="gface"
+       x1="2"
+       y1="0"
+       x2="3"
+       y2="8"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#dfdfdf"
+         id="stop1-7" />
+      <stop
+         offset="1"
+         stop-color="#404040"
+         id="stop2-6" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient38"
+       id="linearGradient1"
+       gradientUnits="userSpaceOnUse"
+       x1="731.81195"
+       y1="78.518806"
+       x2="740.8045"
+       y2="109.22913" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+       x="25.748632"
+       y="32.508999"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         x="25.748632"
+         y="32.508999"
+         style="fill:#a6a6a6;fill-opacity:1">Name</tspan></text>
+    <g
+       id="g5"
+       transform="matrix(0.95710456,0,0,1,-104.40844,-108.95126)"
+       style="stroke-width:1.02216">
+      <rect
+         style="fill:#bfbfbf;fill-opacity:1;stroke:#808080;stroke-width:0.766623;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="rect4"
+         width="93.25"
+         height="13.052399"
+         x="156.48793"
+         y="130.80006" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start;fill:#1a1a1a;fill-opacity:1;stroke-width:1.02216"
+         x="157.15694"
+         y="141.35606"
+         id="text5"><tspan
+           sodipodi:role="line"
+           id="tspan5"
+           x="157.15694"
+           y="141.35606"
+           style="text-align:start;text-anchor:start;fill:#1a1a1a;fill-opacity:1;stroke-width:1.02216">Knob 2</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+       x="24.134623"
+       y="52.495071"
+       id="text6"><tspan
+         sodipodi:role="line"
+         id="tspan6"
+         x="24.134623"
+         y="52.495071"
+         style="fill:#a6a6a6;fill-opacity:1">Macro</tspan></text>
+    <g
+       id="g8"
+       transform="translate(-864.12314,42.367973)"
+       inkscape:label="ham">
+      <path
+         style="fill:none;stroke:#a6a6a6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         d="m 982.01474,3.5070536 h 7.98773"
+         id="path6" />
+      <path
+         style="fill:none;stroke:#a6a6a6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         d="m 982.01474,6.007 h 7.98773"
+         id="path7" />
+      <path
+         style="fill:none;stroke:#a6a6a6;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+         d="m 982.01474,8.507 h 7.98773"
+         id="path8" />
+    </g>
+    <rect
+       style="fill:#bfbfbf;fill-opacity:1;stroke:#808080;stroke-width:0.75;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect8"
+       width="64.25"
+       height="13.052399"
+       x="45.375004"
+       y="41.848801" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start;fill:#1a1a1a;fill-opacity:1"
+       x="46.923325"
+       y="52.591072"
+       id="text8"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         x="46.923325"
+         y="52.591072"
+         style="text-align:start;text-anchor:start;fill:#1a1a1a;fill-opacity:1">42</tspan></text>
+    <rect
+       style="fill:#4073bf;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-linejoin:round;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect9"
+       width="150"
+       height="15.999999"
+       x="0"
+       y="0" />
+    <g
+       id="g30"
+       transform="translate(-252.81861,-35.197891)">
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start"
+         x="311.6955"
+         y="107.27849"
+         id="text9"><tspan
+           sodipodi:role="line"
+           id="tspan9"
+           x="311.6955"
+           y="107.27849"
+           style="text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1">Input port</tspan></text>
+      <g
+         id="g11"
+         transform="translate(195.7555,-161.68471)">
+        <rect
+           id="rect11"
+           fill="none"
+           stroke="#a6a6a6"
+           stroke-width="0.75"
+           width="9.25"
+           height="9.25"
+           x="102.43812"
+           y="259.479" />
+        <path
+           id="path11"
+           aria-label="✔"
+           fill="#595959"
+           opacity="0.4"
+           d="m 104.19968,265.16528 q -0.0879,-0.0923 -0.13623,-0.1582 -0.0439,-0.0659 -0.0439,-0.12745 0,-0.0791 0.0747,-0.1582 0.0791,-0.0791 0.19776,-0.14062 0.12304,-0.0615 0.26367,-0.0967 0.14502,-0.0396 0.27685,-0.0396 0.14063,0 0.22852,0.0396 0.0923,0.0351 0.17578,0.12304 0.33838,0.35596 0.61084,0.7295 0.27686,0.36914 0.54053,0.76464 0.25488,-0.68115 0.52734,-1.31396 0.27246,-0.63721 0.57568,-1.24365 0.30762,-0.61084 0.65479,-1.19971 0.35156,-0.59326 0.76025,-1.19092 0.14942,-0.22412 0.43946,-0.32959 0.29443,-0.10547 0.75146,-0.10547 0.13623,0 0.21973,0.0396 0.0835,0.0396 0.0835,0.10547 0,0.0571 -0.0264,0.11426 -0.0264,0.0571 -0.0791,0.13184 -0.99756,1.39306 -1.81495,2.91797 -0.81738,1.5249 -1.41943,3.21679 -0.0395,0.12305 -0.19336,0.18457 -0.15381,0.0615 -0.45264,0.0615 -0.14062,0 -0.2373,-0.009 -0.0967,-0.009 -0.1626,-0.0352 -0.0659,-0.022 -0.10986,-0.0571 -0.0439,-0.0351 -0.0747,-0.0879 -0.18896,-0.30762 -0.36914,-0.57129 -0.17578,-0.26806 -0.36914,-0.51855 -0.18896,-0.25049 -0.40869,-0.50537 -0.21533,-0.25489 -0.4834,-0.54053 z"
+           style="opacity:1;fill:#d9d9d9;fill-opacity:1" />
+      </g>
+    </g>
+    <g
+       id="g12"
+       transform="translate(-204.70863,-143.44203)">
+      <rect
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#a6a6a6;stroke-width:0.75;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="rect12"
+         width="12"
+         height="12"
+         x="335.5184"
+         y="145.94203"
+         rx="0.523"
+         ry="0.54347825" />
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+         x="341.5184"
+         y="154.90002"
+         id="text12"><tspan
+           sodipodi:role="line"
+           id="tspan12"
+           x="341.5184"
+           y="154.90002"
+           style="fill:#bfbfbf;fill-opacity:1">x</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+       x="74.82"
+       y="12.134"
+       id="text13"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         x="74.82"
+         y="12.134"
+         style="fill:#f5dca3;fill-opacity:1">Macro Knob</tspan></text>
+    <g
+       id="g22"
+       transform="translate(-71.218605,-94.94965)">
+      <g
+         id="g17"
+         transform="translate(-718.06651,-80.283318)">
+        <g
+           id="g16"
+           transform="matrix(0.48979596,0,0,0.48979596,486.66748,268.69)"
+           style="stroke-width:2.04166">
+      <circle
+   cx="736.35486"
+   cy="93.860313"
+   fill="url(#gradient)"
+   id="circle13"
+   style="fill:url(#linearGradient1);fill-opacity:1;stroke-width:2.15131"
+   r="16"
+   inkscape:label="gamma-knob-bg" />
+
+      <circle
+   cx="736.35486"
+   cy="93.860313"
+   r="14.857142"
+   fill="none"
+   stroke="#202020"
+   stroke-width="4.95028"
+   id="circle14"
+   style="stroke:#676767;stroke-width:2.55208;stroke-dasharray:none;stroke-opacity:1" />
+
+      <g
+   id="g15"
+   transform="matrix(1.1428571,0,0,1.1428571,720.35488,77.860311)"
+   style="display:inline;stroke-width:2.04166">
+         <path
+   fill="#cedcf2"
+   d="m 13.25,1.8 v 11 h 1.5 v -11 z"
+   id="path14"
+   style="fill:#d3e5ee;fill-opacity:1;stroke-width:2.04166" />
+
+         <circle
+   fill="none"
+   stroke="#202020"
+   stroke-width="2.55208"
+   cx="14"
+   cy="14"
+   r="0.89999998"
+   id="circle15"
+   style="display:inline" />
+
+         <path
+   opacity="0.8"
+   fill="#cedcf2"
+   d="m 13,0.2 h 2 l -0.2,1.75 h -1.6 z"
+   id="path15"
+   style="opacity:1;fill:#d3e5ee;fill-opacity:0.8;stroke-width:2.04166" />
+
+      </g>
+
+   </g>
+      </g>
+      <g
+         id="g21"
+         transform="translate(-686.06651,-80.283318)">
+        <g
+           id="g20"
+           transform="matrix(0.48979596,0,0,0.48979596,486.66748,268.69)"
+           style="stroke-width:2.04166">
+      <circle
+   cx="736.35486"
+   cy="93.860313"
+   fill="url(#gradient)"
+   id="circle17"
+   style="fill:url(#linearGradient26);fill-opacity:1;stroke-width:2.15131"
+   r="16"
+   inkscape:label="gamma-knob-bg" />
+
+      <circle
+   cx="736.35486"
+   cy="93.860313"
+   r="14.857142"
+   fill="none"
+   stroke="#202020"
+   stroke-width="4.95028"
+   id="circle18"
+   style="stroke:#676767;stroke-width:2.55208;stroke-dasharray:none;stroke-opacity:1" />
+
+      <g
+   id="g19"
+   transform="matrix(1.1428571,0,0,1.1428571,720.35488,77.860311)"
+   style="display:inline;stroke-width:2.04166">
+         <path
+   fill="#cedcf2"
+   d="m 13.25,1.8 v 11 h 1.5 v -11 z"
+   id="path18"
+   style="fill:#d3e5ee;fill-opacity:1;stroke-width:2.04166" />
+
+         <circle
+   fill="none"
+   stroke="#202020"
+   stroke-width="2.55208"
+   cx="14"
+   cy="14"
+   r="0.89999998"
+   id="circle19"
+   style="display:inline" />
+
+         <path
+   opacity="0.8"
+   fill="#cedcf2"
+   d="m 13,0.2 h 2 l -0.2,1.75 h -1.6 z"
+   id="path19"
+   style="opacity:1;fill:#d3e5ee;fill-opacity:0.8;stroke-width:2.04166" />
+
+      </g>
+
+   </g>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-weight:600;font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk Semi-Bold';text-align:center;text-anchor:middle"
+         x="129.2346"
+         y="257.00909"
+         id="text21"
+         inkscape:label="MIX"><tspan
+           sodipodi:role="line"
+           id="tspan21"
+           x="129.2346"
+           y="257.00909"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk Semi-Bold';fill:#737373;fill-opacity:1">min</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-weight:600;font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk Semi-Bold';text-align:center;text-anchor:middle"
+         x="161.00661"
+         y="257.00909"
+         id="text22"
+         inkscape:label="MIX"><tspan
+           sodipodi:role="line"
+           id="tspan22"
+           x="161.00661"
+           y="257.00909"
+           style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk Semi-Bold';fill:#737373;fill-opacity:1">max</tspan></text>
+    </g>
+    <g
+       id="g24"
+       transform="translate(0,16)">
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start"
+         x="63.026489"
+         y="91.333"
+         id="text23"><tspan
+           sodipodi:role="line"
+           id="tspan23"
+           x="63.026489"
+           y="91.333"
+           style="text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1">Unipolar</tspan></text>
+      <circle
+         style="fill:#4071bf;fill-opacity:1;stroke:#3f72c0;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="circle24"
+         cx="53.500008"
+         cy="88.375"
+         r="4" />
+    </g>
+    <g
+       id="g23"
+       transform="translate(0,-16)">
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start"
+         x="62.94249"
+         y="107.333"
+         id="text24"><tspan
+           sodipodi:role="line"
+           id="tspan24"
+           x="62.94249"
+           y="107.333"
+           style="text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1">Bipolar</tspan></text>
+      <circle
+         style="fill:none;fill-opacity:1;stroke:#3f72c0;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="circle25"
+         cx="53.500008"
+         cy="104.375"
+         r="4" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:start;text-orientation:upright;text-anchor:start"
+       x="62.94249"
+       y="124.557"
+       id="text25"><tspan
+         sodipodi:role="line"
+         id="tspan25"
+         x="62.94249"
+         y="124.557"
+         style="text-align:start;text-anchor:start;fill:#a6a6a6;fill-opacity:1">Custom</tspan></text>
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#3f72c0;stroke-width:1;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="circle26"
+       cx="53.500008"
+       cy="120.375"
+       r="4" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+       x="24.872633"
+       y="91.278999"
+       id="text26"><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         x="24.872633"
+         y="91.278999"
+         style="fill:#a6a6a6;fill-opacity:1">Range</tspan></text>
+    <g
+       id="g31"
+       transform="translate(-139.3357,-37.276216)">
+      <g
+         id="g3"
+         transform="translate(193.1586,208.72609)">
+        <circle
+           id="dot-ring"
+           fill="none"
+           stroke="#202020"
+           stroke-width="0.25"
+           cx="4"
+           cy="4"
+           r="3.25" />
+        <circle
+           id="dot-face-up"
+           fill="url(#gface)"
+           stroke-width="0.25"
+           cx="4"
+           cy="4"
+           r="3.1500001"
+           style="fill:url(#gface)" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;line-height:1.25;font-family:'Hanken Grotesk';-inkscape-font-specification:'Hanken Grotesk';font-variant-ligatures:none;text-align:center;text-orientation:upright;text-anchor:middle"
+         x="220.48779"
+         y="216.86009"
+         id="text30"><tspan
+           sodipodi:role="line"
+           id="tspan30"
+           x="220.48779"
+           y="216.86009"
+           style="fill:#a6a6a6;fill-opacity:1">Reset</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#8c8c8c;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 2,167.541 H 148"
+       id="path30" />
+    <rect
+       style="fill:none;stroke:#bfbfbf;stroke-width:1.5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect1"
+       width="148.5"
+       height="184.5"
+       x="0.75000006"
+       y="0.75000006"
+       rx="0.82577193"
+       ry="1.3646046" />
+    <path
+       style="fill:none;stroke:#8c8c8c;stroke-width:0.75;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="M 4,77.541 H 146"
+       id="path1" />
+  </g>
+</svg>

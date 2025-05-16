@@ -26,13 +26,14 @@ struct TextInput : TextField, IApplyTheme
 
     TextInput();
     bool empty() { return text.empty(); }
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onChange(const ChangeEvent& e) override;
     void onAction(const ActionEvent& e) override;
     int getTextPosition(math::Vec mousePos) override;
     void draw(const DrawArgs& args) override;
 };
+
 
 
 struct TextInputMenu : TextInput
@@ -74,5 +75,47 @@ struct TextInputMenu : TextInput
         Base::step();
     }
 };
+
+template <typename Tin = TextInput>
+Tin* createThemedTextInput(
+    float x, float y, float width, float height, 
+    SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
+    std::string content,
+    std::function<void(std::string)> on_change = nullptr,
+    std::function<void(std::string)> on_enter = nullptr,
+    const char* placeholder = nullptr
+    )
+{
+    Tin* t = createWidget<Tin>(Vec(x, y));
+    if (width <= 0) width = 120.f;
+    if (height <= 0) height = 14.f;
+    t->box.size = Vec(width, height);
+    t->applyTheme(theme_engine, theme);
+    t->setText(content);
+    if (on_change) t->set_on_change(on_change);
+    if (on_enter) t->set_on_enter(on_enter);
+    if (placeholder) t->placeholder = placeholder;
+    return t;
+}
+
+template <typename Tin = TextInput>
+Tin* createTextInput(
+    float x, float y, float width, float height,
+    std::string content,
+    std::function<void(std::string)> on_change = nullptr,
+    std::function<void(std::string)> on_enter = nullptr,
+    const char* placeholder = nullptr
+    )
+{
+    Tin* t = createWidget<Tin>(Vec(x, y));
+    if (width <= 0) width = 120.f;
+    if (height <= 0) height = 14.f;
+    t->box.size = Vec(width, height);
+    t->setText(content);
+    if (on_change) t->set_on_change(on_change);
+    if (on_enter) t->set_on_enter(on_enter);
+    if (placeholder) t->placeholder = placeholder;
+    return t;
+}
 
 }

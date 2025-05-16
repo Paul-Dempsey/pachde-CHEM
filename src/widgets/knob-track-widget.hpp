@@ -151,4 +151,29 @@ TTrack * createTrackWidget(
     return o;
 }
 
+template <typename TTrack = TrackWidget>
+TTrack * createTrackWidget(
+    Vec pos,
+    float knob_radius,
+    float min_angle,
+    float max_angle,
+    SvgThemeEngine &engine,
+    std::shared_ptr<SvgTheme> theme,
+    const char * track_theme_key = track_constant::default_track_key,
+    const char * inactive_theme_key = track_constant::default_inactive_track_key
+    )
+{
+    auto o = new TTrack();
+    if (track_theme_key) o->track_key = track_theme_key;
+    if (inactive_theme_key) o->inactive_key = inactive_theme_key;
+    o->applyTheme(engine, theme);
+    o->box.pos = pos;
+    o->box.size = Vec{knob_radius + 2.f, knob_radius + 2.f};
+    o->min_angle = min_angle;
+    o->max_angle = max_angle;
+    o->radius = o->box.size.x * .5f;
+    return o;
+}
+
+
 }

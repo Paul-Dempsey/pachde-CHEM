@@ -342,4 +342,31 @@ struct NextButton: DrawButtonCtlBase
     }
 };
 
+struct FrameButton: DrawButtonCtlBase
+{
+    using Base = DrawButtonCtlBase;
+    FrameButton()
+    {
+        box.size.x = 12.f;
+        box.size.y = 12.f;
+    }
+
+    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
+    {
+        return Base::applyTheme(theme_engine, theme);
+    }
+
+    void draw(const DrawArgs& args) override
+    {
+        Base::draw(args);
+        auto vg = args.vg;
+
+        if (hovered && enabled && !button_down) {
+            FillRect(vg, .5f, .5f, box.size.x - 1.f, box.size.y - .5f, color_styles[ColorIndex::Hovered].color);
+        }
+        FittedBoxRect(vg, 0,0, box.size.x, box.size.y, color_styles[ColorIndex::Frame].color, Fit::Inside, .5f);
+    }
+};
+
+
 }

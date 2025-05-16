@@ -43,9 +43,15 @@ OverlayUi::OverlayUi(OverlayModule *module) :
         title_widget->set_text_color(0xffe6e6e6);
     }
 
-    auto set_preset_button = Center(createThemedButton<SquareButton>(Vec(box.size.x*.5f, box.size.y - 30.f), theme_engine, theme, "Set overlay preset"));
-    set_preset_button->setHandler([=](bool c, bool f) {
-    });
+    auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(box.size.x*.5f, 24.f), theme_engine, theme, "Select overlay preset"));
+    if (my_module) {
+        set_preset_button->setHandler([=](bool c, bool f) {
+            auto haken = chem_host->host_haken();
+            if (my_module->overlay_preset) {
+                haken->select_preset(ChemId::Overlay, my_module->overlay_preset->id);
+            }
+        });
+    }
     addChild(set_preset_button);
 
     // footer
@@ -63,6 +69,9 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     // Browsing UI
 
     if (browsing) {
+        auto logo = new Logo(0.25f);
+        logo->box.pos = Vec(box.size.x * .5f, 60);
+        addChild(Center(logo));
     }
 
     // init
@@ -192,6 +201,8 @@ void OverlayUi::appendContextMenu(Menu *menu)
     label.append(over ? over->name : "<not configured>");
     menu->addChild(createMenuLabel(label));
 
+    menu->addChild(createMenuLabel(format_string("Macros: %d", my_module ? my_module->macros.size() : 0)));
+
     auto preset = my_module ? my_module->live_preset : nullptr;
     menu->addChild(createMenuItem("Use live preset", preset ? preset->name : "<none>", [=](){
        my_module->overlay_preset = my_module->live_preset;
@@ -207,11 +218,7 @@ void OverlayUi::appendContextMenu(Menu *menu)
 
     menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>", 
         [=](Menu *menu) {
-            TextInputMenu *edit = new TextInputMenu();
-            edit->box.size.x = 150;
-            edit->setText(my_module ? my_module->title : "<title>");
-            edit->set_on_change([=](std::string text) { set_title(text); });
-            menu->addChild(edit);
+            menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, my_module ? my_module->title : "<title>", [=](std::string text) { set_title(text); }));
         }));
 
 
@@ -232,6 +239,5 @@ void OverlayUi::appendContextMenu(Menu *menu)
         });
         menu->addChild(picker);
     }));
-
     Base::appendContextMenu(menu);
 }

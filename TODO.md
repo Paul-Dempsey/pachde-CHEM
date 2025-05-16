@@ -2,8 +2,12 @@
 
 - Overlay macros
   - add/remove
-  - sort out XM host connections
-  - separate Overlay theming?
+  - Macros menu: allow adding number by editing
+- Other Overlay functions
+  - Ratio: formula pokes
+  - Ratio: SG shapes
+  - Ratio: OSC types
+- Generic SG control module
 - Bug: rounding lights aren't quite right
 - Option to shut off looking for hardware (so that you can jump into the HE without issues).
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)

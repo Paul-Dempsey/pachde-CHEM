@@ -8,28 +8,41 @@ using namespace svg_theme;
 namespace pachde {
 
 enum class TextAlignment { Left, Center, Right };
+enum class VAlignment { Top, Middle, Bottom };
+
 struct LabelStyle
 {
     const char* key;
     TextAlignment align;
+    VAlignment valign;
     float height;
     bool bold;
 
     LabelStyle()
     :   key("label"),
         align(TextAlignment::Left),
+        valign(VAlignment::Top),
         height(12.f),
         bold(false)
     {}
     LabelStyle(const char * key, TextAlignment align = TextAlignment::Left, float height = 12.f, bool bold = false)
     :   key(key),
         align(align),
+        valign(VAlignment::Top),
+        height(height),
+        bold(bold)
+    {}
+    LabelStyle(const char * key, TextAlignment align, VAlignment vert, float height = 12.f, bool bold = false)
+    :   key(key),
+        align(align),
+        valign(vert),
         height(height),
         bold(bold)
     {}
     LabelStyle& operator=(const LabelStyle&other) {
         key = other.key;
         align = other.align;
+        valign = other.valign;
         height = other.height;
         bold = other.bold;
         return *this;
@@ -37,6 +50,7 @@ struct LabelStyle
     LabelStyle(const LabelStyle& other)
     :   key(other.key),
         align(other.align),
+        valign(other.valign),
         height(other.height),
         bold(other.bold)
     {}

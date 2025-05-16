@@ -21,7 +21,6 @@ struct BitsWidget : OpaqueWidget, IApplyTheme
 
     std::function<void(uint64_t item)> change_fn{nullptr};
 
-    LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
     ElementStyle envelope{"options-box", "#282828", "hsl(0, 0%, 65%)", 1.25f};
     ElementStyle control_frame{"ctl-frame", "hsl(0, 0%, 55%)", "hsl(0, 0%, 55%)", .5f};
     ElementStyle control_glyph{"ctl-glyph", "hsl(0, 0%, 65%)", "hsl(0, 0%, 65%)", .25f};

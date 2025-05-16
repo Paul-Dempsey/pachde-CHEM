@@ -46,6 +46,7 @@ struct MacroMenu: Hamburger
             menu->addChild(createMenuLabel(text));
 
             switch (overlay->overlay_macros_ready()) {
+
             case MacroReadyState::Available: {
                 auto macros{overlay->overlay_macro_usage()};
                 if (macros.empty()) goto NO_MACROS;
@@ -53,15 +54,19 @@ struct MacroMenu: Hamburger
                     auto num = mu.macro_number;
                     menu->addChild(createMenuItem(mu.to_string(), "", [=](){
                         ui->set_macro_number(num);
+                        APP->event->setSelectedWidget(ui);
                     }));
                 }
                 } break;
+
             case MacroReadyState::Unavailable:
 NO_MACROS:
                 menu->addChild(createMenuItem("Load preset macros", "", [=]() {
                     overlay->overlay_request_macros();
+                    APP->event->setSelectedWidget(ui);
                 }));
                 break;
+
             case MacroReadyState::InProgress:
                 menu->addChild(createMenuLabel("Gathering macros...please wait"));
                 break;
@@ -71,6 +76,15 @@ NO_MACROS:
         }
     }
 };
+
+constexpr const float PANEL_WIDTH{120.f};
+constexpr const float CENTER{PANEL_WIDTH*.5f};
+constexpr const float LEFT_AXIS{10.f};
+constexpr const float FULL_WIDTH{PANEL_WIDTH - 2*LEFT_AXIS};
+constexpr const float LABEL_DY{14.75f};
+constexpr const float PALETTE_DX{15.f};
+constexpr const float MINMAX_DX{13.f};
+constexpr const float LIGHT_CY{15.5f};
 
 XMEditUi::XMEditUi(XMEditModule *module) :
     my_module(module)
@@ -87,27 +101,17 @@ XMEditUi::XMEditUi(XMEditModule *module) :
     float x, y;
     bool browsing = !module;
 
-    const float PANEL_WIDTH{120.f};
-    const float CENTER{PANEL_WIDTH*.5f};
-    const float LEFT_AXIS{10.f};
-    const float FULL_WIDTH{PANEL_WIDTH - 2*LEFT_AXIS};
-    const float LABEL_DY{14.75f};
-    const float PALETTE_DX{15.f};
-    const float MINMAX_DX{13.f};
-
-    addChild(createLightCentered<SmallLight<GreenLight>>(Vec(CENTER-8.f, 15.5), my_module, MOD::L_XM));
-    addChild(createLightCentered<SmallLight<WhiteLight>>(Vec(CENTER, 15.5), my_module, MOD::L_OVERLAY));
-    addChild(createLightCentered<SmallLight<BlueLight>>(Vec(CENTER+8.f, 15.5), my_module, MOD::L_CORE));
+    addChild(createLightCentered<SmallLight<GreenLight>>(Vec(CENTER - 10.f, LIGHT_CY), my_module, MOD::L_XM));
+    addChild(createLightCentered<SmallLight<WhiteLight>>(Vec(CENTER,       LIGHT_CY), my_module, MOD::L_OVERLAY));
+    addChild(createLightCentered<SmallLight<BlueLight>> (Vec(CENTER + 10.f, LIGHT_CY), my_module, MOD::L_CORE));
 
     x = LEFT_AXIS;
     y = 20;
     addChild(createLabel(Vec(x,y), FULL_WIDTH, "Section title:", theme_engine, theme, S::control_label_left));
 
     y += LABEL_DY;
-    title_entry = createWidget<TextInput>(Vec(x,y));
-    title_entry->box.size = Vec(PANEL_WIDTH - 2*LEFT_AXIS, 14.f);
-    title_entry->setText(client ? client->get_title() : "");
-    title_entry->set_on_change([=](std::string text){ on_title_change(text); });
+    title_entry = createTextInput(x, y, PANEL_WIDTH - 2*LEFT_AXIS, 14.f, client ? client->xm_get_header_text() : "",
+        [=](std::string text){ on_title_change(text); });
     addChild(title_entry);
 
     y += 18.f;
@@ -139,29 +143,35 @@ XMEditUi::XMEditUi(XMEditModule *module) :
     addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", theme_engine, theme, mini_label_style));
     addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "bg", theme_engine, theme, mini_label_style));
 
-    y = 92.f;
+    y += 24.f;
     x = CENTER;
     tab_header = new TabHeader(Vec(x,y), 8);
     tab_header->set_on_item_change([=](int item) { on_item_change(item); });
     tab_header->applyTheme(theme_engine, theme);
     addChild(Center(tab_header));
 
-    current_macro = client ? client->get_macro(knob_index) : nullptr;
+    current_macro = client ? client->xm_get_macro(knob_index) : nullptr;
 
     y += 14.f;
     x = LEFT_AXIS;
-    addChild(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, MOD::P_ADD_REMOVE, theme_engine, theme));
-    addChild(createLabel(Vec(x + 14.f, y), 60.f, "Enabled", theme_engine, theme, S::control_label_left));
+
+    add_remove = createThemedButton<PlusMinusButton>(Vec(x,y),theme_engine, theme);
+    add_remove->setHandler([=](bool, bool){
+        on_add_remove();
+    });
+    addChild(add_remove);
+    addChild(createLabel(Vec(x + 14.f, y), 65.f, "Add/Remove", theme_engine, theme, S::control_label_left));
 
     y +=  15.f;
     addChild(createLabel(Vec(x,y), 40, "Name:", theme_engine, theme, S::control_label_left));
     y += LABEL_DY;
-    name_entry = createWidget<TextInput>(Vec(x,y));
-    name_entry->box.size = Vec(PANEL_WIDTH - 2*LEFT_AXIS, 14.f);
-    name_entry->set_on_change([=](std::string text){ on_name_change(text); });
-    if (current_macro) {
-        name_entry->setText(current_macro->name);
-    }
+    name_entry = createThemedTextInput(x, y, PANEL_WIDTH - 2*LEFT_AXIS, 14.f, 
+        theme_engine, theme,
+        current_macro ? current_macro->name: "",
+        [=](std::string text){ on_name_change(text); },
+        nullptr,
+        "<knob label>"
+    );
     addChild(name_entry);
 
     y += 18.f;
@@ -217,9 +227,20 @@ XMEditUi::XMEditUi(XMEditModule *module) :
     addChild(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, MOD::P_INPUT, theme_engine, theme));
     addChild(createLabel(Vec(x + 14.f, y), 60.f, "Input port", theme_engine, theme, S::control_label_left));
 
-    y = 280.f;
+    y += 24.f;
     addChild(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, MOD::P_MOD, theme_engine, theme));
     addChild(createLabel(Vec(x + 14.f, y), 60.f, "Modulation", theme_engine, theme, S::control_label_left));
+
+    y += 30.f;
+    auto clear_button = createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme, "Reset");
+    clear_button->setHandler([=](bool, bool){ clear_xm(); });
+    addChild(clear_button);
+    addChild(createLabel(Vec(x + clear_button->box.size.x + 5.f,y), 50, "Reset", theme_engine, theme, S::control_label_left));
+
+    title_entry->nextField = name_entry;
+    title_entry->prevField = this;
+    name_entry->nextField = this;
+    name_entry->prevField = title_entry;
 
     // footer
     LabelStyle status_style{"warning", TextAlignment::Center, 10.f};
@@ -237,6 +258,9 @@ XMEditUi::XMEditUi(XMEditModule *module) :
 
     // Browsing UI
     if (browsing) {
+        auto logo = new Logo(0.5f);
+        logo->box.pos = Vec(CENTER, y + 36.f);
+        addChild(Center(logo));
     }
 
     if (my_module) {
@@ -251,7 +275,7 @@ void XMEditUi::on_title_change(std::string text)
 {
     title = text;
     auto client = get_client();
-    if (client) client->set_header_text(text);
+    if (client) client->xm_set_header_text(text);
 }
 
 void XMEditUi::on_name_change(std::string text)
@@ -259,7 +283,7 @@ void XMEditUi::on_name_change(std::string text)
     if (current_macro) {
         current_macro->name = text;
         auto client = get_client();
-        if (client) client->on_macro_change(current_macro->index);
+        if (client) client->xm_on_macro_change(current_macro->knob_id);
     }
 }
 
@@ -295,7 +319,7 @@ void XMEditUi::set_range(MacroRange range)
         current_macro->min = min;
         current_macro->max = max;
         auto client = get_client();
-        if (client) client->on_macro_change(current_macro->index);
+        if (client) client->xm_on_macro_change(current_macro->knob_id);
     }
     set_range_ui(range);
 }
@@ -314,8 +338,22 @@ void XMEditUi::set_macro_number(uint8_t num)
     if (current_macro) {
         current_macro->macro_number = num;
         auto client = get_client();
-        if (client) client->on_macro_change(current_macro->index);
+        if (client) client->xm_on_macro_change(current_macro->knob_id);
     }
+    refresh_macro_controls();
+}
+
+void XMEditUi::clear_xm()
+{
+    knob_index = 0;
+
+    auto client = get_client();
+    if (client) client->xm_clear();
+    client->xm_set_macro_edit(knob_index);
+    tab_header->set_current_item(knob_index);
+    title = client->xm_get_header_text();
+    title_bg_color = client->xm_get_header_color();
+    title_fg_color = client->xm_get_header_text_color();
     refresh_macro_controls();
 }
 
@@ -323,7 +361,7 @@ void XMEditUi::set_title_background_color(PackedColor color)
 {
     title_bg_color = color;
     auto client = get_client();
-    if (client) client->set_header_color(color);
+    if (client) client->xm_set_header_color(color);
 }
 
 PackedColor XMEditUi::get_title_background_color()
@@ -335,7 +373,7 @@ void XMEditUi::set_title_text_color(PackedColor color)
 {
     title_fg_color = color;
     auto client = get_client();
-    if (client) client->set_header_text_color(color);
+    if (client) client->xm_set_header_text_color(color);
 }
 
 PackedColor XMEditUi::get_title_text_color()
@@ -354,13 +392,25 @@ Module* XMEditUi::get_xm_module()
     return my_module ? my_module->get_xm_module() : nullptr;
 }
 
+void XMEditUi::on_add_remove()
+{
+    auto client = get_client();
+    if (client) {
+        if (add_remove->plus) {
+            client->xm_add_macro(knob_index);
+        } else {
+            client->xm_remove_macro(knob_index);
+        }
+    }
+}
+
 void XMEditUi::on_client_change()
 {
     knob_index = 0;
     on_item_change(knob_index);
     auto client = get_client();
     if (client) {
-        title_entry->setText(client->get_title());
+        title_entry->setText(client->xm_get_header_text());
         status->text("");
     } else {
         title_entry->setText("");
@@ -373,9 +423,10 @@ void XMEditUi::on_client_change()
 void XMEditUi::on_item_change(int item)
 {
     knob_index = item;
+    tab_header->set_current_item(item);
     auto client = get_client();
     if (client) {
-        client->set_macro_edit(item);
+        client->xm_set_macro_edit(item);
         refresh_macro_controls();
     }
 }
@@ -383,22 +434,22 @@ void XMEditUi::on_item_change(int item)
 void XMEditUi::refresh_macro_controls()
 {
     auto client = get_client();
-    current_macro = client ? client->get_macro(knob_index) : nullptr;
+    current_macro = client ? client->xm_get_macro(knob_index) : nullptr;
     if (current_macro) {
+        add_remove->set_plus(false);
         macro_number->text(macro_number_text(current_macro->macro_number));
         name_entry->setText(current_macro->name);
         set_range_ui(current_macro->range);
         if (my_module) {
-            my_module->getParam(MOD::P_ADD_REMOVE).setValue(current_macro->active());
             my_module->getParam(MOD::P_RANGE_MIN).setValue(current_macro->min);
             my_module->getParam(MOD::P_RANGE_MAX).setValue(current_macro->max);
         }
     } else {
+        add_remove->set_plus(true);
         macro_number->text(macro_number_text(INVALID_MACRO));
         name_entry->setText("");
         set_range_ui(MacroRange::Bipolar);
         if (my_module) {
-            my_module->getParam(MOD::P_ADD_REMOVE).setValue(1.f);
             my_module->getParam(MOD::P_RANGE_MIN).setValue(0);
             my_module->getParam(MOD::P_RANGE_MAX).setValue(Haken::max14);
         }
@@ -431,12 +482,69 @@ void XMEditUi::step()
     if (!my_module) return;
     bind_host(my_module);
     panelBorder->setPartners(nullptr != get_xm_module(), false);
+    if (!my_module->ready()) {
+        current_macro = nullptr;
+    } else if (!current_macro) {
+        IExtendedMacro* client = get_client();
+        current_macro = client ? client->xm_get_macro(knob_index) : nullptr;
+    }
+}
+
+void XMEditUi::onSelectKey(const SelectKeyEvent &e)
+{
+    if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT))
+    {
+        switch (e.key) {
+        case GLFW_KEY_1:
+        case GLFW_KEY_2:
+        case GLFW_KEY_3:
+        case GLFW_KEY_4:
+        case GLFW_KEY_5:
+        case GLFW_KEY_6:
+        case GLFW_KEY_7:
+        case GLFW_KEY_8:
+            on_item_change(e.key - GLFW_KEY_1);
+            e.consume(this);
+            return;
+
+        case GLFW_KEY_LEFT: {
+            int item = knob_index - 1;
+            if (item < 0) item = 7;
+            on_item_change(item);
+            e.consume(this);
+            return;
+        } break;
+
+        case GLFW_KEY_RIGHT:{
+            int item = (knob_index + 1) % 8;
+            on_item_change(item);
+            e.consume(this);
+            return;
+        } break;
+
+        case GLFW_KEY_TAB: {
+            auto sel = APP->event->getSelectedWidget();
+            if (sel == this) {
+                APP->event->setSelectedWidget(title_entry);
+                e.consume(this);
+                return;
+            }
+        } break;
+
+        case GLFW_KEY_ESCAPE:
+            APP->event->setSelectedWidget(nullptr);
+            e.consume(this);
+            return;
+        }
+    }
+    Base::onSelectKey(e);
 }
 
 void XMEditUi::draw(const DrawArgs& args)
 {
     Base::draw(args);
     if (!get_client()) return;
+    if (my_module && !my_module->ready()) return;
     auto vg = args.vg;
     auto co = current_style.nvg_color();
     float y = 32.f + (knob_index * 32.f);
@@ -447,12 +555,11 @@ void XMEditUi::draw(const DrawArgs& args)
     nvgClosePath(vg);
     nvgFillColor(vg, co);
     nvgFill(vg);
-    //Line (vg, .75f, y - 14.f, .75f, y + 16.f, co, 1.5f);
 }
 
 void XMEditUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
-    menu->addChild(new MenuSeparator);
+//    menu->addChild(new MenuSeparator);
     Base::appendContextMenu(menu);
 }

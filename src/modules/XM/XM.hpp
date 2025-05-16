@@ -8,20 +8,12 @@
 #include "../../widgets/widgets.hpp"
 #include "../XM-shared/xm-edit-common.hpp"
 #include "../XM-shared/xm-overlay.hpp"
-#include "macro-data.hpp"
 
 using namespace pachde;
 
-struct MacroUi {
-    ssize_t index;
-    GlowKnob* knob{nullptr};
-    TrackWidget* track{nullptr};
-    TextLabel * label{nullptr};
-};
-
 struct XMUi;
 
-struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClient
+struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 {
     enum Params {
         P_1,
@@ -33,6 +25,8 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
         P_7,
         P_8,
         P_MODULATION,
+        P_RANGE_MIN,
+        P_RANGE_MAX,
         NUM_PARAMS
     };
     enum Inputs {
@@ -58,6 +52,8 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
         L_IN_6,
         L_IN_7,
         L_IN_8,
+        L_OVERLAY,
+        L_CORE,
         NUM_LIGHTS
     };
 
@@ -66,23 +62,19 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
     std::string title;
     PackedColor title_bg;
     PackedColor title_fg;
-    MacroData macros;
+    bool has_mod_knob;
+
     int mod_target{-1};
     int last_mod_target{-2};
     bool glow_knobs;
     bool in_mat_poke;
 
+    MacroData my_macros;
+
     IOverlay* overlay{nullptr};
 
     XMModule();
-    ~XMModule() {
-        if (overlay) {
-            overlay->overlay_unregister_client(this);
-        }
-        if (chem_host) {
-            chem_host->unregister_chem_client(this);
-        }
-    }
+    virtual ~XMModule();
 
     XMUi* ui() { return reinterpret_cast<XMUi*>(chem_ui); };
 
@@ -92,26 +84,17 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
         }
     }
 
+    void update_param_info();
+    
     // IOverlayClient
-    void on_overlay_change(IOverlay* host) override { overlay = host; }
+    void on_overlay_change(IOverlay* ovr) override;
     IOverlay* get_overlay() override { return overlay; }
+    int64_t get_module_id() override { return id; }
 
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;
 
-    // IExtendedMacro
-    //virtual bool has_modulation() = 0;
-    std::string get_title() override;
-    PackedColor get_header_color() override;
-    PackedColor get_header_text_color() override;
-    void set_header_color(PackedColor color) override;
-    void set_header_text_color(PackedColor color) override;
-    void set_header_text(std::string title) override;
-    void set_macro_edit(int index) override;
-    std::shared_ptr<MacroDescription> get_macro(int index) override;
-    void add_macro(int index) override;
-    void remove_macro(int index) override;
-    void on_macro_change(int index) override;
+    void xm_clear();
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -123,6 +106,8 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void try_bind_overlay();
+    
     //void onExpanderChange(const ExpanderChangeEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;
     void process_params(const ProcessArgs& args);
@@ -131,51 +116,61 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IExtendedMacro, IOverlayClie
 
 // -- XMacro UI -----------------------------------
 
-//struct XMacroMenu;
+struct EditWireframe;
+struct MacroEdit;
 
-struct XMUi : ChemModuleWidget, IChemClient, IExtendedMacro
+struct XMUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
     IChemHost* chem_host{nullptr};
     XMModule* my_module{nullptr};
 
-    LinkButton* link_button{nullptr};
-    IndicatorWidget* link{nullptr};
-    ElementStyle current_style{"xm-current", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
+    // LinkButton* link_button{nullptr};
+    // IndicatorWidget* link{nullptr};
 
-    int edit_item{0};
+    ElementStyle edit_style{"xm-edit", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
+    ElementStyle placeholder_style{"xm-placeholder", "hsl(0,0%,55%)", "hsl(0,0%,55%)", .25f};
+    
     Swatch* title_bar{nullptr};
     TextLabel * title{nullptr};
     PackedColor title_bg;
     PackedColor title_fg;
-    MacroData* macro_data{nullptr};
-    MacroUi macro_ui[8];
+    MacroEdit* edit_macro{nullptr};
+    EditWireframe* wire_frame{nullptr};
+    bool editing{false};
+    bool draw_placeholders{true};
+    TrimPot* knobs[9]{nullptr};
+    TextLabel* labels[8]{nullptr};
 
     XMUi(XMModule *module);
+    virtual ~XMUi() {
+        if (editing) set_edit_mode(false);
+    }
 
-    bool host_connected();
     void glowing_knobs(bool glow);
     void center_knobs();
 
-    bool editing() { return (edit_item >= 0) && (nullptr != get_edit_module()); }
-    Module * get_edit_module();
+    void update_main_ui(std::shared_ptr<SvgTheme> theme);
 
+    IOverlay* get_overlay() { return my_module ? my_module->get_overlay() : nullptr; }
     Vec knob_center(int index);
+    Vec input_center(int index);
+    void set_edit_mode(bool edit);
+    void set_edit_item(int index);
+    void commit_macro();
+    MacroDescription* get_edit_macro();
+    std::shared_ptr<MacroDescription> get_persistent_macro(int index);
+    bool get_modulation();
+    void set_modulation(bool mod);
 
-    // IExtendedMacro
-    //virtual bool has_modulation() = 0;
-    std::string get_title() override;
-    PackedColor get_header_color() override;
-    PackedColor get_header_text_color() override;
-    void set_header_color(PackedColor color) override;
-    void set_header_text_color(PackedColor color) override;
-    void set_header_text(std::string title) override;
-    void set_macro_edit(int index) override;
-    std::shared_ptr<MacroDescription> get_macro(int index) override;
-    void add_macro(int index) override;
-    void remove_macro(int index) override;
-    void on_macro_change(int index) override;
+    void xm_clear();
+    std::string get_header_text();
+    PackedColor get_header_color();
+    PackedColor get_header_text_color();
+    void set_header_color(PackedColor color);
+    void set_header_text_color(PackedColor color);
+    void set_header_text(std::string title);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

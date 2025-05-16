@@ -5,17 +5,30 @@ using namespace pachde;
 
 XMEditModule::XMEditModule()
 {
-    config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     std::vector<std::string> off_on{ "off", "on"};
-    configSwitch(P_ADD_REMOVE, 0.f, 1.f, 1.f, "Enable macro", off_on);
+    config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+
     configParam(P_RANGE_MIN, 0, Haken::max14, 0, "Minimum");
     configParam(P_RANGE_MAX, 0, Haken::max14, Haken::max14, "Maximum");
-    configSwitch(P_INPUT, 0.f, 1.f, 1.f, "Macro in port", off_on);
+
+    configSwitch(P_INPUT, 0.f, 1.f, 1.f, "Macro input port", off_on);
     configSwitch(P_MOD, 0.f, 1.f, 1.f, "Modulate macro inputs", off_on);
 
     configLight(L_XM, "Connected XM");
     configLight(L_CORE, "Connected Core");
     configLight(L_OVERLAY, "Connected Overlay");
+
+    xm_client = dynamic_cast<IExtendedMacro*>(get_xm_module());
+}
+
+XMEditModule::~XMEditModule()
+{
+    if (overlay) {
+        overlay->overlay_unregister_client(this);
+    }
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+    }
 }
 
 void XMEditModule::dataFromJson(json_t* root)
@@ -59,7 +72,13 @@ Module * XMEditModule::get_xm_module()
 
 IExtendedMacro *XMEditModule::get_xm_client()
 {
-    return dynamic_cast<IExtendedMacro *>(get_xm_module());
+    return xm_client;
+}
+
+void XMEditModule::onExpanderChange(const ExpanderChangeEvent& e)
+{
+    if (e.side) return;
+    xm_client = dynamic_cast<IExtendedMacro*>(get_xm_module());
 }
 
 void XMEditModule::process_params(const ProcessArgs& args)
@@ -84,7 +103,7 @@ void XMEditModule::process_params(const ProcessArgs& args)
 
                 if (change) {
                     auto client = get_xm_client();
-                    if (client) client->on_macro_change(my_ui->knob_index);
+                    if (client) client->xm_on_macro_change(my_ui->knob_index);
                 }
             } else {
                 getParam(P_RANGE_MIN).setValue(macro->range == MacroRange::Bipolar ? 0 : Haken::zero14);
@@ -108,12 +127,21 @@ void XMEditModule::process(const ProcessArgs& args)
         if (!overlay) {
             overlay = find_an_overlay(this, device_claim, "");
         }
+        if (overlay) {
+            overlay->overlay_register_client(this);
+        }
     }
 
     if (0 == ((args.frame + id) % 47)) {
-        getLight(L_XM).setSmoothBrightness(nullptr != get_xm_module(), 90);
-        getLight(L_CORE).setSmoothBrightness(!device_claim.empty() && chem_host && !chem_host->host_busy(), 90);
-        getLight(L_OVERLAY).setSmoothBrightness(nullptr != overlay, 90);
+        bool have_xm = nullptr != get_xm_module();
+        bool have_ready_host = !device_claim.empty() && chem_host && !chem_host->host_busy();
+        bool have_overlay = nullptr != overlay;
+
+        is_ready = have_xm && have_ready_host && have_overlay;
+
+        getLight(L_XM).setSmoothBrightness(have_xm, 90);
+        getLight(L_CORE).setSmoothBrightness(have_ready_host, 90);
+        getLight(L_OVERLAY).setSmoothBrightness(have_overlay, 90);
     }
 }
 

@@ -35,6 +35,7 @@ struct MacroUsage
 {
     uint8_t macro_number{0};
     std::vector<MacroFormUsage> forms;
+    int64_t module_id{-1};
 
     MacroUsage() {}
     MacroUsage(uint8_t num) : macro_number(num) {}

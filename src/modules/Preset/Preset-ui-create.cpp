@@ -189,12 +189,10 @@ PresetUi::PresetUi(PresetModule *module) :
 
     x = 23.5f;
     y = 18.f;
-    search_entry = createWidget<TextInput>(Vec(x, y));
-    search_entry->box.size = Vec(114.f, 14.f);
-    search_entry->applyTheme(theme_engine, theme);
-    search_entry->placeholder = "preset search";
-    search_entry->set_on_change([=](std::string text){ on_search_text_changed(text); });
-    search_entry->set_on_enter([=](std::string text){ on_search_text_enter(); });
+    search_entry = createThemedTextInput(x, y, 114.f, 14.f, theme_engine, theme,         "", 
+        [=](std::string text){ on_search_text_changed(text); },
+        [=](std::string text){ on_search_text_enter(); },
+        "preset search");
     addChild(search_entry);
 
     menu = Center(createThemedWidget<SearchMenu>(Vec(x + 122.f, y + 7.f), theme_engine, theme));

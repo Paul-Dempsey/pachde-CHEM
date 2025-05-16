@@ -43,7 +43,7 @@ inline bool in_range_limit(T value, T minimum, T limit) { return minimum <= valu
 bool get_json_bool(const json_t* root, const char* key, bool default_value);
 float get_json_float(const json_t* root, const char* key, float default_value);
 int get_json_int(const json_t* root, const char* key, int default_value);
-
+int64_t get_json_int64(const json_t* root, const char* key, int64_t default_value);
 std::string get_json_string(const json_t* root, const char* key, const std::string& default_value);
 std::string get_json_string(const json_t* root, const char* key);
 

@@ -29,9 +29,9 @@ IOverlay * find_an_overlay(Module *client_module, std::string claim, std::string
         auto module = engine->getModule(id);
         if (module == client_module) continue;
         if (module->getModel() == modelOverlay) {
-            auto io = reinterpret_cast<IOverlay*>(module);
-            auto chem = reinterpret_cast<ChemModule*>(module);
-            auto host = chem->get_host();
+            auto io = dynamic_cast<IOverlay*>(module);
+            auto chem = dynamic_cast<ChemModule*>(module);
+            auto host = chem ? chem->get_host() : nullptr;
             if (host) {
                 if (0 == claim.compare(host->host_claim())) {
                     auto p = host->host_preset();

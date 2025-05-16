@@ -22,7 +22,6 @@ enum class ChemId : uint8_t {
     Preset,
     Overlay,
     XM,
-    XMEdit,
     Proto
 };
 

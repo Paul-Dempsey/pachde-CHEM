@@ -14,19 +14,20 @@ PresetId parse_id_spec(std::string spec)
 
     uint8_t hi = 0, lo = 0, n = 0;
     auto it = spec.cbegin();
-    while (it != spec.cend() && ('.' != *it)) {
+    auto end = spec.cend();
+    while (it != end && ('.' != *it)) {
         assert(isdigit(*it));
         hi = (hi*10) + (*it - '0');
         it++;
     }
     it++;
-    while (it != spec.cend() && ('.' != *it)) {
+    while (it !=end && ('.' != *it)) {
         assert(isdigit(*it));
         lo = (lo*10) + (*it - '0');
         it++;
     }
     it++;
-    while (it != spec.cend() && ('.' != *it)) {
+    while (it != end) {
         assert(isdigit(*it));
         n = (n*10) + (*it - '0');
         it++;

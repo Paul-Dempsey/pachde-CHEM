@@ -6,6 +6,7 @@ using namespace pachde;
 OverlayModule::OverlayModule()
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+    configLight(L_CONNECTED, "Preset connected");
     mac_build.client_id = ChemId::Overlay;
     mac_build.set_on_complete([=](){ on_macro_request_complete(); });
 }
@@ -76,15 +77,39 @@ void OverlayModule::on_macro_request_complete()
     }
     auto haken = chem_host->host_haken();
     send_store_preset(ChemId::Overlay, haken, overlay_preset);
-
     haken->select_preset(ChemId::Overlay, overlay_preset->id);
+}
+
+void OverlayModule::prune_missing_clients()
+{
+    if (macros.empty()) return;
+    std::vector<int64_t> client_ids;
+    for (auto client : clients) {
+        client_ids.push_back(client->get_module_id());
+    }
+    macros.prune_leaving(client_ids);
 }
 
 MacroReadyState OverlayModule::overlay_macros_ready()
 {
     if (mac_build.in_archive) return MacroReadyState::InProgress;
-    if (macros.empty()) return MacroReadyState::Unavailable;
+    if (macro_usage.empty()) return MacroReadyState::Unavailable;
     return MacroReadyState::Available;
+}
+
+void OverlayModule::overlay_remove_macro(int64_t module, ssize_t knob)
+{
+    macros.remove(module, knob);
+}
+
+void OverlayModule::overlay_add_macro(std::shared_ptr<MacroDescription> macro)
+{
+    macros.add(macro);
+}
+
+void OverlayModule::overlay_add_update_macro(std::shared_ptr<MacroDescription> macro)
+{
+    macros.add_update(macro);
 }
 
 void OverlayModule::dataFromJson(json_t* root)
@@ -102,6 +127,8 @@ void OverlayModule::dataFromJson(json_t* root)
     title = get_json_string(root, "overlay-title");
     bg_color = parse_color(get_json_string(root, "background-color"));
     fg_color = parse_color(get_json_string(root, "foreground-color"));
+    macros.from_json(root);
+
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -115,6 +142,8 @@ json_t* OverlayModule::dataToJson()
     json_object_set_new(root, "overlay-title", json_string(title.c_str()));
     json_object_set_new(root, "background-color", json_string(hex_string(bg_color).c_str()));
     json_object_set_new(root, "foreground-color", json_string(hex_string(fg_color).c_str()));
+    macros.to_json(root);
+
     return root;
 }
 

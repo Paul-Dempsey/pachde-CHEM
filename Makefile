@@ -122,10 +122,6 @@ SOURCES += src/modules/XM-Overlay/Overlay-ui.cpp
 SOURCES += src/modules/XM/XM.cpp
 SOURCES += src/modules/XM/XM-ui.cpp
 
-SOURCES += src/modules/XM-Edit/Edit.cpp
-SOURCES += src/modules/XM-Edit/Edit-ui.cpp
-
-
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets
 # DISTRIBUTABLES += selections

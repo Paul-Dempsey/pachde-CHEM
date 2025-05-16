@@ -139,18 +139,9 @@
       ]
     },
     {
-      "slug": "chem-x-macro",
+      "slug": "chem-xm",
       "name": "CHEM Extended Macro",
       "description": "CHEM Extended Macro for Haken Eagan Matrix",
-      "tags": [
-        "Controller",
-        "Expander"
-      ]
-    },
-    {
-      "slug": "chem-xm-edit",
-      "name": "CHEM Extended Macro Editor",
-      "description": "CHEM Extended Macro Editor for Haken Eagan Matrix",
       "tags": [
         "Controller",
         "Expander"

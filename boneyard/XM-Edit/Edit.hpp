@@ -7,6 +7,7 @@
 #include "../../widgets/widgets.hpp"
 #include "../XM-shared/xm-edit-common.hpp"
 #include "../XM-shared/xm-overlay.hpp"
+#include "add-remove-button.hpp"
 
 using namespace pachde;
 
@@ -15,7 +16,6 @@ struct XMEditUi;
 struct XMEditModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 {
     enum Params {
-        P_ADD_REMOVE,
         P_RANGE_MIN,
         P_RANGE_MAX,
         P_INPUT,
@@ -37,25 +37,21 @@ struct XMEditModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 
     std::string device_claim;
     IOverlay* overlay{nullptr};
+    IExtendedMacro* xm_client{nullptr};
+    bool is_ready{false};
 
     XMEditModule();
-    ~XMEditModule() {
-        if (overlay) {
-            overlay->overlay_unregister_client(this);
-        }
-        if (chem_host) {
-            chem_host->unregister_chem_client(this);
-        }
-    }
+    virtual ~XMEditModule();
 
     XMEditUi* ui() { return reinterpret_cast<XMEditUi*>(chem_ui); };
-
+    bool ready() { return is_ready; }
     Module* get_xm_module();
     IExtendedMacro* get_xm_client();
 
     // IOverlayClient
     void on_overlay_change(IOverlay* host) override { overlay = host; }
     IOverlay* get_overlay() override { return overlay; }
+    int64_t get_module_id() override { return id; }
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
@@ -67,6 +63,7 @@ struct XMEditModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void onExpanderChange(const ExpanderChangeEvent& e) override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -85,6 +82,7 @@ struct XMEditUi : ChemModuleWidget, IChemClient
     //LinkButton* link_button{nullptr};
     TextLabel* status{nullptr};
     TabHeader* tab_header{nullptr};
+    PlusMinusButton* add_remove{nullptr};
     TextLabel* macro_number{nullptr};
     TextInput* title_entry{nullptr};
     TextInput* name_entry{nullptr};
@@ -112,11 +110,14 @@ struct XMEditUi : ChemModuleWidget, IChemClient
     IExtendedMacro* get_client() { return my_module ? my_module->get_xm_client() : nullptr; }
     IOverlay* get_overlay() { return my_module ? my_module->get_overlay() : nullptr; }
 
+    void on_add_remove();
     void on_client_change();
     void on_item_change(int item);
     void refresh_macro_controls();
     void on_title_change(std::string text);
     void on_name_change(std::string text);
+
+    void clear_xm();
     void set_title_background_color(PackedColor color);
     void set_title_text_color(PackedColor color);
     void set_range(MacroRange range);
@@ -136,6 +137,7 @@ struct XMEditUi : ChemModuleWidget, IChemClient
 
     void step() override;
     void appendContextMenu(Menu *menu) override;
+    void onSelectKey(const SelectKeyEvent &e) override;
     void draw(const DrawArgs& args) override;
 };
 

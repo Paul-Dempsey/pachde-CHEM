@@ -15,6 +15,7 @@
 #include "../../widgets/tip-label-widget.hpp"
 #include "../XM-shared/macro-usage.hpp"
 #include "../XM-shared/xm-overlay.hpp"
+#include "../XM-shared/xm-edit-common.hpp"
 #include "v-text.hpp"
 
 using namespace pachde;
@@ -46,8 +47,9 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     PackedColor fg_color{0xffe6e6e6};
 
     std::vector<IOverlayClient*> clients;
-    std::vector<MacroUsage> macros;
-    MacroUsageBuilder mac_build{macros};
+    MacroData macros;
+    std::vector<MacroUsage> macro_usage;
+    MacroUsageBuilder mac_build{macro_usage};
 
     OverlayModule();
     ~OverlayModule() {
@@ -65,16 +67,22 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     void reset();
     void on_macro_request_complete();
+    void prune_missing_clients();
 
     // IOverlay
+    IChemHost* get_host() override { return chem_host; }
     void overlay_register_client(IOverlayClient* client) override;
     void overlay_unregister_client(IOverlayClient* client) override;
     std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
     std::shared_ptr<PresetInfo> overlay_configured_preset() override { return overlay_preset; }
     void overlay_request_macros() override;
     MacroReadyState overlay_macros_ready() override;
-    std::vector<MacroUsage>& overlay_macro_usage() override { return macros; }
-
+    std::vector<MacroUsage>& overlay_macro_usage() override { return macro_usage; }
+    std::shared_ptr<MacroDescription> overlay_get_macro(int64_t module, ssize_t knob) override { return macros.get_macro(module, knob); }
+    void overlay_remove_macro(int64_t module, ssize_t knob) override;
+    void overlay_add_macro(std::shared_ptr<MacroDescription> macro) override;
+    void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) override;
+    
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;
 
