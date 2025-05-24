@@ -2,35 +2,39 @@
 
 namespace pachde {
 
-ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
-    key(key),
-    dx(dx)
+static PackedColor parse(const char * color_spec)
 {
     switch (*color_spec) {
-        case '#': fill_color = parseHexColor(color_spec); break;
-        case 'r': fill_color = parseRgbColor(color_spec); break;
-        case 'h': fill_color = parseHslaColor(color_spec); break;
-        default: fill_color = 0; break;
+        case '#': return parseHexColor(color_spec);
+        case 'r': return parseRgbColor(color_spec);
+        case 'h': return parseHslaColor(color_spec);
+        default: return 0;
     }
 }
 
-ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *stroke_spec, float dx) :
+ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
     key(key),
+    fill_color(parse(color_spec)),
+    stroke_color(0),
     dx(dx)
 {
-    switch (*color_spec) {
-    case '#': fill_color = parseHexColor(color_spec); break;
-    case 'r': fill_color = parseRgbColor(color_spec); break;
-    case 'h': fill_color = parseHslaColor(color_spec); break;
-    default: fill_color = 0; break;
-    }
+}
 
-    switch (*stroke_spec) {
-    case '#': stroke_color = parseHexColor(stroke_spec); break;
-    case 'r': stroke_color = parseRgbColor(stroke_spec); break;
-    case 'h': stroke_color = parseHslaColor(stroke_spec); break;
-    default: stroke_color = 0; break;
-    }
+ElementStyle::ElementStyle(const char *key, PackedColor co, const char *stroke_spec, float dx) :
+    key(key),
+    fill_color(co),
+    stroke_color(parse(stroke_spec)),
+    dx(dx)
+{
+}
+
+
+ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *stroke_spec, float dx) : 
+    key(key),
+    fill_color(parse(color_spec)),
+    stroke_color(parse(stroke_spec)),
+    dx(dx)
+{
 }
 
 void ElementStyle::apply_theme(std::shared_ptr<SvgTheme> theme)

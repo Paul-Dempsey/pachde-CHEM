@@ -34,7 +34,26 @@ struct TextInput : TextField, IApplyTheme
     void draw(const DrawArgs& args) override;
 };
 
+// todo: support multiline=true in TextInput
+struct MultiTextInput : TextField
+{
 
+    std::function<void(std::string)> change_handler{nullptr};
+    std::function<void(std::string)> enter_handler{nullptr};
+
+    MultiTextInput() { multiline = true; }
+
+    void onChange(const ChangeEvent& e) override {
+        if (change_handler) change_handler(text);
+    }
+    void onAction(const ActionEvent& e) override {
+        if (enter_handler) enter_handler(text);
+    }
+
+    void set_on_change(std::function<void(std::string)> handler) { change_handler = handler; }
+    void set_on_enter(std::function<void(std::string)> handler) { enter_handler = handler; }
+
+};
 
 struct TextInputMenu : TextInput
 {
@@ -117,5 +136,7 @@ Tin* createTextInput(
     if (placeholder) t->placeholder = placeholder;
     return t;
 }
+
+
 
 }

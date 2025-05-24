@@ -99,12 +99,15 @@ inline void json_read_float(json_t* root, const char * name, float& var){
 
 class WallTimer
 {
-    double start_time;
-    double interval;
+    double start_time{0.0};
+    double interval{0.0};
 
 public:
-    WallTimer() : interval(0.0) { }
+    WallTimer() {}
     WallTimer(double timeout) : interval(timeout) { }
+
+    void stop() { start_time = 0.0; }
+    bool stopped() { return start_time <= 0; }
 
     void set_interval(double interval) { 
         assert(interval > 0.0);

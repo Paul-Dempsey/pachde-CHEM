@@ -15,12 +15,16 @@ struct TButton : SvgButton, IApplyTheme
 
     bool key_ctrl;
     bool key_shift;
+    bool sticky;
+    bool latched;
     std::function<void(bool, bool)> handler;
     TipHolder * tip_holder;
 
     TButton() 
     :   key_ctrl(false),
         key_shift(false),
+        sticky(false),
+        latched(false),
         handler(nullptr),
         tip_holder(nullptr)
     {
@@ -46,6 +50,11 @@ struct TButton : SvgButton, IApplyTheme
     void setHandler(std::function<void(bool,bool)> callback)
     {
         handler = callback;
+    }
+
+    void set_sticky(bool is_sticky)
+    {
+        sticky = is_sticky;
     }
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
@@ -92,17 +101,17 @@ struct TButton : SvgButton, IApplyTheme
     void onDragStart(const DragStartEvent& e) override
     {
         destroyTip();
-        Base::onDragStart(e);
+        if (!sticky) Base::onDragStart(e);
     }
 
     void onDragLeave(const DragLeaveEvent& e) override {
         destroyTip();
-        Base::onDragLeave(e);
+        if (!sticky) Base::onDragLeave(e);
     }
 
     void onDragEnd(const DragEndEvent& e) override
     {
-        Base::onDragEnd(e);
+        if (!sticky) Base::onDragEnd(e);
         destroyTip();
     }
 
@@ -116,8 +125,14 @@ struct TButton : SvgButton, IApplyTheme
     void onAction(const ActionEvent& e) override
     {
         destroyTip();
+        e.consume(this) ;
         if (handler) {
             handler(key_ctrl, key_shift);
+        }
+        if (sticky) {
+            latched = !latched;
+            sw->setSvg(frames[latched ? 1 : 0]);
+			fb->setDirty();
         } else {
             Base::onAction(e);
         }
@@ -269,6 +284,10 @@ struct Palette3ButtonSvg {
     static std::string up() { return "res/widgets/palette-3.svg"; }
     static std::string down() { return "res/widgets/palette-down.svg"; }
 };
+struct ECircleSvg {
+    static std::string up() { return "res/widgets/edit-circle-up.svg"; }
+    static std::string down() { return "res/widgets/edit-circle-down.svg"; }
+};
 
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using LargeRoundButton = TButton<LargeRoundButtonSvg>;
@@ -281,6 +300,7 @@ using Palette1Button = TButton<Palette1ButtonSvg>;
 using Palette2Button = TButton<Palette2ButtonSvg>;
 using Palette3Button = TButton<Palette3ButtonSvg>;
 using ChicletButton = TButton<ChicletButtonSvg>;
+using EditButton = TButton<ECircleSvg>;
 
 using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
 using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
