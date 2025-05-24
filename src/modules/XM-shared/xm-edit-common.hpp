@@ -129,8 +129,7 @@ struct MacroData
 
     void add(std::shared_ptr<MacroDescription> macro)
     {
-        auto it = find(macro->module_id, macro->knob_id);
-        assert(it == data.cend());
+        assert(find(macro->module_id, macro->knob_id) == data.cend());
         data.push_back(macro);
     }
 

@@ -53,7 +53,7 @@ bool isPeerModule(Module* me, Module* candidate)
 {
     if (!candidate) return false;
 	if (me == candidate) return false;
-	if ((modelXM == candidate->model) ) return false;
+	if (modelXM == candidate->model) return false;
 	return isChemModule(candidate);
 }
 

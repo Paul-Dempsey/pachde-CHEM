@@ -19,7 +19,7 @@ bool HclCompiler::compile(const std::string& program)
         error_message = "Midi definition is empty.";
         return false;
     }
-
+    return true;
 }
 
 

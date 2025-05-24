@@ -117,9 +117,10 @@ void TextInput:: draw(const DrawArgs& args)
                 FillRect(vg, 1.5f, .5f, 1.f, box.size.y - 2.5f, selection_style.nvg_color());
             } else {
                 NVGglyphPosition glyphs[120];
-                int glyph_count;
-                float cx_start, cx_end;
-                glyph_count = nvgTextGlyphPositions(vg, 1.5f, 1.f, txt, nullptr, glyphs, 120);
+                float cx_start{0};
+                float cx_end{0};
+
+                int glyph_count = nvgTextGlyphPositions(vg, 1.5f, 1.f, txt, nullptr, glyphs, 120);
 
                 // { //debug
                 //     NVGglyphPosition* _pg = glyphs;
@@ -134,7 +135,6 @@ void TextInput:: draw(const DrawArgs& args)
                 for (int i = 0; i < glyph_count; ++i, ++pg) {
                     cx_start = pg->x;
                     if (pg->str == txt + cursor) {
-                    
                         break;
                     }
                     if (pg->str + 1 == txt + cursor) {

@@ -125,7 +125,7 @@ namespace me_constants {
     constexpr const float LABEL_OFFSET_DX{5.f};
     constexpr const float ROW_DY{20.f};
     constexpr const float SMALL_ROW_DY{16.f};
-    constexpr const float LABEL_DY = 1.5f;
+    //constexpr const float LABEL_DY = 1.5f;
     constexpr const float OPT_CX{50.f};
     constexpr const float MINMAX_DX{13.f};
 };

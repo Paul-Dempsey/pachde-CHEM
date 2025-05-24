@@ -9,7 +9,7 @@ using namespace pachde;
 
 // -- UI --------------------------------------
 constexpr const float PANEL_WIDTH = 125.f;
-constexpr const float CENTER = PANEL_WIDTH*.5f;
+//constexpr const float CENTER = PANEL_WIDTH*.5f;
 constexpr const float GRID_CY = 138.f;
 
 MidiPadUi::MidiPadUi(MidiPadModule *module) :
