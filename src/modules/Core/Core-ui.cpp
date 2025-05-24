@@ -401,7 +401,7 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
         case Haken::txOver:
         case Haken::rxSynErr:
         case Haken::rxBitErr:
-            em_status_label->text("MIDI receive error");
+            em_status_label->text("MIDI comms error");
             break;
         case Haken::sensComm:
         case Haken::nanErr:

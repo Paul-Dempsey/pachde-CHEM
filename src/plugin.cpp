@@ -20,6 +20,7 @@ void init(Plugin *p)
 	p->addModel(modelPreset);
 	p->addModel(modelOverlay);
 	p->addModel(modelXM);
+	p->addModel(modelMidiPad);
 	//p->addModel(modelProto);
 }
 
@@ -42,6 +43,7 @@ bool isChemModule(Module* candidate)
         || (model == modelPreset)
         || (model == modelOverlay)
 		|| (model == modelXM)
+		|| (model == modelMidiPad)
         //|| (model == modelProto)
         // add new models here
 	);

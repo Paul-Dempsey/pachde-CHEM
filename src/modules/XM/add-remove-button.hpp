@@ -26,7 +26,7 @@ struct PlusMinusButton: DrawButtonCtlBase
         set_plus(!was_plus);
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
         return Base::applyTheme(theme_engine, theme);
     };

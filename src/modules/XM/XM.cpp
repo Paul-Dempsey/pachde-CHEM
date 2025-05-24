@@ -145,17 +145,14 @@ void XMModule::on_overlay_change(IOverlay *ovr)
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
+    if (chem_host) chem_host->unregister_chem_client(this);
     overlay = ovr;
     if (overlay) {
         overlay->overlay_register_client(this);
-        if (chem_host) chem_host->unregister_chem_client(this);
         chem_host = overlay->get_host();
         if (chem_host) {
             chem_host->register_chem_client(this);
         }
-    } else {
-        if (chem_host) chem_host->unregister_chem_client(this);
-        chem_host = nullptr;
     }
 }
 

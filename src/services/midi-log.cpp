@@ -106,26 +106,27 @@ MidiLog::~MidiLog() {
 
 std::string tag_prefix(uint8_t tag) {
     switch (as_chem_id(tag)) {
-    case ChemId::Unknown:  return "Unknown";
-    case ChemId::Haken:    return "Haken";
-    case ChemId::Midi1:    return "Midi1";
-    case ChemId::Midi2:    return "Midi2";
-    case ChemId::Core:     return "Core";
-    case ChemId::Macro:    return "Macro";
-    case ChemId::Pre:      return "Pre";
-    case ChemId::Fx:       return "Fx";
-    case ChemId::Post:     return "Post";
-    case ChemId::Convo:    return "Convo";
-    case ChemId::Jack:     return "Jack";
-    case ChemId::Play:     return "Play";
-    case ChemId::Sustain:    return "Sustain";
-    case ChemId::Sostenuto:  return "Sostenuto";
-    case ChemId::Sostenuto2: return "Sostenuto2";
-    case ChemId::Settings: return "Settings";
-    case ChemId::Preset:   return "Preset";
-    case ChemId::Overlay:  return "Overlay";
-    case ChemId::XM:       return "XM";
-    case ChemId::Proto:    return "Proto";
+    case ChemId::Unknown:   return "Unknown";
+    case ChemId::Haken:     return "Haken";
+    case ChemId::Midi1:     return "Midi1";
+    case ChemId::Midi2:     return "Midi2";
+    case ChemId::Core:      return "Core";
+    case ChemId::Macro:     return "Macro";
+    case ChemId::Pre:       return "Pre";
+    case ChemId::Fx:        return "Fx";
+    case ChemId::Post:      return "Post";
+    case ChemId::Convo:     return "Convo";
+    case ChemId::Jack:      return "Jack";
+    case ChemId::Play:      return "Play";
+    case ChemId::Sustain:   return "Sustain";
+    case ChemId::Sostenuto: return "Sostenuto";
+    case ChemId::Sostenuto2:return "Sostenuto2";
+    case ChemId::Settings:  return "Settings";
+    case ChemId::Preset:    return "Preset";
+    case ChemId::Overlay:   return "Overlay";
+    case ChemId::XM:        return "XM";
+    case ChemId::MidiPad:   return "MidiPad";
+    case ChemId::Proto:     return "Proto";
     default:
         return format_string("%d", tag);
     }

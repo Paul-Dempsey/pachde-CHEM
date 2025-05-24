@@ -146,6 +146,15 @@
         "Controller",
         "Expander"
       ]
+    },
+    {
+      "slug": "chem-midi-pad",
+      "name": "CHEM Midi Pad",
+      "description": "CHEM Midi pad for Haken Eagan Matrix",
+      "tags": [
+        "Controller",
+        "Expander"
+      ]
     }
   ]
 }

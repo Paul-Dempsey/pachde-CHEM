@@ -26,6 +26,7 @@ extern Model* modelPreset;
 extern Model* modelPreset;
 extern Model* modelOverlay;
 extern Model* modelXM;
+extern Model* modelMidiPad;
 //extern Model* modelProto;
 
 // Theming
