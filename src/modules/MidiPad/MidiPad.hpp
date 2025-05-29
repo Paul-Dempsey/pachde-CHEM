@@ -26,6 +26,10 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
         NUM_OUTPUTS
     };
     enum Lights {
+        L_PAD_A1, L_PAD_A2, L_PAD_A3, L_PAD_A4,
+        L_PAD_B1, L_PAD_B2, L_PAD_B3, L_PAD_B4,
+        L_PAD_C1, L_PAD_C2, L_PAD_C3, L_PAD_C4,
+        L_PAD_D1, L_PAD_D2, L_PAD_D3, L_PAD_D4,
         L_EDITING,
         NUM_LIGHTS
     };
@@ -33,6 +37,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     std::string device_claim;
     std::shared_ptr<MidiPad> pad_defs[16]{0};
     bool editing{false};
+    int edit_pad{-1};
     WallTimer ticker;
 
     MidiPadModule();
@@ -84,6 +89,7 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     TextInput* name_field{nullptr};
     //TextInput* midi_field{nullptr};
     MultiTextInput* midi_field{nullptr};
+    TipLabel* status{nullptr};
 
     int edit_pad{-1};
 
@@ -111,7 +117,6 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-4x4.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    void sync_labels();
     void step() override;
     void appendContextMenu(Menu *menu) override;
 };

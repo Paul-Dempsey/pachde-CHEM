@@ -204,7 +204,7 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
         
     float x = 18.f;
     y = PICKER_TOP - 14.f;
-    auto w = Center(createThemedButton<SmallRoundButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(Ctrl+Click to clear)"));
+    auto w = Center(createThemedButton<SmallRoundButton>(Vec(x,y), theme_engine, theme, "Reset MIDI\n(" RACK_MOD_CTRL_NAME "+Click to clear)"));
     if (my_module) {
         w->setHandler([=](bool ctrl, bool shift) {
             if (ctrl) {

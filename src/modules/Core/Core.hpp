@@ -45,6 +45,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     MidiLog* midi_log;
 
     EaganMatrix em;
+    bool disconnected;
     bool is_busy;
     bool in_reboot;
     bool heartbeat;
@@ -82,8 +83,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void reboot();
     void send_midi_rate(HakenMidiRate rate);
     void restore_midi_rate();
-
     void update_from_em();
+    void connect_midi(bool on_off);
+    void init_osmose();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -103,16 +105,19 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return haken_device.get_claim();
     }
     const PresetDescription* host_preset() override {
+        if (disconnected) return nullptr;
         return em.preset.id.valid() ? &em.preset : nullptr;
     }
     HakenMidi* host_haken() override {
+        if (disconnected) return nullptr;
         return &haken_midi;
     }
     EaganMatrix* host_matrix() override {
+        if (disconnected) return nullptr;
         return &em;
     }
     bool host_busy() override {
-        return is_busy || in_reboot || !em.ready || em.busy();
+        return disconnected || is_busy || in_reboot || !em.ready || em.busy();
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
@@ -120,7 +125,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // IHandleEmEvents
     void onLoopDetect(uint8_t cc, uint8_t value) override;
     void onEditorReply(uint8_t reply) override;
-    //void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
+    void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetChanged() override;
     void onUserBegin() override;
     void onUserComplete() override;
@@ -146,6 +151,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_C1_CHANNEL_MAP,
         P_C2_CHANNEL_MAP,
         P_ATTENUATION,
+        P_DISCONNECT,
         NUM_PARAMS
     };
     enum Inputs {
@@ -171,6 +177,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
         L_C1_CHANNEL_MAP,
         L_C2_CHANNEL_MAP,
+        L_DISCONNECT,
         NUM_LIGHTS
     };
 

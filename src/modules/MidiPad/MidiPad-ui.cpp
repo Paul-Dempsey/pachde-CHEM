@@ -10,7 +10,7 @@ using namespace pachde;
 // -- UI --------------------------------------
 constexpr const float PANEL_WIDTH = 125.f;
 //constexpr const float CENTER = PANEL_WIDTH*.5f;
-constexpr const float GRID_CY = 138.f;
+constexpr const float GRID_CY = 135.f;
 
 MidiPadUi::MidiPadUi(MidiPadModule *module) :
     my_module(module)
@@ -27,7 +27,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     float y = 20.f;
     for (int i = 0; i < 16; ++i) {
         auto w = createWidget<PadWidget>(Vec(x,y));
-        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, [=](int id) { on_click_pad(id); });
+        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module, [=](int id) { on_click_pad(id); });
         pads[i] = w;
         addChild(w);
         if (3 == (i % 4)) {
@@ -45,7 +45,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     }
     addChild(edit_button);
 
-    addChild(createLightCentered<TinyLight<YellowLight>>(Vec(6.f, GRID_CY - 8.f), my_module, MidiPadModule::L_EDITING));
+    addChild(createLightCentered<TinyLight<YellowLight>>(Vec(22, GRID_CY - 6.5f), my_module, MidiPadModule::L_EDITING));
 
     // inputs
     const float INPUT_TOP_CY = 292.5f;
@@ -132,7 +132,7 @@ void MidiPadUi::edit_mode(bool editing)
         name_field->text_height = 12.f;
         addChild(name_field);
 
-        y += 18.f;
+        y += 16.f;
         //midi_field = createThemedTextInput(7.5, y, 105.f, 12.f, theme_engine, theme, pad->def,
         //    [=](std::string text){ on_midi_text_changed(text); },
         //    nullptr,
@@ -140,10 +140,13 @@ void MidiPadUi::edit_mode(bool editing)
         //midi_field->text_height = 10.f;
         midi_field = createWidget<MultiTextInput>(Vec(3.5, y));
         midi_field->box.size = Vec(113, 112);
-        midi_field->set_on_change( [=](std::string text){ on_midi_text_changed(text); });
+        midi_field->set_on_enter( [=](std::string text){ on_midi_text_changed(text); });
         midi_field->placeholder = "Pad Midi";
+        midi_field->setText(pad->def);
         addChild(midi_field);
 
+        y += 112;
+        addChild(status = createLabel<TipLabel>(Vec(3.5, y), PANEL_WIDTH - 7, "", theme_engine, theme, S::warning_label));
         name_field->nextField = midi_field;
         midi_field->nextField = name_field;
         name_field->prevField = midi_field;
@@ -165,6 +168,10 @@ void MidiPadUi::edit_mode(bool editing)
             midi_field->requestDelete();
             midi_field = nullptr;
         }
+        if (status) {
+            status->requestDelete();
+            status = nullptr;
+        }
     }
 }
 
@@ -172,6 +179,7 @@ void MidiPadUi::set_edit_pad(int id)
 {
     edit_pad = id;
     my_module->ensure_pad(id);
+    my_module->edit_pad = id;
     auto pad = my_module->pad_defs[id];
     if (nullptr == pads[id]->pad) {
         pads[id]->set_pad(pad);
@@ -184,6 +192,10 @@ void MidiPadUi::set_edit_pad(int id)
     }
     if (midi_field) {
         midi_field->setText(pad->def);
+    }
+    if (status) {
+        status->text("");
+        status->describe("");
     }
 }
 
@@ -207,7 +219,17 @@ void MidiPadUi::on_name_text_changed(std::string text)
 void MidiPadUi::on_midi_text_changed(std::string text)
 {
     assert(in_range(edit_pad, 0, 15));
-    get_pad(edit_pad)->def = text;
+    auto pad = get_pad(edit_pad);
+    pad->def = text;
+    if (!pad->compile()) {
+        status->text(pad->error_message);
+        status->describe(pad->error_message);
+        midi_field->cursor = pad->error_pos;
+        midi_field->selection = pad->error_pos;
+    } else {
+        status->text("ok");
+        status->describe("");
+    }
 }
 
 PackedColor MidiPadUi::get_pad_color()
@@ -224,7 +246,6 @@ void MidiPadUi::set_pad_color(PackedColor color)
 
 void MidiPadUi::setThemeName(const std::string& name, void * context)
 {
-    //applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
 }
 
@@ -245,10 +266,6 @@ bool MidiPadUi::connected() {
     return true;
 }
 
-void MidiPadUi::sync_labels()
-{
-}
-
 void MidiPadUi::step()
 {
     Base::step();
@@ -261,8 +278,6 @@ void MidiPadUi::step()
     //     tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
     //     tracks[i]->set_active(my_module->getInput(i).isConnected());
     // }
-
-    sync_labels();
 }
 
 void MidiPadUi::appendContextMenu(Menu *menu)

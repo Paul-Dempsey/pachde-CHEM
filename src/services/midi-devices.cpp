@@ -41,6 +41,14 @@ bool is_EMDevice(const std::string& name)
         && std::string::npos != text.find("osmose");
 }
 
+bool is_Osmose(const std::string& name)
+{
+    if (name.empty()) { return false; }
+    if (std::string::npos == name.find_first_of('2')) return false;
+    auto text = to_lower_case(name);
+    return std::string::npos != text.find("osmose");
+}
+
 #if defined ARCH_MAC
 std::string FilterDeviceName(const std::string &raw) { return raw; }
 #endif

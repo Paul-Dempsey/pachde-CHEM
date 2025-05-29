@@ -59,9 +59,9 @@ XMModule::~XMModule()
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
-    if (chem_host) {
-        chem_host->unregister_chem_client(this);
-    }
+    // if (chem_host) {
+    //     chem_host->unregister_chem_client(this);
+    // }
 }
 
 void XMModule::dataFromJson(json_t* root)
@@ -145,7 +145,6 @@ void XMModule::on_overlay_change(IOverlay *ovr)
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
-    if (chem_host) chem_host->unregister_chem_client(this);
     overlay = ovr;
     if (overlay) {
         overlay->overlay_register_client(this);

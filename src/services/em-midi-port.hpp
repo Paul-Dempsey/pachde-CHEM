@@ -149,11 +149,15 @@ struct Modulation
     EmControlPort& get_port(int index) {
         return ports[index];
     }
-    EmControlPort* get_port_for_input(int input_id) {
+    EmControlPort* get_param_port(int param_id) {
+        auto it = std::find_if(ports.begin(), ports.end(), [=](EmControlPort& port){ return port.param_id == param_id; });
+        return (it == ports.end()) ? nullptr : &*it;
+    }
+    EmControlPort* get_input_port(int input_id) {
         auto it = std::find_if(ports.begin(), ports.end(), [=](EmControlPort& port){ return port.input_id == input_id; });
         return (it == ports.end()) ? nullptr : &*it;
     }
-    EmControlPort* get_port_for_light(int light_id) {
+    EmControlPort* get_light_port(int light_id) {
         auto it = std::find_if(ports.begin(), ports.end(), [=](EmControlPort& port){ return port.light_id == light_id; });
         return (it == ports.end()) ? nullptr : &*it;
     }

@@ -25,6 +25,9 @@ void MidiPadModule::dataFromJson(json_t* root)
         json_array_foreach(jar, index, jp) {
             auto pad = std::make_shared<MidiPad>(jp);
             pad_defs[pad->id] = pad;
+            if (!pad->def.empty()) {
+                pad->compile();
+            }
         }
     }
 
@@ -128,6 +131,15 @@ void MidiPadModule::process(const ProcessArgs& args)
         if (!editing && !ticker.stopped()) {
             getLight(L_EDITING).setSmoothBrightness(0, 80);
             ticker.stop();
+        }
+        for (int i = 0; i < 16; ++i) {
+            if (editing) {
+                getLight(i).setBrightness(edit_pad == i ? 1.f : 0.f);
+            } else {
+                auto pad = pad_defs[i];
+                bool bright = pad && (pad->defined() || !pad->ok);
+                getLight(i).setBrightness(bright ? 1.f : 0.f);
+            }
         }
     }
 

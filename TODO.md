@@ -2,19 +2,27 @@
 
 - Overlay macros
   - add/remove
-  - Macros menu: allow adding number by editing
-- Other Overlay functions
-  - Ratio: formula pokes
-  - Ratio: SG shapes
-  - Ratio: OSC types
-- Generic SG control module
+  - implement control & dispatch
+  - Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
+
+- MidiPad
+  - red/green status light on pad. off=no midi defined, red=invalid, green=valid midi
 - Bug: rounding lights aren't quite right
 - Option to shut off looking for hardware (so that you can jump into the HE without issues).
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
-- try BloodBat's GH stuff
+- Load tab: attempt gathering only once (prevent looping).
 - color picker
   - choose text syntax
   - 100% transparent option, or transparency slider
+- try BloodBat's GH stuff
+
+## Osmose
+
+- Alternative impl for Volume knob (no attenuation on Osmose = use Post Level)
+- Prebuilt System (factory) preset list
+- Attempt a Learn function for presets, a la Build full database.
+  Otherwise, provide an editing UI.
+
 
 ## Before release
 

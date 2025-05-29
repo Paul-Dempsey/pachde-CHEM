@@ -132,7 +132,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
 {
     if (e.type == Port::OUTPUT) return;
     if (e.connecting) {
-        auto port = get_port_for_input(e.portId);
+        auto port = get_input_port(e.portId);
         if (!port) return; // unmodulated port
 
         mod_target = port->index;
@@ -141,7 +141,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
             pq->setImmediateValue(ports[mod_target].modulation());
         }
     } else {
-        auto port = get_port_for_input(e.portId);
+        auto port = get_input_port(e.portId);
         if (!port) return; // unmodulated port
 
         port->set_mod_amount(0.f);

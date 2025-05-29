@@ -37,7 +37,7 @@ struct TextInput : TextField, IApplyTheme
 // todo: support multiline=true in TextInput
 struct MultiTextInput : TextField
 {
-
+    using Base = TextField;
     std::function<void(std::string)> change_handler{nullptr};
     std::function<void(std::string)> enter_handler{nullptr};
 
@@ -45,11 +45,24 @@ struct MultiTextInput : TextField
 
     void onChange(const ChangeEvent& e) override {
         if (change_handler) change_handler(text);
+        Base::onChange(e);
     }
     void onAction(const ActionEvent& e) override {
         if (enter_handler) enter_handler(text);
+        Base::onAction(e);
     }
-
+    void onSelectKey(const SelectKeyEvent& e) override
+    {
+        if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+            if (e.isKeyCommand(GLFW_KEY_ENTER, RACK_MOD_CTRL) || e.isKeyCommand(GLFW_KEY_KP_ENTER, RACK_MOD_CTRL)) {
+				ActionEvent eAction;
+				onAction(eAction);
+                e.consume(this);
+                return;
+            }
+        }
+        Base::onSelectKey(e);
+    }
     void set_on_change(std::function<void(std::string)> handler) { change_handler = handler; }
     void set_on_enter(std::function<void(std::string)> handler) { enter_handler = handler; }
 

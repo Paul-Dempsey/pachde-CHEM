@@ -1,27 +1,11 @@
 #include "midi-pad.hpp"
 #include "../../services/misc.hpp"
 #include "../../services/colors.hpp"
+#include "hcl.hpp"
 
 namespace pachde {
 
-
-struct HclCompiler {
-    bool ok{false};
-    std::vector<PackedMidiMessage> midi;
-    std::string error_message;
-
-    bool compile(const std::string& program);
-};
-
-bool HclCompiler::compile(const std::string& program)
-{
-    if (program.empty()) {
-        error_message = "Midi definition is empty.";
-        return false;
-    }
-    return true;
-}
-
+// See ../../../doc/hcl.md
 
 static const char * default_pad_name[] = {
     "A1", "A2", "A3", "A4",
@@ -42,7 +26,17 @@ MidiPad::MidiPad(json_t *j)
 
 bool MidiPad::compile()
 {
-    return true;
+    HclCompiler hc;
+    if (hc.compile(this->def, &this->midi)) {
+        ok = true;
+        error_message = "";
+        error_pos = 0;
+        return true;
+    }
+    ok = false;
+    error_message = hc.error_message;
+    error_pos = hc.error_pos;
+    return false;
 }
 
 json_t * MidiPad::to_json()

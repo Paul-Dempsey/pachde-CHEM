@@ -11,6 +11,7 @@ using EME = IHandleEmEvents::EventMask;
 CoreModule::CoreModule() :
     modulation(this, ChemId::Core),
     midi_log(nullptr),
+    disconnected(false),
     is_busy(false),
     in_reboot(false),
     heartbeat(false),
@@ -20,6 +21,7 @@ CoreModule::CoreModule() :
     
     em_event_mask = EME::LoopDetect
         + EME::EditorReply 
+        + EME::HardwareChanged
         + EME::PresetChanged
         + EME::UserBegin
         + EME::UserComplete
@@ -37,7 +39,7 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C1_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 1 Channel map", { "off", "reflect" } );
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", "")->snapEnabled = true;
-
+    configSwitch(Params::P_DISCONNECT, 0.f, 1.f, 0.f, "MIDI Connection", { "Auto", "Disconnected" } );
     dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
@@ -47,7 +49,6 @@ CoreModule::CoreModule() :
     configLight(L_ROUND_INITIAL, "Round initial");
     configLight(L_ROUND,         "Rounding");
     configLight(L_ROUND_RELEASE, "Round on release");
-
     configLight(L_READY,         "Haken device ready");
 
     configOutput(Outputs::OUT_READY, "Ready gate");
@@ -77,14 +78,15 @@ CoreModule::CoreModule() :
     tasks.subscribeChange(this);
 
     EmccPortConfig cfg[] = {
-        EmccPortConfig::cc(P_ATTENUATION,     -1, -1, Haken::ch1, Haken::ccAtten,     true),
+        EmccPortConfig::cc(P_ATTENUATION, -1, -1, Haken::ch1, Haken::ccAtten, true),
     };
     modulation.configure(-1, 1, cfg);
     chem_host = this;
     midi_relay.register_target(this);
 }
 
-CoreModule::~CoreModule() {
+CoreModule::~CoreModule()
+{
     midi_relay.unregister_target(this);
     for (auto client : chem_clients) {
         client->onConnectHost(nullptr);
@@ -161,6 +163,7 @@ void CoreModule::reboot()
     haken_midi_out.output.channel = -1;
 
     em.reset();
+    init_osmose();
     tasks.refresh();
     in_reboot = false;
 }
@@ -187,6 +190,11 @@ void CoreModule::onLoopDetect(uint8_t cc, uint8_t value)
 void CoreModule::onEditorReply(uint8_t reply)
 {
     tasks.complete_task(HakenTask::HeartBeat);
+}
+
+void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
+{
+    init_osmose();
 }
 
 void CoreModule::onPresetChanged()
@@ -295,6 +303,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.channel = -1;
         }
         em.reset();
+        init_osmose();
         tasks.refresh();
         notify_connection_changed(ChemDevice::Haken, source->connection);
     } break;
@@ -388,7 +397,32 @@ void CoreModule::update_from_em()
 {
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
-        modulation.set_em_and_param_low(0, em->get_attenuation(), true);
+        EmControlPort& port = modulation.get_port(0);
+        if (Haken::ccPost == port.cc_id) {
+            modulation.set_em_and_param(0, em->get_post(), true);
+        } else {
+            assert(Haken::ccAtten == port.cc_id);
+            modulation.set_em_and_param_low(0, em->get_attenuation(), true);
+        }
+    }
+}
+
+void CoreModule::connect_midi(bool on_off)
+{
+
+}
+
+void CoreModule::init_osmose()
+{
+    auto hw = em.get_hardware();
+    bool osmose = hw ? (Haken::hw_o49 == hw) : is_Osmose(haken_device.get_claim());
+    EmControlPort& port = modulation.get_port(0);
+    if (osmose) {
+        port.cc_id = Haken::ccPost;
+        port.low_resolution = false;
+    } else {
+        port.cc_id = Haken::ccAtten;
+        port.low_resolution = true;
     }
 }
 
@@ -399,9 +433,18 @@ void CoreModule::do_message(PackedMidiMessage message)
 
     auto cc = midi_cc(message);
     switch (cc) {
-    case Haken::ccAtten:
-        modulation.set_em_and_param_low(0, midi_cc_value(message), true);
-        break;
+    case Haken::ccAtten: {
+        EmControlPort& port = modulation.get_port(0);
+        if (port.cc_id == cc) {
+            modulation.set_em_and_param_low(0, midi_cc_value(message), true);
+        }
+    } break;
+    case Haken::ccPost: {
+        EmControlPort& port = modulation.get_port(0);
+        if (port.cc_id == cc) {
+            modulation.set_em_and_param(0, em.get_post(), true);
+        }
+    } break;
     }
 }
 
@@ -472,13 +515,13 @@ void CoreModule::processLights(const ProcessArgs &args)
     round_leds.set_mode(em.get_round_mode());
     round_leds.set_rate(em.get_round_rate());
     round_leds.update_lights(this, Lights::L_ROUND);
-
     getLight(L_C1_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C1_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C2_MUSIC_FILTER).setBrightnessSmooth(getParam(P_C2_MUSIC_FILTER).getValue(), 45.f);
     getLight(L_C1_MUTE).setBrightnessSmooth(getParam(P_C1_MUTE).getValue(), 45.f);
     getLight(L_C2_MUTE).setBrightnessSmooth(getParam(P_C2_MUTE).getValue(), 45.f);
     getLight(L_C1_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C1_CHANNEL_MAP).getValue(), 45.f);
     getLight(L_C2_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C2_CHANNEL_MAP).getValue(), 45.f);
+    getLight(L_DISCONNECT).setBrightnessSmooth(getParam(P_DISCONNECT).getValue(), 45.f);
 }
 
 void CoreModule::process_params(const ProcessArgs &args)

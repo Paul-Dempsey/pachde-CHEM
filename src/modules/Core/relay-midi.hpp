@@ -23,10 +23,12 @@ struct RelayMidi : IDoMidi
     }
 
     void do_message(PackedMidiMessage message) override {
+        // em first, so targets can use the em's handling of complex processing like hi-res values
+        em->onMessage(message); 
+
         for (auto target: targets) {
             target->do_message(message);
         }
-        em->onMessage(message);
     }
 };
 
