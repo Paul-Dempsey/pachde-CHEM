@@ -125,6 +125,7 @@ SOURCES += src/modules/XM/XM-ui.cpp
 SOURCES += src/modules/MidiPad/MidiPad.cpp
 SOURCES += src/modules/MidiPad/MidiPad-ui.cpp
 SOURCES += src/modules/MidiPad/midi-pad.cpp
+SOURCES += src/modules/MidiPad/hcl.cpp
 
 DISTRIBUTABLES += res
 # DISTRIBUTABLES += presets
