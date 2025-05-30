@@ -14,7 +14,7 @@ on:
   pull_request:
 
 env:
-  rack-sdk-version: 2.6.0
+  rack-sdk-version: 2.6.4
   rack-plugin-toolchain-dir: /home/build/rack-plugin-toolchain
 
 defaults:
@@ -39,7 +39,7 @@ jobs:
           echo "Set plugin version from $pluginversion to $pluginversion-$gitrev"
           cat <<< `jq --arg VERSION "$pluginversion-$gitrev" '.version=$VERSION' plugin.json` > plugin.json
         # only modify plugin version if no tag was created
-        if: "! startsWith(github.ref, 'refs/tags/v')"
+        if: "!startsWith(github.ref, 'refs/tags/v')"
 
   build:
     name: ${{ matrix.platform }}

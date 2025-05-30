@@ -54,7 +54,7 @@ struct MultiTextInput : TextField
     void onSelectKey(const SelectKeyEvent& e) override
     {
         if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-            if (e.KeyBaseEvent::isKeyCommand(GLFW_KEY_ENTER, RACK_MOD_CTRL) || e.KeyBaseEvent::isKeyCommand(GLFW_KEY_KP_ENTER, RACK_MOD_CTRL)) {
+            if (e.isKeyCommand(GLFW_KEY_ENTER, RACK_MOD_CTRL) || e.isKeyCommand(GLFW_KEY_KP_ENTER, RACK_MOD_CTRL)) {
 				ActionEvent eAction;
 				onAction(eAction);
                 e.consume(this);
