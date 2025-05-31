@@ -104,6 +104,7 @@
             "out-ring":   { "stroke": { "color":"#e57f19", "width":0.75 }},
             "p-link": {"stroke": {"color":"#2d6886", "width":0.25 }},
             "pachde": {"fill": "brand"},
+            "pad-label": {"fill": "#fefefe"},
             "palette-down": { "fill": "none", "stroke": {"color": "#808080", "width":0.25} },
             "palette-1": { "fill": "none", "stroke": {"color": "#4072bf", "width":0.25} },
             "palette-2": { "fill": "none", "stroke": {"color": "#bf6a40", "width":0.25} },

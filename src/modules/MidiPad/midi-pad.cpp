@@ -14,7 +14,7 @@ static const char * default_pad_name[] = {
     "D1", "D2", "D3", "D4"
 };
 
-MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c)
+MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c), text_color(0xff000000)
 {
     name = default_pad_name[id];
 }
@@ -46,6 +46,7 @@ json_t * MidiPad::to_json()
     json_object_set_new(root, "name", json_string(name.c_str()));
     json_object_set_new(root, "midi", json_string(def.c_str()));
     json_object_set_new(root, "color", json_string(hex_string(color).c_str()));
+    json_object_set_new(root, "text-color", json_string(hex_string(text_color).c_str()));
     return root;
 }
 
@@ -57,6 +58,10 @@ void MidiPad::from_json(json_t* root)
     color = parse_color(get_json_string(root, "color"), RARE_COLOR);
     if (color == RARE_COLOR) {
         color = 0xff8c8c8c;
+    }
+    text_color = parse_color(get_json_string(root, "text-color"), RARE_COLOR);
+    if (text_color == RARE_COLOR) {
+        text_color = 0xff000000;
     }
 
     //compile();

@@ -35,7 +35,9 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     };
 
     std::string device_claim;
-    std::shared_ptr<MidiPad> pad_defs[16]{0};
+    std::shared_ptr<MidiPad> pad_defs[16]{nullptr};
+    rack::dsp::SchmittTrigger trig[16];
+
     bool editing{false};
     int edit_pad{-1};
     WallTimer ticker;
@@ -50,6 +52,8 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     MidiPadUi* ui() { return reinterpret_cast<MidiPadUi*>(chem_ui); };
     PackedColor get_pad_color(int id);
     void set_pad_color(int pad, PackedColor color);
+    PackedColor get_pad_text_color(int id);
+    void set_pad_text_color(int pad, PackedColor color);
     std::shared_ptr<MidiPad> first_pad();
     void ensure_pad(int id);
 
@@ -83,9 +87,10 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-    PadWidget* pads[16]{nullptr};
+    PadWidget* pad_ui[16]{nullptr};
     EditButton* edit_button{nullptr};
-    Palette1Button* palette{nullptr};
+    Palette1Button* name_palette{nullptr};
+    Palette2Button* pad_palette{nullptr};
     TextInput* name_field{nullptr};
     //TextInput* midi_field{nullptr};
     MultiTextInput* midi_field{nullptr};
@@ -105,6 +110,8 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
 
     PackedColor get_pad_color();
     void set_pad_color(PackedColor color);
+    PackedColor get_pad_text_color();
+    void set_pad_text_color(PackedColor color);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

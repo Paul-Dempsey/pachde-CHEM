@@ -70,6 +70,7 @@
             "options-title": { "fill": " #f9eb6a" },
             "p-link": {"stroke": "#2d6886" },
             "pachde": {"fill": "brand"},
+            "pad-label": {"fill": "#000000"},
             "panel-border": { "stroke": {"color":"brand", "width": 0.5 }},
             "panel" : { "fill": "hsl(200, 35.80%, 22%)" },
             "patty-hover": { "stroke": "brand" },

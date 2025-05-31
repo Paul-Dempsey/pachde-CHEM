@@ -5,19 +5,21 @@ using namespace ::rack;
 #include "../../services/color-help.hpp"
 #include "../../services/colors.hpp"
 #include "../../widgets/element-style.hpp"
+#include "../../widgets/label-widget.hpp"
 #include "../../widgets/TipWidget.hpp"
 using namespace ::svg_theme;
 
 namespace pachde {
 
-const PackedColor DEFAULT_PAD_COLOR = 0xd08c8c8c;
-const PackedColor DEFAULT_LIVE_PAD_COLOR = 0xff8c8c8c;
+const PackedColor DEFAULT_PAD_COLOR = 0xff8c8c8c;
+const PackedColor DEFAULT_PAD_TEXT_COLOR = 0xff000000;
 
 struct MidiPad
 {
     int id;
     bool ok{true};
     PackedColor color;
+    PackedColor text_color;
     std::string name;    
     std::string def;
     std::vector<PackedMidiMessage> midi;
@@ -43,6 +45,7 @@ struct PadWidget : TipWidget, IApplyTheme
     std::shared_ptr<MidiPad> pad{nullptr};
     std::function<void(int)> on_click{nullptr};
     TinyLight<WhiteLight>* light;
+    TextLabel* label;
 
     bool wire{false};
     ElementStyle pad_style{"pad", DEFAULT_PAD_COLOR, DEFAULT_PAD_COLOR, .35f};
@@ -53,22 +56,58 @@ struct PadWidget : TipWidget, IApplyTheme
         box.size = Vec(24.f, 24.f);
     }
 
+    std::string extract_description()
+    {
+        if (!pad || pad->def.empty()) return "";
+        const char * p = pad->def.c_str();
+        while (std::isspace(*p)) ++p;
+        if (*p == '"') {
+            ++p;
+            const char * start = p;
+            while (*p && *p != '"') {
+                ++p;
+            }
+            return std::string(start, p);
+        }
+        return "";
+    }
+
     void init(
         int identifier, 
         std::shared_ptr<MidiPad> the_pad,
         Module* module,
+        SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
         std::function<void(int)> callback)
     {
         id = identifier;
-        set_pad(the_pad);
         on_click = callback;
         addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
+        addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", engine, theme, LabelStyle{"", TextAlignment::Center, 12.f}));
+        applyTheme(engine, theme);
+        set_pad(the_pad);
     }
 
-    void set_pad(std::shared_ptr<MidiPad> the_pad) {
+    void set_pad(std::shared_ptr<MidiPad> the_pad)
+    {
         pad = the_pad;
-        describe(pad ? pad->name : "");
         assert(!pad || id == pad->id);
+        on_pad_change(true, true);
+    }
+
+    void on_pad_change(bool name, bool description)
+    {
+        if (pad) {
+            label->color(fromPacked(pad->text_color));
+            if (name) label->text(pad->name);
+            if (description) {
+                auto desc = extract_description();
+                describe(desc.empty() ? pad->name : pad->name + ": " + desc);
+            }
+        } else {
+            label->color(fromPacked(OPAQUE_BLACK));
+            label->text("");
+            describe("\u2004");
+        }
     }
 
     void onButton(const ButtonEvent& e) override
@@ -81,7 +120,7 @@ struct PadWidget : TipWidget, IApplyTheme
         Base::onButton(e);
     }
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
         wire = (0 == theme->name.compare("Wire"));
         pad_style.apply_theme(theme);
@@ -93,11 +132,7 @@ struct PadWidget : TipWidget, IApplyTheme
     {
         Base::step();
         
-        if (pad && (pad->color == DEFAULT_PAD_COLOR) && pad->defined()) {
-            pad->color = DEFAULT_LIVE_PAD_COLOR;
-        }
-
-        NVGcolor co{0};
+        NVGcolor co(fromPacked(0));
         if (selected) {
             co = SCHEME_YELLOW;
         } else if (pad) {
@@ -108,19 +143,28 @@ struct PadWidget : TipWidget, IApplyTheme
 
     void draw(const DrawArgs& args) override
     {
-        Base::draw(args);
-
         auto vg = args.vg;
         nvgBeginPath(vg);
-        nvgRoundedRect(vg, 0, 0, 24, 24, 1.5);
         if (wire && (pad_style.width() > .01f)) {
+            nvgRoundedRect(vg, 0, 0, 24, 24, 1.5);
             nvgStrokeColor(vg, fromPacked(pad ? pad->color : pad_style.stroke_color));
             nvgStrokeWidth(vg, pad_style.width());
             nvgStroke(vg);
          } else {
-            nvgFillColor(vg, fromPacked(pad ? pad->color : pad_style.fill_color));
-            nvgFill(vg);
+            auto co = fromPacked(pad ? pad->color : pad_style.fill_color);
+            if (pad && !pad->midi.empty()) {
+                nvgRoundedRect(vg, 0, 0, 24, 24, 1.5);
+                nvgFillColor(vg, co);
+                nvgFill(vg);
+            } else {
+                nvgRoundedRect(vg, 1, 1, 23, 23, 1.5);
+                nvgStrokeColor(vg, co);
+                nvgStrokeWidth(vg, .5f);
+                nvgStroke(vg);
+            }
         }
+
+        Base::draw(args);
 
         if (selected) {
             nvgBeginPath(vg);

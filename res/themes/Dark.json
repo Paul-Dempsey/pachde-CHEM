@@ -77,6 +77,7 @@
             "options-title": { "fill": " #f9eb6a" },
             "p-link": {"stroke": "#2d6886" },
             "pachde": {"fill": "brand"},
+            "pad-label": {"fill": "#000000"},
             "palette-down": { "fill": "#808080", "stroke": {"color": "#80808000", "width":0.25} },
             "palette-1": { "fill": "#4072bf", "stroke": {"color": "#4072bf00", "width":0.25} },
             "palette-2": { "fill": "#bf6a40", "stroke": {"color": "#bf6a4000", "width":0.25} },

@@ -27,8 +27,10 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     float y = 20.f;
     for (int i = 0; i < 16; ++i) {
         auto w = createWidget<PadWidget>(Vec(x,y));
-        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module, [=](int id) { on_click_pad(id); });
-        pads[i] = w;
+        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module, 
+            theme_engine, theme,
+            [=](int id) { on_click_pad(id); });
+        pad_ui[i] = w;
         addChild(w);
         if (3 == (i % 4)) {
             x = 15.f;
@@ -67,12 +69,6 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     }
 
     // footer
-
-    // addChild(warn = createLabel<TipLabel>(
-    //     Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
-    // warn->describe("[warning/status]");
-    // warn->glowing(true);
-
     addChild(haken_device_label = createLabel<TipLabel>(
         Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
 
@@ -111,8 +107,20 @@ void MidiPadUi::edit_mode(bool editing)
 
         float y = GRID_CY;
         auto theme = theme_engine.getTheme(getThemeName());
-        palette = Center(createThemedButton<Palette1Button>(Vec(110.5,y), theme_engine, theme, "Text color"));
-        palette->setHandler([=](bool,bool) {
+        name_palette = Center(createThemedButton<Palette1Button>(Vec(96.5,y), theme_engine, theme, "Text color"));
+        name_palette->setHandler([=](bool,bool) {
+            ui::Menu* menu = createMenu();
+            auto picker = new ColorPickerMenu();
+            picker->set_color(get_pad_text_color());
+            picker->set_on_new_color([=](PackedColor color) {
+                set_pad_text_color(color);
+            });
+            menu->addChild(picker);
+        });
+        addChild(name_palette);
+
+        pad_palette = Center(createThemedButton<Palette2Button>(Vec(110.5,y), theme_engine, theme, "Pad color"));
+        pad_palette->setHandler([=](bool,bool) {
             ui::Menu* menu = createMenu();
             auto picker = new ColorPickerMenu();
             picker->set_color(get_pad_color());
@@ -121,11 +129,11 @@ void MidiPadUi::edit_mode(bool editing)
             });
             menu->addChild(picker);
         });
-        addChild(palette);
+        addChild(pad_palette);
 
         y -= 6.f;
         auto pad = get_pad(edit_pad);
-        name_field = createThemedTextInput(25, y, 76.f, 14.f, theme_engine, theme, pad->name, 
+        name_field = createThemedTextInput(30.f, y, 55.f, 14.f, theme_engine, theme, pad->name, 
             [=](std::string text){ on_name_text_changed(text); },
             nullptr,
             "Pad name");
@@ -153,12 +161,24 @@ void MidiPadUi::edit_mode(bool editing)
         midi_field->prevField = name_field;
 
     } else {
-        for (int i = 0; i < 16; ++i) {
-            pads[i]->selected = false;
+        if (midi_field) {
+            on_midi_text_changed(midi_field->getText());
         }
-        if (palette) {
-            palette->requestDelete();
-            palette = nullptr;
+        auto pad = get_pad(edit_pad);
+        if (pad && !pad->def.empty()) {
+            pad->compile();
+        }
+
+        for (int i = 0; i < 16; ++i) {
+            pad_ui[i]->selected = false;
+        }
+        if (name_palette) {
+            name_palette->requestDelete();
+            name_palette = nullptr;
+        }
+        if (pad_palette) {
+            pad_palette->requestDelete();
+            pad_palette = nullptr;
         }
         if (name_field) {
             name_field->requestDelete();
@@ -177,15 +197,23 @@ void MidiPadUi::edit_mode(bool editing)
 
 void MidiPadUi::set_edit_pad(int id)
 {
+    assert(in_range(id, 0, 15));
+    if (-1 != edit_pad) {
+        on_midi_text_changed(midi_field->getText());
+        auto pad = get_pad(edit_pad);
+        if (pad && !pad->def.empty()) {
+            pad->compile();
+        }
+    }
     edit_pad = id;
-    my_module->ensure_pad(id);
     my_module->edit_pad = id;
-    auto pad = my_module->pad_defs[id];
-    if (nullptr == pads[id]->pad) {
-        pads[id]->set_pad(pad);
+    my_module->ensure_pad(id);
+    auto pad = get_pad(id);
+    if (nullptr == pad_ui[id]->pad) {
+        pad_ui[id]->set_pad(pad);
     }
     for (int i = 0; i < 16; ++i) {
-        pads[i]->selected = (i == edit_pad);
+        pad_ui[i]->selected = (i == edit_pad);
     }
     if (name_field) {
         name_field->setText(pad->name);
@@ -204,8 +232,21 @@ void MidiPadUi::on_click_pad(int id)
     if (!my_module) return;
     if (my_module->editing) {
         set_edit_pad(id);
-    } else {
-        // send midi       
+        return;
+    }
+
+    auto pad = get_pad(id);
+    if (pad 
+        && !pad->midi.empty()
+        && chem_host
+        && !chem_host->host_busy()
+    ) {
+        auto haken = chem_host->host_haken();
+        if (haken) {
+            for (auto m: pad->midi) {
+                haken->send_message(m);
+            }
+        }
     }
 }
 
@@ -213,7 +254,7 @@ void MidiPadUi::on_name_text_changed(std::string text)
 {
     assert(in_range(edit_pad, 0, 15));
     get_pad(edit_pad)->name = text;
-    pads[edit_pad]->describe(text);
+    pad_ui[edit_pad]->on_pad_change(true, false);
 }
 
 void MidiPadUi::on_midi_text_changed(std::string text)
@@ -230,6 +271,7 @@ void MidiPadUi::on_midi_text_changed(std::string text)
         status->text("ok");
         status->describe("");
     }
+    pad_ui[edit_pad]->on_pad_change(false, true);
 }
 
 PackedColor MidiPadUi::get_pad_color()
@@ -242,6 +284,20 @@ void MidiPadUi::set_pad_color(PackedColor color)
 {
     if (-1 == edit_pad) return;
     my_module->set_pad_color(edit_pad, color);
+    // not needed: color used at draw time // pads[edit_pad]->on_pad_change(false, false);
+}
+
+PackedColor MidiPadUi::get_pad_text_color()
+{
+    if (-1 == edit_pad) return DEFAULT_PAD_TEXT_COLOR;
+    return my_module ? my_module->get_pad_text_color(edit_pad) : DEFAULT_PAD_TEXT_COLOR;
+}
+
+void MidiPadUi::set_pad_text_color(PackedColor color)
+{
+    if (-1 == edit_pad) return;
+    my_module->set_pad_text_color(edit_pad, color);
+    pad_ui[edit_pad]->on_pad_change(false, false);
 }
 
 void MidiPadUi::setThemeName(const std::string& name, void * context)

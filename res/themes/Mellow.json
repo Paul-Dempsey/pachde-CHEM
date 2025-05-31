@@ -73,6 +73,7 @@
             "options-title": { "fill": " hsl(100, 80%, 85%)" },
             "p-link": {"stroke": "hsl(90, 40%, 50%)" },
             "pachde": {"fill": "brand"},
+            "pad-label": {"fill": "#000000"},
             "panel-border": { "stroke": {"color": "#e9e862", "width": 0.5 }},
             "panel" : { "fill": "#8a7342" },
             "patty-hover": { "stroke": "#63c663" },

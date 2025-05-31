@@ -89,15 +89,15 @@ uint32_t reserved[] = {
 
 bool is_reserved(uint32_t op)
 {
-    #ifndef NDEBUG
-    uint32_t last = 0;
-    for (auto p = &reserved[0]; *p; ++p) {
-        if (last) {
-            assert(last < *p);
-        }
-        last = *p;
-    }
-    #endif
+    // #ifndef NDEBUG
+    // uint32_t last = 0;
+    // for (auto p = &reserved[0]; *p; ++p) {
+    //     if (last) {
+    //         assert(last < *p);
+    //     }
+    //     last = *p;
+    // }
+    // #endif
     if (op) {
         for (auto p = &reserved[0]; *p; ++p) {
             if (op < *p) return false;
@@ -238,11 +238,11 @@ const char * HclCompiler::scan_var_number(const char *scan, NumberSize size)
         } else {
             auto it = variables.find(var);
             if (it == variables.end()) {
-                error(format_string("Undefined variable %s", var), scan);
+                error(format_string("Undefined variable %s", var.c_str()), scan);
             } else {
                 value = it->second;
                 if (!valid_number(value, size)) {
-                    error(format_string("Variable %s value %d out of range for %s", var, value, bitness(size)), scan);
+                    error(format_string("Variable %s value %d out of range for %s", var.c_str(), value, bitness(size)), scan);
                     value = 0;
                 }
             }

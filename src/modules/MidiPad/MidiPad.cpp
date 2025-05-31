@@ -64,6 +64,19 @@ void MidiPadModule::set_pad_color(int id, PackedColor color)
     auto pad = pad_defs[id];
     if (pad) pad->color = color;
 }
+PackedColor MidiPadModule::get_pad_text_color(int id)
+{
+    assert(in_range(id, 0, 15));
+    auto pad = pad_defs[id];
+    return pad ? pad->text_color: DEFAULT_PAD_TEXT_COLOR;
+}
+
+void MidiPadModule::set_pad_text_color(int id, PackedColor color)
+{
+    assert(in_range(id, 0, 15));
+    auto pad = pad_defs[id];
+    if (pad) pad->text_color = color;
+}
 
 std::shared_ptr<MidiPad> MidiPadModule::first_pad()
 {
@@ -75,6 +88,7 @@ std::shared_ptr<MidiPad> MidiPadModule::first_pad()
 
 void MidiPadModule::ensure_pad(int id)
 {
+    assert(in_range(id, 0, 15));
     if (!pad_defs[id]) {
         pad_defs[id] = std::make_shared<MidiPad>(id);
     }
@@ -145,6 +159,23 @@ void MidiPadModule::process(const ProcessArgs& args)
 
     if (!editing) {
         // process inputs
+        auto haken = chem_host->host_haken();
+        if (haken) {
+            for (int i = 0; i < 16; ++i) {
+                auto pad = pad_defs[i];
+                if (pad && pad->defined()) {
+                    auto input = getInput(i);
+                    if (input.isConnected()) {
+                        if (trig[i].process(input.getVoltage(), .1f, .5f)) {
+                            trig[i].reset();
+                            for (auto m: pad->midi) {
+                                haken->send_message(m);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
