@@ -5,10 +5,14 @@ using namespace ::rack;
 #include "../services/svgtheme.hpp"
 using namespace svg_theme;
 
-struct PanelBackgroundWidget : OpaqueWidget, IApplyTheme
+struct PanelBackgroundWidget : Widget, IApplyTheme
 {
+    bool track_parent_size{false};
+
     PackedColor g_0{0xff282828};
     PackedColor g_1{0xff181818};
+
+    void track() { track_parent_size = true; }
 
     void expand_to_parent() {
         auto p = getParent();
@@ -16,6 +20,11 @@ struct PanelBackgroundWidget : OpaqueWidget, IApplyTheme
             box.size = p->box.size;
         }
     }
+
+    void onButton(const ButtonEvent& e) override {
+        e.unconsume();
+    }
+
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
         auto style = theme->getStyle("g-panel");
@@ -36,15 +45,25 @@ struct PanelBackgroundWidget : OpaqueWidget, IApplyTheme
         return true;
     }
 
+    void step() override
+    {
+        if (track_parent_size) {
+            expand_to_parent();
+        }
+    }
+
     void draw(const DrawArgs& args) override
     {
         auto vg = args.vg;
 
         nvgBeginPath(vg);
         // TODO: adjust when not filling parent
-        nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, box.size.x, box.size.y, fromPacked(g_0), fromPacked(g_1)));
+        nvgFillPaint(vg, nvgLinearGradient(vg, 0, 0, 0, box.size.y, fromPacked(g_0), fromPacked(g_1)));
         nvgRect(vg, 0, 0, box.size.x, box.size.y);
         nvgFill(vg);
+
+        // Line(vg, 0, 0, box.size.x, box.size.y, SCHEME_RED, 2);
+        // Line(vg, box.size.x, 0, 0, box.size.y, SCHEME_RED, 2);
     }
 };
 

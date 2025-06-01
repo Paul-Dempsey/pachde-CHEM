@@ -13,6 +13,7 @@ namespace pachde {
 
 const PackedColor DEFAULT_PAD_COLOR = 0xff8c8c8c;
 const PackedColor DEFAULT_PAD_TEXT_COLOR = 0xff000000;
+extern const char * default_pad_name[];
 
 struct MidiPad
 {

@@ -77,6 +77,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
 // -- MidiPad UI -----------------------------------
 
 struct MidiPadMenu;
+struct PadEdit;
 
 struct MidiPadUi : ChemModuleWidget, IChemClient
 {
@@ -88,13 +89,9 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
     PadWidget* pad_ui[16]{nullptr};
+
     EditButton* edit_button{nullptr};
-    Palette1Button* name_palette{nullptr};
-    Palette2Button* pad_palette{nullptr};
-    TextInput* name_field{nullptr};
-    //TextInput* midi_field{nullptr};
-    MultiTextInput* midi_field{nullptr};
-    TipLabel* status{nullptr};
+    PadEdit* edit_ui{nullptr};
 
     int edit_pad{-1};
 
@@ -104,9 +101,11 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     void edit_mode(bool editing);
     void set_edit_pad(int id);
     void on_click_pad(int id);
-    void on_name_text_changed(std::string text);
-    void on_midi_text_changed(std::string text);
-    std::shared_ptr<MidiPad> get_pad(int id) { return my_module ? my_module->pad_defs[id] : nullptr; }
+
+    std::shared_ptr<MidiPad> get_pad(int id) {
+        assert(in_range(id, 0, 15));
+        return my_module ? my_module->pad_defs[id] : nullptr;
+    }
 
     PackedColor get_pad_color();
     void set_pad_color(PackedColor color);
