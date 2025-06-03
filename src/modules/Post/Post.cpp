@@ -10,7 +10,7 @@ PostModule::PostModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    dp4(configParam(Params::P_POST_LEVEL,   0.f, 10.f, 5.f, "Post-level"));
+    dp4(no_randomize(configParam(Params::P_POST_LEVEL, 0.f, 10.f, 5.f, "Post-level")));
     dp4(configParam(Params::P_MIX,          0.f, 10.f, 0.f, "EQ Mix"));
     dp4(configParam(Params::P_TILT,         0.f, 10.f, 5.f, "EQ Tilt"));
     dp4(configParam(Params::P_FREQUENCY,    0.f, 10.f, 5.f, "EQ Frequency"));

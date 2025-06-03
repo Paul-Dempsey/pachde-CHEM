@@ -38,7 +38,7 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C2_MUTE, 0.f, 1.f, 0.f, "MIDI 2 data", { "passed", "blocked" } );
     configSwitch(Params::P_C1_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 1 Channel map", { "off", "reflect" } );
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
-    configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", "")->snapEnabled = true;
+    snap(configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", ""));
     configSwitch(Params::P_DISCONNECT, 0.f, 1.f, 0.f, "MIDI Connection", { "Auto", "Disconnected" } );
     dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
 

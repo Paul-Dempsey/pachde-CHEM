@@ -10,7 +10,7 @@ PreModule::PreModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    dp4(configParam(Params::P_PRE_LEVEL,       0.f, 10.f, 5.f, "Pre-level"));
+    dp4(no_randomize(configParam(Params::P_PRE_LEVEL, 0.f, 10.f, 5.f, "Pre-level")));
     dp4(configParam(Params::P_MIX,             0.f, 10.f, 0.f, "Mix"));
     dp4(configParam(Params::P_THRESHOLD_DRIVE, 0.f, 10.f, 5.f, "Threshold/Drive"));
     dp4(configParam(Params::P_ATTACK,          0.f, 10.f, 5.f, "Attack/-"));

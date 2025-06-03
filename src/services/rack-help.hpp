@@ -6,14 +6,26 @@ namespace pachde
 {
 
 // set displayPrecision = 4
-inline rack::engine::ParamQuantity* dp4(rack::engine::ParamQuantity* p) {
+inline ParamQuantity* dp4(ParamQuantity* p) {
     p->displayPrecision = 4;
     return p;
 }
 
 // set displayPrecision = 2
-inline rack::engine::ParamQuantity* dp2(rack::engine::ParamQuantity* p) {
+inline ParamQuantity* dp2(ParamQuantity* p) {
     p->displayPrecision = 2;
+    return p;
+}
+
+// disable randomization
+inline ParamQuantity* no_randomize(ParamQuantity* p) {
+    p->randomizeEnabled = false;
+    return p;
+}
+
+// enable snap (integer rounding)
+inline ParamQuantity* snap(ParamQuantity* p) {
+    p->snapEnabled = true;
     return p;
 }
 

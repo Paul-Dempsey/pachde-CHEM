@@ -133,6 +133,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void onRandomize() override {}
     void onPortChange(const PortChangeEvent& e) override;
     void update_from_em();
     uint8_t get_param_routing();

@@ -196,6 +196,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
+    void onRandomize() override {}
     void process_params(const ProcessArgs &args);
     void processLights(const ProcessArgs &args);
     void process(const ProcessArgs &args) override;
