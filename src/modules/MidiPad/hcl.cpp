@@ -200,6 +200,10 @@ const char * HclCompiler::scan_opcode(const char *scan)
 const char * HclCompiler::scan_number(const char *scan, NumberSize size)
 {
     value = 0;
+    bool seven_bit = ('\'' == *scan);
+    if (seven_bit) {
+        ++scan;
+    }
     if (!std::isdigit(*scan)) {
         error("Number expected", scan);
         return scan;
@@ -214,9 +218,9 @@ const char * HclCompiler::scan_number(const char *scan, NumberSize size)
         }
         ++scan;
     }
-    ok = valid_number(number, size);
+    ok = valid_number(number, seven_bit ? NumberSize::SevenBit : size);
     if (ok) {
-        value = number;
+        value = (seven_bit && (size == NumberSize::FourteenBit)) ? (number << 7) : number;
     } else {
         error(format_string("%lld is too large for expected %s number", number, bitness(size)), scan);
     }
@@ -400,19 +404,22 @@ const char * HclCompiler::scan_cc(const char *scan)
     if (ok) {
         uint8_t cc = value;
         scan = scan_whitespace_or_comment(scan);
-        scan = scan_number(scan, NumberSize::FourteenBit);
+        scan = scan_var_number(scan, NumberSize::FourteenBit);
         if (ok) { 
             if (dest) {
+                PackedMidiMessage m;
                 // TODO: validate which cc's support 14-bit. Meanwhile the extra cc is just ignored.
                 if (value > 127) {
                     uint8_t lo = value & 0x7f;
                     uint8_t hi = value >> 7;
-                    auto m = Tag(MakeCC(channel, Haken::ccFracIM48, lo), U8(ChemId::MidiPad));
+                    m = Tag(MakeCC(channel, Haken::ccFracIM48, lo), U8(ChemId::MidiPad));
                     dest->push_back(m);
                     m = Tag(MakeCC(channel, cc, hi), U8(ChemId::MidiPad));
                     dest->push_back(m);
                 } else {
-                    auto m = Tag(MakeCC(channel, cc, value), U8(ChemId::MidiPad));
+                    m = Tag(MakeCC(channel, Haken::ccFracIM48, 0), U8(ChemId::MidiPad));
+                    dest->push_back(m);
+                    m = Tag(MakeCC(channel, cc, value), U8(ChemId::MidiPad));
                     dest->push_back(m);
                 }
             }

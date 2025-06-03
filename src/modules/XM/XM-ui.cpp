@@ -236,11 +236,7 @@ NO_MACROS:
 bool MacroEdit::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) 
 {
     auto style = theme->getStyle("ctl-label-hi");
-    if (style) {
-        hi_color = style->fillWithOpacity();
-    } else {
-        hi_color = 0xffd9d9d9;
-    }
+    hi_color = style ? style->fillWithOpacity() : 0xffd9d9d9;
     return false;
 }
 
@@ -282,10 +278,6 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     LabelStyle mini_label_style{"ctl-label", TextAlignment::Center, 10.f, true};
     LabelStyle r_label_style{"ctl-label",  TextAlignment::Right, 14.f, false};
     LabelStyle header_style{"ctl-label-hi", TextAlignment::Center, 16.f, true};
-
-    auto panel = createWidget<PanelBackgroundWidget>(Vec(0,0));
-    addChild(panel);
-    panel->expand_to_parent();
 
     TextButton* close = createWidget<TextButton>(Vec(box.size.x - 14.f, 1.5f));
     close->set_text("x");
@@ -494,7 +486,11 @@ XMUi::XMUi(XMModule *module) :
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
 
-//    float x, y;
+    {
+        auto flyout_background = createWidget<PanelBackgroundWidget>(Vec(0,0));
+        flyout_background->track();
+        addChildBottom(flyout_background);
+    }
 
     title_bar = createWidget<Swatch>(Vec(0, 0));
     title_bar->box.size = Vec(PANEL_WIDTH, 15.f);

@@ -5,11 +5,7 @@
   - implement control & dispatch
   - Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
 
-- MidiPad
-  - clear button
-  - compile button
-  - test button
-
+- Preset and Play: onRandomize select random preset
 - Bug: rounding lights aren't quite right
 - Option to shut off looking for hardware (so that you can jump into the HE without issues).
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)

@@ -27,16 +27,15 @@ MidiPad::MidiPad(json_t *j)
 bool MidiPad::compile()
 {
     HclCompiler hc;
-    if (hc.compile(this->def, &this->midi)) {
-        ok = true;
+    ok = hc.compile(this->def, &this->midi); 
+    if (ok) {
         error_message = "";
         error_pos = 0;
-        return true;
+    } else {
+        error_message = hc.error_message;
+        error_pos = hc.error_pos;
     }
-    ok = false;
-    error_message = hc.error_message;
-    error_pos = hc.error_pos;
-    return false;
+    return ok;
 }
 
 json_t * MidiPad::to_json()

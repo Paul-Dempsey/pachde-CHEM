@@ -12,7 +12,7 @@ using namespace ::svg_theme;
 namespace pachde {
 
 const PackedColor DEFAULT_PAD_COLOR = 0xff8c8c8c;
-const PackedColor DEFAULT_PAD_TEXT_COLOR = 0xff000000;
+const PackedColor DEFAULT_PAD_TEXT_COLOR = 0xffe6e6e6;
 extern const char * default_pad_name[];
 
 struct MidiPad
@@ -32,7 +32,20 @@ struct MidiPad
 
     bool compile();
     bool defined() { return ok && !midi.empty(); }
-
+    bool empty() {
+        if (-1 == id) return true;
+        if (def.empty()) {
+            return name.empty() || (0 == name.compare(default_pad_name[id]));
+        }
+        return false;
+    }
+    void clear() {
+        midi.clear();
+        def.clear();
+        error_message.clear();
+        name = id >= 0 ? default_pad_name[id]: "";
+        error_pos = 0;
+    }
     json_t * to_json();
     void from_json(json_t* root);
 };
@@ -102,12 +115,21 @@ struct PadWidget : TipWidget, IApplyTheme
             if (name) label->text(pad->name);
             if (description) {
                 auto desc = extract_description();
-                describe(desc.empty() ? pad->name : pad->name + ": " + desc);
+                desc = desc.empty() ? pad->name : pad->name + ": " + desc;
+                if (pad->ok) {
+                    if (pad->midi.empty()) {
+                        desc.append("\n(no midi defined)");
+                    }
+                } else {
+                    desc.push_back('\n');
+                    desc.append(pad->error_message);
+                }
+                describe(desc);
             }
         } else {
             label->color(fromPacked(OPAQUE_BLACK));
             label->text("");
-            describe("\u2004");
+            describe("(undefined)");
         }
     }
 
@@ -132,7 +154,7 @@ struct PadWidget : TipWidget, IApplyTheme
     void step() override
     {
         Base::step();
-        
+
         NVGcolor co(fromPacked(0));
         if (selected) {
             co = SCHEME_YELLOW;
@@ -145,19 +167,18 @@ struct PadWidget : TipWidget, IApplyTheme
     void draw(const DrawArgs& args) override
     {
         auto vg = args.vg;
-        nvgBeginPath(vg);
         if (wire && (pad_style.width() > .01f)) {
+            nvgBeginPath(vg);
             nvgRoundedRect(vg, 0, 0, 24, 24, 1.5);
             nvgStrokeColor(vg, fromPacked(pad ? pad->color : pad_style.stroke_color));
             nvgStrokeWidth(vg, pad_style.width());
             nvgStroke(vg);
          } else {
             auto co = fromPacked(pad ? pad->color : pad_style.fill_color);
-            if (pad && !pad->midi.empty()) {
-                nvgRoundedRect(vg, 0, 0, 24, 24, 1.5);
-                nvgFillColor(vg, co);
-                nvgFill(vg);
+            if (pad && !pad->empty()) {
+                RoundRect(vg, 0, 0, 24, 24, co, 1.5);
             } else {
+                nvgBeginPath(vg);
                 nvgRoundedRect(vg, 1, 1, 23, 23, 1.5);
                 nvgStrokeColor(vg, co);
                 nvgStrokeWidth(vg, .5f);

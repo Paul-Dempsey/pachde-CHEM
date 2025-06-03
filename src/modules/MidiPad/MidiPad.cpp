@@ -17,7 +17,7 @@ void MidiPadModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
     device_claim = get_json_string(root, "haken-device");
-
+    title = get_json_string(root, "title");
     auto jar = json_object_get(root, "pads");
     if (jar) {
         json_t* jp;
@@ -38,11 +38,12 @@ json_t* MidiPadModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    json_object_set_new(root, "title", json_string(title.c_str()));
 
     auto jar = json_array();
     for (int i = 0; i < 16; ++i) {
         auto pad = pad_defs[i];
-        if (pad) {
+        if (pad && !pad->empty()) {
             json_array_append_new(jar, pad->to_json());
         }
     }
@@ -94,6 +95,12 @@ void MidiPadModule::ensure_pad(int id)
     }
 }
 
+void MidiPadModule::remove_pad(int id)
+{
+    assert(in_range(id, 0, 15));
+    pad_defs[id] = nullptr;
+}
+
 // IChemClient
 ::rack::engine::Module* MidiPadModule::client_module() { return this; }
 std::string MidiPadModule::client_claim() { return device_claim; }
@@ -122,11 +129,6 @@ void MidiPadModule::process_params(const ProcessArgs& args)
 void MidiPadModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
-    if (!chem_host || chem_host->host_busy()) return;
-
-    if (((args.frame + id) % 41) == 0) {
-        process_params(args);
-    }
 
     if (editing) {
         if (ticker.stopped()) {
@@ -138,22 +140,30 @@ void MidiPadModule::process(const ProcessArgs& args)
                 getLight(L_EDITING).setSmoothBrightness(b > .8f ? 0.f : 1.f, 80);
             }
         }
-    }
-
-    if (0 == ((args.frame + id) % 47)) {
-        //modulation.update_mod_lights();
-        if (!editing && !ticker.stopped()) {
+        for (int i = 0; i < 16; ++i) {
+            getLight(i).setBrightness(edit_pad == i ? 1.f : 0.f);
+        }
+    } else {
+        if (!ticker.stopped()) {
             getLight(L_EDITING).setSmoothBrightness(0, 80);
             ticker.stop();
         }
+    }
+
+    bool lights = (0 == ((args.frame + id) % 47));
+
+    if (!chem_host || chem_host->host_busy()) return;
+
+    if (((args.frame + id) % 41) == 0) {
+        process_params(args);
+    }
+
+    if (lights && !editing) {
+        //modulation.update_mod_lights();
         for (int i = 0; i < 16; ++i) {
-            if (editing) {
-                getLight(i).setBrightness(edit_pad == i ? 1.f : 0.f);
-            } else {
-                auto pad = pad_defs[i];
-                bool bright = pad && (pad->defined() || !pad->ok);
-                getLight(i).setBrightness(bright ? 1.f : 0.f);
-            }
+            auto pad = pad_defs[i];
+            bool bright = pad && (pad->defined() || !pad->ok);
+            getLight(i).setBrightness(bright ? 1.f : 0.f);
         }
     }
 

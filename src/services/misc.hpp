@@ -29,7 +29,7 @@ std::string collapse_space(const std::string& str);
 std::string to_lower_case(const std::string& name);
 bool is_safe_file_char(char ch, bool allow_space = true);
 std::string to_file_safe(const std::string& str, bool allow_space = true);
-
+std::string ellipse_string(const std::string& source, size_t trim_point);
 int randomZeroTo(int size);
 //std::string AbbreviatedName(std::string name);
 std::string TempName(const std::string& suffix);

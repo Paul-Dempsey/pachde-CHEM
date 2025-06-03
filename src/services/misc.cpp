@@ -160,6 +160,14 @@ std::string collapse_space(const std::string &str)
     return text;
 }
 
+std::string ellipse_string(const std::string &source, size_t trim_point)
+{
+    if (source.size() <= trim_point) {
+        return source;
+    }
+    return std::string(source.c_str(), trim_point) + "\u2026";
+}
+
 bool is_safe_file_char(char ch, bool allow_space /*= true*/)
 {
     if (ch < 0) return true;

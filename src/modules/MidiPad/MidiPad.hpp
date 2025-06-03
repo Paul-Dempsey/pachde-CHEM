@@ -35,6 +35,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     };
 
     std::string device_claim;
+    std::string title;
     std::shared_ptr<MidiPad> pad_defs[16]{nullptr};
     rack::dsp::SchmittTrigger trig[16];
 
@@ -56,6 +57,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     void set_pad_text_color(int pad, PackedColor color);
     std::shared_ptr<MidiPad> first_pad();
     void ensure_pad(int id);
+    void remove_pad(int id);
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -67,9 +69,6 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-    void onPortChange(const PortChangeEvent& e) override {
-        //modulation.onPortChange(e);
-    }
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -88,8 +87,9 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
-    PadWidget* pad_ui[16]{nullptr};
 
+    TextLabel* title{nullptr};
+    PadWidget* pad_ui[16]{nullptr};
     EditButton* edit_button{nullptr};
     PadEdit* edit_ui{nullptr};
 
@@ -101,6 +101,8 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     void edit_mode(bool editing);
     void set_edit_pad(int id);
     void on_click_pad(int id);
+    void send_pad(int id);
+    void remove_pad(int id);
 
     std::shared_ptr<MidiPad> get_pad(int id) {
         assert(in_range(id, 0, 15));

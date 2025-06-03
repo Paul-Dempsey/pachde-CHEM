@@ -46,6 +46,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(box.size.x*.5f, 24.f), theme_engine, theme, "Select overlay preset"));
     if (my_module) {
         set_preset_button->setHandler([=](bool c, bool f) {
+            if (!chem_host) return;
             auto haken = chem_host->host_haken();
             if (my_module->overlay_preset) {
                 haken->select_preset(ChemId::Overlay, my_module->overlay_preset->id);
