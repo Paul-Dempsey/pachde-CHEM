@@ -489,6 +489,7 @@ XMUi::XMUi(XMModule *module) :
     {
         auto flyout_background = createWidget<PanelBackgroundWidget>(Vec(0,0));
         flyout_background->track();
+        flyout_background->applyTheme(theme_engine, theme);
         addChildBottom(flyout_background);
     }
 

@@ -14,9 +14,30 @@
     </linearGradient>
   </defs>
   <rect id="g-panel" fill="url(#panel-gradient)" x="0" y="0"  width="360" height="380" />
-  <path
-     id="g-grid"
-     fill="url(#grid-grad)"
+  <path id="w-grid" opacity="0" fill="none" stroke="#614505" stroke-width=".5" d="
+    M 8, 38 h 324 v320 h -324 z
+    M 170,38 v320
+    M 8,54 h 324
+    M 8,70 h 324
+    M 8,86 h 324
+    M 8,102 h 324
+    M 8,118 h 324
+    M 8,134 h 324
+    M 8,150 h 324
+    M 8,166 h 324
+    M 8,182 h 324
+    M 8,198 h 324
+    M 8,214 h 324
+    M 8,230 h 324
+    M 8,246 h 324
+    M 8,262 h 324
+    M 8,278 h 324
+    M 8,294 h 324
+    M 8,310 h 324
+    M 8,326 h 324
+    M 8,342 h 324
+    "/>
+  <path id="g-grid" fill="url(#grid-grad)"
      d="
   M 8,38  h 162 v 14 h -162 z
   M 8,54  h 162 v 14 h -162 z

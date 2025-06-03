@@ -13,7 +13,7 @@
    <g>
       <rect id="g-panel" fill="url(#panel-gradient)" width="210" height="380" x="0" y="0" />
       <g id="grid">
-         <path fill="url(#grid-grad)" id="g-grid" d="
+         <path fill="url(#grid-grad)" id="p-grid" d="
             M 12,34 h 150 v 18 h -150 z
             M 12,54 h 150 v 18 h -150 z
             M 12,74 h 150 v 18 h -150 z

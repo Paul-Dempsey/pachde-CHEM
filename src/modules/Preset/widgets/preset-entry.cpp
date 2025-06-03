@@ -14,7 +14,6 @@ PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers, std::shared_ptr<SvgTh
     hovered(false),
     peers(peers)
 {
-    layout_hint_color = fromPacked(parseHslaColor("hsla(60, 80%, 60%, .25%)"));
     LabelStyle grid_style{"preset"};
     addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", theme_engine, theme, grid_style));
 }
@@ -61,7 +60,6 @@ void PresetEntry::clear_preset()
 
 bool PresetEntry::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTheme> theme)
 {
-//    wire_style = theme->name == "Wire";
     preset_element.apply_theme(theme);
     live_element.apply_theme(theme);
     current_element.apply_theme(theme);
@@ -154,10 +152,6 @@ void PresetEntry::draw(const DrawArgs &args)
 
     Base::draw(args);
 
-    if (layout_hints) {
-        label->layout_hints = false;
-        BoxRect(args.vg, 0, 0, box.size.x, box.size.y, layout_hint_color, 0.35f);
-    }
     if (current) {
         nvgBeginPath(vg);
         nvgMoveTo(vg, -3.5f, box.size.y*.5f - 2.5f);

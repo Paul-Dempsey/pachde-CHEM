@@ -8,7 +8,7 @@ struct PresetUi;
 
 namespace pachde {
 
-struct PresetEntry : OpaqueWidget, IApplyTheme, ILayoutHelp
+struct PresetEntry : OpaqueWidget, IApplyTheme
 {
     using Base = OpaqueWidget;
     TipLabel* label{nullptr};
