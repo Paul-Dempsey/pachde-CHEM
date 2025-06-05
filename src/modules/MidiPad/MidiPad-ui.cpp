@@ -82,8 +82,8 @@ struct PadEdit : OpaqueWidget
         }
         ui->remove_pad(pad_id);
         ui->my_module->ensure_pad(pad_id);
+        ui->pad_ui[pad_id]->set_pad(ui->get_pad(pad_id));
         set_edit_pad(pad_id);
-        ui->pad_ui[pad_id]->on_pad_change(true, true);
     }
 
     void set_edit_pad(int id)
@@ -408,7 +408,6 @@ void MidiPadUi::edit_mode(bool editing)
         edit_ui->init(this);
         addChild(edit_ui);
         set_edit_pad(edit_id);
-
     } else {
         for (int i = 0; i < 16; ++i) {
             pad_ui[i]->selected = false;
@@ -534,6 +533,13 @@ void MidiPadUi::step()
     Base::step();
     if (!my_module) return;
     bind_host(my_module);
+
+    // When closed by clicking flyout close, the edit button is in 
+    // the wrong state (because it wasn't clicked). So we sync it up here.
+    if (edit_button->latched != my_module->editing) {
+        edit_button->latched = my_module->editing;
+        edit_button->sync_frame();
+    }
 
     //knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 

@@ -147,6 +147,13 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
     const char * prefix = pfx.c_str();
 
     switch (status) {
+        case Haken::keyOn: {
+            bytes = format_buffer(buffer, 256, "[%s] ch%0-2d Note %d %d\n", prefix, 1+channel, m.bytes.data1, m.bytes.data2);
+        } break;
+        case Haken::keyOff: {
+            bytes = format_buffer(buffer, 256, "[%s] ch%0-2d Note off %d %d\n", prefix, 1+channel, m.bytes.data1, m.bytes.data2);
+        } break;
+
         case Haken::ccStat: {
             auto cc = midi_cc(m);
             switch (channel) {

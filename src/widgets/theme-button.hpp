@@ -138,6 +138,14 @@ struct TButton : SvgButton, IApplyTheme
         }
     }
 
+    void sync_frame()
+    {
+        if (sticky){
+            sw->setSvg(frames[latched ? 1 : 0]);
+            fb->setDirty();
+        }
+    }
+
     void appendContextMenu(ui::Menu* menu) {}
 
     void createContextMenu() {

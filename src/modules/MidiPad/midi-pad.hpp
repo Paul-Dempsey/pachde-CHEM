@@ -157,7 +157,7 @@ struct PadWidget : TipWidget, IApplyTheme
 
         NVGcolor co(fromPacked(0));
         if (selected) {
-            co = SCHEME_YELLOW;
+            co = pad->ok ? SCHEME_YELLOW : SCHEME_RED;
         } else if (pad) {
             co = pad->ok ? SCHEME_GREEN : SCHEME_RED;
         }
