@@ -11,16 +11,17 @@ typedef union {
 } OC;
 
 enum Reserved: uint32_t {
-    Macro        = 0x0000006d, // "m"
-    Stream       = 0x00000073, // "s"
-    Cc           = 0x00006363, // "cc"
-    Channel      = 0x00006863, // "ch"
-    BiqSin_poke  = 0x00007062, // "bp"
-    Formula_poke = 0x00007066, // "fp"
-    Graph_poke   = 0x00007067, // "gp"
-    Kinetic_poke = 0x0000706b, // "kp"
-    Matrix_poke  = 0x0000706d, // "mp"
-    Conv_poke    = 0x00007076, // "vp"
+    Macro         = 0x0000006d, // "m"
+    Stream        = 0x00000073, // "s"
+    Cc            = 0x00006363, // "cc"
+    ProgramChange = 0x00006370, // "pc"
+    Channel       = 0x00006863, // "ch"
+    BiqSin_poke   = 0x00007062, // "bp"
+    Formula_poke  = 0x00007066, // "fp"
+    Graph_poke    = 0x00007067, // "gp"
+    Kinetic_poke  = 0x0000706b, // "kp"
+    Matrix_poke   = 0x0000706d, // "mp"
+    Conv_poke     = 0x00007076, // "vp"
 };
 
 struct Opcode {
@@ -62,6 +63,7 @@ struct HclCompiler {
     const char * scan_number(const char *scan, NumberSize size);
     const char * scan_channel(const char *scan);
     const char * scan_cc(const char *scan);
+    const char * scan_pc(const char *scan);
     const char * scan_macro(const char *scan);
     const char * scan_stream(const char *scan);
     const char * scan_graph(const char *scan);

@@ -226,6 +226,19 @@ void ChemModuleWidget::draw(const DrawArgs& args)
 #endif
 }
 
+// Hide or show screw widgets in all loaded modules.
+// void set_screws(Widget* widget, bool screwed) {
+//     for (Widget* child : widget->children) {
+//         set_screws(child, screwed);
+//     }
+
+//     auto screw = dynamic_cast<SvgScrew*>(widget);
+//     if (screw) {
+//         screw->setVisible(!screwed);
+//         screw->fb->setDirty(true);
+//     }
+// }
+
 void ChemModuleWidget::appendContextMenu(Menu *menu)
 {
     if (!module) return;
@@ -240,8 +253,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 
     menu->addChild(new MenuSeparator);
     bool screws = style::show_screws();
-    menu->addChild(createCheckMenuItem("Banish screws", "",
-        [screws](){ return !screws; },
+    menu->addChild(createMenuItem(screws ? "Banish screws" : "Allow screws", "",
         [=](){
             auto kv = get_plugin_kv_store();
             if (kv && kv->load()) {
@@ -254,6 +266,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
                 }
                 kv->update(key, KVStore::bool_text(screws));
                 kv->save();
+                //set_screws(APP->scene, screws);
             }
         }));
 

@@ -22,6 +22,7 @@ namespace pachde {
 
             channel : `ch` channel-number
        control-code : `cc` n7 cc-value
+     program-change : 'pc' n7
               macro : `m` macro-number macro-value
              stream : `s` stream-number list
         matrix-poke : `mp` pair-list
@@ -31,6 +32,82 @@ namespace pachde {
          bqsin-poke : `bp` pair-list
           conv-poke : `vp` pair-list
 */
+constexpr const uint64_t LO_14BIT_CC = 
+    (uint64_t(1) << uint64_t(Haken::ccMod)) |
+    (uint64_t(1) << uint64_t(Haken::ccBreath)) |
+    (uint64_t(1) << uint64_t(Haken::ccUndef)) |
+    (uint64_t(1) << uint64_t(Haken::ccFoot)) |
+    (uint64_t(1) << uint64_t(Haken::ccVol)) |
+    (uint64_t(1) << uint64_t(Haken::ccExpres)) |
+    (uint64_t(1) << uint64_t(Haken::ccI)) |
+    (uint64_t(1) << uint64_t(Haken::ccII)) |
+    (uint64_t(1) << uint64_t(Haken::ccIII)) |
+    (uint64_t(1) << uint64_t(Haken::ccIV)) |
+    (uint64_t(1) << uint64_t(Haken::ccV)) |
+    (uint64_t(1) << uint64_t(Haken::ccVI)) |
+    (uint64_t(1) << uint64_t(Haken::ccPost)) |
+    (uint64_t(1) << uint64_t(Haken::ccReci1)) |
+    (uint64_t(1) << uint64_t(Haken::ccReci2)) |
+    (uint64_t(1) << uint64_t(Haken::ccReci3)) |
+    (uint64_t(1) << uint64_t(Haken::ccReci4)) |
+    (uint64_t(1) << uint64_t(Haken::ccReciMix)) |
+    (uint64_t(1) << uint64_t(Haken::ccJack1)) |
+    (uint64_t(1) << uint64_t(Haken::ccJack2)) |
+    (uint64_t(1) << uint64_t(Haken::ccM7)) |
+    (uint64_t(1) << uint64_t(Haken::ccM8)) |
+    (uint64_t(1) << uint64_t(Haken::ccM9)) |
+    (uint64_t(1) << uint64_t(Haken::ccM10)) |
+    (uint64_t(1) << uint64_t(Haken::ccM11)) |
+    (uint64_t(1) << uint64_t(Haken::ccM12)) |
+    (uint64_t(1) << uint64_t(Haken::ccM13)) |
+    (uint64_t(1) << uint64_t(Haken::ccM14)) |
+    (uint64_t(1) << uint64_t(Haken::ccM15)) |
+    (uint64_t(1) << uint64_t(Haken::ccM16)) |
+    (uint64_t(1) << uint64_t(Haken::ccM17)) |
+    (uint64_t(1) << uint64_t(Haken::ccM18)) |
+    (uint64_t(1) << uint64_t(Haken::ccM19)) |
+    (uint64_t(1) << uint64_t(Haken::ccM20)) |
+    (uint64_t(1) << uint64_t(Haken::ccM21)) |
+    (uint64_t(1) << uint64_t(Haken::ccM22)) |
+    (uint64_t(1) << uint64_t(Haken::ccM23)) |
+    (uint64_t(1) << uint64_t(Haken::ccM24)) |
+    (uint64_t(1) << uint64_t(Haken::ccM25)) |
+    (uint64_t(1) << uint64_t(Haken::ccM26)) |
+    (uint64_t(1) << uint64_t(Haken::ccM27)) |
+    (uint64_t(1) << uint64_t(Haken::ccM28)) |
+    (uint64_t(1) << uint64_t(Haken::ccM29)) |
+    (uint64_t(1) << uint64_t(Haken::ccM30))
+;
+constexpr const uint64_t HI_14BIT_CC = 
+    (uint64_t(1) << (uint64_t(Haken::ccBrightness) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccReci5) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccReci6) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM31) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM32) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM33) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM34) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM35) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM36) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM37) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM38) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM39) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM40) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM41) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM42) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM43) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM44) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM45) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM46) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM47) - 64)) |
+    (uint64_t(1) << (uint64_t(Haken::ccM48) - 64))
+;
+
+// Only channels 1-15
+bool is_14bit_cc(uint8_t cc)
+{
+    if (cc < 64) return 0 != ((uint64_t(1) << cc) & LO_14BIT_CC);
+    return 0 != ((uint64_t(1) << (cc - 64)) & HI_14BIT_CC);
+}
 
 const char * scan_whitespace(const char *scan)
 {
@@ -72,11 +149,12 @@ const char * bitness(NumberSize size)
     }
 }
 
-// This must be kept in ascending order
+// Lookup depends on ascending order
 uint32_t reserved[] = {
     Reserved::Macro,
     Reserved::Stream,
     Reserved::Cc,
+    Reserved::ProgramChange,
     Reserved::Channel,
     Reserved::BiqSin_poke,
     Reserved::Formula_poke,
@@ -89,15 +167,15 @@ uint32_t reserved[] = {
 
 bool is_reserved(uint32_t op)
 {
-    // #ifndef NDEBUG
-    // uint32_t last = 0;
-    // for (auto p = &reserved[0]; *p; ++p) {
-    //     if (last) {
-    //         assert(last < *p);
-    //     }
-    //     last = *p;
-    // }
-    // #endif
+    #ifndef NDEBUG
+    uint32_t last = 0;
+    for (auto p = &reserved[0]; *p; ++p) {
+        if (last) {
+            assert(last < *p);
+        }
+        last = *p;
+    }
+    #endif
     if (op) {
         for (auto p = &reserved[0]; *p; ++p) {
             if (op < *p) return false;
@@ -387,6 +465,7 @@ const char * HclCompiler::scan_variable_def(const char *scan)
 
 const char * HclCompiler::scan_channel(const char *scan)
 {
+    scan = scan_whitespace_or_comment(scan);
     scan = scan_number(scan, NumberSize::SevenBit);
     if (ok) {
         if (in_range(int(value), 1, 16)) {
@@ -400,27 +479,49 @@ const char * HclCompiler::scan_channel(const char *scan)
 
 const char * HclCompiler::scan_cc(const char *scan)
 {
+    scan = scan_whitespace_or_comment(scan);
     scan = scan_number(scan, NumberSize::SevenBit);
     if (ok) {
         uint8_t cc = value;
         scan = scan_whitespace_or_comment(scan);
         scan = scan_var_number(scan, NumberSize::FourteenBit);
-        if (ok) { 
+        if (ok) {
+            if (channel == Haken::ch16) {
+                if (value > 127) {
+                    ok = false;
+                    error_message = format_string("Not supported: 14-bit CC %d on channel 16", cc);
+                    return scan;
+                }
+            }
             if (dest) {
                 PackedMidiMessage m;
-                // TODO: validate which cc's support 14-bit. Meanwhile the extra cc is just ignored.
-                if (value > 127) {
-                    uint8_t lo = value & 0x7f;
-                    uint8_t hi = value >> 7;
-                    m = Tag(MakeCC(channel, Haken::ccFracIM48, lo), U8(ChemId::MidiPad));
-                    dest->push_back(m);
-                    m = Tag(MakeCC(channel, cc, hi), U8(ChemId::MidiPad));
-                    dest->push_back(m);
-                } else {
-                    m = Tag(MakeCC(channel, Haken::ccFracIM48, 0), U8(ChemId::MidiPad));
-                    dest->push_back(m);
+                if (channel == Haken::ch16) {
                     m = Tag(MakeCC(channel, cc, value), U8(ChemId::MidiPad));
                     dest->push_back(m);
+                } else {
+                    if (is_14bit_cc(cc)) {
+                        if (value > 127) {
+                            uint8_t lo = value & 0x7f;
+                            uint8_t hi = value >> 7;
+                            m = Tag(MakeCC(channel, Haken::ccFracIM48, lo), U8(ChemId::MidiPad));
+                            dest->push_back(m);
+                            m = Tag(MakeCC(channel, cc, hi), U8(ChemId::MidiPad));
+                            dest->push_back(m);
+                        } else {
+                            m = Tag(MakeCC(channel, Haken::ccFracIM48, 0), U8(ChemId::MidiPad));
+                            dest->push_back(m);
+                            m = Tag(MakeCC(channel, cc, value), U8(ChemId::MidiPad));
+                            dest->push_back(m);
+                        }
+                    } else {
+                        if (value <= 127) {
+                            m = Tag(MakeCC(channel, cc, value), U8(ChemId::MidiPad));
+                            dest->push_back(m);
+                        } else {
+                            ok = false;
+                            error_message = format_string("%d out of range for 7-bit cc %d", value, cc);
+                        }
+                    }
                 }
             }
         }
@@ -428,8 +529,21 @@ const char * HclCompiler::scan_cc(const char *scan)
     return scan;
 }
 
+const char *HclCompiler::scan_pc(const char *scan)
+{
+    scan = scan_whitespace_or_comment(scan);
+    scan = scan_number(scan, NumberSize::SevenBit);
+    if (ok) {
+        uint8_t pc = value;
+        auto m = Tag(MakeProgramChange(channel, pc), U8(ChemId::MidiPad));
+        dest->push_back(m);
+    }
+    return scan;
+}
+
 const char *HclCompiler::scan_macro(const char *scan)
 {
+    scan = scan_whitespace_or_comment(scan);
     scan = scan_number(scan, NumberSize::SevenBit);
     if (ok) {
         if (!in_range(int(value), 1, 90)) {
@@ -438,7 +552,7 @@ const char *HclCompiler::scan_macro(const char *scan)
             return scan;
         }
         uint8_t macro_number = value;
-        scan = scan_whitespace(scan);
+        scan = scan_whitespace_or_comment(scan);
         scan = scan_var_number(scan, NumberSize::FourteenBit);
         if (ok) {
             uint8_t lo = value & 0x7f;
@@ -548,15 +662,16 @@ const char * HclCompiler::scan_list(const char *scan)
 const char * HclCompiler::parse_opcode(const char *scan)
 {
     switch (code.nom()) {
-    case Reserved::Channel: return scan_channel(scan);
-    case Reserved::Cc: return scan_cc(scan);
     case Reserved::Macro: return scan_macro(scan);
     case Reserved::Stream: return scan_stream(scan);
-    case Reserved::Matrix_poke: return scan_poke(scan, Haken::s_Mat_Poke);
+    case Reserved::ProgramChange: return scan_pc(scan);
+    case Reserved::Cc: return scan_cc(scan);
+    case Reserved::Channel: return scan_channel(scan);
+    case Reserved::BiqSin_poke: return scan_poke(scan, Haken::s_BiqSin_Poke);
     case Reserved::Formula_poke: return scan_poke(scan, Haken::s_Form_Poke);
     case Reserved::Graph_poke: return scan_graph(scan);
     case Reserved::Kinetic_poke: return scan_poke(scan, Haken::s_Kinet_Poke);
-    case Reserved::BiqSin_poke: return scan_poke(scan, Haken::s_BiqSin_Poke);
+    case Reserved::Matrix_poke: return scan_poke(scan, Haken::s_Mat_Poke);
     case Reserved::Conv_poke: return scan_poke(scan, Haken::s_Conv_Poke);
     default:
         error(format_string("Unknown opcode %s", code.str()), scan);
