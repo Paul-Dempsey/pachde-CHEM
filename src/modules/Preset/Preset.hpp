@@ -104,7 +104,7 @@ struct Tab {
     }
 };
 
-constexpr const double OSMOSE_SETTLE_TIME = 1.25;
+constexpr const double OSMOSE_SETTLE_TIME = 2.0;
 constexpr const double OSMOSE_PRESET_RESPONSE_TIME = 1.5;
 
 struct OsmoseBuilder

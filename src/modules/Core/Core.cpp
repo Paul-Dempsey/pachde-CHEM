@@ -30,7 +30,8 @@ CoreModule::CoreModule() :
         + EME::SystemBegin
         + EME::SystemComplete
         + EME::MahlingBegin
-        + EME::MahlingComplete;
+        + EME::MahlingComplete
+    );
 
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 

@@ -16,6 +16,7 @@
 
 ## Osmose
 
+- Live preset tracking can't use PresetId: must use name (+metadata?)
 - Preset: Implement loading Prebuilt System (factory) preset list from res/cache
 - Play:
   - Append from User block
