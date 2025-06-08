@@ -164,18 +164,57 @@ void PresetUi::onHoverScroll(const HoverScrollEvent &e)
     Base::onHoverScroll(e);
 }
 
+void PresetUi::end_osmose_scan()
+{
+    #ifndef NDEBUG
+    DEBUG("OB: Finished in %.4f", system::getUnixTime() - osmose_builder->start_time);
+    #endif
+
+    live_preset_label->text("");
+    stop_scan = false;
+    stop_button->requestDelete();
+    stop_button = nullptr;
+    save_presets(osmose_builder->tab);
+    set_tab(osmose_builder->tab, false);
+    delete osmose_builder;
+    osmose_builder = nullptr;
+    stop_spinner();
+    gather_start = false;
+    gathering = PresetTab::Unset;
+    scroll_to(0);
+}
+
 void PresetUi::step()
 {
     Base::step();
     bind_host(my_module);
     Tab& tab = active_tab();
-    if (tab.list.empty() && host_available()) {
+    if (tab.list.empty() && host_available() && (gathering == PresetTab::Unset)) {
         set_tab(active_tab_id, true);
     }
     if (filtering()) {
         filter_off_button->button_down = true;
     }
-
+    if (osmose_builder) {
+        bool done = false;
+        switch (osmose_builder->ready())
+        {
+        case OsmoseBuilder::ReadyResponse::Ready:
+        case OsmoseBuilder::ReadyResponse::Timeout:
+            if (!osmose_builder->next(chem_host->host_haken())) {
+                done = true;
+                live_preset_label->text("");
+            } else {
+                live_preset_label->text(format_string("[%d:%d]", osmose_builder->cc0, osmose_builder->pc));
+            }
+            break;
+        case OsmoseBuilder::ReadyResponse::Waiting:
+            break;
+        }
+        if (done || stop_scan) {
+            end_osmose_scan();
+        }
+    }
 }
 
 void PresetUi::draw(const DrawArgs &args)

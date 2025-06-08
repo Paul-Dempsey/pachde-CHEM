@@ -18,6 +18,7 @@ struct HakenMidi
     MidiLog* log;
     IDoMidi* doer;
     bool tick_tock;
+    bool osmose_target;
 
     HakenMidi(const HakenMidi&) = delete; // no copy constructor
     HakenMidi() : log(nullptr), doer(nullptr), tick_tock(true) {}

@@ -12,11 +12,11 @@ enum FilterId {
 
 inline bool any_filter(uint64_t* p)
 {
-    if (*p++) return true;
-    if (*p++) return true;
-    if (*p++) return true;
-    if (*p++) return true;
-    if (*p++) return true;
+    if (*p) return true;
+    if (*(++p)) return true;
+    if (*(++p)) return true;
+    if (*(++p)) return true;
+    if (*(++p)) return true;
     return false;
 }
 

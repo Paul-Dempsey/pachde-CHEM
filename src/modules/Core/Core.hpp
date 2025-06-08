@@ -26,6 +26,7 @@ struct CoreModule;
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents, IDoMidi
 {
     CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
+
     Modulation modulation;
 
     MidiDeviceHolder haken_device;
@@ -106,7 +107,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     }
     const PresetDescription* host_preset() override {
         if (disconnected) return nullptr;
-        return em.preset.id.valid() ? &em.preset : nullptr;
+        if (em.in_preset) return nullptr;
+        if (em.preset.id.valid()) return &em.preset;
+        return nullptr;
     }
     HakenMidi* host_haken() override {
         if (disconnected) return nullptr;
@@ -278,8 +281,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // IHandleEmEvents
-    void onLoopDetect(uint8_t cc, uint8_t value) override;
-    void onEditorReply(uint8_t reply) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetChanged() override;
     void onTaskMessage(uint8_t code) override;

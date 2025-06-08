@@ -22,6 +22,9 @@ bool PlayUi::connected() {
 
 PlayUi::~PlayUi()
 {
+    if (chem_host) {
+        chem_host->host_matrix()->unsubscribeEMEvents(this);
+    }
     if (modified && module && !my_module->playlist_file.empty()) {
         save_playlist();
     }
@@ -569,30 +572,12 @@ void PlayUi::check_playlist_device()
     }
 }
 
-struct EmHandler: IHandleEmEvents
-{
-    PlayUi* ui;
-    EmHandler(PlayUi* host) : ui(host) {
-        em_event_mask = EventMask::UserComplete 
-            + EventMask::SystemComplete;
-    }
-    virtual ~EmHandler() {};
-
-    void onUserComplete() override {
-        ui->on_fill_complete();
-    }
-    void onSystemComplete() override {
-        ui->on_fill_complete();
-    }
-};
-
 void PlayUi::fill(FillOptions which)
 {
     if (!chem_host) return;
     auto haken = chem_host->host_haken();
     auto matrix = chem_host->host_matrix();
-    em_handler = new EmHandler(this);
-    matrix->subscribeEMEvents(em_handler);
+    matrix->subscribeEMEvents(this);
     gather = which;
 
     startSpinner(this, Vec(box.size.x*.5f, box.size.y * .5f));
@@ -625,9 +610,7 @@ void PlayUi::on_fill_complete()
 
     gather = FillOptions::None;
     auto matrix = chem_host->host_matrix();
-    matrix->unsubscribeEMEvents(em_handler);
-    delete em_handler;
-    em_handler = nullptr;
+    matrix->unsubscribeEMEvents(this);
     sync_to_presets();
 }
 

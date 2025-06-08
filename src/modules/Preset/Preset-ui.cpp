@@ -29,15 +29,37 @@ void PresetUi::build_database(PresetTab which)
     if (!host_available()) return;
     start_spinner();
     Tab& tab = active_tab();
-    db_builder = new DBBuilder();
     PresetId dummy;
+    db_builder = new DBBuilder();
     db_builder->init(tab.list.preset_list, live_preset ? live_preset->id : dummy);
     db_builder->next(chem_host->host_haken());
+}
+
+void PresetUi::create_stop_button()
+{
+    stop_button = createWidget<TextButton>(Vec(170.f, 236.f));
+    stop_button->box.size.x = 50.f;
+    stop_button->set_text("stop scan");
+    stop_button->setHandler([=](bool, bool){ stop_scan = true; });
+    addChild(Center(stop_button));
+}
+
+void PresetUi::request_osmose_user_presets(uint8_t block)
+{
+    auto haken = chem_host->host_haken();
+    start_spinner();
+    gather_start = true;
+    stop_scan = false;
+    create_stop_button();
+    osmose_builder = new OsmoseBuilder();
+    osmose_builder->init(haken, PresetTab::User, block, block);
 }
 
 void PresetUi::request_presets(PresetTab which)
 {
     if (!host_available()) return;
+    bool osmose = is_osmose();
+    auto haken = chem_host->host_haken();
 
     switch (which) {
     case PresetTab::Unset:
@@ -47,13 +69,26 @@ void PresetUi::request_presets(PresetTab which)
     case PresetTab::User:
         user_tab.clear();
         gathering = PresetTab::User;
-        chem_host->host_haken()->request_user(ChemId::Preset);
+        if (osmose) {
+            request_osmose_user_presets(90);
+        } else {
+            haken->request_user(ChemId::Preset);
+        }
         break;
 
     case PresetTab::System:
         system_tab.clear();
         gathering = PresetTab::System;
-        chem_host->host_haken()->request_system(ChemId::Preset);
+        if (osmose) {
+            start_spinner();
+            gather_start = true;
+            stop_scan = false;
+            create_stop_button();
+            osmose_builder = new OsmoseBuilder();
+            osmose_builder->init_system(haken);
+        } else {
+            haken->request_system(ChemId::Preset);
+        }
         break;
     }
 }
@@ -72,7 +107,11 @@ bool PresetUi::load_presets(PresetTab which)
     assert(PresetTab::Unset != which);
     if (!host_available()) return false;
 
-    if ((PresetTab::User == which) && !my_module->use_cached_user_presets) return false;
+    if ((PresetTab::User == which)
+        && !is_osmose()
+        && !my_module->use_cached_user_presets) {
+        return false;
+    }
 
     auto em = chem_host->host_matrix();
     if (!em || (0 == em->firmware_version) || (0 == em->hardware)) return false;
@@ -100,7 +139,7 @@ bool PresetUi::load_presets(PresetTab which)
 
 bool PresetUi::save_presets(PresetTab which)
 {
-    if (!host_available()) return false;
+    if (!chem_host || !my_module || my_module->device_claim.empty()) return false;
 
     Tab& tab = get_tab(which);
     if (0 == tab.count()) return false;
@@ -125,6 +164,16 @@ bool PresetUi::save_presets(PresetTab which)
     auto e = json_dumpf(root, file, JSON_INDENT(2));
 	std::fclose(file);
     return e >= 0;
+}
+
+void PresetUi::forget_presets(PresetTab which)
+{
+    Tab& tab = get_tab(which);
+    tab.clear();
+    auto path = preset_file(which);
+    if (system::exists(path)) {
+        system::remove(path);
+    }
 }
 
 void PresetUi::sort_presets(PresetOrder order)
@@ -253,12 +302,43 @@ void PresetUi::onPresetChange()
         }
         return;
     }
+
+    if (osmose_builder) {
+        assert(gathering != PresetTab::Unset);
+        if (OsmoseBuilder::State::Preset != osmose_builder->state) {
+            return;
+        }
+        bool done = false;
+        if (host_available()) {
+            auto preset = chem_host->host_preset();
+            if (preset && !preset->empty()) {
+                PresetDescription pd;
+                pd.init(preset);
+                pd.id = osmose_builder->send_id();
+                get_tab(gathering).list.add(&pd);
+                osmose_builder->preset_received();
+            }
+        } else {
+            done = true;
+        }
+        if (done) {
+            delete osmose_builder;
+            osmose_builder = nullptr;
+            save_presets(gathering);
+            stop_spinner();
+            gathering = PresetTab::Unset;
+            gather_start = false;
+        }
+
+        return;
+    }
     
     switch (gathering) {
     case PresetTab::Unset:
         break;
     case PresetTab::User:
     case PresetTab::System: {
+        assert(!osmose_builder);
         if (!gather_start) return;
         auto preset = chem_host->host_preset();
         if (preset && !preset->empty()) {
@@ -267,6 +347,7 @@ void PresetUi::onPresetChange()
         return;
     } break;
     }
+
     if (chem_host) {
         auto preset = chem_host->host_preset();
         if (preset) {
@@ -434,7 +515,6 @@ void PresetUi::clear_filters()
     tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
     scroll_to_page_of_index(tab.current_index);
 }
-
 
 void PresetUi::set_tab(PresetTab tab_id, bool fetch)
 {

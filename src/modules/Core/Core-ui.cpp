@@ -4,6 +4,7 @@
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../em/preset-meta.hpp"
+using EME = IHandleEmEvents::EventMask;
 
 CoreModuleWidget::~CoreModuleWidget()
 {
@@ -37,8 +38,6 @@ void CoreModuleWidget::glowing_knobs(bool glow)
 }
 
 
-using EME = IHandleEmEvents::EventMask;
-
 // Layout
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
@@ -60,14 +59,12 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     if (my_module) {
         my_module->set_chem_ui(this);
     }
-
-    em_event_mask = EME::LoopDetect
-        + EME::EditorReply
+    em_event_mask = static_cast<IHandleEmEvents::EventMask>(EME::LoopDetect
         + EME::HardwareChanged
         + EME::PresetChanged
         + EME::TaskMessage
         + EME::LED
-        ;
+    );
 
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
@@ -339,15 +336,6 @@ void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<Mid
 }
 
 // IHandleEmEvents
-void CoreModuleWidget::onLoopDetect(uint8_t cc, uint8_t value)
-{
-}
-
-void CoreModuleWidget::onEditorReply(uint8_t reply)
-{
-   //em_status_label->text(format_string("Editor reply: 0x%04x", reply));
-}
-
 void CoreModuleWidget::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 {
     firmware_label->text(format_string("%s v%03.2f", ShortHardwareName(hardware), firmware_version/100.f));

@@ -13,14 +13,13 @@
 - color picker
   - choose text syntax?
   - 100% transparent option, or transparency slider
-- try BloodBat's GH stuff
 
 ## Osmose
 
-- Prebuilt System (factory) preset list
-- Attempt a Learn function for presets, a la Build full database.
-  Otherwise, provide an editing UI.
-
+- Preset: Implement loading Prebuilt System (factory) preset list from res/cache
+- Play:
+  - Append from User block
+  - Exclude EM-style Append
 
 ## Before release
 

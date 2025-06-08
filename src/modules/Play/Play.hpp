@@ -78,11 +78,10 @@ struct PlayModule : ChemModule, IChemClient
 
 // -- Play UI -----------------------------------
 enum class FillOptions { None, User, System, All };
-struct EmHandler;
 struct PlayMenu;
 constexpr const int PAGE_CAPACITY = 15;
 
-struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
+struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
 {
     using Base = ChemModuleWidget;
 
@@ -99,7 +98,6 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     TipLabel*   warning_label{nullptr};
     Blip*       blip{nullptr};
 
-    EmHandler* em_handler{nullptr};
     FillOptions gather{FillOptions::None};
     bool pending_device_check{false};
     bool modified{false};
@@ -176,6 +174,9 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void check_playlist_device();
     void fill(FillOptions which);
     void on_fill_complete();
+
+    void onUserComplete() override { on_fill_complete(); }
+    void onSystemComplete() override { on_fill_complete(); }
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

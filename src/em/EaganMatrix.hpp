@@ -5,6 +5,7 @@
 #include "em-hardware.h"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
+#include "../chem-id.hpp"
 
 namespace pachde {
 
@@ -22,7 +23,7 @@ struct IHandleEmEvents {
         LED              = 1 << 9,
         MahlingBegin     = 1 << 10,
         MahlingComplete  = 1 << 11,
-
+        None = 0,
         All = LoopDetect
             + EditorReply
             + HardwareChanged
@@ -36,7 +37,8 @@ struct IHandleEmEvents {
             + MahlingBegin
             + MahlingComplete
     };
-    uint16_t em_event_mask{EventMask::All};
+    uint16_t em_event_mask{EventMask::None};
+    ChemId module_id{ChemId::Unknown};
 
     virtual void onLoopDetect(uint8_t cc, uint8_t value) {}
     virtual void onEditorReply(uint8_t reply) {}

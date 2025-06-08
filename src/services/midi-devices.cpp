@@ -41,7 +41,7 @@ bool is_EMDevice(const std::string& name)
         && std::string::npos != text.find("osmose");
 }
 
-bool is_Osmose(const std::string& name)
+bool is_osmose(const std::string& name)
 {
     if (name.empty()) { return false; }
     if (std::string::npos == name.find_first_of('2')) return false;

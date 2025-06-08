@@ -19,8 +19,10 @@ CoreModule::CoreModule() :
 {
     ticker.set_interval(1.0f);
     
-    em_event_mask = EME::LoopDetect
-        + EME::EditorReply 
+    module_id = ChemId::Core;
+    em_event_mask = static_cast<IHandleEmEvents::EventMask>(
+        EME::LoopDetect
+        + EME::EditorReply
         + EME::HardwareChanged
         + EME::PresetChanged
         + EME::UserBegin
@@ -415,7 +417,9 @@ void CoreModule::connect_midi(bool on_off)
 void CoreModule::init_osmose()
 {
     auto hw = em.get_hardware();
-    bool osmose = hw ? (Haken::hw_o49 == hw) : is_Osmose(haken_device.get_claim());
+    bool osmose = hw ? (Haken::hw_o49 == hw) : is_osmose(haken_device.get_claim());
+    haken_midi.osmose_target = osmose;
+
     EmControlPort& port = modulation.get_port(0);
     if (osmose) {
         port.cc_id = Haken::ccPost;

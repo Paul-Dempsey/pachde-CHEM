@@ -5,12 +5,7 @@
 #include "../../em/EaganMatrix.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/bits-widget.hpp"
-#include "../../widgets/draw-button.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/text-input.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "../../widgets/widgets.hpp"
 #include "preset-common.hpp"
 #include "preset-list.hpp"
 #include "./widgets/filter-widget.hpp"
@@ -109,6 +104,112 @@ struct Tab {
     }
 };
 
+constexpr const double OSMOSE_SETTLE_TIME = 1.25;
+constexpr const double OSMOSE_PRESET_RESPONSE_TIME = 1.5;
+
+struct OsmoseBuilder
+{
+    enum class ReadyResponse {
+        Waiting,
+        Ready,
+        Timeout
+    };
+    enum State {
+        Rest,
+        Preset,
+        Settle
+    };
+
+    uint8_t cc0;
+    uint8_t pc;
+    State state{State::Rest};
+    PresetTab tab{PresetTab::Unset};
+    double state_time;  // time in state
+    uint8_t base_page;  // start Haken::ccBankH: playlist 0-29, system 30-34, User 90 ..
+    uint8_t last_page;  // end Haken::ccBankH
+    #ifndef NDEBUG
+    double start_time{system::getUnixTime()};
+    #endif
+    void init_system(HakenMidi* haken) {
+        init(haken, PresetTab::System, 30, 34);
+    }
+    void init_user(HakenMidi* haken) {
+        init(haken, PresetTab::User, 90, 90); //TODO: menu items to scan additional pages
+    }
+    void init(HakenMidi* haken, PresetTab which, uint8_t base, uint8_t last)
+    {
+        tab = which;
+        base_page = cc0 = base;
+        last_page = last;
+        pc = 0;
+        send(haken);
+    }
+
+
+    PresetId send_id() { return PresetId{cc0, 0, pc}; }
+
+    void preset_received()
+    {
+        assert(state == State::Preset);
+        auto current = system::getUnixTime();
+        DEBUG("OB: Received %d %d in %f", cc0, pc, (float)(current - state_time));
+        state = State::Settle;
+        state_time = current;
+    }
+
+    ReadyResponse ready() {
+        ReadyResponse result = ReadyResponse::Timeout;
+
+        switch (state) {
+        case State::Rest:
+            result = ReadyResponse::Ready;
+            break;
+
+        case State::Preset:
+            // waiting for preset_received()
+            if ((system::getUnixTime() - state_time) > OSMOSE_PRESET_RESPONSE_TIME) {
+                state = State::Rest;
+                result = ReadyResponse::Timeout;
+            } else {
+                result = ReadyResponse::Waiting;
+            }
+            break;
+
+        case State::Settle:
+            if ((system::getUnixTime() - state_time) > OSMOSE_SETTLE_TIME) {
+                state = State::Rest;
+                result = ReadyResponse::Ready;
+            } else {
+                result = ReadyResponse::Waiting;
+            }
+        }
+        return result;
+    }
+
+    void send(HakenMidi* haken)
+    {
+        haken->select_preset(ChemId::Preset, send_id());
+        state = Preset;
+        state_time = system::getUnixTime();
+    }
+
+    bool next(HakenMidi* haken)
+    {
+        //assert(State::Rest == state);
+        if (127 == pc) {
+            if (cc0 == last_page) {
+                return false;
+            }
+            pc = 0;
+            ++cc0;
+        } else {
+            ++pc;
+        }
+        send(haken);
+        return true;
+    }
+};
+
 struct DBBuilder {
     std::deque<PresetId> presets;
     void init(const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current) {
@@ -141,6 +242,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     TextLabel* user_label{nullptr};
     TextLabel* system_label{nullptr};
     TextLabel* page_label{nullptr};
+    TextButton* stop_button{nullptr};
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
@@ -158,6 +260,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool spinning{false};
     std::vector<PresetEntry*> preset_grid;
     DBBuilder* db_builder{nullptr};
+    OsmoseBuilder* osmose_builder{nullptr};
+    bool stop_scan{false};
 
     PresetUi(PresetModule *module);
     ~PresetUi();
@@ -171,6 +275,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
         case PresetTab::User: return user_tab;
        }
     }
+    bool is_osmose() { return chem_host && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); }
     Tab& active_tab() { return get_tab(active_tab_id); }
     void set_tab(PresetTab tab, bool fetch);
     PresetList& preset_list(PresetTab which) { return get_tab(which).list; }
@@ -181,10 +286,14 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void stop_spinner();
     PresetId get_live_id() { PresetId dead; return live_preset ? live_preset->id : dead; }
     void build_database(PresetTab which);
+    void create_stop_button();
+    void request_osmose_user_presets(uint8_t block) ;
+    void end_osmose_scan();
     void request_presets(PresetTab which);
     std::string preset_file(PresetTab which);
     bool load_presets(PresetTab which);
     bool save_presets(PresetTab which);
+    void forget_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
     void scroll_to(ssize_t index);
@@ -218,6 +327,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     
     // IHandleEmEvents
     IHandleEmEvents::EventMask em_event_mask{(EventMask)(UserBegin + SystemComplete + UserBegin + UserComplete)};
+    ChemId module_id{ChemId::Preset};
+
     void onSystemBegin() override;
     void onSystemComplete() override;
     void onUserBegin() override;
