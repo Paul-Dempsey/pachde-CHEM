@@ -1,5 +1,16 @@
 # CHEM To-Do
 
+Starting a new refactor to address limitations, issues exposed by Osmose support
+
+- Central preset database in Core
+- Job queue to serialize EM operations
+- Differentiate preset changes from config request/select preset/device update
+- Remove clumsy HakenTask orchestration in favor of priority job queue
+- Replace multiple notification schemes (some with few clients) with job completion callback.
+- Prototype preset check-summing to compensate for Osmose lack of exposed preset ids.
+
+## General
+
 - Overlay macros
   - add/remove
   - implement control & dispatch
@@ -16,11 +27,12 @@
 
 ## Osmose
 
-- Live preset tracking can't use PresetId: must use name (+metadata?)
+- Live preset tracking can't use PresetId: must use something else
 - Preset: Implement loading Prebuilt System (factory) preset list from res/cache
 - Play:
   - Append from User block
   - Exclude EM-style Append
+  - Append from Playlist block
 
 ## Before release
 

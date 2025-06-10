@@ -14,8 +14,16 @@ To download the latest build, see the [Nightly Release](https://github.com/Paul-
 
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
-At this point (June 8 2025), most of CHEM is very close to release quality, and I think more reliable and usable than HC One (_and_ better looking :-).
-I am busy adding basic Overlay Synth support, and working through the tricky Osmose support.
+## June 10 2025
+
+After taking a break from overlay macros to prototype Preset/Play module for the Osmose,
+I realize that some core functions need to be re-architected and improved.
+This probably entails a period of time with a high frequeny of broken builds and instability,
+so I'll be working in a side branch instead of disturbing main.
+This means that you won't see new "nightly" release builds for a while.
+
+Meanwhile, CHEM is working very well for devices other than the Osmose,
+ and even for the Osmose everything but Preset and Play are working.
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
