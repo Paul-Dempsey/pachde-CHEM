@@ -92,6 +92,14 @@ void EaganMatrix::notifyEditorReply(uint8_t editor_reply)
         }
     }
 }
+void EaganMatrix::notifyPresetBegin()
+{
+    for (auto client : clients) {
+        if (client->em_event_mask & IHandleEmEvents::PresetBegin) {
+            client->onPresetBegin();
+        }
+    }
+}
 void EaganMatrix::notifyPresetChanged()
 {
     for (auto client : clients) {
@@ -178,13 +186,13 @@ void EaganMatrix::notifyLED(uint8_t led)
             client->onLED(led);
         }
     }
-
 }
 
 void EaganMatrix::begin_preset()
 {
     clear_preset(false);
     in_preset = true;
+    notifyPresetBegin();
 }
 
 void EaganMatrix::clear_preset(bool notify)
@@ -365,6 +373,13 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     case Haken::ccTask:
         notifyTaskMessage(value);
         switch (value) {
+        case Haken::archiveOk:
+        case Haken::archiveFail:
+            in_preset = false;
+            ready = true;
+            notifyPresetChanged();
+            break;
+
         case Haken::configToMidi:
             pending_config = true;
             break;
@@ -467,10 +482,12 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                     preset.id.set_bank_lo((pn & 0xff80) >> 7);
                     preset.id.set_number(pn & 0x7f);
                 }
-                in_preset = false;
-                pending_config = false;
-                ready = true;
-                notifyPresetChanged();
+                if (in_system || in_user || pending_config) {
+                    pending_config = false;
+                    in_preset = false;
+                    ready = true;
+                    notifyPresetChanged();
+                }
             }
             break;
 

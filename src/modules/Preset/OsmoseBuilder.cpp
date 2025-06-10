@@ -1,0 +1,109 @@
+#include "preset.hpp"
+
+constexpr const double OSMOSE_SETTLE_TIME {2.0};
+constexpr const double OSMOSE_PRESET_START_TIME {0.75};
+constexpr const double OSMOSE_PRESET_RESPONSE_TIME {1.25};
+
+void OsmoseBuilder::init_system(HakenMidi* haken) {
+    init(haken, PresetTab::System, 30, 34);
+}
+
+void OsmoseBuilder::init_user(HakenMidi* haken) {
+    init(haken, PresetTab::User, 90, 90);
+}
+
+void OsmoseBuilder::init(HakenMidi* haken, PresetTab which, uint8_t base, uint8_t last)
+{
+    log = haken->log;
+    tab = which;
+    base_page = cc0 = base;
+    last_page = last;
+    pc = 0;
+    send(haken);
+}
+
+void OsmoseBuilder::preset_start()
+{
+    if (state == Start) return;
+    assert(state == PendingPreset);
+    auto current = system::getUnixTime();
+    if (log) log->log_message("OB", format_string("Preset Started: %d %d in %f", cc0, pc, (float)(current - state_time)));
+    state = State::Preset;
+    state_time = current;
+}
+
+void OsmoseBuilder::preset_received()
+{
+    if (state == Start) return;
+    assert(state == Preset);
+    auto current = system::getUnixTime();
+    if (log) log->log_message("OB", format_string("Preset Received: %d %d in %f", cc0, pc, (float)(current - state_time)));
+    state = State::Settle;
+    state_time = current;
+}
+
+OsmoseBuilder::ReadyResponse OsmoseBuilder::ready() {
+    ReadyResponse result = ReadyResponse::Timeout;
+
+    switch (state) {
+    case State::Start:
+    case State::Rest:
+        result = ReadyResponse::Ready;
+        break;
+
+    case State::PendingPreset:
+        // waiting for preset_start()
+        if ((system::getUnixTime() - state_time) > OSMOSE_PRESET_START_TIME) {
+            state = State::Rest;
+            result = ReadyResponse::Timeout;
+        } else {
+            result = ReadyResponse::Waiting;
+        }
+        break;
+
+    case State::Preset:
+        // waiting for preset_received()
+        if ((system::getUnixTime() - state_time) > OSMOSE_PRESET_RESPONSE_TIME) {
+            state = State::Rest;
+            result = ReadyResponse::Timeout;
+        } else {
+            result = ReadyResponse::Waiting;
+        }
+        break;
+
+    case State::Settle:
+        if ((system::getUnixTime() - state_time) > OSMOSE_SETTLE_TIME) {
+            state = State::Rest;
+            result = ReadyResponse::Ready;
+        } else {
+            result = ReadyResponse::Waiting;
+        }
+    }
+    // if (log) log->log_message("OB", format_string("Ready-result %s", 
+    //     result == ReadyResponse::Ready ? "Ready" : result == ReadyResponse::Waiting ? "Waiting" : result == ReadyResponse::Timeout ? "Timeout" : "????"));
+    return result;
+}
+
+void OsmoseBuilder::send(HakenMidi* haken)
+{
+    state = PendingPreset;
+    state_time = system::getUnixTime();
+    if (log) log->log_message("OB", format_string("Sending [%d:%d] at %f", cc0, pc, state_time));
+    haken->select_preset(ChemId::Preset, send_id());
+}
+
+bool OsmoseBuilder::next(HakenMidi* haken)
+{
+    assert(State::Rest == state);
+    if (127 == pc) {
+        if (cc0 == last_page) {
+            return false;
+        }
+        pc = 0;
+        ++cc0;
+    } else {
+        ++pc;
+    }
+    send(haken);
+    return true;
+}

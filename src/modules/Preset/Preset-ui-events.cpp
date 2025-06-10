@@ -188,13 +188,24 @@ void PresetUi::step()
 {
     Base::step();
     bind_host(my_module);
+
+    if (start_delay.running()) {
+        if (start_delay.finished()) {
+            start_delay.stop();
+        } else {
+            return;
+        }
+    }
+
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available() && (gathering == PresetTab::Unset)) {
         set_tab(active_tab_id, true);
     }
+
     if (filtering()) {
         filter_off_button->button_down = true;
     }
+
     if (osmose_builder) {
         bool done = false;
         switch (osmose_builder->ready())

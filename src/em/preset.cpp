@@ -60,14 +60,14 @@ void PresetDescription::fromJson(const json_t* root)
 
 std::string PresetDescription::summary() const
 {
-    return format_string("[%d.%d.%d] %s", id.bank_hi(), id.bank_lo(), id.number(), name.c_str());
+    return format_string("[%d.%d.%d] %s%s", id.bank_hi(), id.bank_lo(), id.number(), valid() ? "": "(invalid)", name.c_str());
 }
 
 std::string PresetDescription::meta_text() const
 {
     if (text.empty()) return summary();
 
-    auto info = format_string("%s\n[%d.%d.%d]", name.c_str(), id.bank_hi(), id.bank_lo(), id.number());
+    auto info = format_string("%s%s\n[%d.%d.%d]", valid() ? "": "(invalid)", name.c_str(), id.bank_hi(), id.bank_lo(), id.number());
 
     auto macs = make_macro_summary(text);
     if (!macs.empty()) {

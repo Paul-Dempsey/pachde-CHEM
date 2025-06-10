@@ -114,6 +114,12 @@ PlayUi::PlayUi(PlayModule *module) :
     my_module(module)
 {
     setModule(module);
+    IHandleEmEvents::em_event_mask = (EventMask)(
+        SystemComplete + 
+        UserComplete
+    );
+    IHandleEmEvents::module_id = ChemId::Play;
+
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);

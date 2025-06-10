@@ -209,9 +209,15 @@ PresetUi::PresetUi(PresetModule *module) :
     my_module(module)
 {
     setModule(module);
-    module_id = ChemId::Play;
-    em_event_mask = IHandleEmEvents::EventMask(IHandleEmEvents::EventMask::SystemComplete + IHandleEmEvents::EventMask::UserComplete);
-
+    em_event_mask = (EventMask)(
+        PresetBegin + 
+        UserBegin + 
+        SystemComplete + 
+        UserBegin + 
+        UserComplete
+    );
+    module_id = ChemId::Preset;
+    start_delay.run();
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);

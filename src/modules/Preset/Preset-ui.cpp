@@ -58,6 +58,8 @@ void PresetUi::request_osmose_user_presets(uint8_t block)
 void PresetUi::request_presets(PresetTab which)
 {
     if (!host_available()) return;
+    if (start_delay.running()) return;
+
     bool osmose = is_osmose();
     auto haken = chem_host->host_haken();
 
@@ -67,6 +69,7 @@ void PresetUi::request_presets(PresetTab which)
         break;
 
     case PresetTab::User:
+        if (user_loaded) return;
         user_tab.clear();
         gathering = PresetTab::User;
         if (osmose) {
@@ -77,6 +80,7 @@ void PresetUi::request_presets(PresetTab which)
         break;
 
     case PresetTab::System:
+        if (system_loaded) return;
         system_tab.clear();
         gathering = PresetTab::System;
         if (osmose) {
@@ -202,6 +206,12 @@ void PresetUi::sort_presets(PresetOrder order)
         }
         scroll_to_page_of_index(tab.current_index);
     }
+}
+
+void PresetUi::onPresetBegin()
+{
+    if (!osmose_builder) return;
+    osmose_builder->preset_start();
 }
 
 void PresetUi::onSystemBegin()
@@ -435,6 +445,7 @@ void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
         system_tab.clear();
     }
     onConnectionChangeUiImpl(this, device, connection);
+    start_delay.run();
 }
 
 void PresetUi::set_track_live(bool track)
@@ -546,11 +557,20 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
    }
 
     Tab& tab = active_tab();
-    if (fetch && (0 == tab.count()) && host_available()) {
-        if (load_presets(tab_id)) {
-
-        } else {
+    if (fetch && (0 == tab.count()) && host_available() && !start_delay.running()) {
+        if (!load_presets(tab_id)) {
             request_presets(tab_id);
+        }
+        switch (tab_id) {
+        case PresetTab::Unset:
+            assert(false);
+            break;
+        case PresetTab::User:
+            user_loaded = true;
+            break;
+        case PresetTab::System:
+            system_loaded = true;
+            break;
         }
     }
     

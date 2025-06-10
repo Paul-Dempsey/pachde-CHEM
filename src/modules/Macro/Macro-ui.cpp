@@ -223,6 +223,9 @@ void MacroUi::onPresetChange()
         if (preset) {
             preset_label->text(preset->name);
             preset_label->describe(preset->text);
+        } else {
+            preset_label->text("");
+            preset_label->describe("");
         }
     }
 }

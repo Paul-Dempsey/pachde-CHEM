@@ -112,6 +112,7 @@ SOURCES += src/modules/Preset/Preset-ui-events.cpp
 SOURCES += src/modules/Preset/preset-list.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
+SOURCES += src/modules/Preset/OsmoseBuilder.cpp
 
 SOURCES += src/modules/XM-shared/macro-usage.cpp
 SOURCES += src/modules/XM-shared/xm-overlay.cpp

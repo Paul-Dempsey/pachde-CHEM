@@ -59,12 +59,14 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     if (my_module) {
         my_module->set_chem_ui(this);
     }
-    em_event_mask = static_cast<IHandleEmEvents::EventMask>(EME::LoopDetect
+    IHandleEmEvents::em_event_mask =
+        LoopDetect
         + EME::HardwareChanged
         + EME::PresetChanged
         + EME::TaskMessage
         + EME::LED
-    );
+    ;
+    IHandleEmEvents::module_id = ChemId::Core;
 
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());

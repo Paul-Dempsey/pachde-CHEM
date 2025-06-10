@@ -108,7 +108,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     const PresetDescription* host_preset() override {
         if (disconnected) return nullptr;
         if (em.in_preset) return nullptr;
-        if (em.preset.id.valid()) return &em.preset;
+        if (em.preset.valid()) return &em.preset;
         return nullptr;
     }
     HakenMidi* host_haken() override {
@@ -136,9 +136,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void onSystemComplete() override;
     void onMahlingBegin() override;
     void onMahlingComplete() override;
-
-    //void onTaskMessage(uint8_t code) override;
-    //void onLED(uint8_t led) override;
 
     // IHakenTaskEvents
     void onHakenTaskChange(HakenTask task) override;

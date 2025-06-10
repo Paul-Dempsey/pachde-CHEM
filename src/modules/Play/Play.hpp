@@ -175,6 +175,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
     void fill(FillOptions which);
     void on_fill_complete();
 
+    // IHandleEmEvents
     void onUserComplete() override { on_fill_complete(); }
     void onSystemComplete() override { on_fill_complete(); }
 

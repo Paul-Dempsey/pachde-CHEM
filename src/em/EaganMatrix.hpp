@@ -1,11 +1,11 @@
 #pragma once
 #include <stdint.h>
+#include "../chem-id.hpp"
 #include "wrap-HakenMidi.hpp"
 #include "midi-message.h"
 #include "em-hardware.h"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
-#include "../chem-id.hpp"
 
 namespace pachde {
 
@@ -14,19 +14,21 @@ struct IHandleEmEvents {
         LoopDetect       = 1,
         EditorReply      = 1 << 1,
         HardwareChanged  = 1 << 2,
-        PresetChanged    = 1 << 3,
-        UserBegin        = 1 << 4,
-        UserComplete     = 1 << 5,
-        SystemBegin      = 1 << 6,
-        SystemComplete   = 1 << 7,
-        TaskMessage      = 1 << 8,
-        LED              = 1 << 9,
-        MahlingBegin     = 1 << 10,
-        MahlingComplete  = 1 << 11,
+        PresetBegin      = 1 << 3,
+        PresetChanged    = 1 << 4,
+        UserBegin        = 1 << 5,
+        UserComplete     = 1 << 6,
+        SystemBegin      = 1 << 7,
+        SystemComplete   = 1 << 8,
+        TaskMessage      = 1 << 9,
+        LED              = 1 << 10,
+        MahlingBegin     = 1 << 11,
+        MahlingComplete  = 1 << 12,
         None = 0,
         All = LoopDetect
             + EditorReply
             + HardwareChanged
+            + PresetBegin
             + PresetChanged
             + UserBegin
             + UserComplete
@@ -43,6 +45,7 @@ struct IHandleEmEvents {
     virtual void onLoopDetect(uint8_t cc, uint8_t value) {}
     virtual void onEditorReply(uint8_t reply) {}
     virtual void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) {}
+    virtual void onPresetBegin() {}
     virtual void onPresetChanged() {}
     virtual void onUserBegin() {}
     virtual void onUserComplete() {}
@@ -299,6 +302,7 @@ struct EaganMatrix
     void notifyLoopDetect(uint8_t cc, uint8_t value);
     void notifyEditorReply(uint8_t editor_reply);
     void notifyHardwareChanged();
+    void notifyPresetBegin();
     void notifyPresetChanged();
     void notifyUserBegin();
     void notifyUserComplete();
