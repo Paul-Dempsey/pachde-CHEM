@@ -23,7 +23,7 @@ using namespace pachde;
 struct CoreModuleWidget;
 struct CoreModule;
 
-struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents, IDoMidi
+struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
     CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
 
@@ -55,8 +55,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     std::vector<IChemClient*> chem_clients;
     HakenTasks tasks;
 
-    PresetDescription last_preset;
-    bool restore_last_preset;
     OctaveShiftLeds octave;
     RoundingLeds round_leds;
     bool glow_knobs;
@@ -136,9 +134,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void onSystemComplete() override;
     void onMahlingBegin() override;
     void onMahlingComplete() override;
-
-    // IHakenTaskEvents
-    void onHakenTaskChange(HakenTask task) override;
 
     // ----  Rack  ------------------------------------------
 

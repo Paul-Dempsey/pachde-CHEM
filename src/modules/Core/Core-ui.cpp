@@ -546,11 +546,6 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             [this]() { return my_module->is_logging(); },
             [this]() { my_module->enable_logging(!my_module->is_logging()); }));
 
-        menu->addChild(createCheckMenuItem(
-            "Restore last preset", "",
-            [this]() { return my_module->restore_last_preset; },
-            [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;}));
-
         menu->addChild(createCheckMenuItem("Glowing knobs", "", 
             [this](){ return my_module->glow_knobs; },
             [this](){

@@ -88,7 +88,6 @@ HakenTasks::HakenTasks()
         HakenTaskInfo( HakenTask::HeartBeat,     TaskState::Uninitialized, 15.0f,  2.0f, true ),
         HakenTaskInfo( HakenTask::Updates,       TaskState::Uninitialized,  1.0f,  0.0f, false ),
         HakenTaskInfo( HakenTask::PresetInfo,    TaskState::Uninitialized,  2.0f,  4.0f, false ),
-        HakenTaskInfo( HakenTask::LastPreset,    TaskState::Uninitialized,  2.0f,  4.0f, false ),
         HakenTaskInfo( HakenTask::SyncDevices,   TaskState::Uninitialized, 30.0f,  0.0f, true ),
     };
 }
@@ -120,26 +119,12 @@ HakenTaskInfo * HakenTasks::get_task(HakenTask id)
     case HeartBeat:
     case Updates:
     case PresetInfo:
-    case LastPreset:
     case SyncDevices:
         return &tasks[task_index(id)];
     default:
         return nullptr;
     }
 }
-// void HakenTasks::toJson(json_t* root)
-// {
-//     for (const HakenTaskInfo& task: tasks) {
-//         json_object_set_new(root, TaskKey(task.id), task.toJson());
-//     }
-// }
-
-// void HakenTasks::fromJson(json_t* root)
-// {
-//     for (HakenTaskInfo& task: tasks) {
-//         task.fromJson(json_object_get(root, TaskKey(task.id)));
-//     }
-// }
 
 void HakenTasks::refresh()
 {
@@ -357,22 +342,6 @@ void HakenTasks::process(const rack::Module::ProcessArgs& args)
                 chem->haken_midi.request_configuration(ChemId::Core);
                 //chem->haken_midi_out.dispatch(DISPATCH_NOW);
                 notifyChange(HakenTask::PresetInfo);
-            } else {
-                task->not_applicable();
-                notifyChange(current);
-                current = next_task(current);
-            }
-            break;
-
-        case HakenTask::LastPreset:
-            if (chem->is_haken_connected() 
-                && chem->restore_last_preset
-                && !chem->last_preset.empty()) 
-            {
-                chem->log_message("CHEM", "Starting task LastPreset");
-                task->pend();
-                chem->haken_midi.select_preset(ChemId::Core, chem->last_preset.id);
-                notifyChange(HakenTask::LastPreset);
             } else {
                 task->not_applicable();
                 notifyChange(current);

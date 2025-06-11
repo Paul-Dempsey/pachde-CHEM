@@ -14,8 +14,7 @@ CoreModule::CoreModule() :
     disconnected(false),
     is_busy(false),
     in_reboot(false),
-    heartbeat(false),
-    restore_last_preset(false)
+    heartbeat(false)
 {
     ticker.set_interval(1.0f);
     
@@ -77,8 +76,6 @@ CoreModule::CoreModule() :
     broker->registerDeviceHolder(&haken_device);
     broker->registerDeviceHolder(&controller1);
     broker->registerDeviceHolder(&controller2);
-
-    tasks.subscribeChange(this);
 
     EmccPortConfig cfg[] = {
         EmccPortConfig::cc(P_ATTENUATION, -1, -1, Haken::ch1, Haken::ccAtten, true),
@@ -253,10 +250,6 @@ void CoreModule::onMahlingComplete()
     if (chem_ui) ui()->show_busy(is_busy);
 }
 
-void CoreModule::onHakenTaskChange(HakenTask id)
-{
-}
-
 // IChemHost
 void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
@@ -289,8 +282,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     switch (source->role()) {
     case ChemDevice::Haken: {
-        em.ready = false; // todo clear?
-        haken_midi_in.ring.clear();
+        em.ready = false;        haken_midi_in.ring.clear();
         haken_midi_out.ring.clear();
         if (source->connection) {
             haken_midi_in.setDriverId(source->connection->driver_id);
@@ -371,10 +363,6 @@ void CoreModule::dataFromJson(json_t *root)
     controller1.set_claim(get_json_string(root, "controller-1"));
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
-    json_read_bool(root, "restore-preset", restore_last_preset);
-    if (!restore_last_preset) {
-        this->tasks.get_task(HakenTask::LastPreset)->not_applicable();
-    }
     json_read_bool(root, "glow-knobs", glow_knobs);
     // if (!haken_device.get_claim().empty()) {
     //     modulation.mod_from_json(root);
@@ -388,10 +376,7 @@ json_t* CoreModule::dataToJson()
     json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging()));
-    json_object_set_new(root, "restore-preset", json_boolean(restore_last_preset));
-    if (!last_preset.empty()) {
-        json_object_set_new(root, "last-preset", last_preset.toJson(true, true, false));
-    }
+
     // if (!haken_device.get_claim().empty()) {
     //     modulation.mod_to_json(root);
     // }
@@ -414,7 +399,7 @@ void CoreModule::update_from_em()
 
 void CoreModule::connect_midi(bool on_off)
 {
-
+//todo
 }
 
 void CoreModule::init_osmose()
