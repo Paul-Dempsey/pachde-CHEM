@@ -204,10 +204,6 @@ void CoreModule::onPresetChanged()
         if (task->pending()) {
             task->complete();
         }
-        task = tasks.get_task(HakenTask::LastPreset);
-        if (task->pending()) {
-            task->complete();
-        }
     }
     log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     notify_preset_changed();

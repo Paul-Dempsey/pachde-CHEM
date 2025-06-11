@@ -237,7 +237,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     IndicatorWidget* heartbeat_indicator = nullptr;
     IndicatorWidget* updates_indicator = nullptr;
     IndicatorWidget* presetinfo_indicator = nullptr;
-    IndicatorWidget* lastpreset_indicator = nullptr;
     IndicatorWidget* syncdevices_indicator = nullptr;
 
     IndicatorWidget* widget_for_task(HakenTask task);

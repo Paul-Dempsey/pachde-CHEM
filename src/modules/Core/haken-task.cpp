@@ -16,7 +16,6 @@ const char * TaskKey(HakenTask task)
     case HakenTask::HeartBeat:     return "task-heart-beat";
     case HakenTask::Updates:       return "task-updates";
     case HakenTask::PresetInfo:    return "task-preset-info";
-    case HakenTask::LastPreset:    return "task-last-preset";
     default: return "task-unknown";
     }
 
@@ -30,7 +29,6 @@ const char * TaskName(HakenTask task)
     case HakenTask::HeartBeat:     return "Heartbeat";
     case HakenTask::Updates:       return "Request updates";
     case HakenTask::PresetInfo:    return "Request preset info";
-    case HakenTask::LastPreset:    return "Restore last preset";
     case HakenTask::SyncDevices:   return "Synchronize midi devices";
     default: return "unknown task";
     }
@@ -49,35 +47,6 @@ const char * TaskStateName(TaskState state)
     default: return "--";
     }
 }
-
-// void HakenTaskInfo::fromJson(json_t* root) {
-//     if (!root) return;
-
-//     auto j = json_object_get(root, "delay");
-//     if (j) { post_delay = json_number_value(j); }
-
-//     j = json_object_get(root, "budget");
-//     if (j) { 
-//         budget = json_number_value(j);
-//         if (budget < 0.f) budget = 0.f;
-//     }
-
-//     // j = json_object_get(root, "midi-rate");
-//     // if (j) {
-//     //     rate = static_cast<HakenMidiRate>(json_integer_value(j));
-//     //     if (!in_range(static_cast<int>(rate), 0, 2)) {
-//     //         rate = HakenMidiRate::Third;
-//     //     }
-//     // }
-// }
-
-// json_t* HakenTaskInfo::toJson() const {
-//     auto root = json_object();
-//     json_object_set_new(root, "delay", json_real(post_delay));
-//     json_object_set_new(root, "budget", json_integer(static_cast<int>(budget)));
-//     //json_object_set_new(root, "midi_rate", json_integer(static_cast<int>(rate)));
-//     return root;
-// }
 
 HakenTasks::HakenTasks()
 :   current(HakenTask::None)

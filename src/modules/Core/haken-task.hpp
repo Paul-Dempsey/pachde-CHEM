@@ -11,7 +11,6 @@ enum HakenTask : uint8_t {
     HeartBeat,
     Updates,
     PresetInfo,
-    LastPreset,
     SyncDevices,
     End
 };

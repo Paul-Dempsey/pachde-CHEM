@@ -10,7 +10,6 @@ CoreModuleWidget::~CoreModuleWidget()
 {
     if (my_module) {
         my_module->em.unsubscribeEMEvents(this);
-        my_module->tasks.unsubscribeChange(this);
     }
     if (chem_host) {
         chem_host->unregister_chem_client(this);
@@ -36,7 +35,6 @@ void CoreModuleWidget::glowing_knobs(bool glow)
 {
     attenuation_knob->glowing(glow);
 }
-
 
 // Layout
 constexpr const int MODULE_WIDTH = 165;
@@ -244,12 +242,11 @@ void CoreModuleWidget::createRoundingLeds(float cx, float cy, float spread)
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
 {
     auto co = themeColor(coTaskUnscheduled);
-    x -= (spread * 5) *.5f;
+    x -= (spread * 4) *.5f;
     addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::MidiDevice))); x += spread;
     addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, TaskName(HakenTask::HeartBeat))); x += spread;
     addChild(updates_indicator       = createIndicatorCentered(x, y, co, TaskName(HakenTask::Updates))); x += spread;
     addChild(presetinfo_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::PresetInfo))); x += spread;
-    addChild(lastpreset_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::LastPreset))); x += spread;
     addChild(syncdevices_indicator   = createIndicatorCentered(x, y, co, TaskName(HakenTask::SyncDevices)));
 }
 
@@ -260,7 +257,6 @@ void CoreModuleWidget::resetIndicators()
     heartbeat_indicator    ->setColor(co); heartbeat_indicator    ->setFill(false);
     updates_indicator      ->setColor(co); updates_indicator      ->setFill(false);
     presetinfo_indicator   ->setColor(co); presetinfo_indicator   ->setFill(false);
-    lastpreset_indicator   ->setColor(co); lastpreset_indicator   ->setFill(false);
     syncdevices_indicator  ->setColor(co); syncdevices_indicator  ->setFill(false);
 }
 
@@ -317,15 +313,13 @@ void CoreModuleWidget::onConnectHost(IChemHost* host)
     chem_host = host;
 }
 
-void CoreModuleWidget::onPresetChange()
-{}
+void CoreModuleWidget::onPresetChange() {}
 
 void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
 {
     std::string nothing = "";
     resetIndicators();
     em_status_label->text(nothing);
-    //task_status_label->text(nothing);
     preset_label->text(nothing);
     preset_label->describe(nothing);
     std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
@@ -424,7 +418,6 @@ IndicatorWidget* CoreModuleWidget::widget_for_task(HakenTask task)
     case HakenTask::HeartBeat:     return heartbeat_indicator;
     case HakenTask::Updates:       return updates_indicator;
     case HakenTask::PresetInfo:    return presetinfo_indicator;
-    case HakenTask::LastPreset:    return lastpreset_indicator;
     case HakenTask::SyncDevices:   return syncdevices_indicator;
     default: return nullptr;
     }
