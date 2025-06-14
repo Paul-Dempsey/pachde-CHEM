@@ -119,7 +119,7 @@ struct SustainModule : SusModule
     const char * param_name() override { return "Sustain"; }
     const char * min_param_name() override { return "No sustain"; }
     const char * max_param_name() override { return "Max sustain"; }
-    uint8_t from_em() override { return chem_host->host_matrix()->get_sustain(); }
+    uint8_t from_em() override { return chem_host->host_matrix() ? chem_host->host_matrix()->get_sustain() : 0; }
 
 };
 struct SustainUi : SusUi
@@ -139,7 +139,7 @@ struct SostenutoModule : SusModule
     const char * param_name() override { return "Sostenuto"; }
     const char * min_param_name() override { return "No sostenuto"; }
     const char * max_param_name() override { return "Max sostenuto"; }
-    uint8_t from_em() override { return chem_host->host_matrix()->get_sos(); }
+    uint8_t from_em() override { return chem_host->host_matrix() ? chem_host->host_matrix()->get_sos() : 0; }
 };
 
 struct SostenutoUi : SusUi
@@ -159,7 +159,7 @@ struct Sostenuto2Module : SusModule
     const char * param_name() override { return "Sostenuto 2"; }
     const char * min_param_name() override { return "No sostenuto"; }
     const char * max_param_name() override { return "Max sostenuto"; }
-    uint8_t from_em() override { return chem_host->host_matrix()->get_sos2(); }
+    uint8_t from_em() override { return chem_host->host_matrix() ? chem_host->host_matrix()->get_sos2() : 0; }
 };
 
 struct Sostenuto2Ui : SusUi

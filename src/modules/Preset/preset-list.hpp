@@ -7,15 +7,13 @@ using namespace ::rack;
 
 namespace pachde {
 
-bool search_match(const std::string& query, const std::string& target);
-
-struct PresetList {
+struct PresetList
+{
     PresetList(const PresetList&) = delete;
 
     PresetTab tab;
     PresetOrder order{PresetOrder::Natural};
     std::vector<std::shared_ptr<PresetInfo>> preset_list;
-
     std::vector<std::shared_ptr<PresetInfo>> preset_view;
 
     uint64_t filter_masks[5]{0};

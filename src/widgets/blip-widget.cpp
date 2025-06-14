@@ -22,9 +22,9 @@ Blip::Blip(NVGcolor hole, NVGcolor rim, NVGcolor light)
     box.size.x = box.size.y = 16.f;
 }
 
-void Blip::step() {
-    const float inc = .001f;
-
+constexpr const float inc = .005f;
+void Blip::step()
+{
     if (step_bright < bright) {
         step_bright = std::max(bright, step_bright + inc);
     } else if (step_bright > bright) {
@@ -34,10 +34,10 @@ void Blip::step() {
 
 void Blip::drawLayer(const DrawArgs& args, int layer)
 {
-    TipWidget::drawLayer(args, layer);
+    Base::drawLayer(args, layer);
     if (1 != layer) return;
-    if (step_bright < 0.1f) return;
-    if (rack::settings::rackBrightness >= .95f) return;
+    //if (step_bright < 0.1f) return;
+    //if (rack::settings::rackBrightness >= .95f) return;
 
     auto vg = args.vg;
     float cx = box.size.x * .5f;
@@ -47,7 +47,7 @@ void Blip::drawLayer(const DrawArgs& args, int layer)
 
 void Blip::draw(const DrawArgs& args)
 {
-    TipWidget::draw(args);
+    Base::draw(args);
 
     auto vg = args.vg;
     float cx = box.size.x * .5f;

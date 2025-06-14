@@ -132,6 +132,7 @@ void MacroModule::update_from_em()
 {
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
+        if (!em) return;
         for (int param = 0; param <= P_M6; ++param) {
             modulation.set_em_and_param(param, em->get_macro_value(param), true);
         }

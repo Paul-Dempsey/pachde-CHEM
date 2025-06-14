@@ -209,14 +209,14 @@ PresetUi::PresetUi(PresetModule *module) :
     my_module(module)
 {
     setModule(module);
-    em_event_mask = (EventMask)(
+    IHandleEmEvents::module_id = ChemId::Preset;
+    IHandleEmEvents::em_event_mask = (IHandleEmEvents::EventMask)(
         PresetBegin + 
-        UserBegin + 
+        SystemBegin + 
         SystemComplete + 
         UserBegin + 
         UserComplete
     );
-    module_id = ChemId::Preset;
     start_delay.run();
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());

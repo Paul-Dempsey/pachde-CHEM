@@ -170,14 +170,16 @@ void ConvoModule::update_from_em()
 {
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
-        memcpy(conv.data, em->conv, 30);
-        params_from_internal();
-        init_from_em = true;
-    } else {
-        conv.set_default();
-        params_from_internal();
-        init_from_em = false;
+        if (em) {
+            memcpy(conv.data, em->conv, 30);
+            params_from_internal();
+            init_from_em = true;
+            return;
+        }
     }
+    conv.set_default();
+    params_from_internal();
+    init_from_em = false;
 }
 
 void ConvoModule::do_message(PackedMidiMessage message)

@@ -8,6 +8,7 @@ namespace pachde {
 
 struct Blip: TipWidget
 {
+    using Base = TipWidget;
     NVGcolor hole;
     NVGcolor rim;
     NVGcolor light;
@@ -35,6 +36,6 @@ Blip* createBlipCentered(
     NVGcolor light = GetStockColor(StockColor::Azure),
     NVGcolor rim = RampGray(G_50),
     NVGcolor hole = nvgRGBA(0, 0, 0, 0)
-    );
+);
 
 }

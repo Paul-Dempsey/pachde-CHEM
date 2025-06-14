@@ -124,6 +124,7 @@ void PostModule::update_from_em()
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
+    if (!em || !em->is_ready()) { return; }
     modulation.set_em_and_param(P_POST_LEVEL, em->get_post(), true);
     modulation.set_em_and_param_low(P_MIX, em->get_eq_mix(), true);
     modulation.set_em_and_param_low(P_TILT, em->get_eq_tilt(), true);

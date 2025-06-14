@@ -166,9 +166,9 @@ std::string MidiDeviceConnectionInfo::friendly(TextFormatLength length) const
 
     case TextFormatLength::Abbreviated:{
         if (0 == result.compare(0, 9, "Continuum", 0, 9)) {
-            result.replace(1, 9, "C-"); // "C-"
+            result.replace(1, 9, "C-");
         } else if (0 == result.compare(0, 12, "ContinuuMini", 0, 12)) {
-            result.replace(0, 12, "M-"); // substitute "M-"
+            result.replace(0, 12, "M-");
         } else if (0 == result.compare(0, 18, "EaganMatrix Module", 0 , 18)) {
             result.replace(0, 18, "EMM");
         } else if (0 == result.compare("MIDIIN2 (Osmose)")) {

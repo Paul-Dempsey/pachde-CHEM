@@ -280,6 +280,8 @@ void MacroUi::step()
 
     if (!chem_host) return;
     auto em = chem_host->host_matrix();
+    if (!em) return;
+
     auto a1 = em->get_jack_1_assign();
     auto a2 = em->get_jack_2_assign();
     set_pedal_text(m1_ped_label, Haken::ccI, a1, a2);

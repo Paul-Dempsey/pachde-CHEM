@@ -123,7 +123,7 @@ SettingsModule::SettingsModule() :
 
 bool SettingsModule::connected()
 {
-    if (!chem_host) return false;
+    if (!chem_host || !chem_host->host_matrix()) return false;
     auto conn = chem_host->host_connection(ChemDevice::Haken);
     return conn && conn->identified();
 }
@@ -173,7 +173,7 @@ void SettingsModule::update_from_em()
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
-    if (!em->is_ready()) { return; }
+    if (!em || !em->is_ready()) { return; }
 
     uint8_t value;
 

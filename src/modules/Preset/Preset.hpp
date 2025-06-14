@@ -206,7 +206,11 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
         case PresetTab::User: return user_tab;
        }
     }
-    bool is_osmose() { return chem_host && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); }
+    bool is_osmose() { 
+        return chem_host 
+            && chem_host->host_matrix()
+            && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); 
+    }
     Tab& active_tab() { return get_tab(active_tab_id); }
     void set_tab(PresetTab tab, bool fetch);
     PresetList& preset_list(PresetTab which) { return get_tab(which).list; }

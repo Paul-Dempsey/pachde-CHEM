@@ -76,14 +76,6 @@ void EaganMatrix::unsubscribeEMEvents(IHandleEmEvents* client)
         clients.erase(item);
     }
 }
-void EaganMatrix::notifyLoopDetect(uint8_t cc, uint8_t value)
-{
-    for (auto client : clients) {
-        if (client->em_event_mask & IHandleEmEvents::LoopDetect) {
-            client->onLoopDetect(cc, value);
-        }
-    }
-}
 void EaganMatrix::notifyEditorReply(uint8_t editor_reply)
 {
     for (auto client : clients) {
@@ -351,10 +343,9 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
         }
     } break;
 
-    case Haken::ccMini_LB:
-    case Haken::ccLoopDetect:
-        notifyLoopDetect(cc, value);
-        break;
+    // case Haken::ccMini_LB:
+    // case Haken::ccLoopDetect:
+    //     break;
 
     case Haken::ccVersHi:
         firmware_version = value;
@@ -373,12 +364,12 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     case Haken::ccTask:
         notifyTaskMessage(value);
         switch (value) {
-        case Haken::archiveOk:
-        case Haken::archiveFail:
-            in_preset = false;
-            ready = true;
-            notifyPresetChanged();
-            break;
+        // case Haken::archiveOk:
+        // case Haken::archiveFail:
+        //     in_preset = false;
+        //     ready = true;
+        //     notifyPresetChanged();
+        //     break;
 
         case Haken::configToMidi:
             pending_config = true;
@@ -482,12 +473,10 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                     preset.id.set_bank_lo((pn & 0xff80) >> 7);
                     preset.id.set_number(pn & 0x7f);
                 }
-                if (in_system || in_user || pending_config) {
-                    pending_config = false;
-                    in_preset = false;
-                    ready = true;
-                    notifyPresetChanged();
-                }
+                pending_config = false;
+                in_preset = false;
+                ready = true;
+                notifyPresetChanged();
             }
             break;
 

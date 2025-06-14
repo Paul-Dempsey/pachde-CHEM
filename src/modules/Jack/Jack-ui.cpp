@@ -202,7 +202,9 @@ void JackUi::sync_labels()
         }
 
         if (chem_host) {
-            auto pt = chem_host->host_matrix()->get_pedal_types();
+            auto em = chem_host->host_matrix();
+            if (!em) return;
+            auto pt = em->get_pedal_types();
             auto p1 = pt & Haken::bPedType0;
             auto p2 = (pt & Haken::bPedType1) >> Haken::sPedType1;
             if (last_p1 != p1) {
@@ -224,8 +226,10 @@ void JackUi::step()
     bind_host(my_module);
     if (chem_host) {
         auto em = chem_host->host_matrix();
-        level_1->level = uint8_t(em->get_jack_1() >> 7);
-        level_2->level = uint8_t(em->get_jack_2() >> 7);
+        if (em) {
+            level_1->level = uint8_t(em->get_jack_1() >> 7);
+            level_2->level = uint8_t(em->get_jack_2() >> 7);
+        }
     }
     sync_labels();
 }

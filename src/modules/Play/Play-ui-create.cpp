@@ -58,17 +58,21 @@ struct PlayMenu : Hamburger
         menu->addChild(createMenuItem("Sort by Natural (system) order", "", [this](){ ui->sort_presets(PresetOrder::Natural); }, false));
         if (ui->chem_host) {
             auto em = ui->chem_host->host_matrix();
-            if (Haken::hw_o49 != em->get_hardware()) {
-                menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
-                    menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
-                    menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
-                    menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
-                }));
+            if (em) {
+                if (Haken::hw_o49 != em->get_hardware()) {
+                    menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
+                        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
+                        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
+                        menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
+                    }));
+                } else {
+                    menu->addChild(createMenuLabel("Append (unavailble on Osmose)"));
+                }
             } else {
-                menu->addChild(createMenuLabel("Append (unavailble on Osmose)"));
+                menu->addChild(createMenuLabel("Append [no connection]"));
             }
         } else {
-                menu->addChild(createMenuLabel("Append [no connection]"));
+            menu->addChild(createMenuLabel("Append [no connection]"));
         }
 
         menu->addChild(new MenuSeparator);
