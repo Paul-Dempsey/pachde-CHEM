@@ -1,4 +1,4 @@
-#include "preset.hpp"
+#include "Preset.hpp"
 
 constexpr const double OSMOSE_SETTLE_TIME {2.0};
 constexpr const double OSMOSE_PRESET_START_TIME {0.75};
