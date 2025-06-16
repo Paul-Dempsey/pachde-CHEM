@@ -6,6 +6,7 @@
 #include "em-hardware.h"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
+#include "../services/crc.hpp"
 
 namespace pachde {
 
@@ -105,7 +106,8 @@ struct EaganMatrix
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
     PresetDescription preset;
-    
+    crc::crc32 preset_hasher;
+
     bool is_ready() { return ready; }
     void reset();
     
@@ -318,7 +320,7 @@ struct EaganMatrix
     bool handle_macro_cc(uint8_t cc, uint8_t value);
     void onChannelOneCC(uint8_t cc, uint8_t value);
     void onChannelTwoCC(uint8_t cc, uint8_t value);
-    void onChannel16CC(uint8_t cc, uint8_t value);
+    void onChannel16CC(PackedMidiMessage msg);
     void onMessage(PackedMidiMessage msg);
 
 };

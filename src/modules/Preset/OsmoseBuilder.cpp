@@ -42,7 +42,8 @@ void OsmoseBuilder::preset_received()
     state_time = current;
 }
 
-OsmoseBuilder::ReadyResponse OsmoseBuilder::ready() {
+OsmoseBuilder::ReadyResponse OsmoseBuilder::ready()
+{
     ReadyResponse result = ReadyResponse::Timeout;
 
     switch (state) {

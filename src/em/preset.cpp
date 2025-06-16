@@ -38,6 +38,8 @@ PresetId parse_id_spec(std::string spec)
 json_t* PresetDescription::toJson(bool include_id, bool include_name, bool include_text)
 {
     json_t* root = json_object();
+    json_object_set_new(root, "#", json_integer(tag));
+
     if (include_id) {
         json_object_set_new(root, "id", json_string(id_spec_to_string(id).c_str()));
     }
@@ -53,6 +55,7 @@ json_t* PresetDescription::toJson(bool include_id, bool include_name, bool inclu
 
 void PresetDescription::fromJson(const json_t* root)
 {
+    tag = get_json_int(root, "#", 0);
     id = parse_id_spec(get_json_string(root, "id"));
     name = get_json_string(root, "name");
     text = get_json_string(root, "text");

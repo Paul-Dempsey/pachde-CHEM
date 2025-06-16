@@ -3,6 +3,17 @@
 
 namespace pachde {
 
+inline void hash_midi(crc::crc32& hasher, PackedMidiMessage m)
+{
+    m.bytes.tag = 0;
+    hasher.accumulate(&m, sizeof(m));
+}
+inline void hash_2(crc::crc32& hasher, uint8_t b1, uint8_t b2)
+{
+    uint8_t a[] = {b1, b2};
+    hasher.accumulate(&a, 2);
+}
+
 EaganMatrix::EaganMatrix()
 :   ready(false),
     firmware_version(0),
@@ -184,6 +195,7 @@ void EaganMatrix::begin_preset()
 {
     clear_preset(false);
     in_preset = true;
+    preset_hasher.init();
     notifyPresetBegin();
 }
 
@@ -270,8 +282,19 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
     }
 }
 
-void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
+void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
 {
+    uint8_t cc = msg.bytes.data1;
+    uint8_t value = msg.bytes.data2;
+
+    if (in_preset
+        && (cc <= Haken::ccCVCLow)
+        && (cc != Haken::ccBankH)
+        && (cc != Haken::ccBankL)
+    ) {
+        hash_midi(preset_hasher, msg);
+    }
+
     // The ccs ccMod, ccBreath, ccUndef, ccFoot, ccVol, ccExpres
     // can be used for pedal assignment. 
     // When assigned, the cc comes to channel 16. 
@@ -359,6 +382,7 @@ void EaganMatrix::onChannel16CC(uint8_t cc, uint8_t value)
     case Haken::ccCVCHigh:
         hardware = (value & 0x7c) >> 2;
         begin_preset();
+        hash_2(preset_hasher, cc, value);
         break;
 
     case Haken::ccTask:
@@ -434,6 +458,9 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
         case MidiStatus_CC: {
             ch1.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelOneCC(msg.bytes.data1, msg.bytes.data2);
+            if (in_preset) {
+                hash_midi(preset_hasher, msg);
+            }
         } break;
         }
     } break;
@@ -454,7 +481,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
         switch (status) {
         case MidiStatus_CC:
             ch16.cc[msg.bytes.data1] = msg.bytes.data2;
-            onChannel16CC(msg.bytes.data1, msg.bytes.data2);
+            onChannel16CC(msg);
             break;
 
         case MidiStatus_ProgramChange:
@@ -476,12 +503,18 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 pending_config = false;
                 in_preset = false;
                 ready = true;
+                preset.tag = preset_hasher.result();
+                //DEBUG("hash: %d %d %s", preset_hasher.content_size(), preset.tag, preset.name.c_str());
+                preset_hasher.init();
                 notifyPresetChanged();
             }
             break;
 
         case MidiStatus_PolyKeyPressure: {
             switch (data_stream) {
+            case -1: 
+                break;
+
             case Haken::s_Name:
                 if (in_preset) {
                     name_buffer.build(msg.bytes.data1);
@@ -497,31 +530,34 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
 
             case Haken::s_Mat_Poke:
                 mat[msg.bytes.data1] = msg.bytes.data2;
+                if (in_preset) hash_midi(preset_hasher, msg);
                 break;
 
             case Haken:: s_Conv_Poke:
                 conv[msg.bytes.data1] = msg.bytes.data2;
+                if (in_preset) hash_midi(preset_hasher, msg);
                 break;
 
-            case -1:
-            default: break;
+            default:
+                if (in_preset) hash_midi(preset_hasher, msg);
+                break;
             }
             break;
         } break;
 
-        case MidiStatus_ChannelPressure:
-            if (in_preset) {
-                // FW 1009
-                switch (data_stream) {
-                case Haken::s_Name:
-                    name_buffer.build(msg.bytes.data1);
-                    break;
-                case Haken::s_ConText:
-                    text_buffer.build(msg.bytes.data1);
-                    break;
-                }
-            }
-            break;
+        // case MidiStatus_ChannelPressure:
+        //     if (in_preset) {
+        //         // FW 1009
+        //         switch (data_stream) {
+        //         case Haken::s_Name:
+        //             name_buffer.build(msg.bytes.data1);
+        //             break;
+        //         case Haken::s_ConText:
+        //             text_buffer.build(msg.bytes.data1);
+        //             break;
+        //         }
+        //     }
+        //     break;
         }
     } break;
 
