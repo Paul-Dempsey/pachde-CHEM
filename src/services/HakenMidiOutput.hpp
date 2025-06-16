@@ -10,24 +10,24 @@ struct HakenMidiOutput : IDoMidi
     midi::Output output;
     uint64_t message_count;
     MidiLog* log;
-
+    bool enabled{true};
     rack::dsp::RingBuffer<PackedMidiMessage, 1024> ring;
-    void queueMessage(PackedMidiMessage msg);
-    void dispatch(float sampleTime);
     rack::dsp::Timer midi_timer;
-    
+
     HakenMidiOutput(const HakenMidiOutput&) = delete; // no copy constructor
-    HakenMidiOutput() : message_count(0), log(nullptr) {
+    HakenMidiOutput() :
+        message_count(0),
+        log(nullptr)
+    {
         output.setChannel(-1);
     }
+    
+    void enable(bool on = true);
+    void queueMessage(PackedMidiMessage msg);
+    void dispatch(float sampleTime);
 
     midi::Output& midi_out() { return output; }
-
-    void clear() {
-        message_count = 0;
-        ring.clear();
-        midi_timer.reset();
-    }
+    void clear();
     uint64_t count() { return message_count; }
     bool pending() { return ring.size() > 0; }
 

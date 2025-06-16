@@ -28,11 +28,11 @@ void PresetUi::build_database(PresetTab which)
 {
     if (!host_available()) return;
     start_spinner();
-    Tab& tab = active_tab();
+    Tab& tab = get_tab(which);
     PresetId dummy;
     db_builder = new DBBuilder();
-    db_builder->init(tab.list.preset_list, live_preset ? live_preset->id : dummy);
-    db_builder->next(chem_host->host_haken());
+    db_builder->init(which, tab.list.preset_list, live_preset ? live_preset->id : dummy);
+    forget_presets(which);
 }
 
 void PresetUi::create_stop_button()
@@ -46,6 +46,7 @@ void PresetUi::create_stop_button()
 
 void PresetUi::request_osmose_user_presets(uint8_t block)
 {
+    user_loaded = false;
     auto haken = chem_host->host_haken();
     start_spinner();
     gather_start = true;
@@ -72,6 +73,7 @@ void PresetUi::request_presets(PresetTab which)
         if (user_loaded) return;
         user_tab.clear();
         gathering = PresetTab::User;
+        gather_start = true;
         if (osmose) {
             request_osmose_user_presets(90);
         } else {
@@ -83,9 +85,9 @@ void PresetUi::request_presets(PresetTab which)
         if (system_loaded) return;
         system_tab.clear();
         gathering = PresetTab::System;
+        gather_start = true;
         if (osmose) {
             start_spinner();
-            gather_start = true;
             stop_scan = false;
             create_stop_button();
             osmose_builder = new OsmoseBuilder();
@@ -102,6 +104,7 @@ std::string PresetUi::preset_file(PresetTab which)
     assert(PresetTab::Unset != which);
     const char * s_u = which == PresetTab::System ? "system" : "user";
     auto em = chem_host->host_matrix();
+    if (!em) return "";
     auto preset_filename = format_string("%s-%s-%d.json", PresetClassName(em->hardware), s_u, em->firmware_version);
     return user_plugin_asset(preset_filename);
 }
@@ -121,7 +124,7 @@ bool PresetUi::load_presets(PresetTab which)
     if (!em || (0 == em->firmware_version) || (0 == em->hardware)) return false;
 
     auto path = preset_file(which);
-    if (!system::exists(path)) return false;
+    if (path.empty() || !system::exists(path)) return false;
 
     FILE* file = std::fopen(path.c_str(), "r");
 	if (!file) return false;
@@ -162,7 +165,7 @@ bool PresetUi::save_presets(PresetTab which)
     FILE* file = std::fopen(path.c_str(), "wb");
     if (!file) return false;
 
-    uint8_t hardware = chem_host->host_matrix()->hardware;
+    uint8_t hardware = 0; //chem_host->host_matrix() ? chem_host->host_matrix()->hardware : 0;
 
     tab.list.to_json(root, hardware, my_module->device_claim);
     auto e = json_dumpf(root, file, JSON_INDENT(2));
@@ -283,63 +286,27 @@ void PresetUi::onPresetChange()
     if (other_user_gather || other_system_gather) return;
 
     if (db_builder) {
-        bool done = false;
-        if (host_available()) {
-            auto preset = chem_host->host_preset();
-            if (preset) {
-                Tab& tab = active_tab();
-                auto n = tab.list.index_of_id(preset->id);
-                if (n >= 0) {
-                    auto p = tab.list.nth(n);
-                    if (p) {
-                        p->set_text(preset->text);
-                        tab.list.set_dirty();
-                    }
-                }
-                if (!db_builder->next(chem_host->host_haken())) {
-                    save_presets(active_tab_id);
-                    done = true;
-                }
-            }
-        } else {
-            done = true;
+        auto preset = chem_host->host_preset();
+        if (preset) {
+            Tab& tab = active_tab();
+            tab.list.add(preset);
         }
-
-        if (done) {
-            delete db_builder;
-            db_builder = nullptr;
-            stop_spinner();
-        }
+        db_builder->preset_received();
         return;
     }
 
     if (osmose_builder) {
-        assert(gathering != PresetTab::Unset);
         if (OsmoseBuilder::State::Preset != osmose_builder->state) {
             return;
         }
-        bool done = false;
-        if (host_available()) {
-            auto preset = chem_host->host_preset();
-            if (preset && !preset->empty()) {
-                PresetDescription pd;
-                pd.init(preset);
-                pd.id = osmose_builder->send_id();
-                get_tab(gathering).list.add(&pd);
-                osmose_builder->preset_received();
-            }
-        } else {
-            done = true;
+        auto preset = chem_host->host_preset();
+        if (preset && !preset->empty()) {
+            PresetDescription pd;
+            pd.init(preset);
+            pd.id = osmose_builder->send_id();
+            get_tab(gathering).list.add(&pd);
+            osmose_builder->preset_received();
         }
-        if (done) {
-            delete osmose_builder;
-            osmose_builder = nullptr;
-            save_presets(gathering);
-            stop_spinner();
-            gathering = PresetTab::Unset;
-            gather_start = false;
-        }
-
         return;
     }
     
@@ -425,11 +392,13 @@ void PresetUi::stop_spinner()
 void PresetUi::onConnectHost(IChemHost *host)
 {
     if (chem_host) {
-        chem_host->host_matrix()->unsubscribeEMEvents(this);
+        auto em = chem_host->host_matrix();
+        if (em) em->unsubscribeEMEvents(this);
     }
     chem_host = host;
     if (chem_host) {
-        chem_host->host_matrix()->subscribeEMEvents(this);
+        auto em = chem_host->host_matrix();
+        if (em) em->subscribeEMEvents(this);
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
     } else {

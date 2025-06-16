@@ -44,16 +44,17 @@ struct MidiInput : midi::Input
     uint64_t count() { return message_count; }
     void clear()
     {
-        //target = nullptr;
         reset();
         this->setDeviceId(-1);
         this->channel = -1;
+        mute = false;
+        message_count = 0;
     }
     void set_target(IDoMidi* out) { target = out; }
     void set_logger(const std::string& source, MidiLog* logger);
     void set_music_pass(bool pass_music) { music_pass_filter = pass_music; }
     void set_channel_reflect(bool reflect) { channel_reflect = reflect; }
-    void enable(bool enabled = true) { mute = !enabled; }
+    void enable(bool enabled = true);
     void onMessage(const midi::Message& message) override;
 };
 

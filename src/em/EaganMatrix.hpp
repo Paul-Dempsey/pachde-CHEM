@@ -6,27 +6,26 @@
 #include "em-hardware.h"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
+#include "../services/crc.hpp"
 
 namespace pachde {
 
 struct IHandleEmEvents {
     enum EventMask : uint16_t {
-        LoopDetect       = 1,
-        EditorReply      = 1 << 1,
-        HardwareChanged  = 1 << 2,
-        PresetBegin      = 1 << 3,
-        PresetChanged    = 1 << 4,
-        UserBegin        = 1 << 5,
-        UserComplete     = 1 << 6,
-        SystemBegin      = 1 << 7,
-        SystemComplete   = 1 << 8,
-        TaskMessage      = 1 << 9,
-        LED              = 1 << 10,
-        MahlingBegin     = 1 << 11,
-        MahlingComplete  = 1 << 12,
+        EditorReply      = 1,
+        HardwareChanged  = 1 << 1,
+        PresetBegin      = 1 << 2,
+        PresetChanged    = 1 << 3,
+        UserBegin        = 1 << 4,
+        UserComplete     = 1 << 5,
+        SystemBegin      = 1 << 6,
+        SystemComplete   = 1 << 7,
+        TaskMessage      = 1 << 8,
+        LED              = 1 << 9,
+        MahlingBegin     = 1 << 10,
+        MahlingComplete  = 1 << 11,
         None = 0,
-        All = LoopDetect
-            + EditorReply
+        All = EditorReply
             + HardwareChanged
             + PresetBegin
             + PresetChanged
@@ -42,7 +41,6 @@ struct IHandleEmEvents {
     uint16_t em_event_mask{EventMask::None};
     ChemId module_id{ChemId::Unknown};
 
-    virtual void onLoopDetect(uint8_t cc, uint8_t value) {}
     virtual void onEditorReply(uint8_t reply) {}
     virtual void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) {}
     virtual void onPresetBegin() {}
@@ -89,7 +87,7 @@ struct EaganMatrix
             || in_system
             || in_mahling
             || pending_config
-            //|| data_stream != -1
+            || pending_EditorReply
             ;
     }
     // raw channel cc data
@@ -108,7 +106,8 @@ struct EaganMatrix
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
     PresetDescription preset;
-    
+    crc::crc32 preset_hasher;
+
     bool is_ready() { return ready; }
     void reset();
     
@@ -299,7 +298,6 @@ struct EaganMatrix
     void subscribeEMEvents(IHandleEmEvents* client);
     void unsubscribeEMEvents(IHandleEmEvents* client);
 
-    void notifyLoopDetect(uint8_t cc, uint8_t value);
     void notifyEditorReply(uint8_t editor_reply);
     void notifyHardwareChanged();
     void notifyPresetBegin();
@@ -322,7 +320,7 @@ struct EaganMatrix
     bool handle_macro_cc(uint8_t cc, uint8_t value);
     void onChannelOneCC(uint8_t cc, uint8_t value);
     void onChannelTwoCC(uint8_t cc, uint8_t value);
-    void onChannel16CC(uint8_t cc, uint8_t value);
+    void onChannel16CC(PackedMidiMessage msg);
     void onMessage(PackedMidiMessage msg);
 
 };

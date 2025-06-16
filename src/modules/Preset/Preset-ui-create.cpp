@@ -95,15 +95,16 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(new MenuSeparator);
     bool host = ui->host_available();
 
+    menu->addChild(createMenuItem("Clear User presets", "", 
+        [this]() {
+            ui->user_loaded = false;
+            ui->forget_presets(PresetTab::User);
+            ui->set_tab(PresetTab::User, false);
+            ui->scroll_to(0);
+        },
+        !host
+    ));
     if (osmose) {
-        menu->addChild(createMenuItem("Clear User presets", "", 
-            [this](){
-                ui->forget_presets(PresetTab::User);
-                ui->set_tab(PresetTab::User, false);
-                ui->scroll_to(0);
-            },
-            !host
-        ));
         menu->addChild(createSubmenuItem("Scan User presets", "", [=](Menu * menu) {
             menu->addChild(createMenuItem("Block 1", "", [=](){ ui->request_osmose_user_presets(90); }));
             menu->addChild(createMenuItem("Block 2", "", [=](){ ui->request_osmose_user_presets(91); }));
@@ -117,21 +118,30 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
             menu->addChild(createMenuItem("Block 10", "", [=](){ ui->request_osmose_user_presets(99); }));
         }));
         menu->addChild(createMenuItem("Refresh System presets", "", 
-            [this](){ ui->request_presets(PresetTab::System); },
+            [this](){ 
+                ui->system_loaded = false;
+                ui->request_presets(PresetTab::System); 
+            },
             !host
         ));
     } else {
         menu->addChild(createMenuItem("Refresh User presets", "", 
-            [this](){ ui->request_presets(PresetTab::User); },
+            [this](){ 
+                ui->user_loaded = false;
+                ui->request_presets(PresetTab::User); 
+            },
             !host
         ));
         menu->addChild(createMenuItem("Refresh System presets", "", 
-            [this](){ ui->request_presets(PresetTab::System); },
+            [this](){
+                ui->system_loaded = false;
+                ui->request_presets(PresetTab::System);
+            },
             !host
         ));
         std::string name = format_string("Build full %s database", ui->active_tab_id == PresetTab::User ? "User" : "System");
         menu->addChild(createMenuItem(name, "",
-            [this](){ ui->build_database(PresetTab::System); },
+            [this](){ ui->build_database(ui->active_tab_id); },
             !host
         ));
     }
@@ -209,14 +219,14 @@ PresetUi::PresetUi(PresetModule *module) :
     my_module(module)
 {
     setModule(module);
-    em_event_mask = (EventMask)(
+    IHandleEmEvents::module_id = ChemId::Preset;
+    IHandleEmEvents::em_event_mask = (IHandleEmEvents::EventMask)(
         PresetBegin + 
-        UserBegin + 
+        SystemBegin + 
         SystemComplete + 
         UserBegin + 
         UserComplete
     );
-    module_id = ChemId::Preset;
     start_delay.run();
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());

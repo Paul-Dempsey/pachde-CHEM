@@ -134,18 +134,49 @@ struct OsmoseBuilder
 
 struct DBBuilder {
     std::deque<PresetId> presets;
-    void init(const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current) {
+    PresetId current;
+    WallTimer timer;
+    bool pending {false};
+    bool settling {false};
+    PresetTab tab{PresetTab::Unset};
+
+    void init(PresetTab the_tab, const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current_preset)
+    {
+        tab = the_tab;
         for (auto p : source) {
             presets.push_back(p->id);
         }
-        if (current.valid()) {
-            presets.push_back(current);
-        }
+        current = current_preset;
     }
-    bool next(HakenMidi* haken) {
+
+    void preset_received() {
+        pending = false;
+        timer.start(1.0);
+        settling = true;
+    }
+    
+    bool ready() {
+        if (pending) return false;
+        if (settling) {
+            if (timer.finished()) {
+                settling = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool next(HakenMidi* haken)
+    {
         if (presets.empty()) return false;
+        assert(!settling);
+        assert(!pending);
         PresetId id = presets.front();
         presets.pop_front();
+        pending = true;
+        assert(id.valid());
         haken->select_preset(ChemId::Preset, id);
         return true;
     }
@@ -206,7 +237,11 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
         case PresetTab::User: return user_tab;
        }
     }
-    bool is_osmose() { return chem_host && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); }
+    bool is_osmose() { 
+        return chem_host 
+            && chem_host->host_matrix()
+            && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); 
+    }
     Tab& active_tab() { return get_tab(active_tab_id); }
     void set_tab(PresetTab tab, bool fetch);
     PresetList& preset_list(PresetTab which) { return get_tab(which).list; }

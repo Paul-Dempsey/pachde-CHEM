@@ -206,6 +206,23 @@ void PresetUi::step()
         filter_off_button->button_down = true;
     }
 
+    if (db_builder) {
+        if (db_builder->ready()) {
+            if (!db_builder->next(chem_host->host_haken())) {
+                PresetId restore = db_builder->current;
+                auto tab_id =  db_builder->tab;
+                delete db_builder;
+                db_builder = nullptr;
+                save_presets(tab_id);
+                stop_spinner();
+                set_tab(tab_id, false);
+                if (restore.valid()) {
+                    auto haken = chem_host->host_haken();
+                    if (haken) haken->select_preset(ChemId::Preset, restore);
+                }
+            }
+        }
+    }
     if (osmose_builder) {
         bool done = false;
         switch (osmose_builder->ready())

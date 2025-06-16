@@ -76,6 +76,7 @@ void JackModule::pull_jack_data()
 {
     assert(chem_host);
     auto em = chem_host->host_matrix();
+    if (!em) return;
     last_assign_1 = em->get_jack_1_assign();
     last_assign_2 = em->get_jack_2_assign();
     getParam(P_ASSIGN_JACK_1).setValue(last_assign_1);
@@ -135,11 +136,13 @@ void JackModule::process(const ProcessArgs &args)
     }
 
     auto em = chem_host->host_matrix();
-    uint16_t j = em->get_jack_1();
-    getOutput(OUT_JACK_1).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
-
-    j = em->get_jack_2();
-    getOutput(OUT_JACK_2).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
+    if (em) {
+        uint16_t j = em->get_jack_1();
+        getOutput(OUT_JACK_1).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
+    
+        j = em->get_jack_2();
+        getOutput(OUT_JACK_2).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
+    }
 }
 
 Model *modelJack = createModel<JackModule, JackUi>("chem-jack");

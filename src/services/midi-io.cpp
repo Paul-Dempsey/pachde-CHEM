@@ -123,9 +123,14 @@ void MidiInput::drop(int count)
     ring.shiftBuffer(trash, count);
 }
 
-MidiInput::MidiInput(ChemId tag): my_tag(tag), message_count(0), log(nullptr), music_pass_filter(false), mute{false}
+MidiInput::MidiInput(ChemId tag):
+    my_tag(tag),
+    message_count(0),
+    log(nullptr),
+    music_pass_filter(false),
+    mute{false}
 {
-    this->channel = -1;
+    channel = -1;
     midi_timer.time = (random::uniform() * MIDI_RATE); // jitter
 }
 
@@ -135,6 +140,14 @@ void MidiInput::queueMessage(PackedMidiMessage msg)
         drop(16);
     }
     ring.push(msg);
+}
+
+void MidiInput::enable(bool enabled)
+{
+    mute = !enabled; 
+    if (mute) {
+        ring.clear();
+    }
 }
 
 void MidiInput::onMessage(const midi::Message& message)

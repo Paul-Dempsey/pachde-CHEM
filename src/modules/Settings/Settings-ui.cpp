@@ -50,7 +50,7 @@ struct AesMenu : Hamburger
         menu->addChild(createMenuLabel<HamburgerTitle>("AES Audio"));
         if (settings && settings->connected()) {
             auto em = settings->chem_host->host_matrix();
-            auto text = format_string("AES in: %s", AesInputName(em->get_aes_detect()));
+            auto text = format_string("AES in: %s", em ? AesInputName(em->get_aes_detect()) : "(Unavailable)");
             menu->addChild(createMenuLabel(text));
         } else {
             menu->addChild(createMenuLabel("(Unavailable)"));

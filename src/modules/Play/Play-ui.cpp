@@ -23,7 +23,8 @@ bool PlayUi::connected() {
 PlayUi::~PlayUi()
 {
     if (chem_host) {
-        chem_host->host_matrix()->unsubscribeEMEvents(this);
+        auto em = chem_host->host_matrix();
+        if (em) em->unsubscribeEMEvents(this);
     }
     if (modified && module && !my_module->playlist_file.empty()) {
         save_playlist();
@@ -576,7 +577,9 @@ void PlayUi::fill(FillOptions which)
 {
     if (!chem_host) return;
     auto haken = chem_host->host_haken();
+    if (!haken) return;
     auto matrix = chem_host->host_matrix();
+    if (!matrix) return;
     matrix->subscribeEMEvents(this);
     gather = which;
 
@@ -602,7 +605,8 @@ void PlayUi::on_fill_complete()
         break;
     case FillOptions::All:
         gather = FillOptions::System;
-        chem_host->host_haken()->request_system(ChemId::Play);
+        auto haken = chem_host->host_haken();
+        if (haken) haken->request_system(ChemId::Play);
         return;
     }
 
@@ -610,7 +614,7 @@ void PlayUi::on_fill_complete()
 
     gather = FillOptions::None;
     auto matrix = chem_host->host_matrix();
-    matrix->unsubscribeEMEvents(this);
+    if (matrix) matrix->unsubscribeEMEvents(this);
     sync_to_presets();
 }
 

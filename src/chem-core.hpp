@@ -1,6 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "chem-id.hpp"
+#include "chem-job.hpp"
 #include "em/preset.hpp"
 #include "em/EaganMatrix.hpp"
 #include "services/rack-em-convert.hpp"
@@ -30,9 +31,9 @@ struct IChemClient
     virtual ::rack::engine::Module* client_module() = 0;
     virtual std::string client_claim() = 0;
     virtual IDoMidi* client_do_midi() { return nullptr; }
-
+    //virtual void onJobComplete (chem_job::JobId id) {}
     virtual void onConnectHost(IChemHost* host) = 0;
-    virtual void onPresetChange() = 0;
+    virtual void onPresetChange() {};
     virtual void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) = 0;
 };
 

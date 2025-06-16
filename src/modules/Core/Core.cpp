@@ -6,23 +6,17 @@
 
 using namespace pachde;
 
-using EME = IHandleEmEvents::EventMask;
-
 CoreModule::CoreModule() :
     modulation(this, ChemId::Core),
-    midi_log(nullptr),
     disconnected(false),
     is_busy(false),
-    in_reboot(false),
-    heartbeat(false),
-    restore_last_preset(false)
+    in_reboot(false)
 {
     ticker.set_interval(1.0f);
-    
     module_id = ChemId::Core;
-    em_event_mask = static_cast<IHandleEmEvents::EventMask>(
-        EME::LoopDetect
-        + EME::EditorReply
+    using EME = IHandleEmEvents::EventMask;
+    em_event_mask = static_cast<EME>(
+        EME::EditorReply
         + EME::HardwareChanged
         + EME::PresetChanged
         + EME::UserBegin
@@ -42,7 +36,6 @@ CoreModule::CoreModule() :
     configSwitch(Params::P_C1_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 1 Channel map", { "off", "reflect" } );
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     snap(configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", ""));
-    configSwitch(Params::P_DISCONNECT, 0.f, 1.f, 0.f, "MIDI Connection", { "Auto", "Disconnected" } );
     dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
@@ -56,13 +49,14 @@ CoreModule::CoreModule() :
 
     configOutput(Outputs::OUT_READY, "Ready gate");
 
+    startup_tasks.init(this);
+    recurring_tasks.init(this);
     ModuleBroker::get()->register_host(this);
 
     midi_relay.set_em(&em);
     midi_relay.register_target(&haken_midi_out);
 
     em.subscribeEMEvents(this);
-    tasks.setCoreModule(this);
     haken_midi.set_handler(&midi_relay);
 
     haken_device.init(ChemDevice::Haken, this);
@@ -77,8 +71,6 @@ CoreModule::CoreModule() :
     broker->registerDeviceHolder(&haken_device);
     broker->registerDeviceHolder(&controller1);
     broker->registerDeviceHolder(&controller2);
-
-    tasks.subscribeChange(this);
 
     EmccPortConfig cfg[] = {
         EmccPortConfig::cc(P_ATTENUATION, -1, -1, Haken::ch1, Haken::ccAtten, true),
@@ -148,51 +140,42 @@ std::string CoreModule::device_name(ChemDevice which) {
     }
 }
 
-void CoreModule::reboot()
+void CoreModule::reset_tasks()
 {
-    if (in_reboot) return;
-    in_reboot = true;
-
-    controller1_midi_in.ring.clear();
-    controller2_midi_in.ring.clear();
-    haken_midi_in.ring.clear();
-    haken_midi_out.ring.clear();
-
-    controller1_midi_in.reset();
-    controller2_midi_in.reset();
-    haken_midi_in.reset();
-
-    haken_midi_out.output.reset();
-    haken_midi_out.output.channel = -1;
-
-    em.reset();
-    init_osmose();
-    tasks.refresh();
-    in_reboot = false;
-}
-
-void CoreModule::send_midi_rate(HakenMidiRate rate)
-{
-    haken_midi.midi_rate(ChemId::Core, rate);
-}
-
-void CoreModule::restore_midi_rate()
-{
-    if (HakenMidiRate::Full != tasks.midi_rate) {
-        haken_midi.midi_rate(ChemId::Core, HakenMidiRate::Full);
-        tasks.midi_rate = HakenMidiRate::Full;
+    if (!startup_tasks.completed()) return;
+    recurring_tasks.reset();
+    startup_tasks.reset();
+    for (size_t i = 0; i < sizeof(start_states)/sizeof(start_states[0]); ++i) {
+        start_states[i] = ChemTask::State::Untried;
     }
 }
 
-// IHandleEmEvents
-void CoreModule::onLoopDetect(uint8_t cc, uint8_t value)
+void CoreModule::reboot()
 {
-    heartbeat = !heartbeat;
+    if (in_reboot) return;
+
+    in_reboot = true;
+    disconnected = false;
+
+    haken_midi_in.clear();
+    haken_midi_out.clear();
+    controller1_midi_in.clear();
+    controller2_midi_in.clear();
+
+    em.reset();
+    init_osmose();
+    reset_tasks();
+    in_reboot = false;
 }
 
+// IHandleEmEvents
 void CoreModule::onEditorReply(uint8_t reply)
 {
-    tasks.complete_task(HakenTask::HeartBeat);
+    if (!startup_tasks.completed()) {
+        startup_tasks.heartbeat_received();
+    } else {
+        recurring_tasks.heartbeat_received();
+    }
 }
 
 void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
@@ -203,13 +186,8 @@ void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 void CoreModule::onPresetChanged()
 {
     if (em.preset.valid()) {
-        auto task = tasks.get_task(HakenTask::PresetInfo);
-        if (task->pending()) {
-            task->complete();
-        }
-        task = tasks.get_task(HakenTask::LastPreset);
-        if (task->pending()) {
-            task->complete();
+        if (!startup_tasks.completed()) {
+            startup_tasks.configuration_received();
         }
     }
     log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
@@ -253,10 +231,6 @@ void CoreModule::onMahlingComplete()
     if (chem_ui) ui()->show_busy(is_busy);
 }
 
-void CoreModule::onHakenTaskChange(HakenTask id)
-{
-}
-
 // IChemHost
 void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
@@ -284,37 +258,31 @@ void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
 
 void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 {
-    auto sample_time = APP->engine->getSampleTime();
-    getLight(L_READY).setBrightnessSmooth(0.f, 20 * sample_time);
-
     switch (source->role()) {
     case ChemDevice::Haken: {
-        em.ready = false; // todo clear?
+        em.ready = false;
         haken_midi_in.ring.clear();
         haken_midi_out.ring.clear();
-        if (source->connection) {
+        if (!disconnected && source->connection) {
             haken_midi_in.setDriverId(source->connection->driver_id);
             haken_midi_in.setDeviceId(source->connection->input_device_id);
             haken_midi_out.output.setDeviceId(source->connection->output_device_id);
             haken_midi_out.output.channel = -1;
-
             log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
-            haken_midi.editor_present(ChemId::Core);
-            haken_midi_out.dispatch(DISPATCH_NOW);
         } else {
-            log_message("Core", "--- disconnect HAKEN");
             haken_midi_in.reset();
             haken_midi_out.output.reset();
             haken_midi_out.output.channel = -1;
+            log_message("Core", "--- disconnect HAKEN");
         }
         em.reset();
         init_osmose();
-        tasks.refresh();
+        reset_tasks();
         notify_connection_changed(ChemDevice::Haken, source->connection);
     } break;
 
     case ChemDevice::Midi1:
-        if (source->connection) {
+        if (!disconnected && source->connection) {
             log_message("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller1_midi_in.set_channel_reflect(is_em);
@@ -329,7 +297,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
         break;
 
     case ChemDevice::Midi2:
-        if (source->connection) {
+        if (!disconnected && source->connection) {
             log_message("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller2_midi_in.set_channel_reflect(is_em);
@@ -371,10 +339,6 @@ void CoreModule::dataFromJson(json_t *root)
     controller1.set_claim(get_json_string(root, "controller-1"));
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
-    json_read_bool(root, "restore-preset", restore_last_preset);
-    if (!restore_last_preset) {
-        this->tasks.get_task(HakenTask::LastPreset)->not_applicable();
-    }
     json_read_bool(root, "glow-knobs", glow_knobs);
     // if (!haken_device.get_claim().empty()) {
     //     modulation.mod_from_json(root);
@@ -388,10 +352,6 @@ json_t* CoreModule::dataToJson()
     json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging()));
-    json_object_set_new(root, "restore-preset", json_boolean(restore_last_preset));
-    if (!last_preset.empty()) {
-        json_object_set_new(root, "last-preset", last_preset.toJson(true, true, false));
-    }
     // if (!haken_device.get_claim().empty()) {
     //     modulation.mod_to_json(root);
     // }
@@ -400,8 +360,10 @@ json_t* CoreModule::dataToJson()
 
 void CoreModule::update_from_em()
 {
+    if (disconnected) return;
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
+        if (!em) return;
         EmControlPort& port = modulation.get_port(0);
         if (Haken::ccPost == port.cc_id) {
             modulation.set_em_and_param(0, em->get_post(), true);
@@ -412,9 +374,23 @@ void CoreModule::update_from_em()
     }
 }
 
-void CoreModule::connect_midi(bool on_off)
+void CoreModule::connect_midi(bool on)
 {
-
+    if (disconnected == !on) return;
+    disconnected = !on;
+    if (disconnected) {
+        haken_device.connect(nullptr);
+        haken_midi_in.clear();
+        haken_midi_in.enable(false);
+        haken_midi_out.clear();
+        haken_midi_out.enable(false);
+        controller1_midi_in.clear();
+        controller1_midi_in.enable(false);
+        controller2_midi_in.clear();
+        controller2_midi_in.enable(false);
+    } else {
+        reboot();
+    }
 }
 
 void CoreModule::init_osmose()
@@ -446,6 +422,7 @@ void CoreModule::do_message(PackedMidiMessage message)
             modulation.set_em_and_param_low(0, midi_cc_value(message), true);
         }
     } break;
+
     case Haken::ccPost: {
         EmControlPort& port = modulation.get_port(0);
         if (port.cc_id == cc) {
@@ -513,7 +490,7 @@ constexpr const uint64_t PROCESS_PARAM_INTERVAL = 47;
 
 void CoreModule::processLights(const ProcessArgs &args)
 {
-    getLight(L_READY).setBrightnessSmooth(host_busy() ? 0.f : (em.ready ? 1.0f : 0.f), args.sampleTime * 20);
+    getLight(L_READY).setBrightnessSmooth(host_busy() ? 0.f : 1.0f, args.sampleTime * 20);
 
     octave.set_shift(em.get_octave_shift());
     octave.update_lights(this, Lights::L_OCT_SHIFT_FIRST);
@@ -528,7 +505,6 @@ void CoreModule::processLights(const ProcessArgs &args)
     getLight(L_C2_MUTE).setBrightnessSmooth(getParam(P_C2_MUTE).getValue(), 45.f);
     getLight(L_C1_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C1_CHANNEL_MAP).getValue(), 45.f);
     getLight(L_C2_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C2_CHANNEL_MAP).getValue(), 45.f);
-    getLight(L_DISCONNECT).setBrightnessSmooth(getParam(P_DISCONNECT).getValue(), 45.f);
 }
 
 void CoreModule::process_params(const ProcessArgs &args)
@@ -562,7 +538,28 @@ void CoreModule::process_params(const ProcessArgs &args)
 
 void CoreModule::process(const ProcessArgs &args)
 {
-    //ChemModule::process(args);
+    //DO NOT ChemModule::process(args);
+
+    if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
+        processLights(args);
+        if (ticker.lap()) {
+            auto next = getParam(P_NOTHING).getValue() + 1.0f;
+            if (next > getParamQuantity(P_NOTHING)->getMaxValue()) {
+                next = 0.f;
+            }
+            getParam(P_NOTHING).setValue(next);
+        }
+    }
+    if (disconnected) return;
+
+    if (!startup_tasks.completed()) {
+        startup_tasks.process(args);
+    } else {
+        if (!recurring_tasks.started) {
+            recurring_tasks.start();
+        }
+        recurring_tasks.process(args);
+    }
 
     auto sample_time = args.sampleTime;
     controller1_midi_in.dispatch(sample_time);
@@ -575,10 +572,6 @@ void CoreModule::process(const ProcessArgs &args)
         haken_midi_out.dispatch(DISPATCH_NOW);
     } else {
         haken_midi_out.dispatch(sample_time);
-    }
-
-    if (!haken_midi_out.pending()) {
-        tasks.process(args);
     }
 
     if (modulation.sync_params_ready(args)) {
@@ -598,21 +591,12 @@ void CoreModule::process(const ProcessArgs &args)
     }
     
     if (getOutput(OUT_READY).isConnected()) {
-        getOutput(OUT_READY).setVoltage(em.ready && !host_busy() ? 10.0f : 0.0f);
+        getOutput(OUT_READY).setVoltage(host_busy() ? 0.0f : 10.0f);
     }
     if (0 == ((args.frame + id) % PROCESS_PARAM_INTERVAL)) {
         process_params(args);
     }
-    if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {
-        processLights(args);
-        if (ticker.lap()) {
-            auto next = getParam(P_NOTHING).getValue() + 1.0f;
-            if (next > getParamQuantity(P_NOTHING)->getMaxValue()) {
-                next = 0.f;
-            }
-            getParam(P_NOTHING).setValue(next);
-        }
-    }
+
 }
 
 Model *modelCore = createModel<CoreModule, CoreModuleWidget>("chem-core");

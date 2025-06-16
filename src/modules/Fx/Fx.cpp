@@ -98,7 +98,7 @@ void FxModule::onConnectHost(IChemHost* host)
 void FxModule::onPresetChange()
 {
     auto em = chem_host->host_matrix();
-
+    if (!em) return;
     auto disable = em->is_disable_recirculator();
     getParam(Params::P_DISABLE).setValue(disable);
     getLight(Lights::L_DISABLE).setBrightnessSmooth(disable, 45.f);

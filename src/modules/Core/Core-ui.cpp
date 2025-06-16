@@ -10,7 +10,6 @@ CoreModuleWidget::~CoreModuleWidget()
 {
     if (my_module) {
         my_module->em.unsubscribeEMEvents(this);
-        my_module->tasks.unsubscribeChange(this);
     }
     if (chem_host) {
         chem_host->unregister_chem_client(this);
@@ -37,7 +36,6 @@ void CoreModuleWidget::glowing_knobs(bool glow)
     attenuation_knob->glowing(glow);
 }
 
-
 // Layout
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
@@ -60,8 +58,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
         my_module->set_chem_ui(this);
     }
     IHandleEmEvents::em_event_mask =
-        LoopDetect
-        + EME::HardwareChanged
+        EME::HardwareChanged
         + EME::PresetChanged
         + EME::TaskMessage
         + EME::LED
@@ -119,7 +116,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     x = RACK_GRID_WIDTH * 1.5f;
     y = 30.f;
     addChild(createLightCentered<TinyLight<BlueLight>>(Vec(x, y), my_module, CoreModule::L_READY));
-    addChild(blip = createBlipCentered(r_col, y, "EM LED"));
+    addChild(em_led = createBlipCentered(r_col, y, "EM LED"));
 
     x = CENTER;
     y = 178.f;
@@ -145,11 +142,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
         my_module->set_chem_ui(this);
         my_module->register_chem_client(this);
         my_module->em.subscribeEMEvents(this);
-        my_module->tasks.subscribeChange(this);
-        // sync task updates that occurred before now
-        for (HakenTask id = HakenTask::First; id < HakenTask::End; id = next_task(id)) {
-            onHakenTaskChange(id);
-        }
     }
 }
 
@@ -210,8 +202,10 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
                 auto broker = MidiDeviceBroker::get();
                 assert(broker);
                 my_module->haken_device.clear();
+                my_module->haken_midi_out.clear();
                 my_module->controller1.clear();
                 my_module->controller2.clear();
+                my_module->haken_midi_out.enable();
                 my_module->controller1_midi_in.enable();
                 my_module->controller2_midi_in.enable();
             } else {
@@ -220,8 +214,8 @@ void CoreModuleWidget::createMidiPickers(std::shared_ptr<SvgTheme> theme)
                 my_module->controller1.connect(nullptr);
                 my_module->controller2.connect(nullptr);
                 my_module->haken_midi_in.reset();
-                my_module->haken_midi_out.output.reset();
-                my_module->haken_midi_out.output.channel = -1;
+                my_module->haken_midi_out.clear();
+                my_module->haken_midi_out.enable();
                 my_module->controller1_midi_in.reset();
                 my_module->controller1_midi_in.enable();
                 my_module->controller2_midi_in.reset();
@@ -243,25 +237,63 @@ void CoreModuleWidget::createRoundingLeds(float cx, float cy, float spread)
 
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
 {
-    auto co = themeColor(coTaskUnscheduled);
-    x -= (spread * 5) *.5f;
-    addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::MidiDevice))); x += spread;
-    addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, TaskName(HakenTask::HeartBeat))); x += spread;
-    addChild(updates_indicator       = createIndicatorCentered(x, y, co, TaskName(HakenTask::Updates))); x += spread;
-    addChild(presetinfo_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::PresetInfo))); x += spread;
-    addChild(lastpreset_indicator    = createIndicatorCentered(x, y, co, TaskName(HakenTask::LastPreset))); x += spread;
-    addChild(syncdevices_indicator   = createIndicatorCentered(x, y, co, TaskName(HakenTask::SyncDevices)));
+    auto co = themeColor(coTask0);
+    x -= (spread * 3) *.5f;
+    addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, "Midi device")); x += spread;
+    addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, "Heartbeat")); x += spread;
+    addChild(em_init_indicator       = createIndicatorCentered(x, y, co, "Updates")); x += spread;
+    addChild(presetinfo_indicator    = createIndicatorCentered(x, y, co, "Preset Info")); x += spread;
 }
 
-void CoreModuleWidget::resetIndicators()
+void CoreModuleWidget::updateIndicators()
 {
-    auto co = themeColor(coTaskUnscheduled);
-    mididevice_indicator   ->setColor(co); mididevice_indicator   ->setFill(false);
-    heartbeat_indicator    ->setColor(co); heartbeat_indicator    ->setFill(false);
-    updates_indicator      ->setColor(co); updates_indicator      ->setFill(false);
-    presetinfo_indicator   ->setColor(co); presetinfo_indicator   ->setFill(false);
-    lastpreset_indicator   ->setColor(co); lastpreset_indicator   ->setFill(false);
-    syncdevices_indicator  ->setColor(co); syncdevices_indicator  ->setFill(false);
+    if (my_module) {
+        for (size_t i = 0; i < sizeof(my_module->start_states)/sizeof(my_module->start_states[0]); ++i) {
+            auto w = widget_for_task(ChemTaskId(i));
+            if (my_module->disconnected) {
+                w->setColor(themeColor(ThemeColor::coTask0));
+                w->setFill(false);
+            } else {
+                auto state = my_module->start_states[i];
+                w->setColor(taskStateColor(state));
+                w->setFill(ChemTask::State::Untried != state);
+            }
+        }
+    } else {
+        mididevice_indicator->setColor(taskStateColor(ChemTask::State::Complete));
+        mididevice_indicator->setFill(true);
+
+        heartbeat_indicator->setColor(taskStateColor(ChemTask::State::Complete));
+        heartbeat_indicator->setFill(true);
+
+        em_init_indicator->setColor(taskStateColor(ChemTask::State::Complete));
+        em_init_indicator->setFill(true);
+
+        presetinfo_indicator->setColor(taskStateColor(ChemTask::State::Pending));
+        presetinfo_indicator->setFill(true);
+    }
+}
+
+// void CoreModuleWidget::resetIndicators()
+// {
+//     auto co = themeColor(coTask0);
+//     mididevice_indicator   ->setColor(co); mididevice_indicator   ->setFill(false);
+//     heartbeat_indicator    ->setColor(co); heartbeat_indicator    ->setFill(false);
+//     em_init_indicator      ->setColor(co); em_init_indicator      ->setFill(false);
+//     presetinfo_indicator   ->setColor(co); presetinfo_indicator   ->setFill(false);
+// }
+void CoreModuleWidget::connect_midi(bool on)
+{
+    if (my_module) my_module->connect_midi(on);
+    if (!on) {
+        em_led->describe("MIDI Disconnected");
+        em_led->set_light_color(red_light);
+        em_led->set_brightness(1.0);
+        attenuation_knob->enable(false);
+    } else {
+        em_led->describe("EM LED");
+        attenuation_knob->enable(true);
+    }
 }
 
 MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme)
@@ -282,18 +314,13 @@ void CoreModuleWidget::set_theme_colors(const std::string& theme)
     theme_colors[ThemeColor::coHakenMidiOut] = ColorFromTheme(name, "haken-out", nvgRGB(0x45, 0x56, 0xe7));
 
     auto co = nvgRGB(0xe7, 0x44, 0xbe);
-    theme_colors[ThemeColor::coC1MidiIn] = ColorFromTheme(name, "c1-in", co);
-    theme_colors[ThemeColor::coC2MidiIn] = ColorFromTheme(name, "c2-in", co);
-
-    theme_colors[ThemeColor::coTaskUninitialized] = ColorFromTheme(name, "tsk-0", RampGray(G_45));
-    theme_colors[ThemeColor::coTaskUnscheduled]   = ColorFromTheme(name, "tsk-nsch", RampGray(G_50));
-    theme_colors[ThemeColor::coTaskPending]       = ColorFromTheme(name, "tsk-pend", nvgRGB(0xaa, 0x40, 0xbf));
-    theme_colors[ThemeColor::coTaskComplete]      = ColorFromTheme(name, "tsk-comp", nvgRGB(0x54, 0xa7, 0x54));
-    theme_colors[ThemeColor::coTaskDone]          = ColorFromTheme(name, "tsk-done", nvgRGB(0x77, 0xbb, 0x77));
-    theme_colors[ThemeColor::coTaskWaiting]       = ColorFromTheme(name, "tsk-wait", nvgRGB(0x93, 0x99, 0x94));
-    theme_colors[ThemeColor::coTaskNotApplicable] = ColorFromTheme(name, "tsk-na",   nvgRGB(0x93, 0x99, 0x94));
-    theme_colors[ThemeColor::coTaskBroken]        = ColorFromTheme(name, "tsk-broke", nvgRGB(250, 0, 0));
-
+    theme_colors[ThemeColor::coC1MidiIn]     = ColorFromTheme(name, "c1-in", co);
+    theme_colors[ThemeColor::coC2MidiIn]     = ColorFromTheme(name, "c2-in", co);
+    theme_colors[ThemeColor::coTask0]        = ColorFromTheme(name, "tsk-0",     RampGray(G_45));
+    theme_colors[ThemeColor::coTaskPending]  = ColorFromTheme(name, "tsk-pend",  nvgRGB(0xaa, 0x40, 0xbf));
+    theme_colors[ThemeColor::coTaskComplete] = ColorFromTheme(name, "tsk-comp",  nvgRGB(0x54, 0xa7, 0x54));
+    theme_colors[ThemeColor::coTaskWaiting]  = ColorFromTheme(name, "tsk-wait",  nvgRGB(0x93, 0x99, 0x94));
+    theme_colors[ThemeColor::coTaskBroken]   = ColorFromTheme(name, "tsk-broke", nvgRGB(250, 0, 0));
     theme_colors[ThemeColor::coWeird] = GetStockColor(StockColor::Chartreuse);
 }
 
@@ -317,15 +344,11 @@ void CoreModuleWidget::onConnectHost(IChemHost* host)
     chem_host = host;
 }
 
-void CoreModuleWidget::onPresetChange()
-{}
-
 void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
 {
     std::string nothing = "";
-    resetIndicators();
+    //resetIndicators();
     em_status_label->text(nothing);
-    //task_status_label->text(nothing);
     preset_label->text(nothing);
     preset_label->describe(nothing);
     std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
@@ -403,70 +426,49 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
 
 void CoreModuleWidget::onLED(uint8_t led)
 {
-    blip->set_brightness(1.f); 
+    NVGcolor co = no_light;
+    float bright = 1.0;
     switch (led) {
-    case Haken::ledOff:         blip->set_light_color(no_light); blip->set_brightness(0.f); break;
-    case Haken::ledBlue:        blip->set_light_color(blue_light); break;
-    case Haken::ledRed:         blip->set_light_color(red_light); break;
-    case Haken::ledBrightGreen: blip->set_light_color(bright_green_light); break;
-    case Haken::ledGreen:       blip->set_light_color(green_light); break;
-    case Haken::ledWhite:       blip->set_light_color(white_light); break;
-    case Haken::ledYellow:      blip->set_light_color(yellow_light); break;
-    case Haken::ledPurple:      blip->set_light_color(purple_light); break;
-    case Haken::ledBlueGreen:   blip->set_light_color(blue_green_light); break;
+    case Haken::ledOff: bright = 0.f; break;
+    case Haken::ledBlue:        co = blue_light; break;
+    case Haken::ledRed:         co = red_light; break;
+    case Haken::ledBrightGreen: co = bright_green_light; break;
+    case Haken::ledGreen:       co = green_light; break;
+    case Haken::ledWhite:       co = white_light; break;
+    case Haken::ledYellow:      co = yellow_light; break;
+    case Haken::ledPurple:      co = purple_light; break;
+    case Haken::ledBlueGreen:   co = blue_green_light; break;
     }
+    em_led->set_light_color(co);
+    em_led->set_brightness(bright); 
 }
 
-IndicatorWidget* CoreModuleWidget::widget_for_task(HakenTask task)
+IndicatorWidget *CoreModuleWidget::widget_for_task(ChemTaskId task)
 {
     switch (task) {
-    case HakenTask::MidiDevice:    return mididevice_indicator;
-    case HakenTask::HeartBeat:     return heartbeat_indicator;
-    case HakenTask::Updates:       return updates_indicator;
-    case HakenTask::PresetInfo:    return presetinfo_indicator;
-    case HakenTask::LastPreset:    return lastpreset_indicator;
-    case HakenTask::SyncDevices:   return syncdevices_indicator;
-    default: return nullptr;
+    case ChemTaskId::Heartbeat: return heartbeat_indicator;
+    case ChemTaskId::HakenDevice: return mididevice_indicator;
+    case ChemTaskId::EmInit: return em_init_indicator;
+    case ChemTaskId::PresetInfo: return presetinfo_indicator;
+    case ChemTaskId::SyncDevices: break;
     }
-}
-const NVGcolor& CoreModuleWidget::taskStateColor(TaskState state)
-{
-    switch (state) {
-    case TaskState::Uninitialized: return themeColor(ThemeColor::coTaskUninitialized);
-    case TaskState::Unscheduled:   return themeColor(ThemeColor::coTaskUnscheduled);
-    case TaskState::Pending:       return themeColor(ThemeColor::coTaskPending);
-    case TaskState::Complete:      return themeColor(ThemeColor::coTaskComplete);
-    case TaskState::Done:          return themeColor(ThemeColor::coTaskDone);
-    case TaskState::Waiting:       return themeColor(ThemeColor::coTaskWaiting);
-    case TaskState::NotApplicable: return themeColor(ThemeColor::coTaskNotApplicable);
-    case TaskState::Broken:        return themeColor(ThemeColor::coTaskBroken);
-    default: return themeColor(ThemeColor::coWeird);
-    }
+    return nullptr;
 }
 
-// IHakenTaskEvents
-void CoreModuleWidget::onHakenTaskChange(HakenTask id)
+const NVGcolor& CoreModuleWidget::taskStateColor(ChemTask::State state)
 {
-    if ((id != HakenTask::End) && (id != HakenTask::None)) {
-        auto task = my_module->tasks.get_task(id);
-        if (task) {
-            auto widget = widget_for_task(task->id);
-            if (id == HakenTask::SyncDevices && !ModuleBroker::get()->is_primary(my_module)) {
-                widget->describe("Sync: Only the primary Core can sync");
-                widget->setColor(RampGray(G_40));
-                widget->setFill(false);
-            } else {
-                auto text = format_string("%s: %s", TaskName(id), TaskStateName(task->state));
-                widget->describe(text);
-                widget->setColor(taskStateColor(task->state));
-                widget->setFill((task->state != TaskState::Unscheduled) && (task->state != TaskState::NotApplicable));
-            }
-        }
+    switch (state) {
+    case ChemTask::State::Untried:  return themeColor(ThemeColor::coTask0);
+    case ChemTask::State::Pending:  return themeColor(ThemeColor::coTaskPending);
+    case ChemTask::State::Complete: return themeColor(ThemeColor::coTaskComplete);
+    case ChemTask::State::Broken:   return themeColor(ThemeColor::coTaskBroken);
+    default: return themeColor(ThemeColor::coWeird);
     }
 }
 
 void CoreModuleWidget::step()
 {
+    updateIndicators();
     ChemModuleWidget::step();
 }
 
@@ -518,7 +520,7 @@ bool connected (CoreModule* core) {
 
 void CoreModuleWidget::drawLayer(const DrawArgs& args, int layer)
 {
-    Widget::drawLayer(args, layer);
+    ChemModuleWidget::drawLayer(args, layer);
     if (layer != 1) return;
     if (!my_module) return;
 
@@ -546,10 +548,10 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             [this]() { return my_module->is_logging(); },
             [this]() { my_module->enable_logging(!my_module->is_logging()); }));
 
-        menu->addChild(createCheckMenuItem(
-            "Restore last preset", "",
-            [this]() { return my_module->restore_last_preset; },
-            [this]() { my_module->restore_last_preset = !my_module->restore_last_preset;}));
+        menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
+            [=](){ return my_module->disconnected; },
+            [=](){ connect_midi(my_module->disconnected); }
+        ));
 
         menu->addChild(createCheckMenuItem("Glowing knobs", "", 
             [this](){ return my_module->glow_knobs; },

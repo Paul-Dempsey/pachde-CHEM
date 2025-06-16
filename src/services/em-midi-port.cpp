@@ -7,7 +7,8 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
 {
     if (!chem) return;
     if (!pending() && !force) return;
-    if (!chem->host_matrix()->is_ready()) return;
+    auto em = chem->host_matrix();
+    if (!em || !em->is_ready()) return;
     assert (em_value <= Haken::max14);
 
     auto haken = chem->host_haken();

@@ -5,17 +5,7 @@
 #include "../../services/HakenMidiOutput.hpp"
 #include "../../services/midi-devices.hpp"
 #include "../../services/midi-io.hpp"
-#include "../../widgets/blip-widget.hpp"
-#include "../../widgets/em-led-widget.hpp"
-#include "../../widgets/indicator-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/MidiPicker.hpp"
-#include "../../widgets/slider-h-widget.hpp"
-#include "../../widgets/spinner.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
-#include "haken-task.hpp"
+#include "../../widgets/widgets.hpp"
 #include "relay-midi.hpp"
 
 using namespace pachde;
@@ -23,7 +13,67 @@ using namespace pachde;
 struct CoreModuleWidget;
 struct CoreModule;
 
-struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IHakenTaskEvents, IDoMidi
+enum ChemTaskId { Heartbeat, HakenDevice, EmInit, PresetInfo, SyncDevices };
+
+struct ChemTask
+{
+    enum State { Untried, Pending, Complete, Broken };
+    static const char *TaskStateName(State state);
+
+    ChemTaskId id;
+    State state{Untried};
+    float time{0.0};
+    float budget;
+    float period;
+
+    ChemTask (ChemTaskId id, float budget, float period) : id(id), budget(budget), period(period) {}
+
+    bool untried() { return state == Untried; }
+    bool pending() { return state == Pending; }
+    bool completed() { return state == Complete; }
+    bool broken() { return state == Broken; }
+
+    bool ready(float increment);
+    void reset();
+    void start();
+    void complete();
+    void fail();
+};
+
+struct ChemStartupTasks
+{
+    std::deque<ChemTask> queue;
+    CoreModule* core{nullptr};
+    ChemStartupTasks() { reset(); };
+    void init(CoreModule* the_core) { core = the_core; }
+
+    void reset();
+    bool completed() { return queue.empty(); }
+    void process(const rack::Module::ProcessArgs& args);
+    void heartbeat_received();
+    void configuration_received();
+};
+
+struct RecurringChemTasks
+{
+    bool started{false};
+    CoreModule* core{nullptr};
+    ChemTask heart{ChemTaskId::Heartbeat, 2.0, 12.0};
+    ChemTask sync{ChemTaskId::SyncDevices, 0.0, 30.f};
+    
+    RecurringChemTasks()
+    {
+        sync.start();
+        sync.complete(); //pretend we've completed to wait for next recurrence
+    }
+    void init(CoreModule* the_core) { core = the_core; }
+    void start();
+    void reset();
+    void process(const rack::Module::ProcessArgs& args);
+    void heartbeat_received();
+};
+
+struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
     CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
 
@@ -38,25 +88,24 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     MidiInput controller2_midi_in { ChemId::Midi2 };
 
     HakenMidiOutput haken_midi_out;
-
     HakenMidi haken_midi;
-    HakenMidi& get_haken_midi() { return haken_midi; }
+    HakenMidiRate midi_rate{HakenMidiRate::Full};
 
     RelayMidi midi_relay;
-    MidiLog* midi_log;
+    MidiLog* midi_log{nullptr};
 
     EaganMatrix em;
     bool disconnected;
     bool is_busy;
     bool in_reboot;
-    bool heartbeat;
+
     WallTimer ticker;
+    RecurringChemTasks recurring_tasks;
+    ChemStartupTasks startup_tasks;
+    ChemTask::State start_states[4]{ChemTask::State::Untried};
 
     std::vector<IChemClient*> chem_clients;
-    HakenTasks tasks;
 
-    PresetDescription last_preset;
-    bool restore_last_preset;
     OctaveShiftLeds octave;
     RoundingLeds round_leds;
     bool glow_knobs;
@@ -82,11 +131,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool is_controller_2_connected() { return (controller2_midi_in.deviceId >= 0) && (nullptr != controller2.connection); }
 
     void reboot();
-    void send_midi_rate(HakenMidiRate rate);
-    void restore_midi_rate();
     void update_from_em();
     void connect_midi(bool on_off);
     void init_osmose();
+    void reset_tasks();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -120,13 +168,12 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return &em;
     }
     bool host_busy() override {
-        return disconnected || is_busy || in_reboot || !em.ready || em.busy();
+        return disconnected || in_reboot || !em.ready || em.busy();
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
     
     // IHandleEmEvents
-    void onLoopDetect(uint8_t cc, uint8_t value) override;
     void onEditorReply(uint8_t reply) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetChanged() override;
@@ -136,9 +183,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void onSystemComplete() override;
     void onMahlingBegin() override;
     void onMahlingComplete() override;
-
-    // IHakenTaskEvents
-    void onHakenTaskChange(HakenTask task) override;
 
     // ----  Rack  ------------------------------------------
 
@@ -151,7 +195,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_C1_CHANNEL_MAP,
         P_C2_CHANNEL_MAP,
         P_ATTENUATION,
-        P_DISCONNECT,
         NUM_PARAMS
     };
     enum Inputs {
@@ -177,7 +220,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         L_OCT_SHIFT_LAST = L_OCT_SHIFT_FIRST + 6,
         L_C1_CHANNEL_MAP,
         L_C2_CHANNEL_MAP,
-        L_DISCONNECT,
         NUM_LIGHTS
     };
 
@@ -189,7 +231,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     //virtual void onSampleRateChange(const SampleRateChangeEvent& e) override;
     //virtual void onExpanderChange(const ExpanderChangeEvent& e) override;
     virtual void onReset(const ResetEvent& e) override;
-    //virtual void onSetMaster(const SetMasterEvent& e) override;
+    // virtual void onSetMaster(const SetMasterEvent& e) override;
+    // void onUnsetMaster(const UnsetMasterEvent& e) override;
     //virtual void onRandomize(const RandomizeEvent& e) override;
     //virtual void onSave(const SaveEvent& e) override;
 
@@ -207,19 +250,16 @@ enum ThemeColor {
     coHakenMidiOut,
     coC1MidiIn,
     coC2MidiIn,
-    coTaskUninitialized,
-    coTaskUnscheduled,
+    coTask0,
     coTaskPending,
     coTaskComplete,
-    coTaskDone,
     coTaskWaiting,
-    coTaskNotApplicable,
     coTaskBroken,
     coWeird,
     THEME_COLOR_SIZE
 };
 
-struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHakenTaskEvents
+struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
     CoreModule* my_module = nullptr;
     bool spinning{false};
@@ -232,32 +272,29 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     TextLabel* controller2_device_label = nullptr;
     TipLabel* preset_label = nullptr;
     TextLabel* firmware_label = nullptr;
-    //StaticTextLabel* task_status_label = nullptr;
     TextLabel* em_status_label = nullptr;
 
     BlueKnob* attenuation_knob{nullptr};
 
-    Blip* blip = nullptr;
+    Blip* em_led = nullptr;
     IndicatorWidget* mididevice_indicator = nullptr;
     IndicatorWidget* heartbeat_indicator = nullptr;
-    IndicatorWidget* updates_indicator = nullptr;
+    IndicatorWidget* em_init_indicator = nullptr;
     IndicatorWidget* presetinfo_indicator = nullptr;
-    IndicatorWidget* lastpreset_indicator = nullptr;
-    IndicatorWidget* syncdevices_indicator = nullptr;
-
-    IndicatorWidget* widget_for_task(HakenTask task);
+    IndicatorWidget* widget_for_task(ChemTaskId task);
 
     NVGcolor theme_colors[ThemeColor::THEME_COLOR_SIZE];
     const NVGcolor& themeColor(ThemeColor index);
-    const NVGcolor& taskStateColor(TaskState state);
+    const NVGcolor& taskStateColor(ChemTask::State state);
     void set_theme_colors(const std::string& theme = "");
 
     MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme);
     
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);
-    void createIndicatorsCentered(float x, float y, float spread);
     void createRoundingLeds(float x, float y, float spread);
-    void resetIndicators();
+    void createIndicatorsCentered(float x, float y, float spread);
+    void updateIndicators();
+    void connect_midi(bool on);
     
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
@@ -274,7 +311,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     ::rack::engine::Module* client_module() override;
     std::string client_claim() override;
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // IHandleEmEvents
@@ -282,9 +318,6 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void onPresetChanged() override;
     void onTaskMessage(uint8_t code) override;
     void onLED(uint8_t led) override;
-
-    // IHakenTaskEvents
-    void onHakenTaskChange(HakenTask task) override;
 
     void setThemeName(const std::string& name, void *context) override;
 
@@ -295,7 +328,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents, IHaken
     void appendContextMenu(Menu *menu) override;
 };
 
-inline const NVGcolor& CoreModuleWidget::themeColor(ThemeColor which) {
+
+inline const NVGcolor &CoreModuleWidget::themeColor(ThemeColor which)
+{
     assert(which < ThemeColor::THEME_COLOR_SIZE);
     return theme_colors[static_cast<size_t>(which)];
 }

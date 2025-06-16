@@ -77,7 +77,7 @@ void PreModule::update_from_em()
 {
     if (!connected()) return;
     auto em = chem_host->host_matrix();
-    if (!em->is_ready()) { return; }
+    if (!em || !em->is_ready()) { return; }
 
     modulation.set_em_and_param_low(P_PRE_LEVEL, em->get_pre(), true);
     modulation.set_em_and_param_low(P_MIX, em->get_cotan_mix(), true);

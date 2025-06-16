@@ -3,6 +3,7 @@
 #include "PresetId.hpp"
 #include "preset-meta.hpp"
 #include "../services/misc.hpp"
+#include "../services/crc.hpp"
 
 using namespace ::rack;
 
@@ -11,21 +12,24 @@ namespace pachde {
 struct PresetDescription
 {
     PresetId id;
+    uint32_t tag;
     std::string name;
     std::string text;
 
-    PresetDescription() {
-        id.invalidate();
+    PresetDescription() : 
+        tag(0)
+    {
         name.reserve(32);
         text.reserve(256);
     }
 
     PresetDescription(PresetId id, std::string name, std::string text)
-    : id(id), name(name), text(text)
+    : id(id), tag(0), name(name), text(text)
     {}
 
     void init(const PresetDescription* source) {
         if (source) {
+            tag = source->tag;
             id = source->id;
             name = source->name;
             text = source->text;
@@ -40,6 +44,7 @@ struct PresetDescription
     }
 
     void clear() {
+        tag = 0;
         id.clear();
         name.clear();
         text.clear();
@@ -50,6 +55,10 @@ struct PresetDescription
     std::string summary() const;
     std::string meta_text() const;
 };
+
+#ifdef HASH_PRESET
+extern crc::crc32 preset_hasher;
+#endif
 
 struct PresetInfo : PresetDescription {
     using Base = PresetDescription;
@@ -67,12 +76,14 @@ struct PresetInfo : PresetDescription {
     PresetInfo(std::shared_ptr<PresetDescription> preset) :
         PresetDescription(preset->id, preset->name, preset->text)
     {
+        tag = preset->tag;
         FillMetaCodeList(preset->text, meta);
     }
 
     PresetInfo(const PresetDescription* preset) :
         PresetDescription(preset->id, preset->name, preset->text)
     {
+        tag = preset->tag;
         FillMetaCodeList(text, meta);
     }
 

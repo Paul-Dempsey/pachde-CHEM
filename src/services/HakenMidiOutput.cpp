@@ -3,6 +3,25 @@
 
 namespace pachde {
 
+void HakenMidiOutput::enable(bool on)
+{
+    if (enabled == on) return;
+    if (!on) {
+        clear();
+    }
+    enabled = on;
+}
+
+void HakenMidiOutput::clear()
+{
+    message_count = 0;
+    ring.clear();
+    midi_timer.reset();
+    output.reset();
+    output.setChannel(-1);
+    enabled = true;
+}
+
 void HakenMidiOutput::dispatch(float sampleTime)
 {
     float midi_time = midi_timer.process(sampleTime);
@@ -23,6 +42,7 @@ void HakenMidiOutput::dispatch(float sampleTime)
 
 void HakenMidiOutput::queueMessage(PackedMidiMessage msg)
 {
+    if (!enabled) return;
     if (ring.full()) {
         assert(false);
     } else {
@@ -32,7 +52,7 @@ void HakenMidiOutput::queueMessage(PackedMidiMessage msg)
 
 void HakenMidiOutput::do_message(PackedMidiMessage message)
 {
-    if (ChemId::Haken == as_chem_id(message.bytes.tag)) return;
+    if (!enabled || ChemId::Haken == as_chem_id(message.bytes.tag)) return;
     queueMessage(message);
 }
 
