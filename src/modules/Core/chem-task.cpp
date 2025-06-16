@@ -214,11 +214,12 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
     }
     if (sync_ready && !heart.pending() && !heart.broken()) {
         auto broker = ModuleBroker::get();
+        sync.start();
         if (broker->is_primary(core)) {
             core->log_message("Core", "Task SyncDevices");
             MidiDeviceBroker::get()->sync();
-            sync.complete();
-        }       
+        }
+        sync.complete();
     }
 }
 
