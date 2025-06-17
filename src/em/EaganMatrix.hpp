@@ -8,7 +8,7 @@
 #include "FixedStringBuffer.hpp"
 #include "../services/crc.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 struct IHandleEmEvents {
     enum EventMask : uint16_t {
@@ -39,7 +39,7 @@ struct IHandleEmEvents {
             + MahlingComplete
     };
     uint16_t em_event_mask{EventMask::None};
-    ChemId module_id{ChemId::Unknown};
+    pachde::ChemId module_id{pachde::ChemId::Unknown};
 
     virtual void onEditorReply(uint8_t reply) {}
     virtual void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) {}

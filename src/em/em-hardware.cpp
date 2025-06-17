@@ -2,8 +2,7 @@
 #include "wrap-HakenMidi.hpp"
 #include <stdint.h>
 
-namespace pachde {
-
+namespace eaganmatrix {
 
 HardwarePresetClass preset_class_from_hardware(uint8_t hw)
 {

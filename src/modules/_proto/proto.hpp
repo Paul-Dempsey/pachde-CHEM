@@ -13,6 +13,7 @@
 #include "../../widgets/bits-widget.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct ProtoUi;
 

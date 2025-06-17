@@ -1,6 +1,6 @@
 #include "preset-sort.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 bool preset_natural_order(const std::shared_ptr<PresetInfo>& p1, const std::shared_ptr<PresetInfo>& p2)
 {

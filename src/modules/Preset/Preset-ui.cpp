@@ -33,6 +33,12 @@ void PresetUi::build_database(PresetTab which)
     db_builder = new DBBuilder();
     db_builder->init(which, tab.list.preset_list, live_preset ? live_preset->id : dummy);
     forget_presets(which);
+    // auto em = chem_host->host_matrix();
+    // switch (which) {
+    //     case PresetTab::User: em->notifyUserBegin(); break;
+    //     case PresetTab::System: em->notifySystemBegin(); break;
+    //     default: break;
+    // }
 }
 
 void PresetUi::create_stop_button()
@@ -287,7 +293,7 @@ void PresetUi::onPresetChange()
 
     if (db_builder) {
         auto preset = chem_host->host_preset();
-        if (preset) {
+        if (preset && !preset->empty()) {
             Tab& tab = active_tab();
             tab.list.add(preset);
         }

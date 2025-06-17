@@ -1,7 +1,7 @@
 // Copyright (C) Paul Chase Dempsey
 #include "preset-meta.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 std::pair<std::string::const_iterator, std::string::const_iterator>
 get_token(std::string::const_iterator start, std::string::const_iterator end, std::function<bool(char)> pred)

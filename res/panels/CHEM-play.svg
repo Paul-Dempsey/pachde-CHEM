@@ -33,6 +33,8 @@
          <rect fill="#464060" id="grid-new" width="150" height="21" x="12" y="336" />
       </g>
 
+     <path id="d1--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="m 165,116 h 40" />
+
       <g id="g32">
          <path id="minus--ctl-label" transform="translate(171,334)" fill="#808080" d="M 10,5.25 H 2 v 1.5 h 8 z" />
          <path id="plus--ctl-label" transform="translate(189,334)" fill="#808080"

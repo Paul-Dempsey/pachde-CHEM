@@ -7,7 +7,7 @@
 
 using namespace ::rack;
 using namespace ::svg_theme;
-
+using namespace ::eaganmatrix;
 namespace pachde {
 
 constexpr const float GRIP_WIDTH = 10.f;

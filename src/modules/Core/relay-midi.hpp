@@ -7,10 +7,10 @@ namespace pachde{
 
 struct RelayMidi : IDoMidi
 {
-    EaganMatrix* em{nullptr};
+    eaganmatrix::EaganMatrix* em{nullptr};
     std::vector<IDoMidi*> targets;
 
-    void set_em(EaganMatrix* the_em) { em = the_em; }
+    void set_em(eaganmatrix::EaganMatrix* the_em) { em = the_em; }
 
     void register_target(IDoMidi* target) {
         assert(targets.cend() == std::find(targets.cbegin(), targets.cend(), target));

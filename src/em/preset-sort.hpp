@@ -1,7 +1,7 @@
 #pragma once
 #include "preset.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 enum class PresetOrder {
     Natural,

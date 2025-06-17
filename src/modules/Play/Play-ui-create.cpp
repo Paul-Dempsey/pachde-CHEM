@@ -180,10 +180,10 @@ PlayUi::PlayUi(PlayModule *module) :
         Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
     live_preset_label->glowing(true);
 
-    play_menu = createThemedWidget<PlayMenu>(Vec(150.f, PRESETS_TOP - 12.f), theme_engine, theme);
+    play_menu = createThemedWidget<PlayMenu>(Vec(RIGHT_MARGIN_CENTER, 148.f), theme_engine, theme);
     play_menu->setUi(this);
     play_menu->describe("Play actions menu");
-    addChild(play_menu);
+    addChild(Center(play_menu));
 
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
     up_button->describe("Page up");

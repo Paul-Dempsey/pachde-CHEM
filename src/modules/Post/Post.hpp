@@ -11,6 +11,7 @@
 #include "../../widgets/knob-track-widget.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct PostUi;
 

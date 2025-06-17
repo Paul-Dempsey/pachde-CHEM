@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-namespace pachde {
+namespace eaganmatrix {
 
 enum class HardwarePresetClass { Unknown, Continuum, Mini, Micro, Emm, Osmose };
 HardwarePresetClass preset_class_from_hardware(uint8_t hw);

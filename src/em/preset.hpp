@@ -7,7 +7,7 @@
 
 using namespace ::rack;
 
-namespace pachde {
+namespace eaganmatrix {
 
 struct PresetDescription
 {

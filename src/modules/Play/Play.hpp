@@ -16,6 +16,7 @@
 #include "preset-widget.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct PlayUi;
 

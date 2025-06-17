@@ -13,6 +13,7 @@
 #include "./widgets/shift-param.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct JackUi;
 

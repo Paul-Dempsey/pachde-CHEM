@@ -1,7 +1,8 @@
 #include "EaganMatrix.hpp"
 #include "../services/misc.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace eaganmatrix {
 
 inline void hash_midi(crc::crc32& hasher, PackedMidiMessage m)
 {

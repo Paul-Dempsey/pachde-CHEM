@@ -1,8 +1,9 @@
 #include "preset.hpp"
 #include "../services/misc.hpp"
 #include "preset-macro.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace eaganmatrix {
 
 std::string id_spec_to_string(PresetId id) {
     return format_string("%d.%d.%d", id.bank_hi(), id.bank_lo(), id.number());

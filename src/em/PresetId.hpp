@@ -1,6 +1,6 @@
 #pragma once
 
-namespace pachde {
+namespace eaganmatrix {
 
 #pragma pack(push, 1)
 typedef union RawPresetId {

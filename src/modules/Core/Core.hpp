@@ -9,6 +9,7 @@
 #include "relay-midi.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct CoreModuleWidget;
 struct CoreModule;

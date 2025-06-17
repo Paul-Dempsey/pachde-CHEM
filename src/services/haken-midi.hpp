@@ -35,7 +35,7 @@ struct HakenMidi
     void stream_data(ChemId tag, uint8_t d1, uint8_t d2);
     void end_stream(ChemId tag);
 
-    void select_preset(ChemId tag, PresetId id);
+    void select_preset(ChemId tag, eaganmatrix::PresetId id);
     void editor_present(ChemId tag);
     void request_configuration(ChemId tag);
     void request_archive_0(ChemId tag);

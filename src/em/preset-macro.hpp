@@ -3,7 +3,7 @@
 using namespace ::rack;
 #include "../services/misc.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 struct PresetMacro
 {

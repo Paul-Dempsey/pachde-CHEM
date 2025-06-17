@@ -13,7 +13,10 @@ inline bool is_break_char(char c)
     return std::isspace(c);
 }
 
-std::size_t common_prefix_length_insensitive(std::string::const_iterator a, std::string::const_iterator end_a, std::string::const_iterator b, std::string::const_iterator end_b)
+std::size_t common_prefix_length_insensitive(
+    std::string::const_iterator a, std::string::const_iterator end_a,
+    std::string::const_iterator b, std::string::const_iterator end_b
+)
 {
     int common = 0;
     for (; ((a != end_a) && (b != end_b)) && ((*a == *b) || (std::tolower(*a) == std::tolower(*b)));
@@ -235,7 +238,7 @@ ssize_t PresetList::index_of_id(PresetId id)
 
     auto key = id.key();
     auto list{presets()};
-    auto it = std::find_if(list->cbegin(), list->cend(), [key](const std::shared_ptr<pachde::PresetInfo> p){ return key == p->id.key(); });
+    auto it = std::find_if(list->cbegin(), list->cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
     if (it == list->cend()) return -1;
     return it - list->cbegin();
 }
@@ -244,7 +247,7 @@ ssize_t PresetList::index_of_id_unfiltered(PresetId id)
 {
     if (empty()) return -1;
     auto key = id.key();
-    auto it = std::find_if(preset_list.cbegin(), preset_list.cend(), [key](const std::shared_ptr<pachde::PresetInfo> p){ return key == p->id.key(); });
+    auto it = std::find_if(preset_list.cbegin(), preset_list.cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
     if (it == preset_list.cend()) return -1;
     return it - preset_list.cbegin();
 }

@@ -13,6 +13,7 @@
 #include "../../widgets/tip-label-widget.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct SusUi;
 

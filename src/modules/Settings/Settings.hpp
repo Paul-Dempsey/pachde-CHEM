@@ -15,6 +15,7 @@
 #include "./widgets/y-param.hpp"
 #include "./widgets/z-param.hpp"
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct SettingsUi;
 

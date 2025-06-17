@@ -2,6 +2,7 @@
 #include "../../chem.hpp"
 #include "macro-usage.hpp"
 #include "xm-edit-common.hpp"
+using namespace eaganmatrix;
 
 namespace pachde {
 

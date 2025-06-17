@@ -8,6 +8,7 @@
 #include "midi-pad.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 struct MidiPadUi;
 
 struct MidiPadModule : ChemModule, IChemClient, IDoMidi

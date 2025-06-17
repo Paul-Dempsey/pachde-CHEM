@@ -4,6 +4,7 @@ using namespace ::rack;
 #include "preset-common.hpp"
 #include "../../em/preset.hpp"
 #include "../../em/preset-sort.hpp"
+using namespace eaganmatrix;
 
 namespace pachde {
 

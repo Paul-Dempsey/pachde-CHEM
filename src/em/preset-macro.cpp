@@ -1,6 +1,6 @@
 #include "preset-macro.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 PresetMacro::PresetMacro()
 {

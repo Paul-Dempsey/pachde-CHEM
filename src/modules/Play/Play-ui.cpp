@@ -7,6 +7,7 @@
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
+using namespace eaganmatrix;
 
 // -- Play UI -----------------------------------
 
@@ -101,7 +102,7 @@ void PlayUi::sort_presets(PresetOrder order)
 void PlayUi::add_live()
 {
     if (!live_preset) return;
-    auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<pachde::PresetInfo> p){
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<PresetInfo> p){
         return live_preset->id == p->id;
     });
     if (it == presets.cend()) {
@@ -304,7 +305,7 @@ void PlayUi::scroll_to_live()
 {
     if (!live_preset) return;
     auto id = live_preset->id;
-    auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<pachde::PresetInfo>& p){
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<PresetInfo>& p){
         return p->id == id;
     });
     if (it != presets.cend()) {
@@ -506,7 +507,7 @@ void PlayUi::onPresetChange()
         auto preset = chem_host->host_preset();
         if (preset) {
             if (preset->empty()) return;
-            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<pachde::PresetInfo> p){
+            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<PresetInfo> p){
                 return preset->id.key() == p->id.key();
             });
             if (it == presets.cend()) {

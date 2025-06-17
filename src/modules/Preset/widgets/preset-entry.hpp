@@ -4,6 +4,7 @@
 #include "../../../widgets/element-style.hpp"
 #include "../../../em/preset.hpp"
 
+using namespace eaganmatrix;
 struct PresetUi;
 
 namespace pachde {

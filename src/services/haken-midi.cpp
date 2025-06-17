@@ -66,7 +66,7 @@ void HakenMidi::keep_midi(ChemId tag, bool keep)
     end_stream(tag);
 }
 
-void HakenMidi::select_preset(ChemId tag, PresetId id)
+void HakenMidi::select_preset(ChemId tag, eaganmatrix::PresetId id)
 {
     if (log) {
         log->log_message(">>H", "---- Select Preset");

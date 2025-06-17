@@ -10,6 +10,7 @@
 #include "../XM-shared/xm-overlay.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct XMUi;
 

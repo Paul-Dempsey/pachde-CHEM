@@ -19,6 +19,7 @@
 #include "v-text.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 struct OverlayUi;
 

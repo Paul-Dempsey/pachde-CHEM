@@ -5,6 +5,7 @@
 #include "../../services/rack-help.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 
 CoreModule::CoreModule() :
     modulation(this, ChemId::Core),

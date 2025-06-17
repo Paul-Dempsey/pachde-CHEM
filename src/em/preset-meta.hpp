@@ -2,7 +2,7 @@
 #pragma once
 #include <rack.hpp>
 
-namespace pachde {
+namespace eaganmatrix {
 
 enum class PresetGroup : uint8_t {
     Category,

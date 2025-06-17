@@ -1,8 +1,7 @@
 #pragma once
 #include "midi-message.h"
-#include "wrap-HakenMidi.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
 struct EmBatchState: IDoMidi
 {
@@ -10,14 +9,13 @@ struct EmBatchState: IDoMidi
     bool in_system{false};
     bool in_mahling{false};
 
-    EmBatchState() {}
-
     bool busy() {
         return in_system
             || in_user 
             || in_mahling
             ;
     }
+
     void do_message(PackedMidiMessage message) override
     {
         message.bytes.tag = 0;

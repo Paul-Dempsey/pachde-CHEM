@@ -3,7 +3,7 @@
 #include <rack.hpp>
 
 using namespace ::rack;
-namespace pachde {
+namespace eaganmatrix {
 
 template<const size_t size>
 class FixedStringBuffer

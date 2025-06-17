@@ -12,6 +12,7 @@
 #include "./widgets/preset-entry.hpp"
 
 using namespace pachde;
+using namespace eaganmatrix;
 struct PresetUi;
 
 namespace S = pachde::style;
@@ -203,7 +204,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     std::vector<FilterButton*> filter_buttons;
     StateButton * filter_off_button{nullptr};
 
-    WallTimer start_delay{5.0};
+    WallTimer start_delay{4.0};
 
     std::shared_ptr<PresetDescription> live_preset;
 

@@ -176,6 +176,12 @@ void PresetUi::end_osmose_scan()
     stop_button = nullptr;
     save_presets(osmose_builder->tab);
     set_tab(osmose_builder->tab, false);
+    auto em = chem_host->host_matrix();
+    switch (osmose_builder->tab) {
+    case PresetTab::User: em->notifyUserComplete(); break;
+    case PresetTab::System: em->notifySystemComplete(); break;
+    default: break;
+    }
     delete osmose_builder;
     osmose_builder = nullptr;
     stop_spinner();
@@ -208,7 +214,7 @@ void PresetUi::step()
 
     if (db_builder) {
         if (db_builder->ready()) {
-            if (!db_builder->next(chem_host->host_haken())) {
+            if (!db_builder->next(chem_host->host_haken()) || stop_scan) {
                 PresetId restore = db_builder->current;
                 auto tab_id =  db_builder->tab;
                 delete db_builder;
@@ -216,6 +222,12 @@ void PresetUi::step()
                 save_presets(tab_id);
                 stop_spinner();
                 set_tab(tab_id, false);
+                // auto em = chem_host->host_matrix();
+                // switch (tab_id) {
+                //     case PresetTab::User: em->notifyUserComplete(); break;
+                //     case PresetTab::System: em->notifySystemComplete(); break;
+                //     default: break;
+                // }
                 if (restore.valid()) {
                     auto haken = chem_host->host_haken();
                     if (haken) haken->select_preset(ChemId::Preset, restore);
