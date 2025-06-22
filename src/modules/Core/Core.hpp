@@ -7,6 +7,7 @@
 #include "../../services/midi-io.hpp"
 #include "../../widgets/widgets.hpp"
 #include "relay-midi.hpp"
+#include "chem-task.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -14,70 +15,8 @@ using namespace eaganmatrix;
 struct CoreModuleWidget;
 struct CoreModule;
 
-enum ChemTaskId { Heartbeat, HakenDevice, EmInit, PresetInfo, SyncDevices };
-
-struct ChemTask
-{
-    enum State { Untried, Pending, Complete, Broken };
-    static const char *TaskStateName(State state);
-
-    ChemTaskId id;
-    State state{Untried};
-    float time{0.0};
-    float budget;
-    float period;
-
-    ChemTask (ChemTaskId id, float budget, float period) : id(id), budget(budget), period(period) {}
-
-    bool untried() { return state == Untried; }
-    bool pending() { return state == Pending; }
-    bool completed() { return state == Complete; }
-    bool broken() { return state == Broken; }
-
-    bool ready(float increment);
-    void reset();
-    void start();
-    void complete();
-    void fail();
-};
-
-struct ChemStartupTasks
-{
-    std::deque<ChemTask> queue;
-    CoreModule* core{nullptr};
-    ChemStartupTasks() { reset(); };
-    void init(CoreModule* the_core) { core = the_core; }
-
-    void reset();
-    bool completed() { return queue.empty(); }
-    void process(const rack::Module::ProcessArgs& args);
-    void heartbeat_received();
-    void configuration_received();
-};
-
-struct RecurringChemTasks
-{
-    bool started{false};
-    CoreModule* core{nullptr};
-    ChemTask heart{ChemTaskId::Heartbeat, 2.0, 12.0};
-    ChemTask sync{ChemTaskId::SyncDevices, 0.0, 30.f};
-    
-    RecurringChemTasks()
-    {
-        sync.start();
-        sync.complete(); //pretend we've completed to wait for next recurrence
-    }
-    void init(CoreModule* the_core) { core = the_core; }
-    void start();
-    void reset();
-    void process(const rack::Module::ProcessArgs& args);
-    void heartbeat_received();
-};
-
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
-    CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
-
     Modulation modulation;
 
     MidiDeviceHolder haken_device;
@@ -114,6 +53,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // ------------------------------------------
     CoreModule();
     virtual ~CoreModule();
+
+    CoreModuleWidget* ui() { return reinterpret_cast<CoreModuleWidget*>(chem_ui); };
 
     bool is_logging() { return nullptr != midi_log; }
     void enable_logging(bool enable);
@@ -169,7 +110,11 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return &em;
     }
     bool host_busy() override {
-        return disconnected || in_reboot || !em.ready || em.busy();
+        return disconnected
+            || in_reboot
+            || !em.ready
+            || em.busy()
+            || !startup_tasks.completed();
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();

@@ -7,7 +7,7 @@
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/widgets.hpp"
 #include "preset-common.hpp"
-#include "preset-list.hpp"
+#include "preset-tab.hpp"
 #include "./widgets/filter-widget.hpp"
 #include "./widgets/preset-entry.hpp"
 
@@ -90,7 +90,7 @@ constexpr const int PAGE_CAPACITY = ROWS * COLS;
 struct Tab {
     size_t scroll_top{0};
     ssize_t current_index{-1};
-    PresetList list;
+    PresetTabList list;
 
     Tab(const Tab&) = delete;
     Tab(PresetTab id) : list(id) {}
@@ -105,83 +105,88 @@ struct Tab {
     }
 };
 
-struct OsmoseBuilder
-{
-    enum class ReadyResponse { Waiting, Ready, Timeout };
-    enum State { Start, Rest, PendingPreset, Preset, Settle };
+// struct OsmoseBuilder
+// {
+//     enum class ReadyResponse { Ready, Waiting, Timeout, Fail, End };
+//     enum State { Start, Ready, PendingPresetBegin, PendingPresetReceived, Settle, End };
 
-    uint8_t cc0;
-    uint8_t pc;
-    State state{State::Start};
-    PresetTab tab{PresetTab::Unset};
-    double state_time;  // time in state
-    uint8_t base_page;  // start ccBankH: playlist 0-29, system 30-34, User 90 ..
-    uint8_t last_page;  // end ccBankH
-    MidiLog* log{nullptr};
-    #ifndef NDEBUG
-    double start_time{system::getUnixTime()};
-    #endif
+//     // Start Init()(Send) PendingPresetBegin
+//     // PendingPresetBegin preset_started() -> PendingPresetReceived Timeout = not exists
+//     // PendingPresetReceived preset_received() -> Settle      Timeout = error
+//     // Settle [poll ready] Done or Timeout -> Ready
 
-    PresetId send_id() { return PresetId{cc0, 0, pc}; }
-    void init_system(HakenMidi* haken);
-    void init_user(HakenMidi* haken);
-    void init(HakenMidi* haken, PresetTab which, uint8_t base, uint8_t last);
-    void preset_start();
-    void preset_received();
-    ReadyResponse ready();
-    void send(HakenMidi* haken);
-    bool next(HakenMidi* haken);
-};
+//     uint8_t cc0;
+//     uint8_t pc;
+//     State state{State::Start};
+//     PresetTab tab{PresetTab::Unset};
+//     double state_time;  // time in state
+//     uint8_t base_page;  // start ccBankH: playlist 0-29, system 30-34, User 90 ..
+//     uint8_t last_page;  // end ccBankH
+//     MidiLog* log{nullptr};
+//     #ifndef NDEBUG
+//     double start_time{system::getUnixTime()};
+//     #endif
 
-struct DBBuilder {
-    std::deque<PresetId> presets;
-    PresetId current;
-    WallTimer timer;
-    bool pending {false};
-    bool settling {false};
-    PresetTab tab{PresetTab::Unset};
+//     PresetId make_id();
+//     void init_system(HakenMidi* haken);
+//     void init_user(HakenMidi* haken);
+//     void init(HakenMidi* haken, PresetTab which, uint8_t base, uint8_t last);
+//     void preset_started();
+//     void preset_received();
+//     ReadyResponse ready();
+//     void send(HakenMidi* haken);
+//     bool next(HakenMidi* haken);
+// };
 
-    void init(PresetTab the_tab, const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current_preset)
-    {
-        tab = the_tab;
-        for (auto p : source) {
-            presets.push_back(p->id);
-        }
-        current = current_preset;
-    }
+// struct DBBuilder {
+//     std::deque<PresetId> presets;
+//     PresetId current;
+//     WallTimer timer;
+//     bool pending {false};
+//     bool settling {false};
+//     PresetTab tab{PresetTab::Unset};
 
-    void preset_received() {
-        pending = false;
-        timer.start(1.0);
-        settling = true;
-    }
+//     void init(PresetTab the_tab, const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current_preset)
+//     {
+//         tab = the_tab;
+//         for (auto p : source) {
+//             presets.push_back(p->id);
+//         }
+//         current = current_preset;
+//     }
+
+//     void preset_received() {
+//         pending = false;
+//         timer.start(1.0);
+//         settling = true;
+//     }
     
-    bool ready() {
-        if (pending) return false;
-        if (settling) {
-            if (timer.finished()) {
-                settling = false;
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
+//     bool ready() {
+//         if (pending) return false;
+//         if (settling) {
+//             if (timer.finished()) {
+//                 settling = false;
+//                 return true;
+//             } else {
+//                 return false;
+//             }
+//         }
+//         return true;
+//     }
 
-    bool next(HakenMidi* haken)
-    {
-        if (presets.empty()) return false;
-        assert(!settling);
-        assert(!pending);
-        PresetId id = presets.front();
-        presets.pop_front();
-        pending = true;
-        assert(id.valid());
-        haken->select_preset(ChemId::Preset, id);
-        return true;
-    }
-};
+//     bool next(HakenMidi* haken)
+//     {
+//         if (presets.empty()) return false;
+//         assert(!settling);
+//         assert(!pending);
+//         PresetId id = presets.front();
+//         presets.pop_front();
+//         pending = true;
+//         assert(id.valid());
+//         haken->select_preset(ChemId::Preset, id);
+//         return true;
+//     }
+// };
 
 struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
@@ -219,12 +224,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool spinning{false};
     bool user_loaded{false};
     bool system_loaded{false};
+    bool stop_scan{false};
 
     std::vector<PresetEntry*> preset_grid;
 
-    DBBuilder* db_builder{nullptr};
-    OsmoseBuilder* osmose_builder{nullptr};
-    bool stop_scan{false};
+    // DBBuilder* db_builder{nullptr};
+    // OsmoseBuilder* osmose_builder{nullptr};
 
     PresetUi(PresetModule *module);
     ~PresetUi();
@@ -245,8 +250,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     }
     Tab& active_tab() { return get_tab(active_tab_id); }
     void set_tab(PresetTab tab, bool fetch);
-    PresetList& preset_list(PresetTab which) { return get_tab(which).list; }
-    PresetList& presets() { return preset_list(active_tab_id); }
+    PresetTabList& preset_list(PresetTab which) { return get_tab(which).list; }
+    PresetTabList& presets() { return preset_list(active_tab_id); }
     void set_current_index(size_t index);
     bool host_available();
     void start_spinner();
@@ -274,7 +279,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void send_preset(ssize_t index);
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
-    
+
     void on_search_text_changed(std::string text);
     void on_search_text_enter();
     bool filtering();

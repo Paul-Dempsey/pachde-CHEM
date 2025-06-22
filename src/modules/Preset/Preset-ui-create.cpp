@@ -48,17 +48,17 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 
     auto item = createMenuItem<ColorDotMenuItem>("Sort alphabetically", "",
         [this](){ ui->sort_presets(PresetOrder::Alpha); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Alpha ? co_dot : RampGray(G_45);
+    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Alpha ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by category", "",
         [this](){ ui->sort_presets(PresetOrder::Category); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Category ? co_dot : RampGray(G_45);
+    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Category ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by Natural (system) order", "",
         [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
-    item->color = ui->active_tab().list.order == PresetOrder::Natural ? co_dot : RampGray(G_45);
+    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Natural ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     menu->addChild(new MenuSeparator);
@@ -104,6 +104,15 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         },
         !host
     ));
+    menu->addChild(createMenuItem("Clear System presets", "", 
+        [this]() {
+            ui->user_loaded = false;
+            ui->forget_presets(PresetTab::System);
+            ui->set_tab(PresetTab::System, false);
+            ui->scroll_to(0);
+        },
+        !host
+    ));
     if (osmose) {
         menu->addChild(createSubmenuItem("Scan User presets", "", [=](Menu * menu) {
             menu->addChild(createMenuItem("Block 1", "", [=](){ ui->request_osmose_user_presets(90); }));
@@ -139,11 +148,11 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
             },
             !host
         ));
-        std::string name = format_string("Build full %s database", ui->active_tab_id == PresetTab::User ? "User" : "System");
-        menu->addChild(createMenuItem(name, "",
-            [this](){ ui->build_database(ui->active_tab_id); },
-            !host
-        ));
+        // std::string name = format_string("Build full %s database", ui->active_tab_id == PresetTab::User ? "User" : "System");
+        // menu->addChild(createMenuItem(name, "",
+        //     [this](){ ui->build_database(ui->active_tab_id); },
+        //     !host
+        // ));
     }
 
 }
@@ -227,7 +236,6 @@ PresetUi::PresetUi(PresetModule *module) :
         UserBegin + 
         UserComplete
     );
-    start_delay.run();
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
@@ -399,8 +407,8 @@ PresetUi::PresetUi(PresetModule *module) :
         onConnectHost(my_module->chem_host);
         //user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         //system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
-        user_tab.list.order = my_module->user_order;
-        system_tab.list.order = my_module->system_order;
+        user_tab.list.preset_list.order = my_module->user_order;
+        system_tab.list.preset_list.order = my_module->system_order;
 
         set_tab(PresetTab(my_module->active_tab), false);
     }

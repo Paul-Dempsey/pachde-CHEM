@@ -58,6 +58,7 @@ CoreModule::CoreModule() :
     midi_relay.register_target(&haken_midi_out);
 
     em.subscribeEMEvents(this);
+    //haken_midi.set_matrix(&em);
     haken_midi.set_handler(&midi_relay);
 
     haken_device.init(ChemDevice::Haken, this);
@@ -565,10 +566,8 @@ void CoreModule::process(const ProcessArgs &args)
     auto sample_time = args.sampleTime;
     controller1_midi_in.dispatch(sample_time);
     controller2_midi_in.dispatch(sample_time);
-    if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {
-        haken_midi_out.dispatch(DISPATCH_NOW);
-    }
     haken_midi_in.dispatch(sample_time);
+
     if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {
         haken_midi_out.dispatch(DISPATCH_NOW);
     } else {

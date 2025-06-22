@@ -22,6 +22,7 @@ SOURCES += src/em/EaganMatrix.cpp
 SOURCES += src/em/em-hardware.cpp
 SOURCES += src/em/midi-message.cpp
 SOURCES += src/em/preset.cpp
+SOURCES += src/em/preset-list.cpp
 SOURCES += src/em/preset-macro.cpp
 SOURCES += src/em/preset-meta.cpp
 SOURCES += src/em/preset-sort.cpp
@@ -72,6 +73,7 @@ endif
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
 SOURCES += src/modules/Core/chem-task.cpp
+SOURCES += src/modules/Core/preset-enum.cpp
 
 SOURCES += src/modules/Play/Play.cpp
 SOURCES += src/modules/Play/Play-ui.cpp
@@ -109,10 +111,9 @@ SOURCES += src/modules/Preset/Preset.cpp
 SOURCES += src/modules/Preset/Preset-ui.cpp
 SOURCES += src/modules/Preset/Preset-ui-create.cpp
 SOURCES += src/modules/Preset/Preset-ui-events.cpp
-SOURCES += src/modules/Preset/preset-list.cpp
+SOURCES += src/modules/Preset/preset-tab.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
-SOURCES += src/modules/Preset/OsmoseBuilder.cpp
 
 SOURCES += src/modules/XM-shared/macro-usage.cpp
 SOURCES += src/modules/XM-shared/xm-overlay.cpp

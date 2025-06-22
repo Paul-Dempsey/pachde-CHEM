@@ -166,28 +166,29 @@ void PresetUi::onHoverScroll(const HoverScrollEvent &e)
 
 void PresetUi::end_osmose_scan()
 {
-    #ifndef NDEBUG
-    DEBUG("OB: Finished in %.4f", system::getUnixTime() - osmose_builder->start_time);
-    #endif
+    // #ifndef NDEBUG
+    // DEBUG("OB: Finished in %.4f", system::getUnixTime() - osmose_builder->start_time);
+    // #endif
 
-    live_preset_label->text("");
-    stop_scan = false;
-    stop_button->requestDelete();
-    stop_button = nullptr;
-    save_presets(osmose_builder->tab);
-    set_tab(osmose_builder->tab, false);
-    auto em = chem_host->host_matrix();
-    switch (osmose_builder->tab) {
-    case PresetTab::User: em->notifyUserComplete(); break;
-    case PresetTab::System: em->notifySystemComplete(); break;
-    default: break;
-    }
-    delete osmose_builder;
-    osmose_builder = nullptr;
-    stop_spinner();
-    gather_start = false;
-    gathering = PresetTab::Unset;
-    scroll_to(0);
+    // live_preset_label->text("");
+    // stop_scan = false;
+    // stop_button->requestDelete();
+    // stop_button = nullptr;
+    // save_presets(osmose_builder->tab);
+    // set_tab(osmose_builder->tab, false);
+
+    // auto em = chem_host->host_matrix();
+    // switch (osmose_builder->tab) {
+    // case PresetTab::User: em->end_user_scan(); break;
+    // case PresetTab::System: em->end_system_scan(); break;
+    // default: break;
+    // }
+    // delete osmose_builder;
+    // osmose_builder = nullptr;
+    // stop_spinner();
+    // gather_start = false;
+    // gathering = PresetTab::Unset;
+    // scroll_to(0);
 }
 
 void PresetUi::step()
@@ -201,7 +202,9 @@ void PresetUi::step()
         } else {
             return;
         }
-    }
+    }// else if (chem_host && !chem_host->host_busy()) {
+    //    start_delay.run();
+    //}
 
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available() && (gathering == PresetTab::Unset)) {
@@ -212,49 +215,59 @@ void PresetUi::step()
         filter_off_button->button_down = true;
     }
 
-    if (db_builder) {
-        if (db_builder->ready()) {
-            if (!db_builder->next(chem_host->host_haken()) || stop_scan) {
-                PresetId restore = db_builder->current;
-                auto tab_id =  db_builder->tab;
-                delete db_builder;
-                db_builder = nullptr;
-                save_presets(tab_id);
-                stop_spinner();
-                set_tab(tab_id, false);
-                // auto em = chem_host->host_matrix();
-                // switch (tab_id) {
-                //     case PresetTab::User: em->notifyUserComplete(); break;
-                //     case PresetTab::System: em->notifySystemComplete(); break;
-                //     default: break;
-                // }
-                if (restore.valid()) {
-                    auto haken = chem_host->host_haken();
-                    if (haken) haken->select_preset(ChemId::Preset, restore);
-                }
-            }
-        }
-    }
-    if (osmose_builder) {
-        bool done = false;
-        switch (osmose_builder->ready())
-        {
-        case OsmoseBuilder::ReadyResponse::Ready:
-        case OsmoseBuilder::ReadyResponse::Timeout:
-            if (!osmose_builder->next(chem_host->host_haken())) {
-                done = true;
-                live_preset_label->text("");
-            } else {
-                live_preset_label->text(format_string("[%d:%d]", osmose_builder->cc0, osmose_builder->pc));
-            }
-            break;
-        case OsmoseBuilder::ReadyResponse::Waiting:
-            break;
-        }
-        if (done || stop_scan) {
-            end_osmose_scan();
-        }
-    }
+    // if (db_builder) {
+    //     if (db_builder->ready()) {
+    //         if (!db_builder->next(chem_host->host_haken()) || stop_scan) {
+    //             PresetId restore = db_builder->current;
+    //             auto tab_id =  db_builder->tab;
+    //             delete db_builder;
+    //             db_builder = nullptr;
+    //             save_presets(tab_id);
+    //             stop_spinner();
+    //             set_tab(tab_id, false);
+    //             switch (tab_id) {
+    //             case PresetTab::User: chem_host->host_matrix()->end_user_scan(); break;
+    //             case PresetTab::System: chem_host->host_matrix()->end_system_scan(); break;
+    //             default: break;
+    //             }
+    //             if (restore.valid()) {
+    //                 auto haken = chem_host->host_haken();
+    //                 if (haken) haken->select_preset(ChemId::Preset, restore);
+    //             }
+    //         }
+    //     }
+    // }
+    // if (osmose_builder) {
+    //     bool done = false;
+    //     switch (osmose_builder->ready())
+    //     {
+    //     case OsmoseBuilder::ReadyResponse::Ready:
+    //     case OsmoseBuilder::ReadyResponse::Timeout:
+    //         if (!osmose_builder->next(chem_host->host_haken())) {
+    //             done = true;
+    //             live_preset_label->text("");
+    //         } else {
+    //             if (osmose_builder->state == OsmoseBuilder::State::PendingPresetBegin) {
+    //                 live_preset_label->text(format_string("[%d:%d]", osmose_builder->cc0, osmose_builder->pc));
+    //             }
+    //         }
+    //         break;
+    //     case OsmoseBuilder::ReadyResponse::Fail:
+    //         live_preset_label->text("Failed to receive preset");
+    //         done = true;
+    //         break;
+
+    //     case OsmoseBuilder::ReadyResponse::End:
+    //         done = true;
+    //         break;
+
+    //     case OsmoseBuilder::ReadyResponse::Waiting:
+    //         break;
+    //     }
+    //     if (done || stop_scan) {
+    //         end_osmose_scan();
+    //     }
+    // }
 }
 
 void PresetUi::draw(const DrawArgs &args)

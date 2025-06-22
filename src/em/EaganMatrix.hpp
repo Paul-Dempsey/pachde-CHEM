@@ -75,6 +75,7 @@ struct EaganMatrix
     bool in_user;
     bool in_system;
     bool in_mahling;
+    bool in_scan;
     bool pending_EditorReply;
     bool pending_config;
     bool frac_hi;
@@ -86,6 +87,7 @@ struct EaganMatrix
             || in_user
             || in_system
             || in_mahling
+            || in_scan
             || pending_config
             || pending_EditorReply
             ;
@@ -110,7 +112,7 @@ struct EaganMatrix
 
     bool is_ready() { return ready; }
     void reset();
-    
+
     uint16_t get_macro_value(int id) { return macro[id]; }
     float get_macro_voltage(int id);
     
@@ -310,6 +312,11 @@ struct EaganMatrix
     void notifyMahlingComplete();
     void notifyTaskMessage(uint8_t code);
     void notifyLED(uint8_t led);
+
+    void begin_user_scan();
+    void end_user_scan();
+    void begin_system_scan();
+    void end_system_scan();
 
     EaganMatrix();
 

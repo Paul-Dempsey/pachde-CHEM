@@ -72,6 +72,9 @@ void HakenMidi::select_preset(ChemId tag, eaganmatrix::PresetId id)
         log->log_message(">>H", "---- Select Preset");
     }
     assert(id.valid());
+    // if (matrix) {
+    //     matrix->set_preset_id(id);
+    // }
     if (osmose_target) {
         send_message(Tag(MakeCC(Haken::ch1, Haken::ccBankH, id.bank_hi()), tag));
         send_message(Tag(MakeProgramChange(Haken::ch1, id.number()), tag));

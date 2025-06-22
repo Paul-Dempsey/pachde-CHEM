@@ -202,6 +202,7 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
     if (!started || core->disconnected) return;
     auto conn = core->host_connection(ChemDevice::Haken);
     if (!conn || !conn->identified()) return;
+    if (core->host_busy()) return;
 
     bool heart_ready = heart.ready(args.sampleTime);
     bool sync_ready = sync.ready(args.sampleTime);

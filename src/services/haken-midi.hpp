@@ -1,9 +1,10 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "../chem-id.hpp"
-#include "../em/PresetId.hpp"
+#include "../em/EaganMatrix.hpp"
 #include "../em/wrap-HakenMidi.hpp"
 #include "midi-io.hpp"
+using namespace eaganmatrix;
 
 namespace pachde {
 
@@ -15,16 +16,18 @@ enum class HakenMidiRate : uint8_t {
 
 struct HakenMidi
 {
-    MidiLog* log;
-    IDoMidi* doer;
-    bool tick_tock;
-    bool osmose_target;
+    MidiLog* log{nullptr};
+    IDoMidi* doer{nullptr};
+    //EaganMatrix* matrix{nullptr};
+    bool tick_tock{true};
+    bool osmose_target{false};
 
     HakenMidi(const HakenMidi&) = delete; // no copy constructor
-    HakenMidi() : log(nullptr), doer(nullptr), tick_tock(true) {}
+    HakenMidi(){}
 
     void set_handler(IDoMidi* handler) { doer = handler; }
     void set_logger(MidiLog* logger) { log = logger; }
+    //void set_matrix(EaganMatrix* the_matrix) { matrix = the_matrix; }
 
     void send_message(PackedMidiMessage msg) { doer->do_message(msg); }
 

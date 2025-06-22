@@ -251,26 +251,17 @@ void CoreModuleWidget::updateIndicators()
         for (size_t i = 0; i < sizeof(my_module->start_states)/sizeof(my_module->start_states[0]); ++i) {
             auto w = widget_for_task(ChemTaskId(i));
             if (my_module->disconnected) {
-                w->setColor(themeColor(ThemeColor::coTask0));
-                w->setFill(false);
+                w->setLook(themeColor(ThemeColor::coTask0), false);
             } else {
                 auto state = my_module->start_states[i];
-                w->setColor(taskStateColor(state));
-                w->setFill(ChemTask::State::Untried != state);
+                w->setLook(taskStateColor(state), ChemTask::State::Untried != state);
             }
         }
     } else {
-        mididevice_indicator->setColor(taskStateColor(ChemTask::State::Complete));
-        mididevice_indicator->setFill(true);
-
-        heartbeat_indicator->setColor(taskStateColor(ChemTask::State::Complete));
-        heartbeat_indicator->setFill(true);
-
-        em_init_indicator->setColor(taskStateColor(ChemTask::State::Complete));
-        em_init_indicator->setFill(true);
-
-        presetinfo_indicator->setColor(taskStateColor(ChemTask::State::Pending));
-        presetinfo_indicator->setFill(true);
+        mididevice_indicator->setLook(taskStateColor(ChemTask::State::Complete));
+        heartbeat_indicator->setLook(taskStateColor(ChemTask::State::Complete));
+        em_init_indicator->setLook(taskStateColor(ChemTask::State::Complete));
+        presetinfo_indicator->setLook(taskStateColor(ChemTask::State::Pending));
     }
 }
 
@@ -381,6 +372,15 @@ void CoreModuleWidget::onPresetChanged()
 void CoreModuleWidget::onTaskMessage(uint8_t code)
 {
     switch (code) {
+        case Haken::archiveOk:
+        case Haken::eraseMessage:
+        case Haken::endSysNames:
+        case Haken::endUserNames:
+            em_status_label->text("");
+            break;
+        case Haken::archiveFail:
+            em_status_label->text("Archive Fail");
+            break;
         case Haken::reduceGain:
             em_status_label->text("Reduce Gain");
             break;
@@ -390,13 +390,12 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
         case Haken::inFactCalib:
             em_status_label->text("Factory Calibration...");
             break;
-        case Haken::eraseMessage:
-        case Haken::endSysNames:
-        case Haken::endUserNames:
-            em_status_label->text("");
-            break;
         case Haken::midiLoopback:
             em_status_label->text("MIDI Loop Detected");
+            break;
+        case Haken::createLed:
+            em_led->set_light_color(yellow_light);
+            em_led->set_brightness(1.0);
             break;
         case Haken::helloWorld:
             em_status_label->text("The EaganMatrix says hello.");
@@ -584,6 +583,9 @@ void CoreModuleWidget::appendContextMenu(Menu *menu)
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Editor Hello", "", [this]() {
                 my_module->haken_midi.editor_present(ChemId::Core);
+            }));
+            menu->addChild(createMenuItem("ConText", "", [this]() {
+                my_module->haken_midi.request_con_text(ChemId::Core);
             }));
             menu->addChild(createMenuItem("Updates", "", [this]() {
                 my_module->haken_midi.request_updates(ChemId::Core);

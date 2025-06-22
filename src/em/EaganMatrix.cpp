@@ -24,6 +24,7 @@ EaganMatrix::EaganMatrix()
     in_user(false),
     in_system(false),
     in_mahling(false),
+    in_scan(false),
     pending_EditorReply(false),
     pending_config(false),
     frac_hi(false),
@@ -43,6 +44,8 @@ void EaganMatrix::reset()
     in_preset = false;
     in_user = false;
     in_system = false;
+    in_mahling = false;
+    in_scan = false;
     pending_EditorReply = false;
     pending_config = false;
     frac_hi = false;
@@ -192,12 +195,30 @@ void EaganMatrix::notifyLED(uint8_t led)
     }
 }
 
+void EaganMatrix::begin_user_scan() {
+    assert(!busy());
+    in_scan = true;
+    notifyUserBegin();
+};
+void EaganMatrix::end_user_scan() {
+    in_scan = false;
+    notifyUserComplete();
+}
+void EaganMatrix::begin_system_scan() {
+    assert(!busy());
+    in_scan = true;
+    notifySystemBegin();
+};
+void EaganMatrix::end_system_scan() {
+    in_scan = false;
+    notifySystemComplete();
+}
+
 void EaganMatrix::begin_preset()
 {
     clear_preset(false);
     in_preset = true;
     preset_hasher.init();
-    notifyPresetBegin();
 }
 
 void EaganMatrix::clear_preset(bool notify)
@@ -325,7 +346,7 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
         case Haken::s_Name: {
             name_buffer.clear();
             if (set_checked_data_stream(value)) {
-                if (!in_preset) {
+                if (in_system || in_user) {
                     begin_preset();
                 }
             }
@@ -382,8 +403,9 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
 
     case Haken::ccCVCHigh:
         hardware = (value & 0x7c) >> 2;
-        begin_preset();
         hash_2(preset_hasher, cc, value);
+        begin_preset();
+        notifyPresetBegin(); // PresetBegin only when receviing preset details (i.e. not in other requests)
         break;
 
     case Haken::ccTask:
@@ -401,19 +423,19 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
             break;
         case Haken::beginUserNames:
             in_user = true;
-            notifyUserBegin();
+            if (!in_scan) notifyUserBegin();
             break;
         case Haken::endUserNames:
             in_user = false;
-            notifyUserComplete();
+            if (!in_scan) notifyUserComplete();
             break;
         case Haken::endSysNames:
             in_system = false;
-            notifySystemComplete();
+            if (!in_scan) notifySystemComplete();
             break;
         case Haken::beginSysNames:
             in_system = true;
-            notifySystemBegin();
+            if (!in_scan) notifySystemBegin();
             break;
         case Haken::remakeSRMahl:
             if (in_mahling) { // pre-10.50
