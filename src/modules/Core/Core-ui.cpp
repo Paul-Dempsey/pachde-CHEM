@@ -338,13 +338,14 @@ void CoreModuleWidget::onConnectHost(IChemHost* host)
 void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
 {
     std::string nothing = "";
-    //resetIndicators();
-    em_status_label->text(nothing);
-    preset_label->text(nothing);
-    preset_label->describe(nothing);
     std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
     switch (device) {
-    case ChemDevice::Haken: haken_device_label->text(name); break;
+    case ChemDevice::Haken:
+        em_status_label->text(nothing);
+        preset_label->text(nothing);
+        preset_label->describe(nothing);
+        haken_device_label->text(name);
+        break;
     case ChemDevice::Midi1: controller1_device_label->text(name); break;
     case ChemDevice::Midi2: controller2_device_label->text(name); break;
     default: break;

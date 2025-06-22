@@ -127,7 +127,9 @@ std::string CoreModule::device_name(const MidiDeviceHolder& holder) {
     if (holder.connection) {
         return holder.connection->info.friendly(TextFormatLength::Short);
     } else if (!holder.device_claim.empty()) {
-        return holder.device_claim;
+        MidiDeviceConnectionInfo info;
+        info.parse(holder.device_claim);
+        return info.friendly(TextFormatLength::Short);
     }
     return "";
 }
