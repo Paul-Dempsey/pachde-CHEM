@@ -34,13 +34,15 @@ struct Opcode {
 };
 
 
-enum class NumberSize {
+enum class NumberSize
+{
     // trick: Values are max value for the type
     SevenBit = 127,
     FourteenBit = Haken::max14
 };
 
-struct HclCompiler {
+struct HclCompiler
+{
     bool ok{true};
     int error_pos{0};
     std::string error_message;

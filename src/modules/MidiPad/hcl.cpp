@@ -32,82 +32,84 @@ namespace pachde {
          bqsin-poke : `bp` pair-list
           conv-poke : `vp` pair-list
 */
+#define TABLE_BIT(m) (uint64_t(1) << uint64_t(m))
 constexpr const uint64_t LO_14BIT_CC = 
-    (uint64_t(1) << uint64_t(Haken::ccMod)) |
-    (uint64_t(1) << uint64_t(Haken::ccBreath)) |
-    (uint64_t(1) << uint64_t(Haken::ccUndef)) |
-    (uint64_t(1) << uint64_t(Haken::ccFoot)) |
-    (uint64_t(1) << uint64_t(Haken::ccVol)) |
-    (uint64_t(1) << uint64_t(Haken::ccExpres)) |
-    (uint64_t(1) << uint64_t(Haken::ccI)) |
-    (uint64_t(1) << uint64_t(Haken::ccII)) |
-    (uint64_t(1) << uint64_t(Haken::ccIII)) |
-    (uint64_t(1) << uint64_t(Haken::ccIV)) |
-    (uint64_t(1) << uint64_t(Haken::ccV)) |
-    (uint64_t(1) << uint64_t(Haken::ccVI)) |
-    (uint64_t(1) << uint64_t(Haken::ccPost)) |
-    (uint64_t(1) << uint64_t(Haken::ccReci1)) |
-    (uint64_t(1) << uint64_t(Haken::ccReci2)) |
-    (uint64_t(1) << uint64_t(Haken::ccReci3)) |
-    (uint64_t(1) << uint64_t(Haken::ccReci4)) |
-    (uint64_t(1) << uint64_t(Haken::ccReciMix)) |
-    (uint64_t(1) << uint64_t(Haken::ccJack1)) |
-    (uint64_t(1) << uint64_t(Haken::ccJack2)) |
-    (uint64_t(1) << uint64_t(Haken::ccM7)) |
-    (uint64_t(1) << uint64_t(Haken::ccM8)) |
-    (uint64_t(1) << uint64_t(Haken::ccM9)) |
-    (uint64_t(1) << uint64_t(Haken::ccM10)) |
-    (uint64_t(1) << uint64_t(Haken::ccM11)) |
-    (uint64_t(1) << uint64_t(Haken::ccM12)) |
-    (uint64_t(1) << uint64_t(Haken::ccM13)) |
-    (uint64_t(1) << uint64_t(Haken::ccM14)) |
-    (uint64_t(1) << uint64_t(Haken::ccM15)) |
-    (uint64_t(1) << uint64_t(Haken::ccM16)) |
-    (uint64_t(1) << uint64_t(Haken::ccM17)) |
-    (uint64_t(1) << uint64_t(Haken::ccM18)) |
-    (uint64_t(1) << uint64_t(Haken::ccM19)) |
-    (uint64_t(1) << uint64_t(Haken::ccM20)) |
-    (uint64_t(1) << uint64_t(Haken::ccM21)) |
-    (uint64_t(1) << uint64_t(Haken::ccM22)) |
-    (uint64_t(1) << uint64_t(Haken::ccM23)) |
-    (uint64_t(1) << uint64_t(Haken::ccM24)) |
-    (uint64_t(1) << uint64_t(Haken::ccM25)) |
-    (uint64_t(1) << uint64_t(Haken::ccM26)) |
-    (uint64_t(1) << uint64_t(Haken::ccM27)) |
-    (uint64_t(1) << uint64_t(Haken::ccM28)) |
-    (uint64_t(1) << uint64_t(Haken::ccM29)) |
-    (uint64_t(1) << uint64_t(Haken::ccM30))
-;
+    TABLE_BIT(Haken::ccMod) |
+    TABLE_BIT(Haken::ccBreath) |
+    TABLE_BIT(Haken::ccUndef) |
+    TABLE_BIT(Haken::ccFoot) |
+    TABLE_BIT(Haken::ccVol) |
+    TABLE_BIT(Haken::ccExpres) |
+    TABLE_BIT(Haken::ccI) |
+    TABLE_BIT(Haken::ccII) |
+    TABLE_BIT(Haken::ccIII) |
+    TABLE_BIT(Haken::ccIV) |
+    TABLE_BIT(Haken::ccV) |
+    TABLE_BIT(Haken::ccVI) |
+    TABLE_BIT(Haken::ccPost) |
+    TABLE_BIT(Haken::ccReci1) |
+    TABLE_BIT(Haken::ccReci2) |
+    TABLE_BIT(Haken::ccReci3) |
+    TABLE_BIT(Haken::ccReci4) |
+    TABLE_BIT(Haken::ccReciMix) |
+    TABLE_BIT(Haken::ccJack1) |
+    TABLE_BIT(Haken::ccJack2) |
+    TABLE_BIT(Haken::ccM7) |
+    TABLE_BIT(Haken::ccM8) |
+    TABLE_BIT(Haken::ccM9) |
+    TABLE_BIT(Haken::ccM10) |
+    TABLE_BIT(Haken::ccM11) |
+    TABLE_BIT(Haken::ccM12) |
+    TABLE_BIT(Haken::ccM13) |
+    TABLE_BIT(Haken::ccM14) |
+    TABLE_BIT(Haken::ccM15) |
+    TABLE_BIT(Haken::ccM16) |
+    TABLE_BIT(Haken::ccM17) |
+    TABLE_BIT(Haken::ccM18) |
+    TABLE_BIT(Haken::ccM19) |
+    TABLE_BIT(Haken::ccM20) |
+    TABLE_BIT(Haken::ccM21) |
+    TABLE_BIT(Haken::ccM22) |
+    TABLE_BIT(Haken::ccM23) |
+    TABLE_BIT(Haken::ccM24) |
+    TABLE_BIT(Haken::ccM25) |
+    TABLE_BIT(Haken::ccM26) |
+    TABLE_BIT(Haken::ccM27) |
+    TABLE_BIT(Haken::ccM28) |
+    TABLE_BIT(Haken::ccM29) |
+    TABLE_BIT(Haken::ccM30);
+#define HI_TABLE_BIT(m) (uint64_t(1) << (uint64_t(m) - 64))
 constexpr const uint64_t HI_14BIT_CC = 
-    (uint64_t(1) << (uint64_t(Haken::ccBrightness) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccReci5) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccReci6) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM31) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM32) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM33) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM34) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM35) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM36) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM37) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM38) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM39) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM40) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM41) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM42) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM43) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM44) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM45) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM46) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM47) - 64)) |
-    (uint64_t(1) << (uint64_t(Haken::ccM48) - 64))
-;
+    HI_TABLE_BIT(Haken::ccBrightness) |
+    HI_TABLE_BIT(Haken::ccReci5) |
+    HI_TABLE_BIT(Haken::ccReci6) |
+    HI_TABLE_BIT(Haken::ccM31) |
+    HI_TABLE_BIT(Haken::ccM32) |
+    HI_TABLE_BIT(Haken::ccM33) |
+    HI_TABLE_BIT(Haken::ccM34) |
+    HI_TABLE_BIT(Haken::ccM35) |
+    HI_TABLE_BIT(Haken::ccM36) |
+    HI_TABLE_BIT(Haken::ccM37) |
+    HI_TABLE_BIT(Haken::ccM38) |
+    HI_TABLE_BIT(Haken::ccM39) |
+    HI_TABLE_BIT(Haken::ccM40) |
+    HI_TABLE_BIT(Haken::ccM41) |
+    HI_TABLE_BIT(Haken::ccM42) |
+    HI_TABLE_BIT(Haken::ccM43) |
+    HI_TABLE_BIT(Haken::ccM44) |
+    HI_TABLE_BIT(Haken::ccM45) |
+    HI_TABLE_BIT(Haken::ccM46) |
+    HI_TABLE_BIT(Haken::ccM47) |
+    HI_TABLE_BIT(Haken::ccM48);
 
 // Only channels 1-15
 bool is_14bit_cc(uint8_t cc)
 {
-    if (cc < 64) return 0 != ((uint64_t(1) << cc) & LO_14BIT_CC);
-    return 0 != ((uint64_t(1) << (cc - 64)) & HI_14BIT_CC);
+    if (cc < 64) return 0 != (TABLE_BIT(cc) & LO_14BIT_CC);
+    return 0 != (HI_TABLE_BIT(cc) & HI_14BIT_CC);
 }
+#undef TABLE_BIT
+#undef HI_TABLE_BIT
 
 const char * scan_whitespace(const char *scan)
 {
@@ -212,6 +214,7 @@ bool is_op_char(char c)
 {
     return in_range(c, 'b', 'v') ? (0 != (OP_BITS & OP_BIT(c))) : false;
 }
+#undef OP_BIT
 
 Opcode get_maybe_opcode(const char * scan)
 {
@@ -409,7 +412,6 @@ const char *HclCompiler::scan_rational(const char *scan)
 
 const char * HclCompiler::scan_variable_def(const char *scan)
 {
-    //TODO: allow multiple variables: '{' name '=' value (';' name '=' value)* '}'
     assert('{' == *scan);
     ++scan;
     const char * name_start{nullptr};
