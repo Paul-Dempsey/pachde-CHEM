@@ -18,6 +18,7 @@ void MidiDeviceHolder::notifyChanged()
 
 void MidiDeviceHolder::connect(std::shared_ptr<MidiDeviceConnection> connection)
 {
+    if (connection == this->connection) return;
     assert(ChemDevice::Unknown != device_role);
     this->connection = nullptr;
     this->connection = connection;
