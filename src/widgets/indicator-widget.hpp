@@ -37,6 +37,11 @@ struct IndicatorWidget : TipWidget
         dirty();
     }
     void dirty() { _fb->setDirty(); }
+    void setLook(const NVGcolor color, bool fill = true) {
+        _dot->color = color;
+        _dot->filled = fill;
+        dirty();
+    }
     void setColor(const NVGcolor color) {
         _dot->color = color;
         dirty();
@@ -50,8 +55,7 @@ struct IndicatorWidget : TipWidget
 inline IndicatorWidget * createIndicatorCentered(float x, float y, const NVGcolor co, const char * tip = nullptr, bool filled = true)
 {
     IndicatorWidget* w = createWidgetCentered<IndicatorWidget>(Vec(x,y));
-    w->setColor(co);
-    w->setFill(filled);
+    w->setLook(co, filled);
     if (tip) {
         w->describe(tip);
     }

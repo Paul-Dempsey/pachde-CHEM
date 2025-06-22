@@ -167,12 +167,10 @@ void JackUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
     if (device != ChemDevice::Haken) return;
     if (connection) {
         link->describe(connection->info.friendly(TextFormatLength::Long));
-        link->setFill(true);
-        link->setColor(PORT_BLUE);
+        link->setLook(PORT_BLUE);
     } else {
         link->describe("[not connected]");
-        link->setFill(false);
-        link->setColor(RampGray(G_50));
+        link->setLook(RampGray(G_50), false);
     }
 }
 
