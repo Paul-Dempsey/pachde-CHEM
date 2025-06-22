@@ -11,7 +11,7 @@ struct MidiLog
     uint32_t id;
     FILE * log;
     std::string logfile();
-
+    double start_time;
     MidiLog();
     ~MidiLog();
     

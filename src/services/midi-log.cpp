@@ -76,7 +76,8 @@ std::string MidiLog::logfile()
 static uint32_t midi_log_instance_count(0);
 
 MidiLog::MidiLog() :
-    log(nullptr)
+    log(nullptr),
+    start_time(system::getTime())
 {
     id = ++midi_log_instance_count;
 }
@@ -104,7 +105,7 @@ MidiLog::~MidiLog() {
 // void MidiLog::on() { logging = true; }
 // void MidiLog::off() { logging = false; }
 
-std::string tag_prefix(uint8_t tag) {
+const char * tag_prefix(uint8_t tag) {
     switch (as_chem_id(tag)) {
     case ChemId::Unknown:   return "Unknown";
     case ChemId::Haken:     return "Haken";
@@ -127,8 +128,7 @@ std::string tag_prefix(uint8_t tag) {
     case ChemId::XM:        return "XM";
     case ChemId::MidiPad:   return "MidiPad";
     case ChemId::Proto:     return "Proto";
-    default:
-        return format_string("%d", tag);
+    default: return "";
     }
 }
 
@@ -141,17 +141,13 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
     int bytes = 0;
     auto status = midi_status(m);
     auto channel = midi_channel(m);
-    char io_glyph = (dir == IO_Direction::In) ? '<' : '>';
-
-    auto pfx = io_glyph + tag_prefix(midi_tag(m));
-    const char * prefix = pfx.c_str();
 
     switch (status) {
         case Haken::keyOn: {
-            bytes = format_buffer(buffer, 256, "[%s] ch%0-2d Note %d %d\n", prefix, 1+channel, m.bytes.data1, m.bytes.data2);
+            bytes = format_buffer(buffer, 256, "ch%0-2d Note %d %d\n", 1+channel, m.bytes.data1, m.bytes.data2);
         } break;
         case Haken::keyOff: {
-            bytes = format_buffer(buffer, 256, "[%s] ch%0-2d Note off %d %d\n", prefix, 1+channel, m.bytes.data1, m.bytes.data2);
+            bytes = format_buffer(buffer, 256, "ch%0-2d Note off %d %d\n", 1+channel, m.bytes.data1, m.bytes.data2);
         } break;
 
         case Haken::ccStat: {
@@ -159,23 +155,23 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
             switch (channel) {
                 case Haken::ch1:
                 case Haken::ch2:
-                    bytes = format_buffer(buffer, 256, "[%s] ch%0-2d cc%s %02d\n", prefix, 1+channel, ch1_2cc_names.Name(cc).c_str(), m.bytes.data2);
+                    bytes = format_buffer(buffer, 256, "ch%0-2d cc%s %02d\n", 1+channel, ch1_2cc_names.Name(cc).c_str(), m.bytes.data2);
                     break;
 
                 case Haken::ch16:
                     switch (cc) {
                     case Haken::ccTask:
-                        bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), task_names.Name(m.bytes.data2).c_str());
+                        bytes = format_buffer(buffer, 256, "ch%-2d cc%s %s\n", 1+channel, ch16cc_names.Name(cc).c_str(), task_names.Name(m.bytes.data2).c_str());
                         break;
                     case Haken::ccStream:
                         if (127 == m.bytes.data2) {
-                            bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s [END]\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str());
+                            bytes = format_buffer(buffer, 256, "ch%-2d cc%s [END]\n", 1+channel, ch16cc_names.Name(cc).c_str());
                         } else {
-                            bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %s\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), stream_names.Name(m.bytes.data2).c_str());
+                            bytes = format_buffer(buffer, 256, "ch%-2d cc%s %s\n", 1+channel, ch16cc_names.Name(cc).c_str(), stream_names.Name(m.bytes.data2).c_str());
                         }
                         break;
                     default:
-                        bytes = format_buffer(buffer, 256, "[%s] ch%-2d cc%s %02d\n", prefix, 1+channel, ch16cc_names.Name(cc).c_str(), m.bytes.data2);
+                        bytes = format_buffer(buffer, 256, "ch%-2d cc%s %02d\n", 1+channel, ch16cc_names.Name(cc).c_str(), m.bytes.data2);
                         break;
                     }
                     break;
@@ -185,7 +181,7 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
             }} break;
 
         case Haken::progChg: {
-            bytes = format_buffer(buffer, 256, "[%s] ch%-2d %s %d\n", prefix, 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1);
+            bytes = format_buffer(buffer, 256, "ch%-2d %s %d\n", 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1);
         } break;
 
         case Haken::polyKeyPres: {
@@ -193,7 +189,7 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
                 case Haken::ch1:
                 case Haken::ch2:
                 case Haken::ch16:
-                    bytes = format_buffer(buffer, 256, "[%s] ch%-2d %s %d %d (%c%c)\n", prefix, 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1, m.bytes.data2, printable(m.bytes.data1), printable(m.bytes.data2));
+                    bytes = format_buffer(buffer, 256, "ch%-2d %s %d %d (%c%c)\n", 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1, m.bytes.data2, printable(m.bytes.data1), printable(m.bytes.data2));
                     break;
                 default:
                     break;
@@ -201,11 +197,17 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
         } break;
 
         default:
-            bytes = format_buffer(buffer, 256, "[%s] [%08x] ch%-2d %s %d %d\n", prefix, m.data, 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1, m.bytes.data2);
+            bytes = format_buffer(buffer, 256, "[%08x] ch%-2d %s %d %d\n", m.data, 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1, m.bytes.data2);
             break;
     }
     
     if (bytes) {
+        char io_glyph = (dir == IO_Direction::In) ? '<' : '>';
+        const char * tag = tag_prefix(midi_tag(m));
+        char prefix_buffer[80];
+        int prefix_bytes = format_buffer(prefix_buffer, 80, "%.6f [%c%s] ", system::getTime()-start_time, io_glyph, *tag ? tag : format_string("%d", tag).c_str());
+        if (prefix_bytes) std::fwrite(prefix_buffer, 1, prefix_bytes, log);
+
         std::fwrite(buffer, 1, bytes, log);
         std::fflush(log);
     }
