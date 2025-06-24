@@ -88,6 +88,11 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     createIndicatorsCentered(CENTER, PICKER_TOP - 10.f, 9.f);
 
+    auto menu = Center(createThemedWidget<CoreMenu>(Vec(box.size.x - RACK_GRID_WIDTH, PICKER_TOP - 14.f), theme_engine, theme));
+    menu->setUi(this);
+    menu->describe("Core actions menu");
+    addChild(menu);
+
     LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
     addChild(preset_label = createLabel<TipLabel>(
         Vec(CENTER, 118.f), box.size.x, "[preset]", theme_engine, theme, style));
@@ -539,73 +544,131 @@ void CoreModuleWidget::draw(const DrawArgs& args)
     }
 }
 
-void CoreModuleWidget::appendContextMenu(Menu *menu)
+//  ----  CoreMenu  ----
+
+void CoreMenu::onHoverKey(const HoverKeyEvent& e)
 {
-    if (my_module) {
-        menu->addChild(new MenuSeparator);
-        menu->addChild(createCheckMenuItem(
-            "Log MIDI", "",
-            [this]() { return my_module->is_logging(); },
-            [this]() { my_module->enable_logging(!my_module->is_logging()); }));
-
-        menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
-            [=](){ return my_module->disconnected; },
-            [=](){ connect_midi(my_module->disconnected); }
-        ));
-
-        menu->addChild(createCheckMenuItem("Glowing knobs", "", 
-            [this](){ return my_module->glow_knobs; },
-            [this](){
-                my_module->glow_knobs = !my_module->glow_knobs; 
-                glowing_knobs(my_module->glow_knobs);
-            }
-        ));
-        menu->addChild(createSubmenuItem("Themes", "", [=](Menu* menu) {
-            ChemModuleWidget::appendContextMenu(menu);
-        }));
-
-        menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {
-            menu->addChild(createMenuItem("Reset calibration", "", [this]() {
-                my_module->haken_midi.reset_calibration(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("Refine calibration", "", [this]() {
-                my_module->haken_midi.refine_calibration(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("Factory calibration", "", [this]() {
-                my_module->haken_midi.factory_calibration(ChemId::Core);
-            }));
-            menu->addChild(new MenuSeparator);
-            menu->addChild(createMenuItem("Surface alignment", "", [this]() {
-                my_module->haken_midi.surface_alignment(ChemId::Core);
-            }));
-        }));
-
-        menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
-            menu->addChild(new MenuSeparator);
-            menu->addChild(createMenuItem("Editor Hello", "", [this]() {
-                my_module->haken_midi.editor_present(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("ConText", "", [this]() {
-                my_module->haken_midi.request_con_text(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("Updates", "", [this]() {
-                my_module->haken_midi.request_updates(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("Configuration", "", [this]() {
-                my_module->haken_midi.request_configuration(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("User presets", "", [this]() {
-                my_module->haken_midi.request_user(ChemId::Core);
-            }));
-            menu->addChild(createMenuItem("System presets", "", [this]() {
-                my_module->haken_midi.request_system(ChemId::Core);
-            }));
-            menu->addChild(new MenuSeparator);
-            menu->addChild(createMenuItem("Remake Mahling data", "", [this]() {
-                my_module->haken_midi.remake_mahling(ChemId::Core);
-            }));
-
-        }));
-    
+    switch (e.key) {
+        case GLFW_KEY_ENTER:
+        case GLFW_KEY_MENU:
+        if (e.action == GLFW_RELEASE) {
+            e.consume(this);
+            createContextMenu();
+            return;
+        }
     }
+    Base::onHoverKey(e);
+}
+
+void CoreMenu::appendContextMenu(ui::Menu* menu)
+{
+    auto my_module = ui->my_module;
+    if (!my_module) return;
+
+    menu->addChild(createMenuLabel<HamburgerTitle>("Core Actions"));
+    menu->addChild(createCheckMenuItem(
+        "Log MIDI", "",
+        [my_module]() { return my_module->is_logging(); },
+        [my_module]() { my_module->enable_logging(!my_module->is_logging()); }));
+
+    menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
+        [=](){ return my_module->disconnected; },
+        [=](){ ui->connect_midi(my_module->disconnected); }
+    ));
+
+    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+        [my_module](){ return my_module->glow_knobs; },
+        [this, my_module](){
+            my_module->glow_knobs = !my_module->glow_knobs; 
+            ui->glowing_knobs(my_module->glow_knobs);
+        }
+    ));
+ 
+    menu->addChild(createSubmenuItem("Presets", "", [this, my_module](Menu* menu) {
+        if (my_module->em.is_osmose()) {
+            menu->addChild(createMenuItem("Load System presets", "", [my_module]() {
+                ;
+            }));
+            menu->addChild(createMenuItem("Load User presets", "(page 1)", [my_module]() {
+                ;
+            }));
+            menu->addChild(createSubmenuItem("More User pages", "", [this, my_module](Menu* menu) {
+                menu->addChild(createMenuItem("Page 2", "", [my_module]() {
+                    ;
+                }));
+                menu->addChild(createMenuItem("Page 3", "", [my_module]() {
+                    ;
+                }));
+                menu->addChild(createMenuItem("Page 4", "", [my_module]() {
+                    ;
+                }));
+                menu->addChild(createMenuItem("Page 5", "", [my_module]() {
+                    ;
+                }));
+                // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
+                // menu->addChild(createMenuItem("Page 7", "", [my_module]() {}));
+                // menu->addChild(createMenuItem("Page 8", "", [my_module]() {}));
+                // menu->addChild(createMenuItem("Page 9", "", [my_module]() {}));
+                // menu->addChild(createMenuItem("Page 10", "", [my_module]() {}));
+            }));
+        } else {
+            menu->addChild(createMenuItem("Quick System presets", "", [my_module]() {
+                ;
+            }));
+            menu->addChild(createMenuItem("Quick User presets", "", [my_module]() {
+                ;
+            }));
+            menu->addChild(new MenuSeparator);
+            menu->addChild(createMenuItem("Build full System preset database", "", [my_module]() {
+                ;
+            }));
+            menu->addChild(createMenuItem("Build full User preset database", "", [my_module]() {
+                ;
+            }));
+        }
+    }));
+
+    menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {
+        menu->addChild(createMenuItem("Reset calibration", "", [my_module]() {
+            my_module->haken_midi.reset_calibration(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("Refine calibration", "", [my_module]() {
+            my_module->haken_midi.refine_calibration(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("Factory calibration", "", [my_module]() {
+            my_module->haken_midi.factory_calibration(ChemId::Core);
+        }));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuItem("Surface alignment", "", [my_module]() {
+            my_module->haken_midi.surface_alignment(ChemId::Core);
+        }));
+    }));
+
+    menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuItem("Editor Hello", "", [my_module]() {
+            my_module->haken_midi.editor_present(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("ConText", "", [my_module]() {
+            my_module->haken_midi.request_con_text(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("Updates", "", [my_module]() {
+            my_module->haken_midi.request_updates(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("Configuration", "", [my_module]() {
+            my_module->haken_midi.request_configuration(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("User presets", "", [my_module]() {
+            my_module->haken_midi.request_user(ChemId::Core);
+        }));
+        menu->addChild(createMenuItem("System presets", "", [my_module]() {
+            my_module->haken_midi.request_system(ChemId::Core);
+        }));
+        menu->addChild(new MenuSeparator);
+        menu->addChild(createMenuItem("Remake Mahling data", "", [my_module]() {
+            my_module->haken_midi.remake_mahling(ChemId::Core);
+        }));
+
+    }));
+
 }

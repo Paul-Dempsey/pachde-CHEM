@@ -41,4 +41,17 @@ void MidiDeviceHolder::unsubscribe(IMidiDeviceNotify *client)
     assert(client == this->client);
     this->client = nullptr;
 }
+
+std::string MidiDeviceHolder::device_name()
+{
+    if (connection) {
+        return connection->info.friendly(TextFormatLength::Short);
+    } else if (!device_claim.empty()) {
+        MidiDeviceConnectionInfo info;
+        info.parse(device_claim);
+        return info.friendly(TextFormatLength::Short);
+    }
+    return "";
+}
+
 }

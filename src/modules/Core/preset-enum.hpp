@@ -29,14 +29,19 @@ class PresetIdListBuilder : IHandleEmEvents
 {
     HakenPresetEnumerator& target;
     IChemHost * chem{nullptr};
+    // bool complete {false};
     
     PresetIdListBuilder(ChemId client_id, IChemHost* host, HakenPresetEnumerator& e) :
         target(e),
         chem(host)
     {
-        IHandleEmEvents::em_event_mask = IHandleEmEvents::PresetChanged;
+        IHandleEmEvents::em_event_mask = IHandleEmEvents::PresetChanged + IHandleEmEvents::UserComplete + IHandleEmEvents::SystemComplete;
         IHandleEmEvents::module_id = client_id;
     }
+
+    // bool finished() { return complete; }
+    // void onUserComplete() override { complete = true; }
+    // void onSystemComplete() override { complete = true; }
     void onPresetChanged() override {
         auto preset = chem->host_preset();
         if (preset && !preset->empty()) {

@@ -123,23 +123,13 @@ void CoreModule::enable_logging(bool enable)
     }
 }
 
-std::string CoreModule::device_name(const MidiDeviceHolder& holder) {
-    if (holder.connection) {
-        return holder.connection->info.friendly(TextFormatLength::Short);
-    } else if (!holder.device_claim.empty()) {
-        MidiDeviceConnectionInfo info;
-        info.parse(holder.device_claim);
-        return info.friendly(TextFormatLength::Short);
-    }
-    return "";
-}
-
-std::string CoreModule::device_name(ChemDevice which) {
+std::string CoreModule::device_name(ChemDevice which)
+{
     switch (which)
     {
-    case ChemDevice::Haken: return device_name(haken_device);
-    case ChemDevice::Midi1: return device_name(controller1);
-    case ChemDevice::Midi2: return device_name(controller2);
+    case ChemDevice::Haken: return haken_device.device_name();
+    case ChemDevice::Midi1: return controller1.device_name();
+    case ChemDevice::Midi2: return controller2.device_name();
     default: return "";
     }
 }
@@ -195,8 +185,8 @@ void CoreModule::onPresetChanged()
         }
     }
     log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
-    notify_preset_changed();
     update_from_em();
+    notify_preset_changed();
 }
 
 void CoreModule::onUserBegin()
@@ -399,8 +389,7 @@ void CoreModule::connect_midi(bool on)
 
 void CoreModule::init_osmose()
 {
-    auto hw = em.get_hardware();
-    bool osmose = hw ? (Haken::hw_o49 == hw) : is_osmose(haken_device.get_claim());
+    bool osmose = em.is_osmose() ? true : is_osmose(haken_device.get_claim());
     haken_midi.osmose_target = osmose;
 
     EmControlPort& port = modulation.get_port(0);

@@ -14,6 +14,16 @@ using namespace eaganmatrix;
 
 struct CoreModuleWidget;
 struct CoreModule;
+struct CoreMenu : Hamburger
+{
+    using Base = Hamburger;
+
+    CoreModuleWidget* ui{nullptr};
+    void setUi(CoreModuleWidget* w) { ui = w; }
+    //bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    void appendContextMenu(ui::Menu* menu) override;
+    void onHoverKey(const HoverKeyEvent& e) override;
+};
 
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
@@ -65,7 +75,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         if (midi_log) midi_log->log_message(prefix, info);
     }
 
-    std::string device_name(const MidiDeviceHolder& holder);
     std::string device_name(ChemDevice which);
 
     bool is_haken_connected() { return (haken_midi_out.output.deviceId >= 0) && (nullptr != haken_device.connection); }
@@ -210,23 +219,22 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     CoreModule* my_module = nullptr;
     bool spinning{false};
 
-    MidiPicker* haken_picker = nullptr;
-    MidiPicker* controller1_picker = nullptr;
-    MidiPicker* controller2_picker = nullptr;
-    TextLabel* haken_device_label = nullptr;
-    TextLabel* controller1_device_label = nullptr;
-    TextLabel* controller2_device_label = nullptr;
-    TipLabel* preset_label = nullptr;
-    TextLabel* firmware_label = nullptr;
-    TextLabel* em_status_label = nullptr;
-
+    MidiPicker* haken_picker{nullptr};
+    MidiPicker* controller1_picker{nullptr};
+    MidiPicker* controller2_picker{nullptr};
+    TextLabel* haken_device_label{nullptr};
+    TextLabel* controller1_device_label{nullptr};
+    TextLabel* controller2_device_label{nullptr};
+    TipLabel* preset_label{nullptr};
+    TextLabel* firmware_label{nullptr};
+    TextLabel* em_status_label{nullptr};
     BlueKnob* attenuation_knob{nullptr};
+    Blip* em_led{nullptr};;
+    IndicatorWidget* mididevice_indicator{nullptr};
+    IndicatorWidget* heartbeat_indicator{nullptr};
+    IndicatorWidget* em_init_indicator{nullptr};
+    IndicatorWidget* presetinfo_indicator{nullptr};
 
-    Blip* em_led = nullptr;
-    IndicatorWidget* mididevice_indicator = nullptr;
-    IndicatorWidget* heartbeat_indicator = nullptr;
-    IndicatorWidget* em_init_indicator = nullptr;
-    IndicatorWidget* presetinfo_indicator = nullptr;
     IndicatorWidget* widget_for_task(ChemTaskId task);
 
     NVGcolor theme_colors[ThemeColor::THEME_COLOR_SIZE];
@@ -271,7 +279,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
     void step() override;
-    void appendContextMenu(Menu *menu) override;
+    //void appendContextMenu(Menu *menu) override;
 };
 
 
@@ -280,3 +288,5 @@ inline const NVGcolor &CoreModuleWidget::themeColor(ThemeColor which)
     assert(which < ThemeColor::THEME_COLOR_SIZE);
     return theme_colors[static_cast<size_t>(which)];
 }
+
+

@@ -246,7 +246,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     bool is_osmose() { 
         return chem_host 
             && chem_host->host_matrix()
-            && (chem_host->host_matrix()->get_hardware() == Haken::hw_o49); 
+            && chem_host->host_matrix()->is_osmose();
     }
     Tab& active_tab() { return get_tab(active_tab_id); }
     void set_tab(PresetTab tab, bool fetch);

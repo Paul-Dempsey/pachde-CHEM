@@ -120,6 +120,7 @@ struct EaganMatrix
     uint16_t get_jack_2() { return jack_2; }
     uint16_t get_post() { return post; }
     uint8_t get_hardware() { return hardware; }
+    bool is_osmose() { return (Haken::hw_o49 == hardware); }
 
     // simple cc value retreival
     uint8_t get_led() { return ch16.cc[Haken::ccEdState] & Haken::sLedBits; }
