@@ -79,6 +79,12 @@ struct Spinner : OpaqueWidget, IApplyTheme
         tw->translate(center.neg());
         fb->setDirty();
     }
+    void drawLayer(const DrawArgs& args, int layer) override
+    {
+        if (layer != 1) return;
+        if (rack::settings::rackBrightness > .95f) return;
+        fb->draw(args);
+    }
 };
 
 struct ChemSpinSvg {
