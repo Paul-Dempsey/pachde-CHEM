@@ -108,9 +108,9 @@ void PresetUi::request_presets(PresetTab which)
 std::string PresetUi::preset_file(PresetTab which)
 {
     assert(PresetTab::Unset != which);
-    const char * s_u = which == PresetTab::System ? "system" : "user";
     auto em = chem_host->host_matrix();
     if (!em) return "";
+    const char * s_u = which == PresetTab::System ? "system" : "user";
     auto preset_filename = format_string("%s-%s-%d.json", PresetClassName(em->hardware), s_u, em->firmware_version);
     return user_plugin_asset(preset_filename);
 }

@@ -1,6 +1,7 @@
 #include "../../chem.hpp"
 #include "../../chem-core.hpp"
 #include "../../em/EaganMatrix.hpp"
+#include "../../em/preset-list.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/HakenMidiOutput.hpp"
 #include "../../services/midi-devices.hpp"
@@ -8,6 +9,7 @@
 #include "../../widgets/widgets.hpp"
 #include "relay-midi.hpp"
 #include "chem-task.hpp"
+#include "preset-enum.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -20,10 +22,33 @@ struct CoreMenu : Hamburger
 
     CoreModuleWidget* ui{nullptr};
     void setUi(CoreModuleWidget* w) { ui = w; }
-    //bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
     void appendContextMenu(ui::Menu* menu) override;
     void onHoverKey(const HoverKeyEvent& e) override;
 };
+
+enum GatherFlags {
+    None    = 0,
+    System  = 1,
+    User    = (1 << 1),
+    Quick   = (1 << 2),
+    Full    = (1 << 3),
+    Ids     = (1 << 4),
+    Presets = (1 << 5)
+};
+inline bool gather_quick   (GatherFlags g) { return 0 != (g & GatherFlags::Quick); }
+inline bool gather_full    (GatherFlags g) { return 0 != (g & GatherFlags::Full); }
+inline bool gather_system  (GatherFlags g) { return 0 != (g & GatherFlags::System); }
+inline bool gather_user    (GatherFlags g) { return 0 != (g & GatherFlags::User); }
+inline bool gather_ids     (GatherFlags g) { return 0 != (g & GatherFlags::Ids); }
+inline bool gather_presets (GatherFlags g) { return 0 != (g & GatherFlags::Presets); }
+inline bool gather_valid(GatherFlags g)
+{
+    if (GatherFlags::None == g) return true;
+    if ((GatherFlags::Quick + GatherFlags::Full) == (g & (GatherFlags::Quick + GatherFlags::Full))) return false;
+    if ((GatherFlags::User + GatherFlags::System) ==  (g & (GatherFlags::User + GatherFlags::System))) return false;
+    if ((GatherFlags::Ids + GatherFlags::Presets) ==  (g & (GatherFlags::Ids + GatherFlags::Presets))) return false;
+    return true;
+}
 
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
@@ -40,14 +65,24 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     HakenMidiOutput haken_midi_out;
     HakenMidi haken_midi;
     HakenMidiRate midi_rate{HakenMidiRate::Full};
-
     RelayMidi midi_relay;
     MidiLog* midi_log{nullptr};
-
+    
     EaganMatrix em;
-    bool disconnected;
-    bool is_busy;
-    bool in_reboot;
+    bool disconnected{false};
+    bool is_busy{false};
+    bool in_reboot{false};
+    // ui options
+    bool glow_knobs{false};
+    bool refresh_user_presets_on_load{false};
+
+    uint8_t saved_hardware{0};
+
+    PresetList user_presets;
+    PresetList system_presets;
+
+    GatherFlags gathering{GatherFlags::None};
+    HakenPresetEnumerator* id_enum{nullptr};
 
     WallTimer ticker;
     RecurringChemTasks recurring_tasks;
@@ -58,7 +93,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     OctaveShiftLeds octave;
     RoundingLeds round_leds;
-    bool glow_knobs;
 
     // ------------------------------------------
     CoreModule();
@@ -86,6 +120,12 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void connect_midi(bool on_off);
     void init_osmose();
     void reset_tasks();
+    void next_preset();
+    void prev_preset();
+
+    bool load_preset_file(bool user);
+    void load_quick_user_presets();
+    void load_quick_system_presets();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -120,8 +160,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     }
     bool host_busy() override {
         return disconnected
+            || is_busy
             || in_reboot
             || !em.ready
+            || (GatherFlags::None != gathering)
             || em.busy()
             || !startup_tasks.completed();
     }
@@ -254,6 +296,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     virtual ~CoreModuleWidget();
 
     void show_busy(bool busy);
+    bool showing_busy() { return spinning; }
     void glowing_knobs(bool glow);
 
     // ChemModuleWidget

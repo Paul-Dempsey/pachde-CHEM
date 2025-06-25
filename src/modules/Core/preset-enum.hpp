@@ -6,9 +6,8 @@
 
 namespace pachde {
 
-enum class PresetListRequestKind { ccTaskUser, ccTaskSystem, UserIdList, SystemIdList, OsmosePage };
-
-struct IEnumeratePresets {
+struct IEnumeratePresets
+{
     ChemId chem_id{ChemId::Unknown};
     virtual bool next(HakenMidi* haken) = 0;
 };
@@ -29,19 +28,19 @@ class PresetIdListBuilder : IHandleEmEvents
 {
     HakenPresetEnumerator& target;
     IChemHost * chem{nullptr};
-    // bool complete {false};
     
     PresetIdListBuilder(ChemId client_id, IChemHost* host, HakenPresetEnumerator& e) :
         target(e),
         chem(host)
     {
-        IHandleEmEvents::em_event_mask = IHandleEmEvents::PresetChanged + IHandleEmEvents::UserComplete + IHandleEmEvents::SystemComplete;
+        IHandleEmEvents::em_event_mask =
+            IHandleEmEvents::PresetChanged
+            // + IHandleEmEvents::UserComplete
+            // + IHandleEmEvents::SystemComplete
+            ;
         IHandleEmEvents::module_id = client_id;
     }
 
-    // bool finished() { return complete; }
-    // void onUserComplete() override { complete = true; }
-    // void onSystemComplete() override { complete = true; }
     void onPresetChanged() override {
         auto preset = chem->host_preset();
         if (preset && !preset->empty()) {

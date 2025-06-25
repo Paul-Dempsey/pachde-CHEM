@@ -8,6 +8,7 @@
 using namespace ::rack;
 
 namespace eaganmatrix {
+constexpr const uint32_t EMPTY_TAG{1888225264};
 
 struct PresetDescription
 {
@@ -38,6 +39,7 @@ struct PresetDescription
         }
     }
 
+    bool valid_tag() { return tag && (EMPTY_TAG != tag); }
     bool valid() const { return id.valid(); }
     bool empty() const {
         return !valid() || name.empty() || name == "-";

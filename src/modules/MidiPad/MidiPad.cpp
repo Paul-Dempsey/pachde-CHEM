@@ -30,7 +30,7 @@ void MidiPadModule::dataFromJson(json_t* root)
             }
         }
     }
-
+    //TODO: Refresh UI so Rack preset loading works
     ModuleBroker::get()->try_bind_client(this);
 }
 

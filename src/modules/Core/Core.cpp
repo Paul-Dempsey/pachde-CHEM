@@ -7,11 +7,7 @@
 using namespace pachde;
 using namespace eaganmatrix;
 
-CoreModule::CoreModule() :
-    modulation(this, ChemId::Core),
-    disconnected(false),
-    is_busy(false),
-    in_reboot(false)
+CoreModule::CoreModule() : modulation(this, ChemId::Core)
 {
     ticker.set_interval(1.0f);
     module_id = ChemId::Core;
@@ -58,7 +54,6 @@ CoreModule::CoreModule() :
     midi_relay.register_target(&haken_midi_out);
 
     em.subscribeEMEvents(this);
-    //haken_midi.set_matrix(&em);
     haken_midi.set_handler(&midi_relay);
 
     haken_device.init(ChemDevice::Haken, this);
@@ -80,6 +75,8 @@ CoreModule::CoreModule() :
     modulation.configure(-1, 1, cfg);
     chem_host = this;
     midi_relay.register_target(this);
+
+    system_presets.order = PresetOrder::Alpha;
 }
 
 CoreModule::~CoreModule()
@@ -134,9 +131,49 @@ std::string CoreModule::device_name(ChemDevice which)
     }
 }
 
+void CoreModule::next_preset()
+{
+    haken_midi.next_system_preset(ChemId::Core);
+}
+
+void CoreModule::prev_preset()
+{
+    haken_midi.previous_system_preset(ChemId::Core);
+}
+
+bool CoreModule::load_preset_file(bool user)
+{
+    if (host_busy()) return false;
+    if (!em.hardware) return false;
+    auto path = preset_file_name(user, em.hardware);
+    return user ? user_presets.load(path) : system_presets.load(path);
+}
+
+void CoreModule::load_quick_user_presets()
+{
+    if (host_busy()) return;
+    if (load_preset_file(true)) return;
+
+    gathering = static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::User + GatherFlags::Presets);
+    if (!ui()->showing_busy()) {
+        ui()->show_busy(true);
+    }
+    haken_midi.request_user(ChemId::Core);
+}
+
+void CoreModule::load_quick_system_presets()
+{
+    if (host_busy()) return;
+    if (load_preset_file(false)) return;
+    gathering = static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::System + GatherFlags::Presets);
+    if (!ui()->showing_busy()) {
+        ui()->show_busy(true);
+    }
+    haken_midi.request_system(ChemId::Core);
+}
+
 void CoreModule::reset_tasks()
 {
-    if (!startup_tasks.completed()) return;
     recurring_tasks.reset();
     startup_tasks.reset();
     for (size_t i = 0; i < sizeof(start_states)/sizeof(start_states[0]); ++i) {
@@ -174,14 +211,33 @@ void CoreModule::onEditorReply(uint8_t reply)
 
 void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 {
+    saved_hardware = hardware;
     init_osmose();
 }
 
 void CoreModule::onPresetChanged()
 {
-    if (em.preset.valid()) {
+    if (!em.preset.empty()) {
         if (!startup_tasks.completed()) {
             startup_tasks.configuration_received();
+        } else if (gathering) {
+            if (gather_user(gathering)) {
+                if (gather_ids(gathering)) {
+                    id_enum->add(em.preset.id);
+                } else {
+                    assert(gather_presets(gathering));
+                    user_presets.add(&em.preset);
+                }
+            } else if (gather_system(gathering)) {
+                if (gather_ids(gathering)) {
+                    id_enum->add(em.preset.id);
+                } else {
+                    system_presets.add(&em.preset);
+                    assert(gather_presets(gathering));
+                }
+            } else {
+                assert(false);
+            }
         }
     }
     log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
@@ -198,19 +254,29 @@ void CoreModule::onUserBegin()
 void CoreModule::onUserComplete()
 {
     is_busy = false;
-    if (chem_ui) ui()->show_busy(is_busy);
+    if (chem_ui) ui()->show_busy(false);
+    if (gathering) {
+        if (gather_user(gathering)) {
+            user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
+        }
+        gathering = GatherFlags::None;
+    }
 }
 
 void CoreModule::onSystemBegin()
 {
     is_busy = true;
-    if (chem_ui) ui()->show_busy(is_busy);
+    if (chem_ui) ui()->show_busy(true);
 }
 
 void CoreModule::onSystemComplete()
 {
     is_busy = false;
-    if (chem_ui) ui()->show_busy(is_busy);
+    if (chem_ui) ui()->show_busy(false);
+    if (gathering) {
+        system_presets.save(preset_file_name(false, em.hardware), em.hardware, haken_device.device_claim);
+        gathering = GatherFlags::None;
+    }
 }
 
 void CoreModule::onMahlingBegin()
@@ -330,25 +396,21 @@ void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
     haken_device.set_claim(get_json_string(root, "haken-device"));
+    saved_hardware = get_json_int(root, "hardware", 0);
     controller1.set_claim(get_json_string(root, "controller-1"));
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
     json_read_bool(root, "glow-knobs", glow_knobs);
-    // if (!haken_device.get_claim().empty()) {
-    //     modulation.mod_from_json(root);
-    // }
 }
 
 json_t* CoreModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(haken_device.get_claim().c_str()));
+    json_object_set_new(root, "hardware", json_integer(em.get_hardware()));
     json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging()));
-    // if (!haken_device.get_claim().empty()) {
-    //     modulation.mod_to_json(root);
-    // }
     return root;
 }
 

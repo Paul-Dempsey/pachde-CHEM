@@ -83,8 +83,8 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
-    IChemHost*  chem_host{nullptr};
-    MidiPadModule*   my_module{nullptr};
+    IChemHost* chem_host{nullptr};
+    MidiPadModule* my_module{nullptr};
 
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};

@@ -1,4 +1,5 @@
 #include "preset-list.hpp"
+#include "../plugin.hpp"
 #include "em-hardware.h"
 #include "../services/misc.hpp"
 
@@ -7,7 +8,10 @@ namespace eaganmatrix {
 
 void PresetList::add(const PresetDescription* preset)
 {
-    assert(!preset->empty());
+    if (preset->empty()) {
+        assert(false);
+        return;
+    }
 
     auto index = index_of_id(preset->id);
     if (-1 == index) {
@@ -27,10 +31,16 @@ ssize_t PresetList::index_of_id(PresetId id)
     return it - presets.cbegin();
 }
 
+void PresetList::clear()
+{
+    modified = false;
+    presets.clear();
+}
+
 bool PresetList::load(const std::string &path)
 {
     if (path.empty() || !system::exists(path)) return false;
-    FILE* file = std::fopen(path.c_str(), "wb");
+    FILE* file = std::fopen(path.c_str(), "rb");
 	if (!file) {
 		return false;
     }
@@ -113,6 +123,12 @@ void PresetList::sort(PresetOrder order)
         std::sort(presets.begin(), presets.end(), orderfn);
         modified = true;
     }
+}
+
+std::string preset_file_name(bool user, uint8_t hardware)
+{
+    auto preset_filename = format_string("%s-%s.json", PresetClassName(hardware), user ? "user": "system");
+    return user_plugin_asset(preset_filename);
 }
 
 }

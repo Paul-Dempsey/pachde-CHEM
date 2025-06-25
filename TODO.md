@@ -11,18 +11,23 @@ Starting a new refactor to address limitations, issues exposed by Osmose support
 
 - **Core** Process() usually isn't called when there is no audio device selecteed.
   We can check for this and display a message to tell user they need to connect an Audio device to Rack.
-- Preset and Play: onRandomize select random preset
+- Preset and Play (Core?): onRandomize select random preset
 - Bug: rounding lights aren't quite right
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - color picker
   - choose text syntax?
   - 100% transparent option, or transparency slider
 
+## Midi pad
+
+- Make preset save/load work (not updating ui on load?)
+- Factory presets?
+
 ## Overlay macros
 
-  - add/remove
-  - implement control & dispatch
-  - Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
+- add/remove
+- implement control & dispatch
+- Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
 
 ## Osmose
 
