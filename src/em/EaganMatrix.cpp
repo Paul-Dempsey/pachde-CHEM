@@ -77,6 +77,18 @@ float EaganMatrix::get_macro_voltage(int id)
     }
 }
 
+bool EaganMatrix::is_surface()
+{
+    switch (hardware) {
+    case Haken::hw_fL: case Haken::hw_hL: case Haken::hw_fC: case Haken::hw_hC:
+    case Haken::hw_Mini:
+    case Haken::hw_s22: case Haken::hw_s46: case Haken::hw_s70:
+        return true; 
+    default: break;
+    }
+    return false;
+}
+
 void EaganMatrix::subscribeEMEvents(IHandleEmEvents* client)
 {
     if (clients.cend() == std::find(clients.cbegin(), clients.cend(), client)) {
@@ -528,6 +540,9 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 ready = true;
                 preset.tag = preset_hasher.result();
                 //DEBUG("hash: %d %d %s", preset_hasher.content_size(), preset.tag, preset.name.c_str());
+                if (EMPTY_TAG == preset.tag) {
+                    preset.tag = 0;
+                }
                 preset_hasher.init();
                 notifyPresetChanged();
             }
