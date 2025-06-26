@@ -41,6 +41,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     rack::dsp::SchmittTrigger trig[16];
 
     bool editing{false};
+    bool first_init{true};
     int edit_pad{-1};
     WallTimer ticker;
 
@@ -70,6 +71,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void onReset() override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
@@ -99,6 +101,7 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     MidiPadUi(MidiPadModule *module);
 
     bool connected();
+    void refresh();
     void edit_mode(bool editing);
     void set_edit_pad(int id);
     void on_click_pad(int id);
@@ -109,7 +112,6 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
         assert(in_range(id, 0, 15));
         return my_module ? my_module->pad_defs[id] : nullptr;
     }
-
     PackedColor get_pad_color();
     void set_pad_color(PackedColor color);
     PackedColor get_pad_text_color();

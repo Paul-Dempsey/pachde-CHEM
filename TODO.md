@@ -20,8 +20,7 @@ Starting a new refactor to address limitations, issues exposed by Osmose support
 
 ## Midi pad
 
-- Make preset save/load work (not updating ui on load?)
-- Factory presets?
+- What might be some good factory presets?
 
 ## Overlay macros
 

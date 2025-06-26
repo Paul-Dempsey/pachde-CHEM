@@ -386,6 +386,15 @@ void changePanelWidth(SvgPanel* panel, float width)
 	panel->fb->setDirty();
 }
 
+void MidiPadUi::refresh()
+{
+    if (!my_module) return;
+    title->text(my_module->title);
+    for (int i = 0; i < 16; ++i) {
+        pad_ui[i]->set_pad(my_module->pad_defs[i]);
+    }
+}
+
 void MidiPadUi::edit_mode(bool editing)
 {
     if (!my_module) return;

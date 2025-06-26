@@ -16,7 +16,9 @@ MidiPadModule::MidiPadModule()
 void MidiPadModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    device_claim = get_json_string(root, "haken-device");
+    if (first_init) {
+        device_claim = get_json_string(root, "haken-device");
+    }
     title = get_json_string(root, "title");
     auto jar = json_object_get(root, "pads");
     if (jar) {
@@ -30,8 +32,12 @@ void MidiPadModule::dataFromJson(json_t* root)
             }
         }
     }
-    //TODO: Refresh UI so Rack preset loading works
-    ModuleBroker::get()->try_bind_client(this);
+
+    if (first_init) {
+        ModuleBroker::get()->try_bind_client(this);
+    }
+    if (chem_ui) ui()->refresh();
+    first_init = false;
 }
 
 json_t* MidiPadModule::dataToJson()
@@ -50,6 +56,15 @@ json_t* MidiPadModule::dataToJson()
     json_object_set_new(root, "pads", jar);
 
     return root;
+}
+
+void MidiPadModule::onReset()
+{
+    title = "";
+    for (int i = 0; i < 16; ++i) {
+        pad_defs[i] = nullptr;
+    }
+    if (chem_ui) ui()->refresh();
 }
 
 PackedColor MidiPadModule::get_pad_color(int id)
