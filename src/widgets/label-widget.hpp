@@ -10,6 +10,25 @@ namespace pachde {
 enum class TextAlignment { Left, Center, Right };
 enum class VAlignment { Top, Middle, Bottom };
 
+inline NVGalign fromTextAlignment(TextAlignment ta)
+{
+    switch (ta) {
+    case TextAlignment::Left: return NVG_ALIGN_LEFT;
+    case TextAlignment::Center: return NVG_ALIGN_CENTER;
+    case TextAlignment::Right: return NVG_ALIGN_RIGHT;
+    }
+    return NVG_ALIGN_LEFT;
+}
+inline NVGalign fromVAlignment(VAlignment va)
+{
+    switch (va) {
+    case VAlignment::Top: return NVG_ALIGN_TOP;
+    case VAlignment::Middle: return NVG_ALIGN_MIDDLE;
+    case VAlignment::Bottom: return NVG_ALIGN_BOTTOM;
+    }
+    return NVG_ALIGN_TOP;
+}
+
 struct LabelStyle
 {
     const char* key;
@@ -54,7 +73,9 @@ struct LabelStyle
         height(other.height),
         bold(other.bold)
     {}
-
+    NVGalign nvg_alignment() {
+        return static_cast<NVGalign>(fromTextAlignment(align) | fromVAlignment(valign));
+    }
     bool left() { return align == TextAlignment::Left; }
     bool right() { return align == TextAlignment::Right; }
     bool center() { return align == TextAlignment::Center; }

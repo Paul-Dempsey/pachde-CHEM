@@ -31,20 +31,19 @@ void BasicTextLabel::render(const DrawArgs& args)
 
     nvgSave(vg);
     SetTextStyle(vg, font, _color, _style.height);
+    float x, y;
     switch (_style.align) {
-    case TextAlignment::Left:
-        nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_LEFT);
-        nvgText(vg, 0.f, 0.f, _text.c_str(), nullptr);
-        break;
-    case TextAlignment::Center:
-        nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_CENTER);
-        nvgText(vg, box.size.x * .5, 0.f, _text.c_str(), nullptr);
-        break;
-    case TextAlignment::Right:
-        nvgTextAlign(vg, NVG_ALIGN_TOP|NVG_ALIGN_RIGHT);
-        nvgText(vg, box.size.x, 0.f, _text.c_str(), nullptr);
-        break;
+        case TextAlignment::Left: x = 0; break;
+        case TextAlignment::Center: x = box.size.x * .5; break;
+        case TextAlignment::Right: x = box.size.x; break;
     }
+    switch (_style.valign) {
+        case VAlignment::Top: y = 0; break;
+        case VAlignment::Middle: y = box.size.y * .5; break;
+        case VAlignment::Bottom: y = box.size.y; break;
+    }
+    nvgTextAlign(vg, _style.nvg_alignment());
+    nvgText(vg, x, y, _text.c_str(), nullptr);
     nvgRestore(vg);
 }
 

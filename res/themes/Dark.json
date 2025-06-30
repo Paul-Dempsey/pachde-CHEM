@@ -120,6 +120,7 @@
             "slide-thumb": { "fill": "hsl(120, 50%, 50%)" },
             "tab-label-hi":    { "fill": "g90" },
             "tab-label":       { "fill": "g65" },
+            "tbtn-face": { "fill": "#181818" },
             "th": {"stroke": "brand" },
             "title": {"fill": "brand" },
             "tsk-0":     { "fill":"#737373" },

@@ -11,6 +11,7 @@ struct TextButton : FrameButton
 
     std::string text;
     PackedColor color = 0xffe8e8e8;
+    PackedColor bg = 0xff181818;
     LabelStyle label_style{"ctl-glyph", TextAlignment::Center, VAlignment::Middle, 12.f, true};
     
     void set_text(std::string t) { text = t; }
@@ -23,36 +24,39 @@ struct TextButton : FrameButton
         if (!isVisibleColor(color)) {
             color = GetPackedStockColor(StockColor::Gray_65p);
         }
+        bg = theme_engine.getFillColor(theme->name, "tbtn-face", true);
         return true;
     }
 
     void draw(const DrawArgs& args) override
     {
-        Base::draw(args);
-
+        auto vg = args.vg;
         auto font = label_style.bold ? GetPluginFontSemiBold() : GetPluginFontRegular();
         if (!FontOk(font)) return;
-        auto vg = args.vg;
+
+        if (isVisibleColor(bg)) {
+            FillRect(vg, 0, 0, box.size.x, box.size.y, fromPacked(bg));
+        }    
+
+        Base::draw(args);
 
         nvgScissor(vg, 1, 1, box.size.x-2, box.size.y -2);
-        Vec pos{0.f, 0.f};
-        NVGalign align{NVGalign(NVG_ALIGN_TOP|NVG_ALIGN_LEFT)};
-        
+
+        float x, y;
         switch (label_style.align) {
-        case TextAlignment::Center:
-            align = NVGalign(NVG_ALIGN_TOP|NVG_ALIGN_CENTER);
-            pos.x = box.size.x * .5;
-            break;
-        case TextAlignment::Right:
-            align = NVGalign(NVG_ALIGN_TOP|NVG_ALIGN_RIGHT);
-            pos.x = box.size.x;
-            break;
-        default:
-            break;
+        case TextAlignment::Left: x = 0; break;
+        case TextAlignment::Center: x = box.size.x * .5; break;
+        case TextAlignment::Right: x = box.size.x; break;
         }
+        switch (label_style.valign) {
+        case VAlignment::Top: y = 0; break;
+        case VAlignment::Middle: y = box.size.y * .5; break;
+        case VAlignment::Bottom: y = box.size.y; break;
+        }
+
         SetTextStyle(vg, font, fromPacked(color), label_style.height);
-        nvgTextAlign(vg, align);
-        nvgText(vg, pos.x, pos.y, text.c_str(), nullptr);
+        nvgTextAlign(vg, label_style.nvg_alignment());
+        nvgText(vg, x, y, text.c_str(), nullptr);
 
         nvgResetScissor(vg);
     }
