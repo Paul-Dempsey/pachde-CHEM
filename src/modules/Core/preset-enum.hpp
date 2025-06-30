@@ -9,42 +9,62 @@ namespace pachde {
 struct IEnumeratePresets
 {
     ChemId chem_id{ChemId::Unknown};
+    virtual ~IEnumeratePresets() {}
+    virtual std::string next_text() = 0;
+    virtual PresetId expected_id() = 0;
     virtual bool next(HakenMidi* haken) = 0;
 };
 
 struct HakenPresetEnumerator: IEnumeratePresets
 {
-    std::vector<PresetId> ids;
-    size_t current{0};
+    HakenPresetEnumerator(const HakenPresetEnumerator&) = delete;
 
+    std::vector<PresetId> ids;
+    PresetId expected;
+    size_t current{0};
+    virtual ~HakenPresetEnumerator() {}
     HakenPresetEnumerator(ChemId source) {
         chem_id = source;
     }
     void add(PresetId id) { ids.push_back(id); }
+    std::string next_text() override;
+    PresetId expected_id() override { return expected; }
     bool next(HakenMidi* haken) override;
 };
 
-class PresetIdListBuilder : IHandleEmEvents
+struct PresetIdListBuilder : IHandleEmEvents
 {
-    HakenPresetEnumerator& target;
+    PresetIdListBuilder(const PresetIdListBuilder &) = delete;
+
+    HakenPresetEnumerator * target{nullptr};
     IChemHost * chem{nullptr};
-    
-    PresetIdListBuilder(ChemId client_id, IChemHost* host, HakenPresetEnumerator& e) :
+    bool end_received{false};
+    bool complete{false};
+
+    virtual ~PresetIdListBuilder() {}
+    PresetIdListBuilder(ChemId client_id, IChemHost* host, HakenPresetEnumerator* e) :
         target(e),
         chem(host)
     {
         IHandleEmEvents::em_event_mask =
             IHandleEmEvents::PresetChanged
-            // + IHandleEmEvents::UserComplete
-            // + IHandleEmEvents::SystemComplete
+            + IHandleEmEvents::UserComplete
+            + IHandleEmEvents::SystemComplete
+            + IHandleEmEvents::AllowNested
             ;
         IHandleEmEvents::module_id = client_id;
     }
-
+    bool finished() { return complete; }
+    void onUserComplete() override { end_received = true; }
+    void onSystemComplete() override { end_received = true; }
     void onPresetChanged() override {
         auto preset = chem->host_preset();
         if (preset && !preset->empty()) {
-            target.add(preset->id);
+            if (end_received) {
+                complete = true;
+            } else {
+                target->add(preset->id);
+            }
         }
     }
 };
@@ -52,49 +72,53 @@ class PresetIdListBuilder : IHandleEmEvents
 
 struct OsmosePresetEnumerator: IEnumeratePresets
 {
+    OsmosePresetEnumerator(const OsmosePresetEnumerator&) = delete;
+
     uint8_t page{0};
     uint8_t last_page{0};
     uint8_t index{0};
-    
+    PresetId expected;
+    virtual ~OsmosePresetEnumerator() {}
     OsmosePresetEnumerator(ChemId source, uint8_t page) :
-        page(page), last_page(page) { chem_id = source; }
-
+    page(page), last_page(page) { chem_id = source; }
+    
     OsmosePresetEnumerator(ChemId source, uint8_t page, uint8_t last_page) :
-        page(page), last_page(last_page) { chem_id = source; }
-
+    page(page), last_page(last_page) { chem_id = source; }
+    
+    std::string next_text() override { return format_string("[%d.%d]", page, index); }
+    PresetId expected_id() override { return expected; }
     bool next(HakenMidi* haken) override;
 };
 
-constexpr const float OSMOSE_PRESET_START_TIME {0.75};
-constexpr const float OSMOSE_PRESET_RESPONSE_TIME {2.5};
-constexpr const float OSMOSE_SETTLE_TIME {2.5};
-
-constexpr const float HAKEN_PRESET_START_TIME {0.25};
-constexpr const float HAKEN_PRESET_RESPONSE_TIME {1.5};
-constexpr const float HAKEN_SETTLE_TIME {2.0};
-
 struct PresetListBuildCoordinator
 {
+    PresetListBuildCoordinator(const PresetListBuildCoordinator&) = delete;
+
     enum class Phase { Init, Start, PendBegin, Begin, PendReceive, Receive, Settle, End};
     Phase phase{Phase::Init};
     IEnumeratePresets * iter{nullptr};
     MidiLog * log{nullptr};
+    bool first;
 
-    float total;
-    float begin;
-    float pend;
-    float settle;
+    float total{0};
+    float begin{0};
+    float pend{0};
+    float settle{0};
 
-    float begin_timeout;
-    float receive_timeout;
-    float settle_timeout;
+    float begin_timeout{INFINITY};
+    float receive_timeout{INFINITY};
+    float settle_timeout{INFINITY};
 
     Phase get_phase() { return phase; }
-
-    void configure(MidiLog * logger, bool osmose, IEnumeratePresets * iterator);
+    ~PresetListBuildCoordinator() {
+        if (iter) delete iter;
+    }
+    // takes ownership of iterator
+    PresetListBuildCoordinator(MidiLog * logger, bool osmose, IEnumeratePresets * iterator);
     void start_building();
     void preset_started();
     void preset_received();
+    void resume();
 
     // true = continue
     // false = check state

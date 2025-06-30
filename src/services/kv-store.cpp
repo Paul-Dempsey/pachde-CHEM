@@ -32,7 +32,17 @@ bool KVStore::bool_value(const std::string& text, bool default_value)
     assert(false);
     return default_value;
 }
-    
+
+float KVStore::float_value(const std::string &text, float default_value)
+{
+    if (text.empty()) return default_value;
+    char * stop{nullptr};
+    const char *s = text.c_str();
+    float r = std::strtof(s, &stop);
+    if (stop == s) return default_value;
+    return r;
+}
+
 inline std::string scan_part(const char* start, const char* limit, const char** next)
 {
     const char *scan = start;

@@ -18,6 +18,8 @@ void PresetList::add(const PresetDescription* preset)
         auto pi = std::make_shared<PresetInfo>(preset);
         presets.push_back(pi);
         modified = true;
+    } else {
+        presets[index]->init(preset);
     }
 }
 

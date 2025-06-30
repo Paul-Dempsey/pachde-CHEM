@@ -15,6 +15,7 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
     em_event_mask = static_cast<EME>(
         EME::EditorReply
         + EME::HardwareChanged
+        + EME::PresetBegin
         + EME::PresetChanged
         + EME::UserBegin
         + EME::UserComplete
@@ -141,36 +142,128 @@ void CoreModule::prev_preset()
     haken_midi.previous_system_preset(ChemId::Core);
 }
 
-bool CoreModule::load_preset_file(bool user)
+PresetResult CoreModule::load_preset_file(bool user)
 {
-    if (host_busy()) return false;
-    if (!em.hardware) return false;
+    if (host_busy()) return PresetResult::NotReady;
+    if (!em.hardware) return PresetResult::NotReady;
     auto path = preset_file_name(user, em.hardware);
-    return user ? user_presets.load(path) : system_presets.load(path);
+    bool ok = user ? user_presets.load(path) : system_presets.load(path);
+    return ok ? PresetResult::Ok : PresetResult::FileNotFound;
 }
 
-void CoreModule::load_quick_user_presets()
+PresetResult CoreModule::load_quick_user_presets()
 {
-    if (host_busy()) return;
-    if (load_preset_file(true)) return;
+    if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
+    if (host_busy()) return PresetResult::NotReady;
+    if (PresetResult::Ok == load_preset_file(true)) return PresetResult::Ok;
 
-    gathering = static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::User + GatherFlags::Presets);
-    if (!ui()->showing_busy()) {
+    if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
     }
+    gathering = QuickUserPresets;
     haken_midi.request_user(ChemId::Core);
+    return PresetResult::Ok;
 }
 
-void CoreModule::load_quick_system_presets()
+PresetResult CoreModule::load_quick_system_presets()
 {
-    if (host_busy()) return;
-    if (load_preset_file(false)) return;
-    gathering = static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::System + GatherFlags::Presets);
-    if (!ui()->showing_busy()) {
+    if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
+    if (host_busy()) return PresetResult::NotReady;
+    if (PresetResult::Ok == load_preset_file(false)) return PresetResult::Ok;
+
+    if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
     }
+    gathering = QuickSystemPresets;
     haken_midi.request_system(ChemId::Core);
+    return PresetResult::Ok;
 }
+
+PresetResult CoreModule::load_full_user_presets()
+{
+    if (host_busy()) return PresetResult::NotReady;
+    if (chem_ui && !ui()->showing_busy()) {
+        ui()->show_busy(true);
+    }
+    em.begin_user_scan();
+    if (em.is_osmose()) {
+        full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, 90));
+        full_build->start_building();
+    } else {
+        auto hpe = new HakenPresetEnumerator(ChemId::Core);
+        id_builder = new PresetIdListBuilder(ChemId::Core, this, hpe);
+        full_build = new PresetListBuildCoordinator(midi_log, false, hpe);
+        em.subscribeEMEvents(id_builder);
+        haken_midi.request_user(ChemId::Core);
+    }
+    gathering = FullUserPresets;
+    return PresetResult::Ok;
+}
+
+PresetResult CoreModule::scan_osmose_user_presets(uint8_t page)
+{
+    if (!em.is_osmose()) return PresetResult::NotApplicableEm;
+    if (host_busy()) return PresetResult::NotReady;
+    if (chem_ui && !ui()->showing_busy()) {
+        ui()->show_busy(true);
+    }
+    em.begin_user_scan();
+    full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, page));
+    full_build->start_building();
+    gathering = FullUserPresets;
+    return PresetResult::Ok;
+}
+
+PresetResult CoreModule::load_full_system_presets()
+{
+    if (host_busy()) return PresetResult::NotReady;
+
+    if (chem_ui && !ui()->showing_busy()) {
+        ui()->show_busy(true);
+    }
+    em.begin_system_scan();
+    if (em.is_osmose()) {
+        full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, 30, 34));
+        full_build->start_building();
+    } else {
+        auto hpe = new HakenPresetEnumerator(ChemId::Core);
+        id_builder = new PresetIdListBuilder(ChemId::Core, this, hpe);
+        em.subscribeEMEvents(id_builder);
+        haken_midi.request_system(ChemId::Core);
+        full_build = new PresetListBuildCoordinator(midi_log, false, hpe);
+    }
+    gathering = FullSystemPresets;
+
+    return PresetResult::Ok;
+}
+
+PresetResult CoreModule::end_scan()
+{
+    if (!gathering) return PresetResult::NotApplicable;
+    auto gather = gathering;
+    gathering = GatherFlags::None;
+    if (midi_log) {
+        midi_log->log_message("PLB", format_string("Completed in %.6f", full_build->total));
+    }
+    if (gather_user(gather)) {
+        em.end_user_scan();
+        user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
+    } else {
+        assert(gather_system(gather));
+        em.end_system_scan();
+        system_presets.save(preset_file_name(false, em.hardware), em.hardware, haken_device.device_claim);
+    }
+    if (chem_ui) {
+        ui()->show_busy(false);
+        ui()->remove_stop_button();
+    }
+    auto fb = full_build;
+    full_build = nullptr;
+    delete fb;
+    stop_scan = false;
+    return PresetResult::Ok;
+}
+
 
 void CoreModule::reset_tasks()
 {
@@ -215,34 +308,53 @@ void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
     init_osmose();
 }
 
+void CoreModule::onPresetBegin()
+{
+    if (gathering && full_build) {
+        if (PresetListBuildCoordinator::Phase::PendBegin == full_build->phase) {
+            full_build->preset_started();
+        }
+    }
+}
+
 void CoreModule::onPresetChanged()
 {
+    log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     if (!em.preset.empty()) {
         if (!startup_tasks.completed()) {
             startup_tasks.configuration_received();
         } else if (gathering) {
             if (gather_user(gathering)) {
-                if (gather_ids(gathering)) {
-                    id_enum->add(em.preset.id);
-                } else {
+                if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
+                    full_build->preset_received();
+                    if (em.is_osmose()) {
+                        em.preset.id = full_build->iter->expected_id();
+                    } else {
+                        assert(em.preset.id.key() == full_build->iter->expected_id().key());
+                    }
                     user_presets.add(&em.preset);
                 }
             } else if (gather_system(gathering)) {
-                if (gather_ids(gathering)) {
-                    id_enum->add(em.preset.id);
-                } else {
-                    system_presets.add(&em.preset);
+                if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
+                    full_build->preset_received();
+                    if (em.is_osmose()) {
+                        em.preset.id = full_build->iter->expected_id();
+                    } else {
+                        assert(em.preset.id.key() == full_build->iter->expected_id().key());
+                    }
+                    system_presets.add(&em.preset);
                 }
             } else {
                 assert(false);
             }
         }
     }
-    log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     update_from_em();
-    notify_preset_changed();
+    if (startup_tasks.completed() && !gathering) {
+        notify_preset_changed();
+    }
 }
 
 void CoreModule::onUserBegin()
@@ -255,10 +367,8 @@ void CoreModule::onUserComplete()
 {
     is_busy = false;
     if (chem_ui) ui()->show_busy(false);
-    if (gathering) {
-        if (gather_user(gathering)) {
-            user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
-        }
+    if (QuickUserPresets == gathering) {
+        user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
 }
@@ -273,7 +383,7 @@ void CoreModule::onSystemComplete()
 {
     is_busy = false;
     if (chem_ui) ui()->show_busy(false);
-    if (gathering) {
+    if (QuickSystemPresets == gathering) {
         system_presets.save(preset_file_name(false, em.hardware), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
@@ -591,6 +701,49 @@ void CoreModule::process_params(const ProcessArgs &args)
     }
 }
 
+void CoreModule::process_gather(const ProcessArgs &args)
+{
+    if (!gathering) return;
+
+    if (stop_scan) {
+        end_scan();
+        return;
+    }
+
+    if (id_builder) {
+        if (id_builder->finished()) {
+            em.unsubscribeEMEvents(id_builder);
+            delete id_builder;
+            id_builder = nullptr;
+            full_build->start_building();
+        }
+        return;
+    } 
+
+    if (full_build) {
+        using PHASE = PresetListBuildCoordinator::Phase;
+        if (chem_ui && (PHASE::Start == full_build->phase)) {
+            ui()->em_status_label->text(format_string("Scanning %s", full_build->iter->next_text().c_str()));
+        }
+        if (!full_build->process(&haken_midi, args)) {
+            switch (full_build->get_phase()) {
+            case PHASE::PendBegin:
+                full_build->resume();
+                break;
+            case PHASE::PendReceive:
+                // TODO: retry list?
+                full_build->resume();
+                break;
+            case PHASE::End:
+                end_scan();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
 void CoreModule::process(const ProcessArgs &args)
 {
     //DO NOT ChemModule::process(args);
@@ -609,6 +762,9 @@ void CoreModule::process(const ProcessArgs &args)
 
     if (!startup_tasks.completed()) {
         startup_tasks.process(args);
+        if (startup_tasks.completed()) {
+            log_message("CoreStart", "----  Startup Tasks Complete  ----");
+        }
     } else {
         if (!recurring_tasks.started) {
             recurring_tasks.start();
@@ -626,6 +782,8 @@ void CoreModule::process(const ProcessArgs &args)
     } else {
         haken_midi_out.dispatch(sample_time);
     }
+
+    process_gather(args);
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();

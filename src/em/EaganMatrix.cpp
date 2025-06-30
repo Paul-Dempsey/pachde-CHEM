@@ -84,7 +84,8 @@ bool EaganMatrix::is_surface()
     case Haken::hw_Mini:
     case Haken::hw_s22: case Haken::hw_s46: case Haken::hw_s70:
         return true; 
-    default: break;
+    default: 
+        break;
     }
     return false;
 }
@@ -136,10 +137,16 @@ void EaganMatrix::notifyHardwareChanged()
     }
 }
 
+inline bool notify_nested(uint16_t client_mask, IHandleEmEvents::EventMask event, bool scanning)
+{
+    return (client_mask & event)
+        && (!scanning || (client_mask & IHandleEmEvents::AllowNested));
+}
+
 void EaganMatrix::notifyUserBegin()
 {
     for (auto client : clients) {
-        if (client->em_event_mask & IHandleEmEvents::UserBegin) {
+        if (notify_nested(client->em_event_mask, IHandleEmEvents::UserBegin, in_scan)) {
             client->onUserBegin();
         }
     }
@@ -148,7 +155,7 @@ void EaganMatrix::notifyUserBegin()
 void EaganMatrix::notifyUserComplete()
 {
     for (auto client : clients) {
-        if (client->em_event_mask & IHandleEmEvents::UserComplete) {
+        if (notify_nested(client->em_event_mask, IHandleEmEvents::UserComplete, in_scan)) {
             client->onUserComplete();
         }
     }
@@ -157,7 +164,7 @@ void EaganMatrix::notifyUserComplete()
 void EaganMatrix::notifySystemBegin()
 {
     for (auto client : clients) {
-        if (client->em_event_mask & IHandleEmEvents::SystemBegin) {
+        if (notify_nested(client->em_event_mask, IHandleEmEvents::SystemBegin, in_scan)) {
             client->onSystemBegin();
         }
     }
@@ -166,7 +173,7 @@ void EaganMatrix::notifySystemBegin()
 void EaganMatrix::notifySystemComplete()
 {
     for (auto client : clients) {
-        if (client->em_event_mask & IHandleEmEvents::SystemComplete) {
+        if (notify_nested(client->em_event_mask, IHandleEmEvents::SystemComplete, in_scan)) {
             client->onSystemComplete();
         }
     }
@@ -207,35 +214,45 @@ void EaganMatrix::notifyLED(uint8_t led)
     }
 }
 
-void EaganMatrix::begin_user_scan() {
+void EaganMatrix::begin_user_scan()
+{
     assert(!busy());
+    assert(!in_scan);
     in_scan = true;
     notifyUserBegin();
 };
-void EaganMatrix::end_user_scan() {
-    in_scan = false;
-    notifyUserComplete();
+void EaganMatrix::end_user_scan()
+{
+    if (in_scan) {
+        in_scan = false;
+        notifyUserComplete();
+    }
 }
-void EaganMatrix::begin_system_scan() {
+void EaganMatrix::begin_system_scan()
+{
     assert(!busy());
+    assert(!in_scan);
     in_scan = true;
     notifySystemBegin();
 };
-void EaganMatrix::end_system_scan() {
-    in_scan = false;
-    notifySystemComplete();
+void EaganMatrix::end_system_scan()
+{
+    if (in_scan) {
+        in_scan = false;
+        notifySystemComplete();
+    }
 }
 
 void EaganMatrix::begin_preset()
 {
     clear_preset(false);
     in_preset = true;
-    preset_hasher.init();
 }
 
 void EaganMatrix::clear_preset(bool notify)
 {
     in_preset = false;
+    preset_hasher.init();
     preset.clear();
     name_buffer.clear();
     text_buffer.clear();
@@ -414,9 +431,9 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
         break;
 
     case Haken::ccCVCHigh:
+        begin_preset();
         hardware = (value & 0x7c) >> 2;
         hash_2(preset_hasher, cc, value);
-        begin_preset();
         notifyPresetBegin(); // PresetBegin only when receviing preset details (i.e. not in other requests)
         break;
 
@@ -435,19 +452,19 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
             break;
         case Haken::beginUserNames:
             in_user = true;
-            if (!in_scan) notifyUserBegin();
+            notifyUserBegin();
             break;
         case Haken::endUserNames:
             in_user = false;
-            if (!in_scan) notifyUserComplete();
+            notifyUserComplete();
             break;
         case Haken::endSysNames:
             in_system = false;
-            if (!in_scan) notifySystemComplete();
+            notifySystemComplete();
             break;
         case Haken::beginSysNames:
             in_system = true;
-            if (!in_scan) notifySystemBegin();
+            notifySystemBegin();
             break;
         case Haken::remakeSRMahl:
             if (in_mahling) { // pre-10.50

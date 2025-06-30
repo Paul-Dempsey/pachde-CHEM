@@ -271,6 +271,8 @@ void MacroUi::step()
     if (!my_module) return;
     bind_host(my_module);
 
+    if (!chem_host || chem_host->host_busy()) return;
+
     knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 
     for (int i = 0; i <= M6; ++i) {
@@ -278,10 +280,8 @@ void MacroUi::step()
         tracks[i]->set_active(my_module->getInput(i).isConnected());
     }
 
-    if (!chem_host) return;
     auto em = chem_host->host_matrix();
     if (!em) return;
-
     auto a1 = em->get_jack_1_assign();
     auto a2 = em->get_jack_2_assign();
     set_pedal_text(m1_ped_label, Haken::ccI, a1, a2);

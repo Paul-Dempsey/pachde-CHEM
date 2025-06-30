@@ -24,6 +24,7 @@ struct KVStore {
 
     static const char* bool_text(bool f);
     static bool bool_value(const std::string& text, bool default_value = false);
+    static float float_value(const std::string& text, float default_value = 0.0f);
 };
 
 std::shared_ptr<KVStore> get_plugin_kv_store();

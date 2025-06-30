@@ -256,6 +256,7 @@ void FxUi::step()
     if (!my_module) return;
     bind_host(my_module);
 
+    if (!chem_host || chem_host->host_busy()) return;
     knobs[K_MODULATION]->enable(my_module->modulation.has_target());
 
     for (int i = 0; i < K_MODULATION; ++i) {

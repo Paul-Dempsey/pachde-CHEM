@@ -1,11 +1,9 @@
 # CHEM To-Do
 
-Starting a new refactor to address limitations, issues exposed by Osmose support
+Refactor to address limitations, issues exposed by Osmose support.
 
-- Central preset database in Core
-- Job queue to serialize EM operations
-- Differentiate preset changes from config request/select preset/device update?
-- Replace multiple notification schemes (some with few clients) with job completion callback?
+- Preset enumeration timeout config for field-tweaking
+- Core API to load/get presets
 
 ## General
 
@@ -30,11 +28,9 @@ Starting a new refactor to address limitations, issues exposed by Osmose support
 
 ## Osmose
 
-- Live preset tracking can't use PresetId: must use something else
-- Preset: Implement loading Prebuilt System (factory) preset list from res/cache
+- Live preset tracking can't use PresetId: must use something else (crc)
 - Play:
-  - Append from User block
-  - Exclude EM-style Append
+  - Import user/system sets
   - Append from Playlist block
 
 ## Before release

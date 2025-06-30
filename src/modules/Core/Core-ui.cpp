@@ -28,6 +28,7 @@ void CoreModuleWidget::show_busy(bool busy)
     } else {
         stopSpinner(this);
         spinning = false;
+        em_status_label->text("");
     }
 }
 
@@ -240,6 +241,28 @@ void CoreModuleWidget::createRoundingLeds(float cx, float cy, float spread)
     addChild(createLightCentered<TinySimpleLight<RedLight>>(Vec(x, cy), my_module, CoreModule::L_ROUND_RELEASE));
 }
 
+void CoreModuleWidget::create_stop_button()
+{
+    stop_button = createWidget<TextButton>(Vec(CENTER, NAV_ROW));
+    stop_button->box.size.x = 80.f;
+    stop_button->box.size.y = 18.f;
+    stop_button->set_text("stop scan");
+    stop_button->setHandler([=](bool, bool){
+        my_module->stop_scan = true;
+        remove_stop_button();
+        em_status_label->text("Preset scan stopped");
+    });
+    addChild(Center(stop_button));
+}
+
+void CoreModuleWidget::remove_stop_button()
+{
+    if (stop_button) {
+        stop_button->requestDelete();
+        stop_button = nullptr;
+    }
+}
+
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
 {
     auto co = themeColor(coTask0);
@@ -377,6 +400,7 @@ void CoreModuleWidget::onPresetChanged()
 
 void CoreModuleWidget::onTaskMessage(uint8_t code)
 {
+    if (my_module && my_module->gathering) return;
     switch (code) {
         case Haken::archiveOk:
         case Haken::eraseMessage:
@@ -566,15 +590,36 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
     if (!my_module) return;
 
     menu->addChild(createMenuLabel<HamburgerTitle>("Core Actions"));
+
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module](Menu* menu) {
         if (my_module->em.is_osmose()) {
-            menu->addChild(createMenuItem("Load System presets", "", [my_module]() {}));
-            menu->addChild(createMenuItem("Load User presets", "(page 1)", [my_module]() {}));
-            menu->addChild(createSubmenuItem("More User pages", "", [this, my_module](Menu* menu) {
-                menu->addChild(createMenuItem("Page 2", "", [my_module]() {}));
-                menu->addChild(createMenuItem("Page 3", "", [my_module]() {}));
-                menu->addChild(createMenuItem("Page 4", "", [my_module]() {}));
-                menu->addChild(createMenuItem("Page 5", "", [my_module]() {}));
+            menu->addChild(createMenuItem("Load System presets", "", [=]() {
+                ui->em_status_label->text("Full System presets...");
+                my_module->load_full_system_presets();
+                ui->create_stop_button();
+            }));
+            menu->addChild(createMenuItem("Load User presets", "(page 1)", [=]() {
+                ui->em_status_label->text("User presets (page 1)...");
+                my_module->load_full_user_presets();
+                ui->create_stop_button();
+            }));
+            menu->addChild(createSubmenuItem("More User pages", "", [=](Menu* menu) {
+                menu->addChild(createMenuItem("Page 2", "", [=]() {
+                    my_module->scan_osmose_user_presets(91);
+                    ui->create_stop_button();
+                }));
+                menu->addChild(createMenuItem("Page 3", "", [=]() {
+                    my_module->scan_osmose_user_presets(92);
+                    ui->create_stop_button();
+                }));
+                menu->addChild(createMenuItem("Page 4", "", [=]() {
+                    my_module->scan_osmose_user_presets(93);
+                    ui->create_stop_button();
+                }));
+                menu->addChild(createMenuItem("Page 5", "", [=]() {
+                    my_module->scan_osmose_user_presets(94);
+                    ui->create_stop_button();
+                }));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
                 // menu->addChild(createMenuItem("Page 7", "", [my_module]() {}));
                 // menu->addChild(createMenuItem("Page 8", "", [my_module]() {}));
@@ -582,19 +627,29 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 // menu->addChild(createMenuItem("Page 10", "", [my_module]() {}));
             }));
         } else {
-            menu->addChild(createCheckMenuItem("Refresh User presets on start", "", 
-                [my_module](){ return my_module->refresh_user_presets_on_load; },
-                [my_module](){ my_module->refresh_user_presets_on_load = !my_module->refresh_user_presets_on_load; }
+            menu->addChild(createCheckMenuItem("Use saved user presets", "", 
+                [my_module](){ return my_module->use_saved_user_presets; },
+                [my_module](){ my_module->use_saved_user_presets = !my_module->use_saved_user_presets; }
             ));
-            menu->addChild(createMenuItem("Quick User presets", "", [my_module]() {
+            menu->addChild(createMenuItem("Quick User presets", "", [=]() {
+                ui->em_status_label->text("Quick User presets...");
                 my_module->load_quick_user_presets();
             }));
-            menu->addChild(createMenuItem("Full User preset database", "", [my_module]() {}));
+            menu->addChild(createMenuItem("Full User preset database", "", [=]() {
+                ui->em_status_label->text("Full User presets...");
+                my_module->load_full_user_presets();
+                ui->create_stop_button();
+            }));
             menu->addChild(new MenuSeparator);
-            menu->addChild(createMenuItem("Quick System presets", "", [my_module]() {
+            menu->addChild(createMenuItem("Quick System presets", "", [=]() {
+                ui->em_status_label->text("Quick System presets...");
                 my_module->load_quick_system_presets();
             }));
-            menu->addChild(createMenuItem("Full System preset database", "", [my_module]() {}));
+            menu->addChild(createMenuItem("Full System preset database", "", [=]() {
+                ui->em_status_label->text("Full System presets...");
+                my_module->load_full_system_presets();
+                ui->create_stop_button();
+            }));
         }
     }));
 

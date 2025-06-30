@@ -24,6 +24,7 @@ struct IHandleEmEvents {
         LED              = 1 << 9,
         MahlingBegin     = 1 << 10,
         MahlingComplete  = 1 << 11,
+        AllowNested      = 1 << 12,
         None = 0,
         All = EditorReply
             + HardwareChanged
@@ -37,6 +38,7 @@ struct IHandleEmEvents {
             + LED
             + MahlingBegin
             + MahlingComplete
+            + AllowNested
     };
     uint16_t em_event_mask{EventMask::None};
     pachde::ChemId module_id{pachde::ChemId::Unknown};

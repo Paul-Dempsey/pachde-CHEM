@@ -35,6 +35,11 @@ enum GatherFlags {
     Ids     = (1 << 4),
     Presets = (1 << 5)
 };
+constexpr const GatherFlags QuickUserPresets{static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::User + GatherFlags::Presets)};
+constexpr const GatherFlags QuickSystemPresets{static_cast<GatherFlags>(GatherFlags::Quick + GatherFlags::System + GatherFlags::Presets)};
+constexpr const GatherFlags FullUserPresets{static_cast<GatherFlags>(GatherFlags::Full + GatherFlags::User + GatherFlags::Presets)};
+constexpr const GatherFlags FullSystemPresets{static_cast<GatherFlags>(GatherFlags::Full + GatherFlags::System + GatherFlags::Presets)};
+
 inline bool gather_quick   (GatherFlags g) { return 0 != (g & GatherFlags::Quick); }
 inline bool gather_full    (GatherFlags g) { return 0 != (g & GatherFlags::Full); }
 inline bool gather_system  (GatherFlags g) { return 0 != (g & GatherFlags::System); }
@@ -49,6 +54,16 @@ inline bool gather_valid(GatherFlags g)
     if ((GatherFlags::Ids + GatherFlags::Presets) ==  (g & (GatherFlags::Ids + GatherFlags::Presets))) return false;
     return true;
 }
+
+//TODO move to interface
+    enum class PresetResult {
+        Ok,
+        FileNotFound,
+        NotReady,
+        NotApplicable,
+        NotApplicableOsmose,
+        NotApplicableEm
+    };
 
 struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
 {
@@ -74,7 +89,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool in_reboot{false};
     // ui options
     bool glow_knobs{false};
-    bool refresh_user_presets_on_load{false};
+    bool use_saved_user_presets{false};
 
     uint8_t saved_hardware{0};
 
@@ -82,7 +97,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     PresetList system_presets;
 
     GatherFlags gathering{GatherFlags::None};
-    HakenPresetEnumerator* id_enum{nullptr};
+    PresetIdListBuilder* id_builder{nullptr};
+    PresetListBuildCoordinator* full_build{nullptr};
+    bool stop_scan{false};
 
     WallTimer ticker;
     RecurringChemTasks recurring_tasks;
@@ -123,9 +140,16 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void next_preset();
     void prev_preset();
 
-    bool load_preset_file(bool user);
-    void load_quick_user_presets();
-    void load_quick_system_presets();
+    // IPresetList
+    PresetList* get_user_presets() { return &user_presets; }
+    PresetList* get_system_presets() { return &system_presets; }
+    PresetResult load_preset_file(bool user);
+    PresetResult load_quick_user_presets();
+    PresetResult load_quick_system_presets();
+    PresetResult load_full_system_presets();
+    PresetResult load_full_user_presets();
+    PresetResult scan_osmose_user_presets(uint8_t page);
+    PresetResult end_scan();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -159,13 +183,14 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         return &em;
     }
     bool host_busy() override {
-        return disconnected
-            || is_busy
+        return is_busy
+            || disconnected
             || in_reboot
             || !em.ready
-            || (GatherFlags::None != gathering)
             || em.busy()
-            || !startup_tasks.completed();
+            || !startup_tasks.completed()
+            || gathering
+            ;
     }
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
@@ -173,6 +198,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // IHandleEmEvents
     void onEditorReply(uint8_t reply) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
+    void onPresetBegin() override;
     void onPresetChanged() override;
     void onUserBegin() override;
     void onUserComplete() override;
@@ -239,6 +265,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void onRandomize() override {}
     void process_params(const ProcessArgs &args);
     void processLights(const ProcessArgs &args);
+    void process_gather(const ProcessArgs &args);
     void process(const ProcessArgs &args) override;
 };
 
@@ -270,6 +297,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     TipLabel* preset_label{nullptr};
     TextLabel* firmware_label{nullptr};
     TextLabel* em_status_label{nullptr};
+    TextButton* stop_button{nullptr};
     BlueKnob* attenuation_knob{nullptr};
     Blip* em_led{nullptr};;
     IndicatorWidget* mididevice_indicator{nullptr};
@@ -288,6 +316,8 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);
     void createRoundingLeds(float x, float y, float spread);
+    void create_stop_button();
+    void remove_stop_button();
     void createIndicatorsCentered(float x, float y, float spread);
     void updateIndicators();
     void connect_midi(bool on);
