@@ -135,7 +135,7 @@ struct PadWidget : TipWidget, IApplyTheme
 
     void onButton(const ButtonEvent& e) override
     {
-        if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+        if ((e.button == GLFW_MOUSE_BUTTON_LEFT) && (e.action == GLFW_RELEASE)) {
             if (on_click) {
                 on_click(id);
             }
