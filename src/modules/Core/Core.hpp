@@ -55,17 +55,7 @@ inline bool gather_valid(GatherFlags g)
     return true;
 }
 
-//TODO move to interface
-    enum class PresetResult {
-        Ok,
-        FileNotFound,
-        NotReady,
-        NotApplicable,
-        NotApplicableOsmose,
-        NotApplicableEm
-    };
-
-struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi
+struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, IDoMidi, IPresetList
 {
     Modulation modulation;
 
@@ -141,15 +131,17 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void prev_preset();
 
     // IPresetList
-    PresetList* get_user_presets() { return &user_presets; }
-    PresetList* get_system_presets() { return &system_presets; }
-    PresetResult load_preset_file(bool user);
-    PresetResult load_quick_user_presets();
-    PresetResult load_quick_system_presets();
-    PresetResult load_full_system_presets();
-    PresetResult load_full_user_presets();
-    PresetResult scan_osmose_user_presets(uint8_t page);
+    PresetResult load_preset_file(bool user) override;
+    PresetResult load_quick_user_presets() override;
+    PresetResult load_quick_system_presets() override;
+    PresetResult load_full_system_presets() override;
+    PresetResult load_full_user_presets() override;
+    PresetResult scan_osmose_presets(uint8_t page) override;
+    PresetList* host_user_presets() override { return &user_presets; }
+    PresetList* host_system_presets()  override { return &system_presets; }
+
     PresetResult end_scan();
+    void load_lists();
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
@@ -192,6 +184,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
             || gathering
             ;
     }
+    IPresetList* host_preset_list() override { return host_busy() ? nullptr : this; }
+
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
     

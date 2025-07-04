@@ -12,7 +12,7 @@ struct IEnumeratePresets
     virtual ~IEnumeratePresets() {}
     virtual std::string next_text() = 0;
     virtual PresetId expected_id() = 0;
-    virtual bool next(HakenMidi* haken) = 0;
+    virtual bool next(HakenMidi* haken, EaganMatrix * em) = 0;
 };
 
 struct HakenPresetEnumerator: IEnumeratePresets
@@ -29,7 +29,7 @@ struct HakenPresetEnumerator: IEnumeratePresets
     void add(PresetId id) { ids.push_back(id); }
     std::string next_text() override;
     PresetId expected_id() override { return expected; }
-    bool next(HakenMidi* haken) override;
+    bool next(HakenMidi* haken, EaganMatrix * em) override;
 };
 
 struct PresetIdListBuilder : IHandleEmEvents
@@ -87,7 +87,7 @@ struct OsmosePresetEnumerator: IEnumeratePresets
     
     std::string next_text() override { return format_string("[%d.%d]", page, index); }
     PresetId expected_id() override { return expected; }
-    bool next(HakenMidi* haken) override;
+    bool next(HakenMidi* haken, EaganMatrix * em) override;
 };
 
 struct PresetListBuildCoordinator
@@ -100,10 +100,10 @@ struct PresetListBuildCoordinator
     MidiLog * log{nullptr};
     bool first;
 
-    float total{0};
-    float begin{0};
-    float pend{0};
-    float settle{0};
+    double total{0.0};
+    float begin{0.0};
+    float pend{0.0};
+    float settle{0.0};
 
     float begin_timeout{INFINITY};
     float receive_timeout{INFINITY};
@@ -126,7 +126,7 @@ struct PresetListBuildCoordinator
     //      Phase::PendBegin = did not receive start of preset in timeout
     //      Phase::PendReceive = did not receive preset change in timeout
     //      other = N/A
-    bool process(HakenMidi* haken, const rack::Module::ProcessArgs& args);
+    bool process(HakenMidi* haken, EaganMatrix * em, const rack::Module::ProcessArgs& args);
 };
 
 }

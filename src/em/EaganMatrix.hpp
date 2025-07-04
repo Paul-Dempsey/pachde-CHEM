@@ -74,6 +74,7 @@ struct EaganMatrix
 
     bool broken_midi;
     bool in_preset;
+    bool in_preset_detail;
     bool in_user;
     bool in_system;
     bool in_mahling;
@@ -96,7 +97,6 @@ struct EaganMatrix
     }
     // raw channel cc data
     ChannelData ch1;
-    ChannelData ch2;
     ChannelData ch16;
 
     uint16_t macro[90];
@@ -111,6 +111,7 @@ struct EaganMatrix
     FixedStringBuffer<256> text_buffer;
     PresetDescription preset;
     crc::crc32 preset_hasher;
+    PresetId osmose_id;
 
     bool is_ready() { return ready; }
     void reset();
@@ -318,6 +319,7 @@ struct EaganMatrix
     void notifyTaskMessage(uint8_t code);
     void notifyLED(uint8_t led);
 
+    void set_osmose_id(PresetId id) { osmose_id = id; }
     void begin_user_scan();
     void end_user_scan();
     void begin_system_scan();

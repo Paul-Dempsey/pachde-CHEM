@@ -596,29 +596,23 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             menu->addChild(createMenuItem("Load System presets", "", [=]() {
                 ui->em_status_label->text("Full System presets...");
                 my_module->load_full_system_presets();
-                ui->create_stop_button();
             }));
             menu->addChild(createMenuItem("Load User presets", "(page 1)", [=]() {
                 ui->em_status_label->text("User presets (page 1)...");
                 my_module->load_full_user_presets();
-                ui->create_stop_button();
             }));
             menu->addChild(createSubmenuItem("More User pages", "", [=](Menu* menu) {
                 menu->addChild(createMenuItem("Page 2", "", [=]() {
-                    my_module->scan_osmose_user_presets(91);
-                    ui->create_stop_button();
+                    my_module->scan_osmose_presets(91);
                 }));
                 menu->addChild(createMenuItem("Page 3", "", [=]() {
-                    my_module->scan_osmose_user_presets(92);
-                    ui->create_stop_button();
+                    my_module->scan_osmose_presets(92);
                 }));
                 menu->addChild(createMenuItem("Page 4", "", [=]() {
-                    my_module->scan_osmose_user_presets(93);
-                    ui->create_stop_button();
+                    my_module->scan_osmose_presets(93);
                 }));
                 menu->addChild(createMenuItem("Page 5", "", [=]() {
-                    my_module->scan_osmose_user_presets(94);
-                    ui->create_stop_button();
+                    my_module->scan_osmose_presets(94);
                 }));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
                 // menu->addChild(createMenuItem("Page 7", "", [my_module]() {}));

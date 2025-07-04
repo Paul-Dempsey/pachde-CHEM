@@ -2,6 +2,7 @@
 #include <rack.hpp>
 #include "chem-id.hpp"
 #include "em/preset.hpp"
+#include "em/preset-list.hpp"
 #include "em/EaganMatrix.hpp"
 #include "services/rack-em-convert.hpp"
 #include "services/midi-devices.hpp"
@@ -10,6 +11,27 @@
 namespace pachde {
 
 struct IChemClient;
+
+enum class PresetResult {
+    Ok,
+    FileNotFound,
+    NotReady,
+    NotApplicable,
+    NotApplicableOsmose,
+    NotApplicableEm
+};
+
+struct IPresetList
+{
+    virtual PresetResult load_preset_file(bool user) = 0;
+    virtual PresetResult load_quick_user_presets() = 0;
+    virtual PresetResult load_quick_system_presets() = 0;
+    virtual PresetResult load_full_system_presets() = 0;
+    virtual PresetResult load_full_user_presets() = 0;
+    virtual PresetResult scan_osmose_presets(uint8_t page) = 0;
+    virtual PresetList* host_user_presets() = 0;
+    virtual PresetList* host_system_presets() = 0;
+};
 
 struct IChemHost
 {
@@ -23,6 +45,7 @@ struct IChemHost
     virtual HakenMidi* host_haken() = 0;
     virtual eaganmatrix::EaganMatrix* host_matrix() = 0;
     virtual const eaganmatrix::PresetDescription* host_preset() = 0;
+    virtual IPresetList* host_preset_list() = 0;
 };
 
 struct IChemClient

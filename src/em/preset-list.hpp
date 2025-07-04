@@ -18,6 +18,7 @@ struct PresetList
     bool empty() { return presets.empty(); }
     bool dirty() { return modified; }
     ssize_t index_of_id(PresetId id);
+    ssize_t index_of_tag(uint32_t tag);
     void add(const PresetDescription* preset);
     void clear();
     bool load(const std::string& path);

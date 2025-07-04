@@ -23,6 +23,15 @@ void PresetList::add(const PresetDescription* preset)
     }
 }
 
+ssize_t PresetList::index_of_tag(uint32_t tag)
+{
+    if (!tag || empty()) return -1;
+
+    auto it = std::find_if(presets.cbegin(), presets.cend(), [tag](const std::shared_ptr<PresetInfo> p){ return tag == p->tag; });
+    if (it == presets.cend()) return -1;
+    return it - presets.cbegin();
+}
+
 ssize_t PresetList::index_of_id(PresetId id)
 {
     if (!id.valid() || empty()) return -1;

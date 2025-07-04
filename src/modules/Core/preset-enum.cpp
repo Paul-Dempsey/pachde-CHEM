@@ -13,7 +13,7 @@ std::string HakenPresetEnumerator::next_text()
     return format_string("[%d.%d.%d]", id.bank_hi(), id.bank_lo(), id.number());
 }
 
-bool HakenPresetEnumerator::next(HakenMidi *haken)
+bool HakenPresetEnumerator::next(HakenMidi *haken, EaganMatrix *)
 {
     if (current >= ids.size()) return false;
     expected = ids[current++];
@@ -27,7 +27,7 @@ bool HakenPresetEnumerator::next(HakenMidi *haken)
 
 // ---- OsmosePresetEnumerator  ----
 
-bool OsmosePresetEnumerator::next(HakenMidi* haken)
+bool OsmosePresetEnumerator::next(HakenMidi* haken, EaganMatrix * em)
 {
     if (index > 127) {
         index = 0;
@@ -38,6 +38,7 @@ bool OsmosePresetEnumerator::next(HakenMidi* haken)
         haken->log->log_message("OPE", format_string("Requesting [%d.%d]", page, index));
     }
     expected = PresetId(page, 0, index);
+    em->set_osmose_id(expected);
     haken->send_message(Tag(MakeCC(Haken::ch1, Haken::ccBankH, page), chem_id));
     haken->send_message(Tag(MakeProgramChange(Haken::ch1, index), chem_id));
     ++index;
@@ -127,7 +128,16 @@ void PresetListBuildCoordinator::preset_started()
 
 void PresetListBuildCoordinator::preset_received()
 {
-    if (phase == Phase::PendReceive) phase = Phase::Receive;
+    if (phase == Phase::PendReceive) {
+        phase = Phase::Receive;
+    } else if (phase == Phase::Settle) {
+        // sometimes osmose sends spurious copies of presets after selection
+        // in this case we want to wait until it's done whatever recovery 
+        // this is doing (I assume it's some kind of recovery), 
+        // so we reset the settle timeout
+        if (log) log->log_message("PLB", "extending settle time");
+        settle = 0.0f;
+    }
 }
 
 void PresetListBuildCoordinator::resume()
@@ -143,15 +153,15 @@ void PresetListBuildCoordinator::resume()
 //      Phase::PendBegin = did not receive start of preset in timeout
 //      Phase::PendReceive = did not receive preset change in timeout
 //      other = N/A
-bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::ProcessArgs& args)
+bool PresetListBuildCoordinator::process(HakenMidi* haken, EaganMatrix * em, const rack::Module::ProcessArgs& args)
 {
+    if (phase != Phase::End) total += args.sampleTime;
     switch (phase) {
         case Phase::Init:
             return true;
 
         case Phase::Start:
-            total += args.sampleTime;
-            if (iter->next(haken)) {
+            if (iter->next(haken, em)) {
                 begin = 0.0f;
                 phase = Phase::PendBegin;
                 return true;
@@ -162,7 +172,6 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::P
             break;
 
         case Phase::PendBegin:
-            total += args.sampleTime;
             begin += args.sampleTime;
             if ((first && (begin > 2.0)) || (!first && (begin > begin_timeout))) {
                 if (log) log->log_message("PLB", format_string("PendBegin timeout %.6f > %.6f ", begin, first ? 2.0f : begin_timeout));
@@ -172,7 +181,6 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::P
             return true;
 
         case Phase::Begin:
-            total += args.sampleTime;
             if (log) {
                 begin += args.sampleTime;
                 log->log_message("PLB", format_string("preset_started() in %.6f", begin));
@@ -183,7 +191,6 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::P
 
         case Phase::PendReceive:
             first  = false;
-            total += args.sampleTime;
             pend += args.sampleTime;
             if (pend > receive_timeout) {
                 if (log) log->log_message("PLB", "PendReceive timeout");
@@ -192,7 +199,6 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::P
             return true;
 
         case Phase::Receive:
-            total += args.sampleTime;
             if (log) {
                 pend += args.sampleTime;
                 log->log_message("PLB", format_string("preset_received() in %.6f", pend));
@@ -202,7 +208,6 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, const rack::Module::P
             return true;
 
         case Phase::Settle:
-            total += args.sampleTime;
             settle += args.sampleTime;
             if (settle > settle_timeout) {
                 if (log) log->log_message("PLB", "Settle complete");

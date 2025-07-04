@@ -134,12 +134,76 @@ std::string CoreModule::device_name(ChemDevice which)
 
 void CoreModule::next_preset()
 {
-    haken_midi.next_system_preset(ChemId::Core);
+    load_lists();
+    if (em.is_osmose()) {
+        PresetId id;
+        if (em.preset.id.valid() && em.preset.id.key()) {
+            auto index = system_presets.index_of_id(em.preset.id);
+            if (-1 == index) {
+                index = user_presets.index_of_id(em.preset.id);
+                if (-1 == index) return;
+                if (++index >= user_presets.size()) index = 0;
+                id = user_presets.presets[index]->id;
+            } else {
+                if (++index >= system_presets.size()) index = 0;
+                id = system_presets.presets[index]->id;
+            }
+        } else if (em.preset.tag) {
+            auto index = system_presets.index_of_tag(em.preset.tag);
+            if (-1 == index) {
+                index = user_presets.index_of_tag(em.preset.tag);
+                if (-1 == index) return;
+                if (++index >= user_presets.size()) index = 0;
+                id = user_presets.presets[index]->id;
+            } else {
+                if (++index >= system_presets.size()) index = 0;
+                id = system_presets.presets[index]->id;
+            }
+        }
+        if (id.valid()) {
+            em.set_osmose_id(id);
+            haken_midi.select_preset(ChemId::Core,id);
+        }
+    } else {
+        haken_midi.next_system_preset(ChemId::Core);
+    }
 }
 
 void CoreModule::prev_preset()
 {
-    haken_midi.previous_system_preset(ChemId::Core);
+    load_lists();
+    if (em.is_osmose()) {
+        PresetId id;
+        if (em.preset.id.valid() && em.preset.id.key()) {
+            auto index = system_presets.index_of_id(em.preset.id);
+            if (-1 == index) {
+                index = user_presets.index_of_id(em.preset.id);
+                if (-1 == index) return;
+                if (--index < 0) index = user_presets.size()-1;
+                id = user_presets.presets[index]->id;
+            } else {
+                if (--index < 0) index = system_presets.size()-1;
+                id = system_presets.presets[index]->id;
+            }
+        } else if (em.preset.tag) {
+            auto index = system_presets.index_of_tag(em.preset.tag);
+            if (-1 == index) {
+                index = user_presets.index_of_tag(em.preset.tag);
+                if (-1 == index) return;
+                if (--index < 0) index = user_presets.size() - 1;
+                id = user_presets.presets[index]->id;
+            } else {
+                if (--index < 0) index = system_presets.size() - 1;
+                id = system_presets.presets[index]->id;
+            }
+        }
+        if (id.valid()) {
+            em.set_osmose_id(id);
+            haken_midi.select_preset(ChemId::Core,id);
+        }
+    } else {
+        haken_midi.previous_system_preset(ChemId::Core);
+    }
 }
 
 PresetResult CoreModule::load_preset_file(bool user)
@@ -182,8 +246,11 @@ PresetResult CoreModule::load_quick_system_presets()
 PresetResult CoreModule::load_full_user_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
+    if (PresetResult::Ok == load_preset_file(true)) return PresetResult::Ok;
+
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
+        ui()->create_stop_button();
     }
     em.begin_user_scan();
     if (em.is_osmose()) {
@@ -200,12 +267,13 @@ PresetResult CoreModule::load_full_user_presets()
     return PresetResult::Ok;
 }
 
-PresetResult CoreModule::scan_osmose_user_presets(uint8_t page)
+PresetResult CoreModule::scan_osmose_presets(uint8_t page)
 {
     if (!em.is_osmose()) return PresetResult::NotApplicableEm;
     if (host_busy()) return PresetResult::NotReady;
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
+        ui()->create_stop_button();
     }
     em.begin_user_scan();
     full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, page));
@@ -217,9 +285,11 @@ PresetResult CoreModule::scan_osmose_user_presets(uint8_t page)
 PresetResult CoreModule::load_full_system_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
+    if (PresetResult::Ok == load_preset_file(false)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
+        ui()->create_stop_button();
     }
     em.begin_system_scan();
     if (em.is_osmose()) {
@@ -264,6 +334,17 @@ PresetResult CoreModule::end_scan()
     return PresetResult::Ok;
 }
 
+void CoreModule::load_lists()
+{
+    if (host_busy()) return;
+    if (!em.hardware) return;
+    if (system_presets.empty()) {
+        load_preset_file(false);
+    }
+    if (user_presets.empty()) {
+        load_preset_file(true);
+    }
+}
 
 void CoreModule::reset_tasks()
 {
@@ -327,23 +408,19 @@ void CoreModule::onPresetChanged()
             if (gather_user(gathering)) {
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
-                    full_build->preset_received();
-                    if (em.is_osmose()) {
-                        em.preset.id = full_build->iter->expected_id();
-                    } else {
-                        assert(em.preset.id.key() == full_build->iter->expected_id().key());
+                    if (em.preset.id.key() != full_build->iter->expected_id().key()) {
+                        log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     }
+                    full_build->preset_received();
                     user_presets.add(&em.preset);
                 }
             } else if (gather_system(gathering)) {
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
-                    full_build->preset_received();
-                    if (em.is_osmose()) {
-                        em.preset.id = full_build->iter->expected_id();
-                    } else {
-                        assert(em.preset.id.key() == full_build->iter->expected_id().key());
+                    if (em.preset.id.key() != full_build->iter->expected_id().key()) {
+                        log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     }
+                    full_build->preset_received();
                     system_presets.add(&em.preset);
                 }
             } else {
@@ -725,7 +802,7 @@ void CoreModule::process_gather(const ProcessArgs &args)
         if (chem_ui && (PHASE::Start == full_build->phase)) {
             ui()->em_status_label->text(format_string("Scanning %s", full_build->iter->next_text().c_str()));
         }
-        if (!full_build->process(&haken_midi, args)) {
+        if (!full_build->process(&haken_midi, &em, args)) {
             switch (full_build->get_phase()) {
             case PHASE::PendBegin:
                 full_build->resume();

@@ -104,7 +104,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
     case ChemTaskId::Heartbeat: {
         if (task.ready(args.sampleTime)) {
             switch (task.state) {
-            case ChemTask::State::Untried: 
+            case ChemTask::State::Untried:
                 if (core->is_haken_connected()) {
                     core->log_message("CoreStart", "Heartbeat");
                     core->haken_midi.editor_present(ChemId::Core);
@@ -203,15 +203,19 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
     auto conn = core->host_connection(ChemDevice::Haken);
     if (!conn || !conn->identified()) return;
     if (core->host_busy()) return;
-
-    bool heart_ready = heart.ready(args.sampleTime);
+    bool heartless = core->em.is_osmose();
+    bool heart_ready = heartless || heart.ready(args.sampleTime);
     bool sync_ready = sync.ready(args.sampleTime);
     if (!(heart_ready || sync_ready)) return;
 
     if (heart_ready) {
-        core->log_message("Core", "Task Heartbeat");
-        core->haken_midi.editor_present(ChemId::Core);
-        heart.start();
+        if (heartless) {
+            heart.complete();            
+        } else {
+            core->log_message("Core", "Task Heartbeat");
+            core->haken_midi.editor_present(ChemId::Core);
+            heart.start();
+        }
     }
     if (sync_ready && !heart.pending() && !heart.broken()) {
         auto broker = ModuleBroker::get();
