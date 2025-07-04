@@ -1,9 +1,7 @@
 # CHEM To-Do
 
-Refactor to address limitations, issues exposed by Osmose support.
-
-- Preset enumeration timeout config for field-tweaking
-- Core API to load/get presets
+- **Preset** Strip list building and rewire to get preset lists from Core
+- Should Preset spin while Core is scanning?
 
 ## General
 
@@ -18,6 +16,7 @@ Refactor to address limitations, issues exposed by Osmose support.
 
 ## Midi pad
 
+- Implement hover/push ui feedback
 - What might be some good factory presets?
 
 ## Overlay macros
