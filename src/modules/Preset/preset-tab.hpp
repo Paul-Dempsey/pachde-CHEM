@@ -14,7 +14,7 @@ struct PresetTabList
     PresetTabList(const PresetTabList&) = delete;
 
     PresetTab tab;
-    PresetList preset_list;
+    std::shared_ptr<PresetList> preset_list{nullptr};
     std::vector<std::shared_ptr<PresetInfo>> preset_view;
 
     uint64_t filter_masks[5]{0};
@@ -36,15 +36,14 @@ struct PresetTabList
     PresetTabList(PresetTab id):
         tab(id)
     {
-        preset_list.order = PresetTab::User == id ? PresetOrder::Natural : PresetOrder::Alpha;
     }
-    bool empty() { return preset_list.empty(); }
-    bool dirty() { return preset_list.modified; }
-    void set_dirty() { preset_list.modified = true; }
-    size_t count() { return filtering ? preset_view.size() : preset_list.size(); }
+    bool empty() { return preset_list ? preset_list->empty() : true; }
+    bool dirty() { return preset_list ? preset_list->modified : false; }
+    void set_dirty() { assert(preset_list); preset_list->modified = true; }
+    size_t count() { return filtering ? preset_view.size() : (preset_list ? preset_list->size() : 0); }
     ssize_t index_of_id(PresetId id);
     ssize_t index_of_id_unfiltered(PresetId id);
-    std::vector<std::shared_ptr<PresetInfo>>* presets() { return filtering ? &preset_view : &preset_list.presets; }
+    std::vector<std::shared_ptr<PresetInfo>>* presets() { return filtering ? &preset_view : (preset_list ? &preset_list->presets : nullptr); }
 
     void refresh_filter_view();
 
@@ -52,7 +51,7 @@ struct PresetTabList
 
     void clear() {
         preset_view.clear();
-        preset_list.clear();
+        preset_list = nullptr;
     }
 
     bool load(const std::string& path);
@@ -63,7 +62,7 @@ struct PresetTabList
         if (filtering) {
             return preset_view.empty() ? nullptr : preset_view[which];
         } else {
-            return preset_list.empty() ? nullptr : preset_list.presets[which];
+            return !preset_list || preset_list->empty() ? nullptr : preset_list->presets[which];
         }
     }
 };

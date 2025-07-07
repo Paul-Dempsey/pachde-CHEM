@@ -38,15 +38,9 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     };
 
     std::string device_claim;
-    //uint8_t hardware{0};
-    //uint16_t firmware{0};
     bool track_live{false};
-    bool use_cached_user_presets{false};
     bool keep_search_filters{true};
     PresetTab active_tab{PresetTab::System};
-
-    PresetOrder user_order{PresetOrder::Natural};
-    PresetOrder system_order{PresetOrder::Alpha};
 
     uint64_t user_filters[5]{0};
     uint64_t system_filters[5]{0};
@@ -69,7 +63,6 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     json_t* dataToJson() override;
 
     void clear_filters(PresetTab tab_id);
-    void set_order(PresetTab tab_id, PresetOrder order);
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
@@ -105,89 +98,6 @@ struct Tab {
     }
 };
 
-// struct OsmoseBuilder
-// {
-//     enum class ReadyResponse { Ready, Waiting, Timeout, Fail, End };
-//     enum State { Start, Ready, PendingPresetBegin, PendingPresetReceived, Settle, End };
-
-//     // Start Init()(Send) PendingPresetBegin
-//     // PendingPresetBegin preset_started() -> PendingPresetReceived Timeout = not exists
-//     // PendingPresetReceived preset_received() -> Settle      Timeout = error
-//     // Settle [poll ready] Done or Timeout -> Ready
-
-//     uint8_t cc0;
-//     uint8_t pc;
-//     State state{State::Start};
-//     PresetTab tab{PresetTab::Unset};
-//     double state_time;  // time in state
-//     uint8_t base_page;  // start ccBankH: playlist 0-29, system 30-34, User 90 ..
-//     uint8_t last_page;  // end ccBankH
-//     MidiLog* log{nullptr};
-//     #ifndef NDEBUG
-//     double start_time{system::getUnixTime()};
-//     #endif
-
-//     PresetId make_id();
-//     void init_system(HakenMidi* haken);
-//     void init_user(HakenMidi* haken);
-//     void init(HakenMidi* haken, PresetTab which, uint8_t base, uint8_t last);
-//     void preset_started();
-//     void preset_received();
-//     ReadyResponse ready();
-//     void send(HakenMidi* haken);
-//     bool next(HakenMidi* haken);
-// };
-
-// struct DBBuilder {
-//     std::deque<PresetId> presets;
-//     PresetId current;
-//     WallTimer timer;
-//     bool pending {false};
-//     bool settling {false};
-//     PresetTab tab{PresetTab::Unset};
-
-//     void init(PresetTab the_tab, const std::vector<std::shared_ptr<PresetInfo>>& source, PresetId current_preset)
-//     {
-//         tab = the_tab;
-//         for (auto p : source) {
-//             presets.push_back(p->id);
-//         }
-//         current = current_preset;
-//     }
-
-//     void preset_received() {
-//         pending = false;
-//         timer.start(1.0);
-//         settling = true;
-//     }
-    
-//     bool ready() {
-//         if (pending) return false;
-//         if (settling) {
-//             if (timer.finished()) {
-//                 settling = false;
-//                 return true;
-//             } else {
-//                 return false;
-//             }
-//         }
-//         return true;
-//     }
-
-//     bool next(HakenMidi* haken)
-//     {
-//         if (presets.empty()) return false;
-//         assert(!settling);
-//         assert(!pending);
-//         PresetId id = presets.front();
-//         presets.pop_front();
-//         pending = true;
-//         assert(id.valid());
-//         haken->select_preset(ChemId::Preset, id);
-//         return true;
-//     }
-// };
-
 struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
     using Base = ChemModuleWidget;
@@ -201,7 +111,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     TextLabel* user_label{nullptr};
     TextLabel* system_label{nullptr};
     TextLabel* page_label{nullptr};
-    TextButton* stop_button{nullptr};
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
@@ -209,7 +118,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     std::vector<FilterButton*> filter_buttons;
     StateButton * filter_off_button{nullptr};
 
-    WallTimer start_delay{4.0};
+    WallTimer start_delay{3.5};
 
     std::shared_ptr<PresetDescription> live_preset;
 
@@ -217,22 +126,12 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     Tab user_tab {PresetTab::User};
     Tab system_tab {PresetTab::System};
 
-    PresetTab gathering{PresetTab::Unset};
-    bool gather_start{false};
     bool other_user_gather{false};
     bool other_system_gather{false};
-    bool spinning{false};
-    bool user_loaded{false};
-    bool system_loaded{false};
-    bool stop_scan{false};
 
     std::vector<PresetEntry*> preset_grid;
 
-    // DBBuilder* db_builder{nullptr};
-    // OsmoseBuilder* osmose_builder{nullptr};
-
     PresetUi(PresetModule *module);
-    ~PresetUi();
     
     Tab& get_tab(PresetTab id) {
        switch (id) {
@@ -254,18 +153,11 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     PresetTabList& presets() { return preset_list(active_tab_id); }
     void set_current_index(size_t index);
     bool host_available();
-    void start_spinner();
-    void stop_spinner();
-    PresetId get_live_id() { PresetId dead; return live_preset ? live_preset->id : dead; }
-    void build_database(PresetTab which);
-    void create_stop_button();
-    void request_osmose_user_presets(uint8_t block) ;
-    void end_osmose_scan();
+    PresetId get_live_id() { return live_preset ? live_preset->id : PresetId{}; }
+
     void request_presets(PresetTab which);
     std::string preset_file(PresetTab which);
     bool load_presets(PresetTab which);
-    bool save_presets(PresetTab which);
-    void forget_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
     void scroll_to(ssize_t index);
@@ -298,7 +190,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void createScrews(std::shared_ptr<SvgTheme> theme) override;
     
     // IHandleEmEvents
-    void onPresetBegin() override;
     void onSystemBegin() override;
     void onSystemComplete() override;
     void onUserBegin() override;

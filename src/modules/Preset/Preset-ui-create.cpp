@@ -46,19 +46,21 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 
     NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
 
+    Tab & tab = ui->active_tab();
+    PresetOrder order = tab.list.preset_list ? tab.list.preset_list->order : PresetOrder::Alpha;
     auto item = createMenuItem<ColorDotMenuItem>("Sort alphabetically", "",
         [this](){ ui->sort_presets(PresetOrder::Alpha); }, false);
-    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Alpha ? co_dot : RampGray(G_45);
+    item->color = (PresetOrder::Alpha == order) ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by category", "",
         [this](){ ui->sort_presets(PresetOrder::Category); }, false);
-    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Category ? co_dot : RampGray(G_45);
+    item->color = (PresetOrder::Category == order) ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     item = createMenuItem<ColorDotMenuItem>("Sort by Natural (system) order", "",
         [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
-    item->color = ui->active_tab().list.preset_list.order == PresetOrder::Natural ? co_dot : RampGray(G_45);
+    item->color = (PresetOrder::Natural == order) ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
     menu->addChild(new MenuSeparator);
@@ -79,82 +81,17 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         !ui->my_module
     ));
     
-    bool osmose = ui->is_osmose();
-
-    menu->addChild(createCheckMenuItem("Use cached User presets", "", 
-        [this, osmose]() { return osmose || ui->my_module->use_cached_user_presets; },
-        [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
-        osmose || !ui->my_module
-    ));
+    //bool osmose = ui->is_osmose();
+    // menu->addChild(createCheckMenuItem("Use cached User presets", "", 
+    //     [this, osmose]() { return osmose || ui->my_module->use_cached_user_presets; },
+    //     [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
+    //     osmose || !ui->my_module
+    // ));
     menu->addChild(createCheckMenuItem("Keep search filters", "", 
         [this]() { return ui->my_module->keep_search_filters; },
         [this]() { ui->my_module->keep_search_filters = !ui->my_module->keep_search_filters; },
         !ui->my_module
     ));
-
-    menu->addChild(new MenuSeparator);
-    bool host = ui->host_available();
-
-    menu->addChild(createMenuItem("Clear User presets", "", 
-        [this]() {
-            ui->user_loaded = false;
-            ui->forget_presets(PresetTab::User);
-            ui->set_tab(PresetTab::User, false);
-            ui->scroll_to(0);
-        },
-        !host
-    ));
-    menu->addChild(createMenuItem("Clear System presets", "", 
-        [this]() {
-            ui->user_loaded = false;
-            ui->forget_presets(PresetTab::System);
-            ui->set_tab(PresetTab::System, false);
-            ui->scroll_to(0);
-        },
-        !host
-    ));
-    if (osmose) {
-        menu->addChild(createSubmenuItem("Scan User presets", "", [=](Menu * menu) {
-            menu->addChild(createMenuItem("Block 1", "", [=](){ ui->request_osmose_user_presets(90); }));
-            menu->addChild(createMenuItem("Block 2", "", [=](){ ui->request_osmose_user_presets(91); }));
-            menu->addChild(createMenuItem("Block 3", "", [=](){ ui->request_osmose_user_presets(92); }));
-            menu->addChild(createMenuItem("Block 4", "", [=](){ ui->request_osmose_user_presets(93); }));
-            menu->addChild(createMenuItem("Block 5", "", [=](){ ui->request_osmose_user_presets(94); }));
-            menu->addChild(createMenuItem("Block 6", "", [=](){ ui->request_osmose_user_presets(95); }));
-            menu->addChild(createMenuItem("Block 7", "", [=](){ ui->request_osmose_user_presets(96); }));
-            menu->addChild(createMenuItem("Block 8", "", [=](){ ui->request_osmose_user_presets(97); }));
-            menu->addChild(createMenuItem("Block 9", "", [=](){ ui->request_osmose_user_presets(98); }));
-            menu->addChild(createMenuItem("Block 10", "", [=](){ ui->request_osmose_user_presets(99); }));
-        }));
-        menu->addChild(createMenuItem("Refresh System presets", "", 
-            [this](){ 
-                ui->system_loaded = false;
-                ui->request_presets(PresetTab::System); 
-            },
-            !host
-        ));
-    } else {
-        menu->addChild(createMenuItem("Refresh User presets", "", 
-            [this](){ 
-                ui->user_loaded = false;
-                ui->request_presets(PresetTab::User); 
-            },
-            !host
-        ));
-        menu->addChild(createMenuItem("Refresh System presets", "", 
-            [this](){
-                ui->system_loaded = false;
-                ui->request_presets(PresetTab::System);
-            },
-            !host
-        ));
-        // std::string name = format_string("Build full %s database", ui->active_tab_id == PresetTab::User ? "User" : "System");
-        // menu->addChild(createMenuItem(name, "",
-        //     [this](){ ui->build_database(ui->active_tab_id); },
-        //     !host
-        // ));
-    }
-
 }
 
 struct SearchMenu : PresetMenu
@@ -230,7 +167,6 @@ PresetUi::PresetUi(PresetModule *module) :
     setModule(module);
     IHandleEmEvents::module_id = ChemId::Preset;
     IHandleEmEvents::em_event_mask = (IHandleEmEvents::EventMask)(
-        PresetBegin + 
         SystemBegin + 
         SystemComplete + 
         UserBegin + 
@@ -407,8 +343,8 @@ PresetUi::PresetUi(PresetModule *module) :
         onConnectHost(my_module->chem_host);
         //user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
         //system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
-        user_tab.list.preset_list.order = my_module->user_order;
-        system_tab.list.preset_list.order = my_module->system_order;
+        //user_tab.list.preset_list.order = my_module->user_order;
+        //system_tab.list.preset_list.order = my_module->system_order;
 
         set_tab(PresetTab(my_module->active_tab), false);
     }

@@ -1,7 +1,7 @@
 # CHEM To-Do
 
-- **Preset** Strip list building and rewire to get preset lists from Core
-- Should Preset spin while Core is scanning?
+- **Play** Integrate new preset management/Osmose
+- Fix Preset sort does not update UI
 
 ## General
 

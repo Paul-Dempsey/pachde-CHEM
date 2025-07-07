@@ -77,7 +77,9 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
     chem_host = this;
     midi_relay.register_target(this);
 
-    system_presets.order = PresetOrder::Alpha;
+    system_presets = std::make_shared<PresetList>();
+    system_presets->order = PresetOrder::Alpha;
+    user_presets = std::make_shared<PresetList>();
 }
 
 CoreModule::~CoreModule()
@@ -135,29 +137,34 @@ std::string CoreModule::device_name(ChemDevice which)
 void CoreModule::next_preset()
 {
     load_lists();
+    
     if (em.is_osmose()) {
+        if (!system_presets && !user_presets) return;
         PresetId id;
         if (em.preset.id.valid() && em.preset.id.key()) {
-            auto index = system_presets.index_of_id(em.preset.id);
-            if (-1 == index) {
-                index = user_presets.index_of_id(em.preset.id);
+            auto index = system_presets->index_of_id(em.preset.id);
+            if ((-1 == index) && user_presets) {
+                index = user_presets->index_of_id(em.preset.id);
                 if (-1 == index) return;
-                if (++index >= user_presets.size()) index = 0;
-                id = user_presets.presets[index]->id;
+                if (++index >= user_presets->size()) index = 0;
+                id = user_presets->presets[index]->id;
             } else {
-                if (++index >= system_presets.size()) index = 0;
-                id = system_presets.presets[index]->id;
+                if (++index >= system_presets->size()) index = 0;
+                id = system_presets->presets[index]->id;
             }
         } else if (em.preset.tag) {
-            auto index = system_presets.index_of_tag(em.preset.tag);
-            if (-1 == index) {
-                index = user_presets.index_of_tag(em.preset.tag);
+            ssize_t index{-1};
+            if (system_presets) {
+                index = system_presets->index_of_tag(em.preset.tag);
+            }
+            if ((-1 == index) && user_presets) {
+                index = user_presets->index_of_tag(em.preset.tag);
                 if (-1 == index) return;
-                if (++index >= user_presets.size()) index = 0;
-                id = user_presets.presets[index]->id;
+                if (++index >= user_presets->size()) index = 0;
+                id = user_presets->presets[index]->id;
             } else {
-                if (++index >= system_presets.size()) index = 0;
-                id = system_presets.presets[index]->id;
+                if (++index >= system_presets->size()) index = 0;
+                id = system_presets->presets[index]->id;
             }
         }
         if (id.valid()) {
@@ -173,28 +180,34 @@ void CoreModule::prev_preset()
 {
     load_lists();
     if (em.is_osmose()) {
+        if (!system_presets && !user_presets) return;
         PresetId id;
+        ssize_t index{-1};
         if (em.preset.id.valid() && em.preset.id.key()) {
-            auto index = system_presets.index_of_id(em.preset.id);
-            if (-1 == index) {
-                index = user_presets.index_of_id(em.preset.id);
+            if (system_presets) {
+                system_presets->index_of_id(em.preset.id);
+            } 
+            if ((-1 == index) && user_presets) {
+                index = user_presets->index_of_id(em.preset.id);
                 if (-1 == index) return;
-                if (--index < 0) index = user_presets.size()-1;
-                id = user_presets.presets[index]->id;
+                if (--index < 0) index = user_presets->size()-1;
+                id = user_presets->presets[index]->id;
             } else {
-                if (--index < 0) index = system_presets.size()-1;
-                id = system_presets.presets[index]->id;
+                if (--index < 0) index = system_presets->size()-1;
+                id = system_presets->presets[index]->id;
             }
         } else if (em.preset.tag) {
-            auto index = system_presets.index_of_tag(em.preset.tag);
-            if (-1 == index) {
-                index = user_presets.index_of_tag(em.preset.tag);
+            if (system_presets) {
+                index = system_presets->index_of_tag(em.preset.tag);
+            } 
+            if ((-1 == index) && user_presets) {
+                index = user_presets->index_of_tag(em.preset.tag);
                 if (-1 == index) return;
-                if (--index < 0) index = user_presets.size() - 1;
-                id = user_presets.presets[index]->id;
+                if (--index < 0) index = user_presets->size() - 1;
+                id = user_presets->presets[index]->id;
             } else {
-                if (--index < 0) index = system_presets.size() - 1;
-                id = system_presets.presets[index]->id;
+                if (--index < 0) index = system_presets->size() - 1;
+                id = system_presets->presets[index]->id;
             }
         }
         if (id.valid()) {
@@ -206,20 +219,21 @@ void CoreModule::prev_preset()
     }
 }
 
-PresetResult CoreModule::load_preset_file(bool user)
+PresetResult CoreModule::load_preset_file(PresetTab which)
 {
+    valid_tab(which);
     if (host_busy()) return PresetResult::NotReady;
     if (!em.hardware) return PresetResult::NotReady;
-    auto path = preset_file_name(user, em.hardware);
-    bool ok = user ? user_presets.load(path) : system_presets.load(path);
-    return ok ? PresetResult::Ok : PresetResult::FileNotFound;
+    auto path = preset_file_name(which, em.hardware);
+    auto list = which == PresetTab::User ? user_presets : system_presets;
+    return list->load(path) ? PresetResult::Ok : PresetResult::FileNotFound;
 }
 
 PresetResult CoreModule::load_quick_user_presets()
 {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(true)) return PresetResult::Ok;
+    if (PresetResult::Ok == load_preset_file(PresetTab::User)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -233,7 +247,7 @@ PresetResult CoreModule::load_quick_system_presets()
 {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(false)) return PresetResult::Ok;
+    if (PresetResult::Ok == load_preset_file(PresetTab::System)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -246,7 +260,7 @@ PresetResult CoreModule::load_quick_system_presets()
 PresetResult CoreModule::load_full_user_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(true)) return PresetResult::Ok;
+    if (PresetResult::Ok == load_preset_file(PresetTab::User)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -259,8 +273,8 @@ PresetResult CoreModule::load_full_user_presets()
     } else {
         auto hpe = new HakenPresetEnumerator(ChemId::Core);
         id_builder = new PresetIdListBuilder(ChemId::Core, this, hpe);
-        full_build = new PresetListBuildCoordinator(midi_log, false, hpe);
         em.subscribeEMEvents(id_builder);
+        full_build = new PresetListBuildCoordinator(midi_log, false, hpe);
         haken_midi.request_user(ChemId::Core);
     }
     gathering = FullUserPresets;
@@ -282,10 +296,26 @@ PresetResult CoreModule::scan_osmose_presets(uint8_t page)
     return PresetResult::Ok;
 }
 
+std::shared_ptr<PresetList> CoreModule::host_user_presets()
+{
+    if (user_presets->empty() && !host_busy()) {
+        load_preset_file(PresetTab::User);
+    }
+    return user_presets;
+}
+
+std::shared_ptr<PresetList> CoreModule::host_system_presets()
+{
+    if (system_presets->empty() && !host_busy()) {
+        load_preset_file(PresetTab::System);
+    }
+    return system_presets;
+}
+
 PresetResult CoreModule::load_full_system_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(false)) return PresetResult::Ok;
+    if (PresetResult::Ok == load_preset_file(PresetTab::System)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -317,11 +347,11 @@ PresetResult CoreModule::end_scan()
     }
     if (gather_user(gather)) {
         em.end_user_scan();
-        user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware), em.hardware, haken_device.device_claim);
     } else {
         assert(gather_system(gather));
         em.end_system_scan();
-        system_presets.save(preset_file_name(false, em.hardware), em.hardware, haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware), em.hardware, haken_device.device_claim);
     }
     if (chem_ui) {
         ui()->show_busy(false);
@@ -338,11 +368,11 @@ void CoreModule::load_lists()
 {
     if (host_busy()) return;
     if (!em.hardware) return;
-    if (system_presets.empty()) {
-        load_preset_file(false);
+    if (system_presets->empty()) {
+        load_preset_file(PresetTab::System);
     }
-    if (user_presets.empty()) {
-        load_preset_file(true);
+    if (user_presets->empty()) {
+        load_preset_file(PresetTab::User);
     }
 }
 
@@ -412,7 +442,9 @@ void CoreModule::onPresetChanged()
                         log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     }
                     full_build->preset_received();
-                    user_presets.add(&em.preset);
+                    user_presets->add(&em.preset);
+                } else if (gather_quick(gathering)) {
+                    user_presets->add(&em.preset);
                 }
             } else if (gather_system(gathering)) {
                 if (gather_full(gathering) && !id_builder) {
@@ -421,7 +453,9 @@ void CoreModule::onPresetChanged()
                         log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     }
                     full_build->preset_received();
-                    system_presets.add(&em.preset);
+                    system_presets->add(&em.preset);
+                } else if (gather_quick(gathering)) {
+                    system_presets->add(&em.preset);
                 }
             } else {
                 assert(false);
@@ -443,9 +477,12 @@ void CoreModule::onUserBegin()
 void CoreModule::onUserComplete()
 {
     is_busy = false;
-    if (chem_ui) ui()->show_busy(false);
+    if (chem_ui) {
+        ui()->show_busy(false);
+        ui()->remove_stop_button();
+    }
     if (QuickUserPresets == gathering) {
-        user_presets.save(preset_file_name(true, em.hardware), em.hardware, haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
 }
@@ -459,9 +496,12 @@ void CoreModule::onSystemBegin()
 void CoreModule::onSystemComplete()
 {
     is_busy = false;
-    if (chem_ui) ui()->show_busy(false);
+    if (chem_ui) {
+        ui()->show_busy(false);
+        ui()->remove_stop_button();
+    }
     if (QuickSystemPresets == gathering) {
-        system_presets.save(preset_file_name(false, em.hardware), em.hardware, haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
 }
@@ -510,11 +550,15 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
         em.ready = false;
         haken_midi_in.ring.clear();
         haken_midi_out.ring.clear();
+        user_presets->clear();
+        system_presets->clear();
         if (!disconnected && source->connection) {
             haken_midi_in.setDriverId(source->connection->driver_id);
             haken_midi_in.setDeviceId(source->connection->input_device_id);
             haken_midi_out.output.setDeviceId(source->connection->output_device_id);
             haken_midi_out.output.channel = -1;
+            load_preset_file(PresetTab::System);
+            load_preset_file(PresetTab::User);
             log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
         } else {
             haken_midi_in.reset();

@@ -243,16 +243,18 @@ void CoreModuleWidget::createRoundingLeds(float cx, float cy, float spread)
 
 void CoreModuleWidget::create_stop_button()
 {
-    stop_button = createWidget<TextButton>(Vec(CENTER, NAV_ROW));
-    stop_button->box.size.x = 80.f;
-    stop_button->box.size.y = 18.f;
-    stop_button->set_text("stop scan");
-    stop_button->setHandler([=](bool, bool){
-        my_module->stop_scan = true;
-        remove_stop_button();
-        em_status_label->text("Preset scan stopped");
-    });
-    addChild(Center(stop_button));
+    if (!stop_button) {
+        stop_button = createWidget<TextButton>(Vec(CENTER, NAV_ROW));
+        stop_button->box.size.x = 80.f;
+        stop_button->box.size.y = 18.f;
+        stop_button->set_text("stop scan");
+        stop_button->setHandler([=](bool, bool){
+            my_module->stop_scan = true;
+            remove_stop_button();
+            em_status_label->text("Preset scan stopped");
+        });
+        addChild(Center(stop_button));
+    }
 }
 
 void CoreModuleWidget::remove_stop_button()
@@ -266,11 +268,13 @@ void CoreModuleWidget::remove_stop_button()
 void CoreModuleWidget::createIndicatorsCentered(float x, float y, float spread)
 {
     auto co = themeColor(coTask0);
-    x -= (spread * 3) *.5f;
-    addChild(mididevice_indicator    = createIndicatorCentered(x, y, co, "Midi device")); x += spread;
-    addChild(heartbeat_indicator     = createIndicatorCentered(x, y, co, "Heartbeat")); x += spread;
-    addChild(em_init_indicator       = createIndicatorCentered(x, y, co, "Updates")); x += spread;
-    addChild(presetinfo_indicator    = createIndicatorCentered(x, y, co, "Preset Info")); x += spread;
+    x -= (spread * 5) *.5f;
+    addChild(mididevice_indicator      = createIndicatorCentered(x, y, co, "Midi device")); x += spread;
+    addChild(heartbeat_indicator       = createIndicatorCentered(x, y, co, "Heartbeat")); x += spread;
+    addChild(em_init_indicator         = createIndicatorCentered(x, y, co, "Updates")); x += spread;
+    addChild(presetinfo_indicator      = createIndicatorCentered(x, y, co, "Initial preset info")); x += spread;
+    addChild(system_presets_indicator  = createIndicatorCentered(x, y, co, "System preset info")); x += spread;
+    addChild(user_presets_indicator    = createIndicatorCentered(x, y, co, "User preset info"));
 }
 
 void CoreModuleWidget::updateIndicators()
@@ -285,11 +289,19 @@ void CoreModuleWidget::updateIndicators()
                 w->setLook(taskStateColor(state), ChemTask::State::Untried != state);
             }
         }
+        system_presets_indicator->setLook(taskStateColor(my_module->system_presets->empty() 
+            ? ChemTask::State::Untried
+            : (gather_system(my_module->gathering) ? ChemTask::State::Pending : ChemTask::State::Complete)));
+        user_presets_indicator->setLook(taskStateColor(my_module->user_presets->empty() 
+            ? ChemTask::State::Untried
+            : (gather_user(my_module->gathering) ? ChemTask::State::Pending : ChemTask::State::Complete)));
     } else {
         mididevice_indicator->setLook(taskStateColor(ChemTask::State::Complete));
         heartbeat_indicator->setLook(taskStateColor(ChemTask::State::Complete));
         em_init_indicator->setLook(taskStateColor(ChemTask::State::Complete));
         presetinfo_indicator->setLook(taskStateColor(ChemTask::State::Pending));
+        user_presets_indicator->setLook(taskStateColor(ChemTask::State::Untried));
+        system_presets_indicator->setLook(taskStateColor(ChemTask::State::Untried));
     }
 }
 
@@ -479,7 +491,7 @@ IndicatorWidget *CoreModuleWidget::widget_for_task(ChemTaskId task)
     case ChemTaskId::HakenDevice: return mididevice_indicator;
     case ChemTaskId::EmInit: return em_init_indicator;
     case ChemTaskId::PresetInfo: return presetinfo_indicator;
-    case ChemTaskId::SyncDevices: break;
+    default: break;
     }
     return nullptr;
 }
@@ -592,26 +604,37 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(createMenuLabel<HamburgerTitle>("Core Actions"));
 
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module](Menu* menu) {
+        menu->addChild(createMenuItem("Clear system presets", "", [=]() {
+            my_module->system_presets->clear();
+        }));
+        menu->addChild(createMenuItem("Clear user presets", "", [=]() {
+            my_module->user_presets->clear();
+        }));
+
         if (my_module->em.is_osmose()) {
             menu->addChild(createMenuItem("Load System presets", "", [=]() {
-                ui->em_status_label->text("Full System presets...");
+                ui->em_status_label->text("Loading Full System presets...");
                 my_module->load_full_system_presets();
             }));
             menu->addChild(createMenuItem("Load User presets", "(page 1)", [=]() {
-                ui->em_status_label->text("User presets (page 1)...");
+                ui->em_status_label->text("Loading User presets (page 1)...");
                 my_module->load_full_user_presets();
             }));
-            menu->addChild(createSubmenuItem("More User pages", "", [=](Menu* menu) {
+            menu->addChild(createSubmenuItem("Load more User pages", "", [=](Menu* menu) {
                 menu->addChild(createMenuItem("Page 2", "", [=]() {
+                    ui->em_status_label->text("Loading User presets (page 2)...");
                     my_module->scan_osmose_presets(91);
                 }));
                 menu->addChild(createMenuItem("Page 3", "", [=]() {
+                    ui->em_status_label->text("Loading User presets (page 3)...");
                     my_module->scan_osmose_presets(92);
                 }));
                 menu->addChild(createMenuItem("Page 4", "", [=]() {
+                    ui->em_status_label->text("Loading User presets (page 4)...");
                     my_module->scan_osmose_presets(93);
                 }));
                 menu->addChild(createMenuItem("Page 5", "", [=]() {
+                    ui->em_status_label->text("Loading User presets (page 5)...");
                     my_module->scan_osmose_presets(94);
                 }));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
@@ -626,21 +649,21 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 [my_module](){ my_module->use_saved_user_presets = !my_module->use_saved_user_presets; }
             ));
             menu->addChild(createMenuItem("Quick User presets", "", [=]() {
-                ui->em_status_label->text("Quick User presets...");
+                ui->em_status_label->text("Loading quick User presets...");
                 my_module->load_quick_user_presets();
             }));
             menu->addChild(createMenuItem("Full User preset database", "", [=]() {
-                ui->em_status_label->text("Full User presets...");
+                ui->em_status_label->text("Loading full User presets...");
                 my_module->load_full_user_presets();
                 ui->create_stop_button();
             }));
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Quick System presets", "", [=]() {
-                ui->em_status_label->text("Quick System presets...");
+                ui->em_status_label->text("Loading quick System presets...");
                 my_module->load_quick_system_presets();
             }));
             menu->addChild(createMenuItem("Full System preset database", "", [=]() {
-                ui->em_status_label->text("Full System presets...");
+                ui->em_status_label->text("Loading full System presets...");
                 my_module->load_full_system_presets();
                 ui->create_stop_button();
             }));

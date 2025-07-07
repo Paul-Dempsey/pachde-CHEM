@@ -8,184 +8,30 @@
 #include "../../widgets/spinner.hpp"
 
 using PM = PresetModule;
-
-PresetUi::~PresetUi()
-{
-    if (user_tab.list.dirty()) {
-        save_presets(PresetTab::User);
-    }
-    if (user_tab.list.dirty()) {
-        save_presets(PresetTab::System);
-    }
-}
+using namespace eaganmatrix;
 
 void no_preset(TipLabel* label) {
     label->text("");
     label->describe("(none)");
 }
 
-void PresetUi::build_database(PresetTab which)
-{
-    // if (!host_available()) return;
-    // Tab& tab = get_tab(which);
-    // PresetId dummy;
-    // db_builder = new DBBuilder();
-    // db_builder->init(which, tab.list.preset_list.presets, live_preset ? live_preset->id : dummy);
-    // forget_presets(which);
-    // auto em = chem_host->host_matrix();
-    // switch (which) {
-    // case PresetTab::User: em->begin_user_scan(); break;
-    // case PresetTab::System: em->begin_system_scan(); break;
-    // default: break;
-    // }
-}
-
-void PresetUi::create_stop_button()
-{
-    stop_button = createWidget<TextButton>(Vec(170.f, 236.f));
-    stop_button->box.size.x = 50.f;
-    stop_button->set_text("stop scan");
-    stop_button->setHandler([=](bool, bool){ stop_scan = true; });
-    addChild(Center(stop_button));
-}
-
-void PresetUi::request_osmose_user_presets(uint8_t block)
-{
-    // user_loaded = false;
-    // auto haken = chem_host->host_haken();
-    // start_spinner();
-    // gather_start = true;
-    // stop_scan = false;
-    // create_stop_button();
-    // osmose_builder = new OsmoseBuilder();
-    // osmose_builder->init(haken, PresetTab::User, block, block);
-}
-
 void PresetUi::request_presets(PresetTab which)
 {
-    if (!host_available()) return;
-    if (start_delay.running()) return;
-
-    bool osmose = is_osmose();
-    auto haken = chem_host->host_haken();
-    //auto em = chem_host->host_matrix();
-    switch (which) {
-    case PresetTab::Unset:
-        assert(false);
-        break;
-
-    case PresetTab::User:
-        if (user_loaded) return;
-        user_tab.clear();
-        gathering = PresetTab::User;
-        gather_start = true;
-        if (osmose) {
-            // em->begin_user_scan();
-            // request_osmose_user_presets(90);
-        } else {
-            haken->request_user(ChemId::Preset);
-        }
-        break;
-
-    case PresetTab::System:
-        if (system_loaded) return;
-        system_tab.clear();
-        gathering = PresetTab::System;
-        gather_start = true;
-        if (osmose) {
-            // stop_scan = false;
-            // create_stop_button();
-            // em->begin_system_scan();
-            // osmose_builder = new OsmoseBuilder();
-            // osmose_builder->init_system(haken);
-        } else {
-            haken->request_system(ChemId::Preset);
-        }
-        break;
-    }
-}
-
-std::string PresetUi::preset_file(PresetTab which)
-{
-    assert(PresetTab::Unset != which);
-    auto em = chem_host->host_matrix();
-    if (!em) return "";
-    const char * s_u = which == PresetTab::System ? "system" : "user";
-    auto preset_filename = format_string("%s-%s-%d.json", PresetClassName(em->hardware), s_u, em->firmware_version);
-    return user_plugin_asset(preset_filename);
+    // if (!host_available()) return;
+    // auto pl = chem_host->host_preset_list();
+    // if (!pl) return;
+    //TODO
 }
 
 bool PresetUi::load_presets(PresetTab which)
 {
-    assert(PresetTab::Unset != which);
+    valid_tab(which);
     if (!host_available()) return false;
-
-    if ((PresetTab::User == which)
-        && !is_osmose()
-        && !my_module->use_cached_user_presets) {
-        return false;
-    }
-
-    auto em = chem_host->host_matrix();
-    if (!em || (0 == em->firmware_version) || (0 == em->hardware)) return false;
-
-    auto path = preset_file(which);
-    if (path.empty() || !system::exists(path)) return false;
-
-    FILE* file = std::fopen(path.c_str(), "r");
-	if (!file) return false;
-
-    DEFER({std::fclose(file);});
-
-    json_error_t error;
-	json_t* root = json_loadf(file, 0, &error);
-	if (!root) {
-		WARN("Invalid JSON at %d:%d %s in %s", error.line, error.column, error.text, path.c_str());
-        return false;
-    }
-    Tab& tab = get_tab(which);
-    tab.clear();
-    //tab.list.set_device_info(em->firmware_version, em->hardware);
-    tab.list.preset_list.order = which == PresetTab::User ? my_module->user_order : my_module->system_order;
-    return tab.list.preset_list.from_json(root, path);
-}
-
-bool PresetUi::save_presets(PresetTab which)
-{
-    if (!chem_host || !my_module || my_module->device_claim.empty()) return false;
-
-    Tab& tab = get_tab(which);
-    if (0 == tab.count()) return false;
-
-    auto root = json_object();
-    if (!root) { return false; }
-	DEFER({json_decref(root);});
-
-    auto path = preset_file(which);
-    if (system::exists(path)) {
-        system::remove(path);
-    }
-    auto dir = system::getDirectory(path);
-    system::createDirectories(dir);
-
-    FILE* file = std::fopen(path.c_str(), "wb");
-    if (!file) return false;
-
-    uint8_t hardware = chem_host->host_matrix() ? chem_host->host_matrix()->hardware : 0;
-    tab.list.preset_list.to_json(root, hardware, my_module->device_claim);
-    auto e = json_dumpf(root, file, JSON_INDENT(2));
-	std::fclose(file);
-    return e >= 0;
-}
-
-void PresetUi::forget_presets(PresetTab which)
-{
-    Tab& tab = get_tab(which);
-    tab.clear();
-    auto path = preset_file(which);
-    if (system::exists(path)) {
-        system::remove(path);
-    }
+    auto pl = chem_host->host_preset_list();
+    if (!pl) return false;
+    Tab & tab = get_tab(which);
+    tab.list.preset_list = (PresetTab::User == which) ? pl->host_user_presets() : pl->host_system_presets();
+    return (nullptr != tab.list.preset_list) && !tab.list.preset_list->empty();
 }
 
 void PresetUi::sort_presets(PresetOrder order)
@@ -193,8 +39,8 @@ void PresetUi::sort_presets(PresetOrder order)
     if (!my_module) return;
     
     Tab & tab = active_tab();
-    if (tab.list.preset_list.order == order) return;
-    my_module->set_order(active_tab_id, order);
+    if (!tab.list.preset_list) return;
+    if (tab.list.preset_list->order == order) return;
     if (0 == tab.count()) return;
 
     PresetId current_id;
@@ -203,7 +49,7 @@ void PresetUi::sort_presets(PresetOrder order)
     }
 
     tab.list.sort(order);
-    save_presets(active_tab_id);
+    //save_presets(active_tab_id);
 
     if (my_module->track_live) {
         scroll_to_live();
@@ -216,119 +62,42 @@ void PresetUi::sort_presets(PresetOrder order)
     }
 }
 
-void PresetUi::onPresetBegin()
-{
-    // if (!osmose_builder) return;
-    // osmose_builder->preset_started();
-}
-
 void PresetUi::onSystemBegin()
 {
-    if (PresetTab::Unset == gathering) {
-        other_system_gather = true;
-    } else {
-        start_spinner();
-        gather_start = true;
-    }
+    other_system_gather = true;
 }
 
 void PresetUi::onSystemComplete()
 {
-    stop_spinner();
-    gather_start = false;
     if (other_system_gather) {
         other_system_gather = false;
         return;
     }
-    if (gathering == PresetTab::System) {
-        gathering = PresetTab::Unset;
 
-        //auto em = chem_host->host_matrix();
-        //system_tab.list.set_device_info(em->firmware_version, em->hardware);
-        system_tab.list.sort(my_module->system_order);
-        save_presets(PresetTab::System);
-        system_tab.list.refresh_filter_view();
-        if (active_tab_id == PresetTab::System) {
-            scroll_to(0);
-        }
+    system_tab.list.refresh_filter_view();
+    if (active_tab_id == PresetTab::System) {
+        scroll_to(0);
     }
 }
 
 void PresetUi::onUserBegin()
 {
-    if (PresetTab::Unset == gathering) {
-        other_user_gather = true;
-    } else {
-        start_spinner();
-        gather_start = true;
-    }
+    other_user_gather = true;
 }
 
 void PresetUi::onUserComplete()
 {
-    stop_spinner();
-    gather_start = false;
-    if (other_user_gather) {
-        other_user_gather = false;
-        return;
-    }
-    if (gathering == PresetTab::User) {
-        gathering = PresetTab::Unset;
-
-        user_tab.list.sort(my_module->user_order);
-        save_presets(PresetTab::User);
-        user_tab.list.refresh_filter_view();
-
-        if (active_tab_id == PresetTab::User) {
-            scroll_to(0);
-        }
+    other_user_gather = false;
+    user_tab.list.refresh_filter_view();
+    if (active_tab_id == PresetTab::User) {
+        scroll_to(0);
     }
 }
 
 void PresetUi::onPresetChange()
 {
-    // ignore preset changes while some other module is gathering presets
+    // ignore preset changes while gathering presets
     if (other_user_gather || other_system_gather) return;
-
-    // if (db_builder) {
-    //     auto preset = chem_host->host_preset();
-    //     if (preset && !preset->empty()) {
-    //         Tab& tab = active_tab();
-    //         tab.list.add(preset);
-    //     }
-    //     db_builder->preset_received();
-    //     return;
-    // }
-
-    // if (osmose_builder) {
-    //     if (OsmoseBuilder::State::PendingPresetReceived != osmose_builder->state) {
-    //         return;
-    //     }
-    //     auto preset = chem_host->host_preset();
-    //     if (preset && !preset->empty()) {
-    //         PresetDescription pd;
-    //         pd.init(preset);
-    //         pd.id = osmose_builder->make_id();
-    //         get_tab(gathering).list.add(&pd);
-    //         osmose_builder->preset_received();
-    //     }
-    //     return;
-    // }
-    
-    switch (gathering) {
-    case PresetTab::Unset:
-        break;
-    case PresetTab::User:
-    case PresetTab::System: {
-//        assert(!osmose_builder);
-        if (!gather_start) return;
-        auto preset = chem_host->host_preset();
-        if (preset && !preset->empty()) {
-            get_tab(gathering).list.add(preset);
-        }
-        return;
-    } break;
-    }
 
     if (chem_host) {
         auto preset = chem_host->host_preset();
@@ -374,24 +143,7 @@ bool PresetUi::host_available()
     if (!chem_host) return false;
     if (chem_host->host_busy()) return false;
     if (!chem_host->host_connection(ChemDevice::Haken)) return false;
-    auto em = chem_host->host_matrix();
-    if (!em || !em->is_ready() || em->busy()) return false;
-
     return true;
-}
-
-void PresetUi::start_spinner()
-{
-    if (!spinning) {
-        startSpinner(this, Vec(170.f, 190.f));
-        spinning = true;
-    }
-}
-
-void PresetUi::stop_spinner()
-{
-    stopSpinner(this);
-    spinning = false;
 }
 
 void PresetUi::onConnectHost(IChemHost *host)
@@ -417,6 +169,7 @@ void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
     if (ChemDevice::Haken == device) {
         user_tab.clear();
         system_tab.clear();
+        set_tab(active_tab_id, true);
     }
     onConnectionChangeUiImpl(this, device, connection);
     start_delay.run();
@@ -535,17 +288,6 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
         if (!load_presets(tab_id)) {
             request_presets(tab_id);
         }
-        switch (tab_id) {
-        case PresetTab::Unset:
-            assert(false);
-            break;
-        case PresetTab::User:
-            user_loaded = true;
-            break;
-        case PresetTab::System:
-            system_loaded = true;
-            break;
-        }
     }
     
     auto theme = theme_engine.getTheme(getThemeName());
@@ -661,6 +403,7 @@ void PresetUi::send_preset(ssize_t index)
     if (index >= ssize_t(tab.count())) return;
     auto preset = tab.list.nth(index);
     if (preset && host_available()) {
+        chem_host->host_matrix()->set_osmose_id(preset->id);
         chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
     }
 }

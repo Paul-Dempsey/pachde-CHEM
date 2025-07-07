@@ -1,8 +1,13 @@
 #pragma once
+#include <stdint.h>
 #include "preset.hpp"
 #include "preset-sort.hpp"
 
 namespace eaganmatrix {
+
+enum class PresetTab { Unset = -1, System, User };
+
+inline void valid_tab(PresetTab which) { assert((PresetTab::User == which) || (PresetTab::System == which)); }
 
 struct PresetList
 {
@@ -28,6 +33,6 @@ struct PresetList
     void sort(PresetOrder order);
 };
 
-std::string preset_file_name(bool user, uint8_t hardware);
+std::string preset_file_name(PresetTab which, uint8_t hardware);
 
 }

@@ -539,8 +539,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
             if (in_preset) {
                 preset.id.set_number(msg.bytes.data1);
 
-                if (osmose_id.valid()) {
-                    assert(is_osmose());
+                if (is_osmose() && osmose_id.valid()) {
                     preset.id = osmose_id;
                     if (in_preset_detail) {
                         osmose_id.invalidate(); // consume the id

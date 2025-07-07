@@ -60,12 +60,12 @@ bool search_match(const std::string &query, const std::string &text, bool anchor
 
 bool PresetTabList::load(const std::string &path)
 {
-    return preset_list.load(path);
+    return preset_list->load(path);
 }
 
 bool PresetTabList::save(const std::string &path, uint8_t hardware, const std::string& connection_info)
 {
-    return preset_list.save(path, hardware, connection_info);
+    return preset_list->save(path, hardware, connection_info);
 }
 
 void PresetTabList::set_filter(FilterId index, uint64_t mask)
@@ -135,9 +135,9 @@ inline bool zip_any_filter(uint64_t* a, uint64_t* b)
 void PresetTabList::refresh_filter_view()
 {
     preset_view.clear(); 
-    if (filtering) {
+    if (filtering && preset_list) {
         auto inserter = std::back_inserter(preset_view);
-        for (auto p: preset_list.presets) {
+        for (auto p: preset_list->presets) {
             bool match{true};
             if (mask_filtering) {
                 uint64_t preset_masks[5];
@@ -165,6 +165,7 @@ ssize_t PresetTabList::index_of_id(PresetId id)
 
     auto key = id.key();
     auto list{presets()};
+    if (!list) return -1;
     auto it = std::find_if(list->cbegin(), list->cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
     if (it == list->cend()) return -1;
     return it - list->cbegin();
@@ -172,17 +173,20 @@ ssize_t PresetTabList::index_of_id(PresetId id)
 
 ssize_t PresetTabList::index_of_id_unfiltered(PresetId id)
 {
-    return preset_list.index_of_id(id);
+    if (!preset_list) return -1;
+    return preset_list->index_of_id(id);
 }
 
 void PresetTabList::add(const PresetDescription* preset)
 {
-    preset_list.add(preset);
+    if (!preset_list) return;
+    preset_list->add(preset);
 }
 
 void PresetTabList::sort(PresetOrder order)
 {
-    preset_list.sort(order);
+    if (!preset_list) return;
+    preset_list->sort(order);
     if (filtered()) {
         auto orderfn = getPresetSort(order);
         std::sort(preset_view.begin(), preset_view.end(), orderfn);

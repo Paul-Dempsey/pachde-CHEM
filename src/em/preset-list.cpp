@@ -1,7 +1,7 @@
 #include "preset-list.hpp"
 #include "../plugin.hpp"
-#include "em-hardware.h"
 #include "../services/misc.hpp"
+#include "em-hardware.h"
 
 using namespace pachde;
 namespace eaganmatrix {
@@ -96,6 +96,7 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
 {
     clear();
 
+    order = PresetOrder(get_json_int(root, "order", int(order)));
     auto jar = json_object_get(root, "presets");
     if (jar) {
         json_t* jp;
@@ -106,10 +107,6 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
             preset->ensure_meta();
             presets.push_back(preset);
         }
-    }
-    if (order != PresetOrder(get_json_int(root, "order", int(order)))) {
-        auto orderfn = getPresetSort(order);
-        std::sort(presets.begin(), presets.end(), orderfn);
     }
     return true;
 }
@@ -128,7 +125,7 @@ void PresetList::to_json(json_t* root, uint8_t hardware, const std::string& conn
 
 void PresetList::sort(PresetOrder order)
 {
-    if (this->order != order) {
+    if (modified || (this->order != order)) {
         this->order = order;
         auto orderfn = getPresetSort(order);
         std::sort(presets.begin(), presets.end(), orderfn);
@@ -136,9 +133,10 @@ void PresetList::sort(PresetOrder order)
     }
 }
 
-std::string preset_file_name(bool user, uint8_t hardware)
+std::string preset_file_name(eaganmatrix::PresetTab which, uint8_t hardware)
 {
-    auto preset_filename = format_string("%s-%s.json", PresetClassName(hardware), user ? "user": "system");
+    valid_tab(which);
+    auto preset_filename = format_string("%s-%s.json", PresetClassName(hardware), (eaganmatrix::PresetTab::User == which) ? "user": "system");
     return user_plugin_asset(preset_filename);
 }
 

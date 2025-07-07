@@ -83,8 +83,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     uint8_t saved_hardware{0};
 
-    PresetList user_presets;
-    PresetList system_presets;
+    std::shared_ptr<PresetList> user_presets{nullptr};
+    std::shared_ptr<PresetList> system_presets{nullptr};
 
     GatherFlags gathering{GatherFlags::None};
     PresetIdListBuilder* id_builder{nullptr};
@@ -131,14 +131,14 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void prev_preset();
 
     // IPresetList
-    PresetResult load_preset_file(bool user) override;
-    PresetResult load_quick_user_presets() override;
-    PresetResult load_quick_system_presets() override;
-    PresetResult load_full_system_presets() override;
-    PresetResult load_full_user_presets() override;
-    PresetResult scan_osmose_presets(uint8_t page) override;
-    PresetList* host_user_presets() override { return &user_presets; }
-    PresetList* host_system_presets()  override { return &system_presets; }
+    PresetResult load_preset_file(eaganmatrix::PresetTab which);
+    PresetResult load_quick_user_presets();
+    PresetResult load_quick_system_presets();
+    PresetResult load_full_system_presets();
+    PresetResult load_full_user_presets();
+    PresetResult scan_osmose_presets(uint8_t page);
+    std::shared_ptr<PresetList> host_user_presets() override;
+    std::shared_ptr<PresetList> host_system_presets() override;
 
     PresetResult end_scan();
     void load_lists();
@@ -298,6 +298,8 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     IndicatorWidget* heartbeat_indicator{nullptr};
     IndicatorWidget* em_init_indicator{nullptr};
     IndicatorWidget* presetinfo_indicator{nullptr};
+    IndicatorWidget* user_presets_indicator{nullptr};
+    IndicatorWidget* system_presets_indicator{nullptr};
 
     IndicatorWidget* widget_for_task(ChemTaskId task);
 

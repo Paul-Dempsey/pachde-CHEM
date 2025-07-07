@@ -10,16 +10,12 @@ void PresetModule::dataFromJson(json_t *root)
     ChemModule::dataFromJson(root);
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "track-live", track_live);
-    json_read_bool(root, "cache_user", use_cached_user_presets);
     json_read_bool(root,"keep-search", keep_search_filters);
-    active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
-    user_order = PresetOrder(get_json_int(root, "user-sort-order", int(PresetOrder::Natural)));
-    system_order = PresetOrder(get_json_int(root, "system-sort-order", int(PresetOrder::Alpha)));
-
     json_read_bool(root, "search-name", search_name);
     json_read_bool(root, "search-text", search_meta);
     json_read_bool(root, "search-anchored", search_anchor);
     json_read_bool(root, "search-incremental", search_incremental);
+    active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
 
     if (keep_search_filters) {
         auto jar = json_object_get(root, "user-filters");
@@ -51,15 +47,12 @@ json_t* PresetModule::dataToJson()
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
     json_object_set_new(root, "track-live", json_boolean(track_live));
-    json_object_set_new(root, "cache_user", json_boolean(use_cached_user_presets));
     json_object_set_new(root, "keep-search", json_boolean(keep_search_filters));
-    json_object_set_new(root, "tab", json_integer(int(active_tab)));
-    json_object_set_new(root, "user-sort-order", json_integer(int(user_order)));
-    json_object_set_new(root, "system-sort-order", json_integer(int(system_order)));
     json_object_set_new(root, "search-name", json_boolean(search_name));
     json_object_set_new(root, "search-text", json_boolean(search_meta));
     json_object_set_new(root, "search-anchored", json_boolean(search_anchor));
     json_object_set_new(root, "search-incremental", json_boolean(search_incremental));
+    json_object_set_new(root, "tab", json_integer(int(active_tab)));
 
     if (keep_search_filters) {
         auto jar = json_array();
@@ -90,15 +83,6 @@ void PresetModule::clear_filters(PresetTab tab_id)
     switch (tab_id) {
     case PresetTab::User: std::memset(user_filters, 0, sizeof(user_filters)); return;
     case PresetTab::System:std::memset(system_filters, 0, sizeof(system_filters)); return;
-    default: break;
-    }
-}
-
-void PresetModule::set_order(PresetTab tab, PresetOrder order)
-{
-    switch (tab) {
-    case PresetTab::User: user_order = order; return;
-    case PresetTab::System: system_order = order; return;
     default: break;
     }
 }
