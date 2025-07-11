@@ -59,15 +59,12 @@ struct PlayMenu : Hamburger
         if (ui->chem_host) {
             auto em = ui->chem_host->host_matrix();
             if (em) {
-                if (! em->is_osmose()) {
+                if (!em->is_osmose()) {
                     menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
                         menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
                         menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
                         menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
                     }));
-                } else {
-                    menu->addChild(createMenuLabel("Append (unavailble on Osmose)"));
-                    //TODO:get playlist....
                 }
             } else {
                 menu->addChild(createMenuLabel("Append [no EM connection]"));
