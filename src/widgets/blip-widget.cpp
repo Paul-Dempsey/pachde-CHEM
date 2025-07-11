@@ -38,11 +38,12 @@ void Blip::drawLayer(const DrawArgs& args, int layer)
     if (1 != layer) return;
     //if (step_bright < 0.1f) return;
     //if (rack::settings::rackBrightness >= .95f) return;
-
+    auto actual_bright = step_bright * rack::settings::haloBrightness;
+    if (actual_bright < 0.1f) return;
     auto vg = args.vg;
     float cx = box.size.x * .5f;
     float cy = box.size.y * .5f;
-    CircularHalo(vg, cx, cy, radius, radius*3.f, nvgTransRGBAf(light, step_bright * rack::settings::haloBrightness));
+    CircularHalo(vg, cx, cy, radius, radius*3.f, nvgTransRGBAf(light, actual_bright));
 }
 
 void Blip::draw(const DrawArgs& args)
