@@ -80,6 +80,8 @@ void PresetUi::onSystemBegin()
 {
     other_system_gather = true;
     help_label->text("scanning System presets");
+    live_preset_label->text("");
+    live_preset_label->describe("");
 }
 
 void PresetUi::onSystemComplete()
@@ -99,6 +101,8 @@ void PresetUi::onUserBegin()
 {
     other_user_gather = true;
     help_label->text("scanning User presets");
+    live_preset_label->text("");
+    live_preset_label->describe("");
 }
 
 void PresetUi::onUserComplete()
