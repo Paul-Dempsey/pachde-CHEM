@@ -167,5 +167,5 @@ void PlayUi::clear_playlist(bool forget_file)
     presets.clear();
     clear_selected();
     sync_to_presets();
-    set_modified(true);
+    if (!forget_file) set_modified(true);
 }

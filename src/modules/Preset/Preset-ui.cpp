@@ -15,12 +15,23 @@ void no_preset(TipLabel* label) {
     label->describe("(none)");
 }
 
-void PresetUi::request_presets(PresetTab which)
+void PresetUi::on_list_changed(eaganmatrix::PresetTab which)
 {
-    // if (!host_available()) return;
-    // auto pl = chem_host->host_preset_list();
-    // if (!pl) return;
-    //TODO
+    Tab& tab = get_tab(which);
+    std::shared_ptr<PresetList> ppl{nullptr};
+    if (chem_host) {
+        auto ipl = chem_host->host_preset_list();
+        if (ipl) {
+            switch (which) {
+            case PresetTab::Unset: break;
+            case PresetTab::System: ppl = ipl->host_system_presets(); break;
+            case PresetTab::User: ppl = ipl->host_user_presets(); break;
+            }
+        }
+    }
+    tab.set_list(ppl);
+    onPresetChange();
+    update_help();
 }
 
 bool PresetUi::load_presets(PresetTab which)
@@ -40,7 +51,6 @@ void PresetUi::sort_presets(PresetOrder order)
     
     Tab & tab = active_tab();
     if (!tab.list.preset_list) return;
-    if (tab.list.preset_list->order == order) return;
     if (0 == tab.count()) return;
 
     PresetId current_id;
@@ -49,7 +59,11 @@ void PresetUi::sort_presets(PresetOrder order)
     }
 
     tab.list.sort(order);
-    //save_presets(active_tab_id);
+    if (host_available()) {
+        auto hw = chem_host->host_matrix()->get_hardware();
+        auto file = preset_file_name(active_tab_id, hw);
+        tab.list.save(file, hw, chem_host->host_claim());
+    }
 
     if (my_module->track_live) {
         scroll_to_live();
@@ -65,6 +79,7 @@ void PresetUi::sort_presets(PresetOrder order)
 void PresetUi::onSystemBegin()
 {
     other_system_gather = true;
+    help_label->text("scanning System presets");
 }
 
 void PresetUi::onSystemComplete()
@@ -73,16 +88,17 @@ void PresetUi::onSystemComplete()
         other_system_gather = false;
         return;
     }
-
     system_tab.list.refresh_filter_view();
     if (active_tab_id == PresetTab::System) {
         scroll_to(0);
     }
+    help_label->text("");
 }
 
 void PresetUi::onUserBegin()
 {
     other_user_gather = true;
+    help_label->text("scanning User presets");
 }
 
 void PresetUi::onUserComplete()
@@ -92,6 +108,7 @@ void PresetUi::onUserComplete()
     if (active_tab_id == PresetTab::User) {
         scroll_to(0);
     }
+    help_label->text("");
 }
 
 void PresetUi::onPresetChange()
@@ -156,6 +173,10 @@ void PresetUi::onConnectHost(IChemHost *host)
     if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em) em->subscribeEMEvents(this);
+        auto ipl = chem_host->host_preset_list();
+        if (ipl) {
+            ipl->register_preset_list_client(this);
+        }
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
         onPresetChange();
     } else {
@@ -284,17 +305,15 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
    }
 
     Tab& tab = active_tab();
-    if (fetch && (0 == tab.count()) && host_available() && !start_delay.running()) {
-        if (!load_presets(tab_id)) {
-            request_presets(tab_id);
-        }
+    if (fetch && (0 == tab.count()) && !start_delay.running() && host_available()) {
+        load_presets(tab_id);
     }
-    
     auto theme = theme_engine.getTheme(getThemeName());
     user_label->applyTheme(theme_engine, theme);
     system_label->applyTheme(theme_engine, theme);
 
     scroll_to(tab.scroll_top);
+    update_help();
 }
 
 void PresetUi::scroll_to(ssize_t index)
@@ -396,6 +415,16 @@ void PresetUi::update_page_controls()
     }
 }
 
+void PresetUi::update_help()
+{
+    Tab& tab = active_tab();
+    if (tab.list.empty()) {
+        help_label->text("scan presets using the Core actions menu");
+    } else {
+        help_label->text("");
+    }
+}
+
 void PresetUi::send_preset(ssize_t index)
 {
     if (index < 0) return;
@@ -407,7 +436,6 @@ void PresetUi::send_preset(ssize_t index)
         chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
     }
 }
-
 
 void PresetUi::next_preset(bool ctrl, bool shift)
 {

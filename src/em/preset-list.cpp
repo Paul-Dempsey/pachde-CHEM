@@ -12,7 +12,7 @@ void PresetList::add(const PresetDescription* preset)
         assert(false);
         return;
     }
-
+    assert(preset->id.key() != 0);
     auto index = index_of_id(preset->id);
     if (-1 == index) {
         auto pi = std::make_shared<PresetInfo>(preset);

@@ -80,14 +80,19 @@ constexpr const int ROWS = 20;
 constexpr const int COLS = 2;
 constexpr const int PAGE_CAPACITY = ROWS * COLS;
 
-struct Tab {
+struct Tab
+{
     size_t scroll_top{0};
     ssize_t current_index{-1};
     PresetTabList list;
 
     Tab(const Tab&) = delete;
     Tab(PresetTab id) : list(id) {}
-
+    void set_list(std::shared_ptr<PresetList> shlist) {
+        scroll_top = 0;
+        current_index = -1;
+        list.set_list(shlist);
+    }
     PresetTab id() { return list.tab; }
     size_t count() { return list.count(); }
     void clear() { list.clear(); scroll_top = 0; current_index = -1; }
@@ -98,7 +103,7 @@ struct Tab {
     }
 };
 
-struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
+struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListClient
 {
     using Base = ChemModuleWidget;
     PresetModule* my_module{nullptr};
@@ -111,6 +116,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     TextLabel* user_label{nullptr};
     TextLabel* system_label{nullptr};
     TextLabel* page_label{nullptr};
+    TextLabel* help_label{nullptr};
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
@@ -132,7 +138,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     std::vector<PresetEntry*> preset_grid;
 
     PresetUi(PresetModule *module);
-    
+    virtual ~PresetUi();
+
     Tab& get_tab(PresetTab id) {
        switch (id) {
         case PresetTab::Unset: assert(false); goto sys;
@@ -154,9 +161,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void set_current_index(size_t index);
     bool host_available();
     PresetId get_live_id() { return live_preset ? live_preset->id : PresetId{}; }
-
-    void request_presets(PresetTab which);
-    std::string preset_file(PresetTab which);
     bool load_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
@@ -167,6 +171,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     void page_up(bool control, bool shift);
     void page_down(bool control, bool shift);
     void update_page_controls();
+    void update_help();
     
     void send_preset(ssize_t index);
     void previous_preset(bool c, bool s);
@@ -188,7 +193,10 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
     void createScrews(std::shared_ptr<SvgTheme> theme) override;
-    
+
+    // IPresetListClient
+    void on_list_changed(eaganmatrix::PresetTab which) override;
+
     // IHandleEmEvents
     void onSystemBegin() override;
     void onSystemComplete() override;

@@ -312,6 +312,9 @@ PresetUi::PresetUi(PresetModule *module) :
         }
     }
 
+    LabelStyle help_style{"curpreset", TextAlignment::Center, 16.f, true};
+    addChild(help_label = createLabel<TextLabel>(Vec(172,180), 280.f, "", theme_engine, theme, help_style));
+
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), theme_engine, theme, "Core link");
     if (my_module) {
@@ -341,12 +344,17 @@ PresetUi::PresetUi(PresetModule *module) :
     if (module) {
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
-        //user_tab.list.set_device_info(my_module->firmware, my_module->hardware);
-        //system_tab.list.set_device_info(my_module->firmware, my_module->hardware);
-        //user_tab.list.preset_list.order = my_module->user_order;
-        //system_tab.list.preset_list.order = my_module->system_order;
-
         set_tab(PresetTab(my_module->active_tab), false);
+    }
+}
+
+PresetUi::~PresetUi()
+{
+    if (chem_host) {
+        auto ipl = chem_host->host_preset_list();
+        if (ipl) {
+            ipl->unregister_preset_list_client(this);
+        }
     }
 }
 

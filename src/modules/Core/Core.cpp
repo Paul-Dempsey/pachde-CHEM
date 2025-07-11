@@ -78,21 +78,25 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
     midi_relay.register_target(this);
 
     system_presets = std::make_shared<PresetList>();
-    system_presets->order = PresetOrder::Alpha;
     user_presets = std::make_shared<PresetList>();
 }
 
 CoreModule::~CoreModule()
 {
     midi_relay.unregister_target(this);
-    for (auto client : chem_clients) {
-        client->onConnectHost(nullptr);
-    }
-    ModuleBroker::get()->unregister_host(this);
     controller1_midi_in.clear();
     controller2_midi_in.clear();
     controller1.unsubscribe(this);
     controller2.unsubscribe(this);
+
+    user_presets = nullptr;
+    system_presets = nullptr;
+    notify_preset_list_changed(PresetTab::User);
+    notify_preset_list_changed(PresetTab::System);
+    for (auto client : chem_clients) {
+        client->onConnectHost(nullptr);
+    }
+    ModuleBroker::get()->unregister_host(this);
     auto broker = MidiDeviceBroker::get();
     broker->unRegisterDeviceHolder(&haken_device);
     broker->unRegisterDeviceHolder(&controller1);
@@ -109,12 +113,14 @@ void CoreModule::enable_logging(bool enable)
         haken_midi_in.set_logger("<<H", midi_log);
         controller1_midi_in.set_logger("<C1", midi_log);
         controller2_midi_in.set_logger("<C2", midi_log);
+        em.log = midi_log;
     } else {
         haken_midi.set_logger(nullptr);
         haken_midi_out.set_logger(nullptr);
         haken_midi_in.set_logger("", nullptr);
         controller1_midi_in.set_logger("", nullptr);
         controller2_midi_in.set_logger("", nullptr);
+        em.log = nullptr;
         if (midi_log) {
             midi_log->close();
             delete midi_log;
@@ -134,42 +140,60 @@ std::string CoreModule::device_name(ChemDevice which)
     }
 }
 
+
+PresetId CoreModule::prev_next_id(ssize_t increment)
+{
+    ssize_t index{-1};
+    PresetId id;
+    if (em.preset.id.valid() && em.preset.id.key()) {
+        index = system_presets->index_of_id(em.preset.id);
+        if (index >= 0) {
+            index = index + increment;
+            index = (index < 0) 
+                ? system_presets->size() -1 
+                : ((index >= system_presets->size()) ? 0 : index);
+            id = system_presets->presets[index]->id;
+        } else if (user_presets) {
+            auto index = user_presets->index_of_id(em.preset.id);
+            if (index >= 0) {
+                index = index + increment;
+                index = (index < 0) 
+                    ? user_presets->size() -1 
+                    : ((index >= user_presets->size()) ? 0 : index);
+                id = user_presets->presets[index]->id;
+            }
+        }
+    } else if (em.preset.tag) {
+        index = system_presets->index_of_tag(em.preset.tag);
+        if (index >= 0) {
+            index = index + increment;
+            index = (index < 0) 
+                ? system_presets->size() -1 
+                : ((index >= system_presets->size()) ? 0 : index);
+            id = system_presets->presets[index]->id;
+        } else if (user_presets) {
+            auto index = user_presets->index_of_tag(em.preset.tag);
+            if (index >= 0) {
+                index = index + increment;
+                index = (index < 0) 
+                    ? user_presets->size() -1 
+                    : ((index >= user_presets->size()) ? 0 : index);
+                id = user_presets->presets[index]->id;
+            }
+        }
+    }
+    return id;
+}
+
+
 void CoreModule::next_preset()
 {
     load_lists();
-    
     if (em.is_osmose()) {
-        if (!system_presets && !user_presets) return;
-        PresetId id;
-        if (em.preset.id.valid() && em.preset.id.key()) {
-            auto index = system_presets->index_of_id(em.preset.id);
-            if ((-1 == index) && user_presets) {
-                index = user_presets->index_of_id(em.preset.id);
-                if (-1 == index) return;
-                if (++index >= user_presets->size()) index = 0;
-                id = user_presets->presets[index]->id;
-            } else {
-                if (++index >= system_presets->size()) index = 0;
-                id = system_presets->presets[index]->id;
-            }
-        } else if (em.preset.tag) {
-            ssize_t index{-1};
-            if (system_presets) {
-                index = system_presets->index_of_tag(em.preset.tag);
-            }
-            if ((-1 == index) && user_presets) {
-                index = user_presets->index_of_tag(em.preset.tag);
-                if (-1 == index) return;
-                if (++index >= user_presets->size()) index = 0;
-                id = user_presets->presets[index]->id;
-            } else {
-                if (++index >= system_presets->size()) index = 0;
-                id = system_presets->presets[index]->id;
-            }
-        }
+        PresetId id = prev_next_id(1);
         if (id.valid()) {
             em.set_osmose_id(id);
-            haken_midi.select_preset(ChemId::Core,id);
+            haken_midi.select_preset(ChemId::Core, id);
         }
     } else {
         haken_midi.next_system_preset(ChemId::Core);
@@ -180,53 +204,40 @@ void CoreModule::prev_preset()
 {
     load_lists();
     if (em.is_osmose()) {
-        if (!system_presets && !user_presets) return;
-        PresetId id;
-        ssize_t index{-1};
-        if (em.preset.id.valid() && em.preset.id.key()) {
-            if (system_presets) {
-                system_presets->index_of_id(em.preset.id);
-            } 
-            if ((-1 == index) && user_presets) {
-                index = user_presets->index_of_id(em.preset.id);
-                if (-1 == index) return;
-                if (--index < 0) index = user_presets->size()-1;
-                id = user_presets->presets[index]->id;
-            } else {
-                if (--index < 0) index = system_presets->size()-1;
-                id = system_presets->presets[index]->id;
-            }
-        } else if (em.preset.tag) {
-            if (system_presets) {
-                index = system_presets->index_of_tag(em.preset.tag);
-            } 
-            if ((-1 == index) && user_presets) {
-                index = user_presets->index_of_tag(em.preset.tag);
-                if (-1 == index) return;
-                if (--index < 0) index = user_presets->size() - 1;
-                id = user_presets->presets[index]->id;
-            } else {
-                if (--index < 0) index = system_presets->size() - 1;
-                id = system_presets->presets[index]->id;
-            }
-        }
+        PresetId id = prev_next_id(-1);
         if (id.valid()) {
             em.set_osmose_id(id);
-            haken_midi.select_preset(ChemId::Core,id);
+            haken_midi.select_preset(ChemId::Core, id);
         }
     } else {
         haken_midi.previous_system_preset(ChemId::Core);
     }
 }
 
-PresetResult CoreModule::load_preset_file(PresetTab which)
+void CoreModule::clear_presets(eaganmatrix::PresetTab which)
 {
     valid_tab(which);
-    if (host_busy()) return PresetResult::NotReady;
+    auto list = which == PresetTab::User ? user_presets : system_presets;
+    list->clear();
+    auto path = preset_file_name(which, em.hardware);
+    if (!path.empty()) {
+        system::remove(path);
+    }
+    notify_preset_list_changed(which);
+}
+
+PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load)
+{
+    valid_tab(which);
+    if (!busy_load && host_busy()) return PresetResult::NotReady;
     if (!em.hardware) return PresetResult::NotReady;
     auto path = preset_file_name(which, em.hardware);
     auto list = which == PresetTab::User ? user_presets : system_presets;
-    return list->load(path) ? PresetResult::Ok : PresetResult::FileNotFound;
+    auto result = list->load(path) ? PresetResult::Ok : PresetResult::FileNotFound;
+    if (result == PresetResult::Ok) {
+        notify_preset_list_changed(which);
+    }
+    return result;
 }
 
 PresetResult CoreModule::load_quick_user_presets()
@@ -296,9 +307,33 @@ PresetResult CoreModule::scan_osmose_presets(uint8_t page)
     return PresetResult::Ok;
 }
 
+void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which)
+{
+    for (auto client: preset_list_clients) {
+        client->on_list_changed(which);
+    }
+}
+
+void CoreModule::register_preset_list_client(IPresetListClient *client)
+{
+    if (preset_list_clients.cend() == std::find(preset_list_clients.cbegin(), preset_list_clients.cend(), client)) {
+        preset_list_clients.push_back(client);
+    }
+}
+
+void CoreModule::unregister_preset_list_client(IPresetListClient *client)
+{
+    auto cit = std::find(preset_list_clients.begin(), preset_list_clients.end(), client);
+    if (cit != preset_list_clients.end()) {
+        preset_list_clients.erase(cit);
+    }
+}
+
 std::shared_ptr<PresetList> CoreModule::host_user_presets()
 {
-    if (user_presets->empty() && !host_busy()) {
+    if (user_presets
+        && user_presets->empty()
+        && !host_busy()) {
         load_preset_file(PresetTab::User);
     }
     return user_presets;
@@ -306,7 +341,9 @@ std::shared_ptr<PresetList> CoreModule::host_user_presets()
 
 std::shared_ptr<PresetList> CoreModule::host_system_presets()
 {
-    if (system_presets->empty() && !host_busy()) {
+    if (system_presets
+        && system_presets->empty()
+        && !host_busy()) {
         load_preset_file(PresetTab::System);
     }
     return system_presets;
@@ -345,13 +382,17 @@ PresetResult CoreModule::end_scan()
     if (midi_log) {
         midi_log->log_message("PLB", format_string("Completed in %.6f", full_build->total));
     }
+    PresetTab tab{PresetTab::Unset};
     if (gather_user(gather)) {
         em.end_user_scan();
         user_presets->save(preset_file_name(PresetTab::User, em.hardware), em.hardware, haken_device.device_claim);
+        tab = PresetTab::User;
     } else {
         assert(gather_system(gather));
         em.end_system_scan();
+        system_presets->sort(PresetOrder::Alpha);
         system_presets->save(preset_file_name(PresetTab::System, em.hardware), em.hardware, haken_device.device_claim);
+        tab = PresetTab::System;
     }
     if (chem_ui) {
         ui()->show_busy(false);
@@ -361,6 +402,7 @@ PresetResult CoreModule::end_scan()
     full_build = nullptr;
     delete fb;
     stop_scan = false;
+    notify_preset_list_changed(tab);
     return PresetResult::Ok;
 }
 
@@ -369,10 +411,14 @@ void CoreModule::load_lists()
     if (host_busy()) return;
     if (!em.hardware) return;
     if (system_presets->empty()) {
-        load_preset_file(PresetTab::System);
+        if (PresetResult::Ok == load_preset_file(PresetTab::System)) {
+            notify_preset_list_changed(PresetTab::System);
+        }
     }
     if (user_presets->empty()) {
-        load_preset_file(PresetTab::User);
+        if (PresetResult::Ok == load_preset_file(PresetTab::User)) {
+            notify_preset_list_changed(PresetTab::User);
+        }
     }
 }
 
@@ -439,26 +485,52 @@ void CoreModule::onPresetChanged()
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
                     if (em.preset.id.key() != full_build->iter->expected_id().key()) {
-                        log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                        log_message("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                    } else {
+                        full_build->preset_received();
+                        user_presets->add(&em.preset);
                     }
-                    full_build->preset_received();
-                    user_presets->add(&em.preset);
                 } else if (gather_quick(gathering)) {
+                    assert(!em.is_osmose());
                     user_presets->add(&em.preset);
                 }
             } else if (gather_system(gathering)) {
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
                     if (em.preset.id.key() != full_build->iter->expected_id().key()) {
-                        log_message("Core", format_string("oid[%6x] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                        log_message("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                    } else {
+                        full_build->preset_received();
+                        system_presets->add(&em.preset);
                     }
-                    full_build->preset_received();
-                    system_presets->add(&em.preset);
                 } else if (gather_quick(gathering)) {
+                    assert(!em.is_osmose());
                     system_presets->add(&em.preset);
                 }
             } else {
                 assert(false);
+            }
+        }
+    }
+    if (!gathering && (em.preset.id.key() == 0) && em.is_osmose() && em.preset.valid_tag()) {
+        bool found{false};
+        if (user_presets->empty()) {
+            load_preset_file(PresetTab::User, true);
+        }
+        if (!user_presets->empty()) {
+            auto index = user_presets->index_of_tag(em.preset.tag);
+            if (index >= 0) {
+                em.preset.id = user_presets->presets[index]->id;
+                found = true;
+            }
+        }
+        if (!found) {
+            if (system_presets->empty()) {
+                load_preset_file(PresetTab::System, true);
+            }
+            auto index = system_presets->index_of_tag(em.preset.tag);
+            if (index >= 0) {
+                em.preset.id = system_presets->presets[index]->id;
             }
         }
     }

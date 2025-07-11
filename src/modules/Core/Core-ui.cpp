@@ -604,37 +604,39 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(createMenuLabel<HamburgerTitle>("Core Actions"));
 
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module](Menu* menu) {
-        menu->addChild(createMenuItem("Clear system presets", "", [=]() {
-            my_module->system_presets->clear();
+        menu->addChild(createMenuItem("Clear System presets", "", [=]() {
+            my_module->clear_presets(PresetTab::System);
         }));
-        menu->addChild(createMenuItem("Clear user presets", "", [=]() {
-            my_module->user_presets->clear();
+        menu->addChild(createMenuItem("Clear User presets", "", [=]() {
+            my_module->clear_presets(PresetTab::User);
         }));
 
+        menu->addChild(new MenuSeparator);
+
         if (my_module->em.is_osmose()) {
-            menu->addChild(createMenuItem("Load System presets", "", [=]() {
-                ui->em_status_label->text("Loading Full System presets...");
+            menu->addChild(createMenuItem("Make System preset database", "", [=]() {
+                ui->em_status_label->text("Scanning Full System presets...");
                 my_module->load_full_system_presets();
             }));
-            menu->addChild(createMenuItem("Load User presets", "(page 1)", [=]() {
-                ui->em_status_label->text("Loading User presets (page 1)...");
+            menu->addChild(createMenuItem("Make User preset database", "(page 1)", [=]() {
+                ui->em_status_label->text("Scanning User presets (page 1)...");
                 my_module->load_full_user_presets();
             }));
-            menu->addChild(createSubmenuItem("Load more User pages", "", [=](Menu* menu) {
+            menu->addChild(createSubmenuItem("Scan more User pages", "", [=](Menu* menu) {
                 menu->addChild(createMenuItem("Page 2", "", [=]() {
-                    ui->em_status_label->text("Loading User presets (page 2)...");
+                    ui->em_status_label->text("Scanning User presets (page 2)...");
                     my_module->scan_osmose_presets(91);
                 }));
                 menu->addChild(createMenuItem("Page 3", "", [=]() {
-                    ui->em_status_label->text("Loading User presets (page 3)...");
+                    ui->em_status_label->text("Scanning User presets (page 3)...");
                     my_module->scan_osmose_presets(92);
                 }));
                 menu->addChild(createMenuItem("Page 4", "", [=]() {
-                    ui->em_status_label->text("Loading User presets (page 4)...");
+                    ui->em_status_label->text("Scanning User presets (page 4)...");
                     my_module->scan_osmose_presets(93);
                 }));
                 menu->addChild(createMenuItem("Page 5", "", [=]() {
-                    ui->em_status_label->text("Loading User presets (page 5)...");
+                    ui->em_status_label->text("Scanning User presets (page 5)...");
                     my_module->scan_osmose_presets(94);
                 }));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
@@ -644,27 +646,25 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 // menu->addChild(createMenuItem("Page 10", "", [my_module]() {}));
             }));
         } else {
-            menu->addChild(createCheckMenuItem("Use saved user presets", "", 
-                [my_module](){ return my_module->use_saved_user_presets; },
-                [my_module](){ my_module->use_saved_user_presets = !my_module->use_saved_user_presets; }
-            ));
-            menu->addChild(createMenuItem("Quick User presets", "", [=]() {
-                ui->em_status_label->text("Loading quick User presets...");
-                my_module->load_quick_user_presets();
-            }));
-            menu->addChild(createMenuItem("Full User preset database", "", [=]() {
-                ui->em_status_label->text("Loading full User presets...");
-                my_module->load_full_user_presets();
-                ui->create_stop_button();
-            }));
-            menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Quick System presets", "", [=]() {
-                ui->em_status_label->text("Loading quick System presets...");
+                ui->em_status_label->text("Scanning quick System presets...");
                 my_module->load_quick_system_presets();
             }));
-            menu->addChild(createMenuItem("Full System preset database", "", [=]() {
-                ui->em_status_label->text("Loading full System presets...");
+            menu->addChild(createMenuItem("Make full System preset database", "", [=]() {
+                ui->em_status_label->text("Scanning full System presets...");
                 my_module->load_full_system_presets();
+                ui->create_stop_button();
+            }));
+
+            menu->addChild(new MenuSeparator);
+
+            menu->addChild(createMenuItem("Quick User presets", "", [=]() {
+                ui->em_status_label->text("Scanning quick User presets...");
+                my_module->load_quick_user_presets();
+            }));
+            menu->addChild(createMenuItem("Make full User preset database", "", [=]() {
+                ui->em_status_label->text("Scanning full User presets...");
+                my_module->load_full_user_presets();
                 ui->create_stop_button();
             }));
         }

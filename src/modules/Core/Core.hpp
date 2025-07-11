@@ -79,13 +79,12 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool in_reboot{false};
     // ui options
     bool glow_knobs{false};
-    bool use_saved_user_presets{false};
 
     uint8_t saved_hardware{0};
 
     std::shared_ptr<PresetList> user_presets{nullptr};
     std::shared_ptr<PresetList> system_presets{nullptr};
-
+    std::vector<IPresetListClient*> preset_list_clients;
     GatherFlags gathering{GatherFlags::None};
     PresetIdListBuilder* id_builder{nullptr};
     PresetListBuildCoordinator* full_build{nullptr};
@@ -127,16 +126,20 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void connect_midi(bool on_off);
     void init_osmose();
     void reset_tasks();
+    PresetId prev_next_id(ssize_t increment);
     void next_preset();
     void prev_preset();
-
-    // IPresetList
-    PresetResult load_preset_file(eaganmatrix::PresetTab which);
+    void clear_presets(eaganmatrix::PresetTab which);
+    PresetResult load_preset_file(eaganmatrix::PresetTab which, bool busy_load = false);
     PresetResult load_quick_user_presets();
     PresetResult load_quick_system_presets();
     PresetResult load_full_system_presets();
     PresetResult load_full_user_presets();
     PresetResult scan_osmose_presets(uint8_t page);
+    void notify_preset_list_changed(eaganmatrix::PresetTab which);
+    // IPresetList
+    void register_preset_list_client(IPresetListClient* client) override;
+    void unregister_preset_list_client(IPresetListClient* client) override;
     std::shared_ptr<PresetList> host_user_presets() override;
     std::shared_ptr<PresetList> host_system_presets() override;
 

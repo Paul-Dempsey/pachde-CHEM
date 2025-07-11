@@ -219,9 +219,10 @@ void EaganMatrix::begin_user_scan()
 {
     assert(!busy());
     assert(!in_scan);
-    in_scan = true;
     notifyUserBegin();
+    in_scan = true;
 };
+
 void EaganMatrix::end_user_scan()
 {
     if (in_scan) {
@@ -229,13 +230,15 @@ void EaganMatrix::end_user_scan()
         notifyUserComplete();
     }
 }
+
 void EaganMatrix::begin_system_scan()
 {
     assert(!busy());
     assert(!in_scan);
-    in_scan = true;
     notifySystemBegin();
+    in_scan = true;
 };
+
 void EaganMatrix::end_system_scan()
 {
     if (in_scan) {
@@ -335,7 +338,7 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
     uint8_t cc = msg.bytes.data1;
     uint8_t value = msg.bytes.data2;
 
-    if (in_preset
+    if (in_preset_detail
         && (cc <= Haken::ccCVCLow) // highest cc included in a preset
         && (cc != Haken::ccBankH) // exclude id
         && (cc != Haken::ccBankL) // exclude id
@@ -565,7 +568,9 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 in_preset_detail = false;
                 ready = true;
                 preset.tag = preset_hasher.result();
-                //DEBUG("hash: %d %d %s", preset_hasher.content_size(), preset.tag, preset.name.c_str());
+                if (log){
+                    log->log_message("EM", format_string("hash: %d %d %s", preset_hasher.content_size(), preset.tag, preset.name.c_str()));
+                }
                 if (EMPTY_TAG == preset.tag) {
                     preset.tag = 0;
                 }

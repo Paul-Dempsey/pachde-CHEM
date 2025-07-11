@@ -1,8 +1,5 @@
 # CHEM To-Do
 
-- **Play** Integrate new preset management/Osmose
-- Fix Preset sort does not update UI
-
 ## General
 
 - **Core** Process() usually isn't called when there is no audio device selecteed.

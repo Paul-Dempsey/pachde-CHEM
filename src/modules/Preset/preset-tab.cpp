@@ -159,6 +159,14 @@ void PresetTabList::refresh_filter_view()
     }
 }
 
+void PresetTabList::set_list(std::shared_ptr<PresetList> list)
+{
+    if (list != preset_list) {
+        preset_list = list;
+        refresh_filter_view();
+    }
+}
+
 ssize_t PresetTabList::index_of_id(PresetId id)
 {
     if (!id.valid() || empty()) return -1;

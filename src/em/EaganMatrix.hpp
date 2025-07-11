@@ -7,6 +7,7 @@
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
 #include "../services/crc.hpp"
+#include "../services/midi-log.hpp"
 
 namespace eaganmatrix {
 
@@ -112,6 +113,7 @@ struct EaganMatrix
     PresetDescription preset;
     crc::crc32 preset_hasher;
     PresetId osmose_id;
+    pachde::MidiLog* log{nullptr};
 
     bool is_ready() { return ready; }
     void reset();

@@ -694,6 +694,8 @@ void PlayUi::onChoosePreset(PresetWidget* source)
         if (haken->log) {
             haken->log->log_message("play", format_string("Selecting %s", current_preset->summary().c_str()));
         }
+        auto em = chem_host->host_matrix();
+        if (em) em->set_osmose_id(id);
         haken->select_preset(ChemId::Play, id);
     }
 }
@@ -802,15 +804,9 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e)
 
         case GLFW_KEY_ENTER:
             if (current_index < 0) {
-            } else {
+            } else if (e.action != GLFW_REPEAT) {
                 current_preset = presets[current_index];
-                auto haken = chem_host->host_haken();
-                if (haken) {
-                    if (haken->log) {
-                        haken->log->log_message("play", format_string("Selecting %s", current_preset->summary().c_str()));
-                    }
-                    haken->select_preset(ChemId::Play, current_preset->id);
-                } 
+                select_preset(current_preset->id);
             }
             e.consume(this);
             return;
@@ -915,6 +911,7 @@ void PlayUi::step()
     if (pending_device_check) {
         check_playlist_device();
     }
+    //blip->set_brightness(modified ? 1 : 0);
 }
 
 void PlayUi::draw(const DrawArgs& args)

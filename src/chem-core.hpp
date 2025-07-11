@@ -21,23 +21,15 @@ enum class PresetResult {
     NotApplicableEm
 };
 
-// struct IPresetListClient
-// {
-//     virtual void on_list_changed(eaganmatrix::PresetTab which) = 0;
-// };
+struct IPresetListClient
+{
+    virtual void on_list_changed(eaganmatrix::PresetTab which) = 0;
+};
 
 struct IPresetList
 {
-    // virtual PresetResult load_preset_file(eaganmatrix::PresetTab tab) = 0;
-    // virtual PresetResult load_quick_user_presets() = 0;
-    // virtual PresetResult load_quick_system_presets() = 0;
-    // virtual PresetResult load_full_system_presets() = 0;
-    // virtual PresetResult load_full_user_presets() = 0;
-    // virtual PresetResult scan_osmose_presets(uint8_t page) = 0;
-
-    //virtual void register_preset_list_client(IPresetListClient* client) = 0;
-    //virtual void unregister_preset_list_client(IPresetListClient* client) = 0;
-
+    virtual void register_preset_list_client(IPresetListClient* client) = 0;
+    virtual void unregister_preset_list_client(IPresetListClient* client) = 0;
     virtual std::shared_ptr<PresetList> host_user_presets() = 0;
     virtual std::shared_ptr<PresetList> host_system_presets() = 0;
 };

@@ -37,6 +37,7 @@ struct PresetTabList
         tab(id)
     {
     }
+    void set_list(std::shared_ptr<PresetList> list);
     bool empty() { return preset_list ? preset_list->empty() : true; }
     bool dirty() { return preset_list ? preset_list->modified : false; }
     void set_dirty() { assert(preset_list); preset_list->modified = true; }

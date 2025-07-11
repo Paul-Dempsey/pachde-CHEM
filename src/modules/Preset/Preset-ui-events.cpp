@@ -149,7 +149,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
 
 void PresetUi::onHoverScroll(const HoverScrollEvent &e)
 {
-    if (in_range(e.pos.x, 8.f, 334.f) && in_range(e.pos.y, 38.f, 185.f)) {
+    if (in_range(e.pos.x, 2.f, 378.f) && in_range(e.pos.y, 38.f, 358.f)) {
         int delta = PAGE_CAPACITY * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
         if (0 != delta) {
             Tab& tab = active_tab();
@@ -179,10 +179,10 @@ void PresetUi::step()
     //    start_delay.run();
     //}
 
-    // Tab& tab = active_tab();
-    // if (tab.list.empty() && host_available()) {
-    //     set_tab(active_tab_id, true);
-    // }
+    Tab& tab = active_tab();
+    if (tab.list.empty() && host_available()) {
+        set_tab(active_tab_id, true);
+    }
 
     if (filtering()) {
         filter_off_button->button_down = true;
