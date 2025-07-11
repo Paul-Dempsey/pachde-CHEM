@@ -2,14 +2,31 @@
 
 ## General
 
+- Unify preset file formats
 - **Core** Process() usually isn't called when there is no audio device selecteed.
   We can check for this and display a message to tell user they need to connect an Audio device to Rack.
 - Preset and Play (Core?): onRandomize select random preset
-- Bug: rounding lights aren't quite right
+- Bug: rounding lights aren't quite same as Continuum
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - color picker
   - choose text syntax?
-  - 100% transparent option, or transparency slider
+  - 100% transparent option
+  - transparency slider
+
+## Core
+
+- Fix: Switching devices always requires a reset.
+- Fix: Scan should always reset list, not load saved
+
+## Preset
+
+- Fix: Often requires clicking tab to refresh list.
+- Progress indicator during run delay
+- Don't show preset load prompt until run delay elapsed (i.e. until list availability is actually known).
+
+## Play
+
+- Append playlist page
 
 ## Midi pad
 

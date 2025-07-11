@@ -5,7 +5,8 @@
 To get started, you must have installed VCV Rack and download the CHEM `.vcvplugin` file from GitHub.
 To download and install the latest build of **#d CHEM**, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
-When CHEM is released (coming soon), you will be able to subscribe to the **#d CHEM** plugin in the VCV Rack library. A subscription is recommended so that you are automatically updated when the plugin is revised with new modules, features, or bug fixes.
+When CHEM is released, you will be able to subscribe to the **#d CHEM** plugin in the VCV Rack library.
+A subscription is recommended so that you are automatically updated when the plugin is revised with new modules, features, and bug fixes.
 
 Start with the [**Core**](./core.md#chem-core) module.
 
@@ -25,6 +26,7 @@ Start with the [**Core**](./core.md#chem-core) module.
 | [**Sustain**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sustain |
 | [**Sostenuto**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto |
 | [**Sostenuto 2**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto 2 |
+| [**MidiPad**](./midipad.md#chem-midipad) | 4x4 custom Midi pads. |
 | [**Settings**](./settings.md#chem-settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing, and more. |
 
 More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).

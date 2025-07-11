@@ -13,7 +13,7 @@ Once you have a list of presets, click the name of the preset in the list to loa
 > **Important** —
 > Most of the keyboard controls you'd expect to use for navigating, selecting, and editing are reserved by VCV Rack.
 > These include Delete, Page Up, Page Down, Arrow keys, etc., so take care.
-> Your interactions with Play are mouse-driven.
+> Your interactions with Play are mainly mouse-driven.
 
 When connected, the live preset on your device is shown in the box below the playlist.
 Click the **Heart** (favorite) button to add the live preset to your playlist.
@@ -44,9 +44,7 @@ The **current** and **live** _Two Chords_, and the selected _Unanswered Question
 
 ### The Play "hamburger" menu
 
-More options for populating and editing a playlist are in the "hamburger" menu at the top right of the preset list.
-You can add all User presets and system presets to the list.
-If you don't want that many, you can edit the list down.
+More options for editing a playlist are in the "hamburger" menu at the top right of the preset list.
 
 ![Play menu](./image/play-menu-2.png)
 

@@ -1,18 +1,14 @@
 # CHEM Preset
 
-**Preset** provides fast access to all the presets installed on your device.
+**Preset** provides fast access to the presets installed on your device.
 
-When first added to Rack and connected to an EaganMatrix device,
- **Preset**  automatically scans for available presets on the device.
-Once System presets have been scanned, a list is saved in the Rack User folder and you generally don't need to scan again.
+When starting to use a new EaganMatrix device or first using CHEM Preset and Play,
+you must first manually build databases for System and User presets on the device.
+The process of building the databases can take a significant amount of time (which is why it isn't automatic).
+This can take nearly an hour on Osmose for System presets.
 
-While scanning is active, a spinning CHEM logo appears over the **Preset** and **Core** modules.
-Avoid playing the Haken device or interacting with Rack while preset scanning is in underway.
-
-By default User presets are always scanned when you open the User tab the first time in a session.
-This ensures that the list is always current with what you may have loaded, unloaded, or edited.
-If you don't edit presets often and want to avoid the scan, you can choose *Use cached User presets* from the *Preset Actions* hamburger menu in the middle right of the module.
-When using cached presets, a scan occurs only once for a given EM device.
+Scanning System and User presets is initiated from the [**Core** module](./core.md#chem-core) **Core actions menu**.
+See the [**Core** module documentaiton](./core.md#chem-core) for details.
 
 ![CHEM Preset module](./image/preset.png)
 
@@ -45,12 +41,8 @@ For example, most EM devices contain no presets tagged with **DP** (Demo Preset)
 
 ![CHEM Preset search](./image/preset-search.png)
 
-The default fast scan of presets when initializing the module does not include all metadata.
-Category information is available, but Author information is not included.
-As you load presets, full metadata is captured for that preset and the database is updated.
-So over time, full information is added for the presets you've loaded into the device.
-If you want full information available, you can run *build full database* from the *Preset Actions* menu.
-You should only need to ever run this once for a given EM device.
+A "Quick scan" of presets does not include all metadata.
+For example, Category information is available, but Author information is not included.
 
 ## Preset actions menu
 
@@ -65,11 +57,7 @@ The "hamburger" menu on the right is the *Preset Actions* menu.
 | **Sort by Natural (system) order** | Arrange the presets in the system order. This is the same order that presets are loaded when using the *Previous*/*Next* buttons on the **Core** module. |
 | **Show live preset** | Scrolls the *live* preset into view. |
 | **Track live preset** | The *current* preset follows the *live* preset. |
-| **Use cached User presets** | Don't rescan user presets when opening the User tab the first time. If you have added or removed presets, the list in the User tab won't be accurate. To get back in sync, choose *Refresh User Presets* |
 | **Keep search filters** | When enabled, metadata filters are retained across invocations of Rack with the same Rack patch. If not enabled, each invocation starts fresh with all presets shown. |
-| **Refresh User presets** | Re-scan the list of User presets. This is only needed after changing presets on the device, and you have *Use cached User presets* enabled. |
-| **Refresh System presets** | Re-scan the list of System presets. This is needed only after loading a different firmware version.  |
-| **Build full User/System database** | The default fast scanning of presets doesn't capture complete preset metadata. It doesn't include the Author, if present, for example. If you want to be able to search on complete metadata, you can build a complete database for the current tab. This requires loading every preset present on the device. This will take some time (allow 1/2 hour for System presets). You should not play the surface or interact with Rack during the scan. |
 
 ## Right-side controls
 

@@ -6,7 +6,7 @@ CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to
 
 Haken EaganMatrix firmware version 10.40 added many features and improvements to the MIDI protocol.
 The changes are big enough to warrant a redesign of the modularization and user interface, hence a new plugin.
-Today it is recommended to be running firmware 10.52, but 10.4x should be ok.
+Today it is recommended to be running firmware 10.52, but 10.4x should be fine.
 
 [![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
 
@@ -14,16 +14,21 @@ To download the latest build, see the [Nightly Release](https://github.com/Paul-
 
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
-## June 10 2025
+## July 11 2025
 
-After taking a break from overlay macros to prototype Preset/Play module for the Osmose,
-I realize that some core functions need to be re-architected and improved.
-This probably entails a period of time with a high frequeny of broken builds and instability,
-so I'll be working in a side branch instead of disturbing main.
-This means that you won't see new "nightly" release builds for a while.
+Osmose presets support is integrated!
 
-Meanwhile, CHEM is working very well for devices other than the Osmose,
- and even for the Osmose everything but Preset and Play are working.
+Supporting presets for Osmose brings some significant changes to the way presets are managed.
+When starting to use a new EaganMatrix device or first using CHEM,
+you must manually build databases for System and User presets on the device
+in order to use preset-related functions such as the Preset and Play modules.
+
+This is now completely manual, because the process of building the databases can take a significant amount of time.
+It can take an hour on Osmose for System presets. The good news is that the System databases must be built only once.
+
+After adding user presets on the device, you must re-scan User presets to pick up your changes.
+
+See the documentation for Preset and Core for instructions.
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
