@@ -623,19 +623,19 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 my_module->load_full_user_presets();
             }));
             menu->addChild(createSubmenuItem("Scan more User pages", "", [=](Menu* menu) {
-                menu->addChild(createMenuItem("Page 2", "", [=]() {
+                menu->addChild(createMenuItem("Scan and append Page 2", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 2)...");
                     my_module->scan_osmose_presets(91);
                 }));
-                menu->addChild(createMenuItem("Page 3", "", [=]() {
+                menu->addChild(createMenuItem("Scan and append Page 3", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 3)...");
                     my_module->scan_osmose_presets(92);
                 }));
-                menu->addChild(createMenuItem("Page 4", "", [=]() {
+                menu->addChild(createMenuItem("Scan and append Page 4", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 4)...");
                     my_module->scan_osmose_presets(93);
                 }));
-                menu->addChild(createMenuItem("Page 5", "", [=]() {
+                menu->addChild(createMenuItem("Scan and append Page 5", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 5)...");
                     my_module->scan_osmose_presets(94);
                 }));

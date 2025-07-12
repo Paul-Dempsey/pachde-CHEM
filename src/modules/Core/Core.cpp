@@ -271,7 +271,7 @@ PresetResult CoreModule::load_quick_system_presets()
 PresetResult CoreModule::load_full_user_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(PresetTab::User)) return PresetResult::Ok;
+    user_presets->clear();
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -331,9 +331,7 @@ void CoreModule::unregister_preset_list_client(IPresetListClient *client)
 
 std::shared_ptr<PresetList> CoreModule::host_user_presets()
 {
-    if (user_presets
-        && user_presets->empty()
-        && !host_busy()) {
+    if (user_presets && user_presets->empty()) {
         load_preset_file(PresetTab::User);
     }
     return user_presets;
@@ -341,9 +339,7 @@ std::shared_ptr<PresetList> CoreModule::host_user_presets()
 
 std::shared_ptr<PresetList> CoreModule::host_system_presets()
 {
-    if (system_presets
-        && system_presets->empty()
-        && !host_busy()) {
+    if (system_presets && system_presets->empty()) {
         load_preset_file(PresetTab::System);
     }
     return system_presets;
@@ -352,7 +348,7 @@ std::shared_ptr<PresetList> CoreModule::host_system_presets()
 PresetResult CoreModule::load_full_system_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(PresetTab::System)) return PresetResult::Ok;
+    system_presets->clear();
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
