@@ -82,7 +82,7 @@ enum class FillOptions { None, User, System, All };
 struct PlayMenu;
 constexpr const int PAGE_CAPACITY = 15;
 
-struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
+struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 {
     using Base = ChemModuleWidget;
 
@@ -99,7 +99,6 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
     TipLabel*   warning_label{nullptr};
     Blip*       blip{nullptr};
 
-    FillOptions gather{FillOptions::None};
     bool pending_device_check{false};
     bool modified{false};
     void set_modified(bool schmutz) {
@@ -120,7 +119,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
     
     std::string playlist_name;
     std::string playlist_device;
-    
+
     PlayUi(PlayModule *module);
     ~PlayUi();
 
@@ -173,12 +172,8 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction, IHandleEmEvents
     void to_down();
     void to_n(int dx);
     void check_playlist_device();
-    void fill(FillOptions which);
-    void on_fill_complete();
 
-    // IHandleEmEvents
-    void onUserComplete() override { on_fill_complete(); }
-    void onSystemComplete() override { on_fill_complete(); }
+    void fill(FillOptions which);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

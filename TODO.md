@@ -38,10 +38,8 @@
 
 ## Osmose
 
-- Live preset tracking can't use PresetId: must use something else (crc)
 - Play:
-  - Import user/system sets
-  - Append from Playlist block
+  - (+Core) Append from Playlist block
 
 ## Before release
 

@@ -59,15 +59,11 @@ struct PlayMenu : Hamburger
         if (ui->chem_host) {
             auto em = ui->chem_host->host_matrix();
             if (em) {
-                if (!em->is_osmose()) {
-                    menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
-                        menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
-                        menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
-                        menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
-                    }));
-                }
-            } else {
-                menu->addChild(createMenuLabel("Append [no EM connection]"));
+                menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
+                    menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
+                    menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
+                    menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
+                }));
             }
         } else {
             menu->addChild(createMenuLabel("Append [no connection]"));
@@ -116,12 +112,6 @@ PlayUi::PlayUi(PlayModule *module) :
     my_module(module)
 {
     setModule(module);
-    IHandleEmEvents::em_event_mask = (EventMask)(
-        SystemComplete + 
-        UserComplete
-    );
-    IHandleEmEvents::module_id = ChemId::Play;
-
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);

@@ -23,10 +23,6 @@ bool PlayUi::connected() {
 
 PlayUi::~PlayUi()
 {
-    if (chem_host) {
-        auto em = chem_host->host_matrix();
-        if (em) em->unsubscribeEMEvents(this);
-    }
     if (modified && module && !my_module->playlist_file.empty()) {
         save_playlist();
     }
@@ -503,23 +499,6 @@ void PlayUi::to_down()
 
 void PlayUi::onPresetChange()
 {
-    if (gather != FillOptions::None) {
-        auto preset = chem_host->host_preset();
-        if (preset) {
-            if (preset->empty()) return;
-            auto it = std::find_if(presets.cbegin(), presets.cend(), [preset](std::shared_ptr<PresetInfo> p){
-                return preset->id.key() == p->id.key();
-            });
-            if (it == presets.cend()) {
-                auto new_preset = std::make_shared<PresetInfo>();
-                new_preset->init(preset);
-                presets.push_back(new_preset);
-                set_modified(true);
-            }
-        }
-        return;
-    }
-
     if (my_module && my_module->batch_busy()) return;
 
     if (chem_host) {
@@ -577,45 +556,37 @@ void PlayUi::check_playlist_device()
 void PlayUi::fill(FillOptions which)
 {
     if (!chem_host) return;
-    auto haken = chem_host->host_haken();
-    if (!haken) return;
-    auto matrix = chem_host->host_matrix();
-    if (!matrix) return;
-    matrix->subscribeEMEvents(this);
-    gather = which;
+    auto ipl = chem_host->host_preset_list();
+    if (!ipl) return;
 
-    startSpinner(this, Vec(box.size.x*.5f, box.size.y * .5f));
+    std::shared_ptr<eaganmatrix::PresetList> list_u{nullptr};
+    std::shared_ptr<eaganmatrix::PresetList> list_s{nullptr};
 
     switch (which) {
-    case FillOptions::None: break;
-    case FillOptions::User: haken->request_user(ChemId::Play); break;
-    case FillOptions::System: haken->request_system(ChemId::Play); break;
-    case FillOptions::All: haken->request_user(ChemId::Play); break;
-    }
-}
-
-void PlayUi::on_fill_complete()
-{
-    if (!chem_host) return;
-    switch (gather) {
-    case FillOptions::None:
-        assert(false);
-        return;
+    case FillOptions::None: return;
     case FillOptions::User:
-    case FillOptions::System:
+        list_u = ipl->host_user_presets();
         break;
-    case FillOptions::All:
-        gather = FillOptions::System;
-        auto haken = chem_host->host_haken();
-        if (haken) haken->request_system(ChemId::Play);
-        return;
+    case FillOptions::System:
+        list_s = ipl->host_system_presets();
+        break;
+    case FillOptions::All: 
+        list_u = ipl->host_user_presets();
+        list_s = ipl->host_system_presets(); 
+        break;
     }
-
-    stopSpinner(this);
-
-    gather = FillOptions::None;
-    auto matrix = chem_host->host_matrix();
-    if (matrix) matrix->unsubscribeEMEvents(this);
+    if (list_u) {
+        for (auto p: list_u->presets) {
+            presets.push_back(p);
+        }
+        set_modified(true);
+    }
+    if (list_s) {
+        for (auto p: list_s->presets) {
+            presets.push_back(p);
+        }
+        set_modified(true);
+    }
     sync_to_presets();
 }
 
