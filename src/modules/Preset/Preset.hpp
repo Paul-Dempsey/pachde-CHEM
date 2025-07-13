@@ -103,6 +103,8 @@ struct Tab
     }
 };
 
+constexpr const float PRESET_TOP = 38.f;
+
 struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListClient
 {
     using Base = ChemModuleWidget;

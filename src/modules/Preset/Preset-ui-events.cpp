@@ -182,6 +182,7 @@ void PresetUi::step()
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available()) {
         set_tab(active_tab_id, true);
+        update_help();
     }
 
     if (filtering()) {
@@ -192,6 +193,9 @@ void PresetUi::step()
 void PresetUi::draw(const DrawArgs &args)
 {
     Base::draw(args);
+    if (start_delay.running()) {
+        FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 6.f, page_label->get_color());
+    }
     #ifdef LAYOUT_HELP
     if (hints) {
         Line(args.vg, RCENTER, 0, RCENTER, 380, nvgTransRGBAf(PORT_VIOLET, .5f), .5f);

@@ -115,6 +115,12 @@ public:
         this->interval = interval;
     }
 
+    // 0..1
+    float progress() {
+        if (interval <= 0.0) return 0.0f;
+        return static_cast<float>((rack::system::getTime() - start_time) / interval);
+    }
+
     void run() {
         assert(interval > 0.0);
         start_time = rack::system::getTime();

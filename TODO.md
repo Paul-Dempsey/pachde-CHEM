@@ -21,12 +21,10 @@
 ## Preset
 
 - Fix: Often requires clicking tab to refresh list.
-- Progress indicator during run delay
-- Don't show preset load prompt until run delay elapsed (i.e. until list availability is actually known).
 
 ## Play
 
-- Append playlist page
+- Osmose: Append playlist page
 
 ## MidiPad
 

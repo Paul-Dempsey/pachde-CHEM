@@ -317,7 +317,7 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
     system_label->applyTheme(theme_engine, theme);
 
     scroll_to(tab.scroll_top);
-    update_help();
+    //update_help();
 }
 
 void PresetUi::scroll_to(ssize_t index)

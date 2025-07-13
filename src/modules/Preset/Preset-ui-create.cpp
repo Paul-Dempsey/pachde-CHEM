@@ -298,7 +298,6 @@ PresetUi::PresetUi(PresetModule *module) :
     }
 
     // preset grid
-    const float PRESET_TOP = 38.f;
     x = 9.f; y = PRESET_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
         auto entry = PresetEntry::create(Vec(x,y), preset_grid, this, theme);

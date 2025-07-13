@@ -106,6 +106,7 @@ struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
         _style = other;
         box.size.y = _style.height;
     }
+    const NVGcolor & get_color() { return _color; }
     void color(const NVGcolor &new_color) { _color = new_color; }
     void glowing(bool glow) {
         bright = glow;
@@ -155,6 +156,7 @@ struct TextLabel: Widget, IApplyTheme, ILayoutHelp
         _label->text(text);
         dirty();
     }
+    const NVGcolor& get_color() { return _label->get_color(); }
     void color(const NVGcolor &new_color) {
         _label->color(new_color);
         dirty();
