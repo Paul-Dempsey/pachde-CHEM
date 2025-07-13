@@ -66,6 +66,158 @@ void MidiPad::from_json(json_t* root)
     //compile();
 }
 
+PadWidget::PadWidget()
+{
+    box.size = Vec(24.f, 24.f);
+}
+
+std::string PadWidget::extract_description()
+{
+    if (!pad || pad->def.empty()) return "";
+    const char * p = pad->def.c_str();
+    while (std::isspace(*p)) ++p;
+    if (*p == '"') {
+        ++p;
+        const char * start = p;
+        while (*p && *p != '"') {
+            ++p;
+        }
+        return std::string(start, p);
+    }
+    return "";
+}
+
+void PadWidget::init(
+    int identifier, 
+    std::shared_ptr<MidiPad> the_pad,
+    Module* module,
+    SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
+    std::function<void(int)> callback)
+{
+    id = identifier;
+    on_click = callback;
+    addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
+    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", engine, theme, LabelStyle{"", TextAlignment::Center, 12.f}));
+    applyTheme(engine, theme);
+    set_pad(the_pad);
+}
+
+void PadWidget::set_pad(std::shared_ptr<MidiPad> the_pad)
+{
+    pad = the_pad;
+    assert(!pad || id == pad->id);
+    on_pad_change(true, true);
+}
+
+void PadWidget::on_pad_change(bool name, bool description)
+{
+    if (pad) {
+        label->color(fromPacked(pad->text_color));
+        if (name) label->text(pad->name);
+        if (description) {
+            auto desc = extract_description();
+            desc = desc.empty() ? pad->name : pad->name + ": " + desc;
+            if (pad->ok) {
+                if (pad->midi.empty()) {
+                    desc.append("\n(no midi defined)");
+                }
+            } else {
+                desc.push_back('\n');
+                desc.append(pad->error_message);
+            }
+            describe(desc);
+        }
+    } else {
+        label->color(fromPacked(OPAQUE_BLACK));
+        label->text("");
+        describe("(undefined)");
+    }
+}
+
+void PadWidget::onHover(const HoverEvent &e)
+{
+    Base::onHover(e);
+    e.consume(this);
+}
+
+void PadWidget::onLeave(const LeaveEvent &e)
+{
+    Base::onLeave(e);
+    button_down = false;
+}
+
+void PadWidget::onButton(const ButtonEvent &e)
+{
+    if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (e.action == GLFW_PRESS) {
+            button_down = true;
+        } else if (e.action == GLFW_RELEASE) { 
+            button_down = false;
+            if (on_click) {
+                on_click(id);
+            }    
+        }
+    }
+    Base::onButton(e);
+}    
+
+bool PadWidget::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+{
+    wire = (0 == theme->name.compare("Wire"));
+    pad_style.apply_theme(theme);
+    pad_sel_style.apply_theme(theme);
+    pad_down_style.apply_theme(theme);
+    return true;
+}
+
+void PadWidget::step()
+{
+    Base::step();
+
+    NVGcolor co(fromPacked(0));
+    if (selected) {
+        co = pad->ok ? SCHEME_YELLOW : SCHEME_RED;
+    } else if (pad) {
+        co = pad->ok ? SCHEME_GREEN : SCHEME_RED;
+    }
+    (*light->baseColors.begin()) = co;
+}
+
+void PadWidget::draw(const DrawArgs& args)
+{
+    auto vg = args.vg;
+    if (wire && (pad_style.width() > .01f)) {
+        nvgBeginPath(vg);
+        float o = button_down ? 1 : 0;
+        nvgRoundedRect(vg, o, o, 24, 24, 1.5);
+        PackedColor co = pad ? (button_down ? pad_down_style.fill_color : pad->color) : pad_style.stroke_color;
+        nvgStrokeColor(vg, fromPacked(co));
+        nvgStrokeWidth(vg, pad_style.width());
+        nvgStroke(vg);
+    } else {
+        auto co = fromPacked(pad ? (button_down ? pad_down_style.fill_color : pad->color) : pad_style.fill_color);
+        if (pad && !pad->empty()) {
+            float o = button_down ? 1 : 0;
+            RoundRect(vg, o, o, 24, 24, co, 1.5);
+        } else {
+            nvgBeginPath(vg);
+            nvgRoundedRect(vg, 1, 1, 23, 23, 1.5);
+            nvgStrokeColor(vg, co);
+            nvgStrokeWidth(vg, .5f);
+            nvgStroke(vg);
+        }
+    }
+
+    Base::draw(args);
+
+    if (selected) {
+        nvgBeginPath(vg);
+        nvgRoundedRect(vg, -.5, -.5, 25, 25, 1.5);
+        nvgStrokeColor(vg, pad_sel_style.nvg_stroke_color());
+        nvgStrokeWidth(vg, pad_sel_style.width());
+        nvgStroke(vg);
+    }
+}
 
 
 }

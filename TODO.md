@@ -16,7 +16,7 @@
 ## Core
 
 - Fix: Switching devices always requires a reset.
-- Fix: Scan should always reset list, not load saved
+- Add UI to clear only specific user pages.
 
 ## Preset
 
@@ -28,9 +28,8 @@
 
 - Append playlist page
 
-## Midi pad
+## MidiPad
 
-- Implement hover/push ui feedback
 - What might be some good factory presets?
 
 ## Overlay macros
