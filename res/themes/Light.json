@@ -8,7 +8,7 @@
             "CHEM": { "fill": "#c78d11" },
             "choice-hover": { "stroke": { "color":"g10", "width":0.25}},
             "choice":  { "fill" : "g5" },
-            "cop-bezel": { "fill": "#5d8ed7", "opacity": 0.2 },
+            "cop-bezel": { "fill": " #c6d7f0ff" },
             "ctl-active": { "fill": "hsl(0, 80%, 40%)" },
             "ctl-disabled":{ "fill": "g50", "stroke": "g20"  },
             "ctl-frame-hi":{ "stroke": "g35" },

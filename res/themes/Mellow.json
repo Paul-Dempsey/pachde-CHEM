@@ -8,7 +8,7 @@
             "CHEM": {"fill": "brand"},
             "choice-hover": { "stroke": { "color":"hsl(41, 75%, 80%)", "width":0.25}},
             "choice":  { "fill" : "g5" },
-            "cop-bezel": { "opacity": 0.1 },
+            "cop-bezel": { "fill": " hsl(42, 80%, 22.5%)" },
             "ctl-active": { "fill": " hsl(0, 80%, 65%)" },
             "ctl-bar": { "stroke": "#725619"},
             "ctl-disabled": { "fill": "hsl(41, 35%, 35%)", "stroke": "hsl(41, 35%, 35%)" },
