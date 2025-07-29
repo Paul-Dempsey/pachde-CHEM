@@ -17,7 +17,7 @@ const uint8_t INVALID_MACRO{0};
 // amount      = bipolar amount in percent, -100% to 100%
 inline float xm_modulated_value(float param_value, float cv, float amount) {
     if (0.f == amount) return param_value;
-    return clamp(param_value + (cv * (amount * .01)), -1.f, 1.f);
+    return clamp(param_value + ((cv * (1.f/5.f)) * (amount * .01f)), -1.f, 1.f);
 }
 
 struct MacroDescription

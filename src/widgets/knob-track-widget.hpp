@@ -29,6 +29,8 @@ struct TrackWidget : TransparentWidget, IApplyTheme
     float dot_radius;
     float min_angle;
     float max_angle;
+    float min_value{0.f};
+    float max_value{10.f};
     bool active;
     const char * track_key;
     const char * inactive_key;
@@ -56,8 +58,13 @@ struct TrackWidget : TransparentWidget, IApplyTheme
 
     void set_active(bool enable) { active = enable; }
     void set_value(float value) {
-        assert(in_range(value, 0.f, 10.f));
+        assert(in_range(value, min_value, max_value));
         this->value = value;
+    }
+    void set_min_max_value(float min, float max) {
+        assert(min < max);
+        min_value = min;
+        max_value = max;
     }
 
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
@@ -104,7 +111,7 @@ struct TrackWidget : TransparentWidget, IApplyTheme
         if (active) {
             KnobTrack(args.vg, radius, radius, min_angle, max_angle, radius, track_width, track_color);
 
-            float angle = M_PI - rescale(value, 0.f, 10.f, min_angle, max_angle);
+            float angle = M_PI - rescale(value, min_value, max_value, min_angle, max_angle);
             float xdot = radius * std::sin(angle);
             float ydot = radius * std::cos(angle);
             Dot(args.vg, radius + xdot, radius + ydot, dot_color, true, dot_radius);
@@ -119,7 +126,7 @@ struct TrackWidget : TransparentWidget, IApplyTheme
             if (rack::settings::rackBrightness <= .95f) return;
             KnobTrack(args.vg, radius, radius, min_angle, max_angle, radius, track_width, track_color);
 
-            float angle = M_PI - rescale(value, 0.f, 10.f, min_angle, max_angle);
+            float angle = M_PI - rescale(value, min_value, max_value, min_angle, max_angle);
             float xdot = radius * std::sin(angle);
             float ydot = radius * std::cos(angle);
             Dot(args.vg, radius + xdot, radius + ydot, dot_color, true, dot_radius);

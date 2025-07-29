@@ -594,6 +594,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
 
         if (macro->modulated) {
             track = createTrackWidget(knob, theme_engine, theme);
+            track->set_min_max_value(-1.f, 1.f);
             tracks[i] = track;
             addChild(track);
 
@@ -822,7 +823,7 @@ void XMUi::step()
         int i = macro->knob_id;
         if (tracks[i]) {
             tracks[i]->set_active(my_module->getInput(i).isConnected());
-            tracks[i]->set_value(macro->mod_value + 5.f); // track expects 0=10
+            tracks[i]->set_value(macro->mod_value);
         }
     }
 
