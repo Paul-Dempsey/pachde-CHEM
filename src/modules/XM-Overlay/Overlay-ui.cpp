@@ -68,7 +68,6 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     addChild(link_button);
 
     // Browsing UI
-
     if (browsing) {
         auto logo = new Logo(0.25f);
         logo->box.pos = Vec(box.size.x * .5f, 60);
@@ -76,30 +75,14 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     }
 
     // init
-    // if (!my_module || my_module->glow_knobs) {
-    //     glowing_knobs(true);
-    // }
-
     if (my_module) {
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
 }
 
-// void OverlayUi::glowing_knobs(bool glow) {
-//     // for (int i = 0; i < OverlayModule::NUM_KNOBS; ++i) {
-//     //     knobs[i]->glowing(glow);
-//     // }
-// }
-
-// void OverlayUi::center_knobs()
-// {
-//     if (!my_module) return;
-// }
-
 void OverlayUi::setThemeName(const std::string& name, void * context)
 {
-    //applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
 }
 
@@ -149,25 +132,6 @@ void OverlayUi::set_title(std::string text)
     my_module->title = text;
 }
 
-void OverlayUi::onHoverKey(const HoverKeyEvent &e)
-{
-    if (my_module) {
-        if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
-            switch (e.key) {
-            // case GLFW_KEY_0:
-            //     e.consume(this);
-            //     my_module->modulation.zero_modulation();
-            //     return;
-            // case GLFW_KEY_5:
-            //     center_knobs();
-            //     e.consume(this);
-            //     return;
-            }
-        }
-    }
-    Base::onHoverKey(e);
-}
-
 void OverlayUi::step()
 {
     Base::step();
@@ -181,13 +145,6 @@ void OverlayUi::step()
         right = e && (e->getModel() == modelXM);
     }
     panelBorder->setPartners(left, right);
-
-    //knobs[K_MODULATION]->enable(my_module->modulation.has_target());
-
-    // for (int i = 0; i < K_MODULATION; ++i) {
-    //     tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
-    //     tracks[i]->set_active(my_module->getInput(i).isConnected());
-    // }
 
 }
 

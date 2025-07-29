@@ -24,14 +24,13 @@ uint8_t macro_number_from_string(std::string s)
             break;
         }
     }
-    return valid ? clamp(n, 7, 90) : 0;
+    return (valid && in_range(n, 7, 90)) ? n : 0;
 }
 
 constexpr const float PANEL_WIDTH   = 45.f;
 constexpr const float CENTER        = PANEL_WIDTH*.5f;
 constexpr const float KNOBS_TOP     = 28;
 constexpr const float KNOB_DY       = 32;
-// constexpr const float KNOB_LABEL_DY = 9;
 constexpr const float PORT_TOP_CY   = 286;
 constexpr const float PORT_DY       = 19.f;
 constexpr const float PORT_MOD_DX   = 10.F;
@@ -125,7 +124,6 @@ namespace me_constants {
     constexpr const float LABEL_OFFSET_DX{5.f};
     constexpr const float ROW_DY{20.f};
     constexpr const float SMALL_ROW_DY{16.f};
-    //constexpr const float LABEL_DY = 1.5f;
     constexpr const float OPT_CX{50.f};
     constexpr const float MINMAX_DX{13.f};
 };
@@ -511,7 +509,7 @@ XMUi::XMUi(XMModule *module) :
     if (browsing) {
         // all inputs
         addChild(createChemKnob<TrimPot>(Vec(CENTER, PORT_TOP_CY), my_module, XMModule::P_MODULATION, theme_engine, theme));
-        
+        // TODO: track
         const NVGcolor co_port = PORT_CORN;
         float axis = -1.f;
         for (int i = 0; i < 8; ++i) {
@@ -544,25 +542,33 @@ XMUi::XMUi(XMModule *module) :
     }
 }
 
+void XMUi::clear_dynamic_ui()
+{
+    memset(knobs, 0, sizeof(knobs));
+    memset(labels, 0, sizeof(labels));
+    memset(tracks, 0, sizeof(tracks));
+
+    std::vector<Widget*> removals;
+    for (Widget* child: children) {
+        if (in_range(child->box.pos.y, 8.f, 372.f)) {
+            removals.push_back(child);
+        }
+    }
+    for (Widget* child: removals) {
+        removeChild(child);
+        delete child;
+    }
+}
+
 void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
 {
     if (!my_module) return;
 
-    {
-        memset(knobs, 0, sizeof(knobs));
-        memset(labels, 0, sizeof(labels));
-        std::vector<Widget*> removals;
-        for (Widget* child: children) {
-            if (child->box.pos.y > 15.f && child->box.pos.y< box.size.x -15.f) {
-                removals.push_back(child);
-            }
-        }
-        for (Widget* child: removals) {
-            removeChild(child);
-        }
-    }
+    clear_dynamic_ui();
     
     TrimPot* knob{nullptr};
+    TrackWidget* track{nullptr};
+
     if (get_modulation()) {
         knob = createChemKnob<TrimPot>(Vec(CENTER, PORT_TOP_CY), my_module, XMModule::P_MODULATION, theme_engine, theme);
         knobs[XMModule::P_MODULATION] = knob;
@@ -587,8 +593,16 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
         addChild(label);
 
         if (macro->modulated) {
+            track = createTrackWidget(knob, theme_engine, theme);
+            tracks[i] = track;
+            addChild(track);
+
             pos = input_center(i);
             addChild(Center(createThemedColorInput(pos, my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
+            {
+                float xoff = i < 4 ? -2.f : 2.f;
+                addChild(Center(createClickRegion(pos.x + xoff, pos.y, 22.f, 19.5f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
+            }
             pos.x += axis*PORT_MOD_DX;
             pos.y -= PORT_MOD_DY;
             addChild(Center(createLight<TinySimpleLight<GreenLight>>(pos, my_module, i)));
@@ -624,6 +638,7 @@ void XMUi::set_edit_mode(bool edit)
 {
     editing = edit;
     if (editing) {
+        clear_dynamic_ui();
         if (!wire_frame) {
             wire_frame = createWidget<EditWireframe>(Vec(0,0));
             wire_frame->set_ui(this);
@@ -799,12 +814,17 @@ void XMUi::step()
     }
     panelBorder->setPartners(left, right);
 
-    //knobs[K_MODULATION]->enable(my_module->modulation.has_target());
+    if (knobs[XMModule::P_MODULATION]) {
+        knobs[XMModule::P_MODULATION]->enable(my_module->mod_target >= 0);
+    }
 
-    // for (int i = 0; i < K_MODULATION; ++i) {
-    //     tracks[i]->set_value(my_module->modulation.get_port(i).modulated());
-    //     tracks[i]->set_active(my_module->getInput(i).isConnected());
-    // }
+    for (auto macro : my_module->my_macros.data) {
+        int i = macro->knob_id;
+        if (tracks[i]) {
+            tracks[i]->set_active(my_module->getInput(i).isConnected());
+            tracks[i]->set_value(macro->mod_value + 5.f); // track expects 0=10
+        }
+    }
 
 }
 

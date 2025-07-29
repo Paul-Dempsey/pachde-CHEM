@@ -142,8 +142,9 @@ struct XMUi : ChemModuleWidget, IChemClient
     bool editing{false};
     bool draw_placeholders{true};
     TrimPot* knobs[9]{nullptr};
+    TrackWidget* tracks[8]{nullptr};
     TextLabel* labels[8]{nullptr};
-
+    
     XMUi(XMModule *module);
     virtual ~XMUi() {
         if (editing) set_edit_mode(false);
@@ -152,8 +153,8 @@ struct XMUi : ChemModuleWidget, IChemClient
     void glowing_knobs(bool glow);
     void center_knobs();
 
+    void clear_dynamic_ui();
     void update_main_ui(std::shared_ptr<SvgTheme> theme);
-
     IOverlay* get_overlay() { return my_module ? my_module->get_overlay() : nullptr; }
     Vec knob_center(int index);
     Vec input_center(int index);

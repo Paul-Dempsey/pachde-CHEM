@@ -13,15 +13,15 @@ XMModule::XMModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
-    configParam(P_1, -5.f, 5.f, 0.f, "#1");
-    configParam(P_2, -5.f, 5.f, 0.f, "#2");
-    configParam(P_3, -5.f, 5.f, 0.f, "#3");
-    configParam(P_4, -5.f, 5.f, 0.f, "#4");
-    configParam(P_5, -5.f, 5.f, 0.f, "#5");
-    configParam(P_6, -5.f, 5.f, 0.f, "#6");
-    configParam(P_7, -5.f, 5.f, 0.f, "#7");
-    configParam(P_8, -5.f, 5.f, 0.f, "#8");
-    configParam(P_MODULATION, -5.f, 5.f, 0.f, "Mod amount");
+    configParam(P_1, -1.f, 1.f, 0.f, "#1");
+    configParam(P_2, -1.f, 1.f, 0.f, "#2");
+    configParam(P_3, -1.f, 1.f, 0.f, "#3");
+    configParam(P_4, -1.f, 1.f, 0.f, "#4");
+    configParam(P_5, -1.f, 1.f, 0.f, "#5");
+    configParam(P_6, -1.f, 1.f, 0.f, "#6");
+    configParam(P_7, -1.f, 1.f, 0.f, "#7");
+    configParam(P_8, -1.f, 1.f, 0.f, "#8");
+    dp4(configParam(P_MODULATION, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     configParam(P_RANGE_MIN, 0, Haken::max14, Haken::zero14, "Minimum");
     configParam(P_RANGE_MAX, 0, Haken::max14, Haken::zero14, "Maximum");
@@ -156,7 +156,6 @@ void XMModule::on_overlay_change(IOverlay *ovr)
 }
 
 // IExtendedMacro
-// virtual bool has_modulation() = 0;
 void XMModule::xm_clear() {
     title= "";
     title_bg = GetPackedStockColor(StockColor::pachde_blue_medium);
@@ -176,11 +175,6 @@ void XMModule::onConnectHost(IChemHost* host)
 
 void XMModule::onPresetChange()
 {
-//    auto em = chem_host->host_matrix();
-
-    // modulation.set_em_and_param_low(P_R1, em->get_r1(), true);
-    // getParam(P_EFFECT).setValue(em->get_recirculator_type());
-
     //if (chem_ui) ui()->onPresetChange();
 }
 
@@ -226,12 +220,6 @@ void XMModule::do_message(PackedMidiMessage message)
 
 }
 
-// void XMModule::onExpanderChange(const ExpanderChangeEvent& e)
-// {
-//     if (e.side) return; // only care about left expanders
-
-// }
-
 void XMModule::onPortChange(const PortChangeEvent& e)
 {
     if (e.connecting) {
@@ -247,11 +235,21 @@ void XMModule::onPortChange(const PortChangeEvent& e)
             }
         }
     }
+    if (mod_target >= 0) {
+        auto macro = my_macros.get_macro(getId(), mod_target);
+        getParam(P_MODULATION).setValue(macro ? macro->mod_amount : 0.f);
+    }
 }
 
 void XMModule::process_params(const ProcessArgs& args)
 {
-    //modulation.pull_mod_amount();
+    if (has_mod_knob && (mod_target >= 0)) {
+        auto macro = my_macros.get_macro(getId(), mod_target);
+        macro->mod_amount = getParam(P_MODULATION).getValue();
+    }
+    for (auto macro: my_macros.data) {
+        macro->param_value = getParam(macro->knob_id).getValue();
+    }
 }
 
 void XMModule::process(const ProcessArgs& args)
@@ -264,8 +262,9 @@ void XMModule::process(const ProcessArgs& args)
     }
     if (overlay && !chem_host && (0 == (jitter_frame % 97))) {
         onConnectHost(overlay->get_host());
+        return;
     }
-
+    bool free_host = chem_host && !chem_host->host_busy();
     if (0 == (jitter_frame % 47)) {
         if (last_mod_target != mod_target) {
             for (int i = 0; i < 8; ++i) {
@@ -274,13 +273,18 @@ void XMModule::process(const ProcessArgs& args)
             last_mod_target = mod_target;
         }
         getLight(L_OVERLAY).setSmoothBrightness((overlay ? 1.0f : 0.f), 90);
-        getLight(L_CORE).setSmoothBrightness(chem_host && !chem_host->host_busy(), 90);
+        getLight(L_CORE).setSmoothBrightness(free_host, 90);
     }
 
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!free_host) return;
     if ((jitter_frame % 41) == 0) {
         process_params(args);
     }
+    for (auto macro: my_macros.data) {
+        macro->cv = getInput(macro->knob_id).getVoltage();
+        macro->mod_value = xm_modulated_value(macro->param_value, macro->cv, macro->mod_amount);
+    }
+
 }
 
 Model *modelXM = createModel<XMModule, XMUi>("chem-xm");

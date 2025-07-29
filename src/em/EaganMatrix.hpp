@@ -11,6 +11,14 @@
 
 namespace eaganmatrix {
 
+uint8_t macro_msb_cc(uint8_t macro_number);
+
+inline uint8_t macro_lsb_cc(uint8_t macro_number)
+{
+    assert(pachde::in_range(static_cast<int>(macro_number), 1, 90));
+    return (macro_number < 49) ? Haken::ccFracIM48 : Haken::ccFracM49M90;
+}
+
 struct IHandleEmEvents {
     enum EventMask : uint16_t {
         EditorReply      = 1,

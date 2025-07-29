@@ -15,6 +15,7 @@
 
 ## Core
 
+- Fix: Osmose startup preset needs special code to get sync'd up when preset db is available.
 - Fix: Switching devices always requires a reset.
 - Add UI to clear only specific user pages.
 
@@ -32,14 +33,10 @@
 
 ## Overlay macros
 
-- add/remove
 - implement control & dispatch
 - Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
 
 ## Osmose
-
-- Play:
-  - (+Core) Append from Playlist block
 
 ## Before release
 

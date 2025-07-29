@@ -5,14 +5,7 @@
 #include "../../services/color-help.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
-#include "../../widgets/color-picker.hpp"
-#include "../../widgets/indicator-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/selector-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
+#include "../../widgets/widgets.hpp"
 #include "../XM-shared/macro-usage.hpp"
 #include "../XM-shared/xm-overlay.hpp"
 #include "../XM-shared/xm-edit-common.hpp"
@@ -25,15 +18,6 @@ struct OverlayUi;
 
 struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 {
-    enum Params {
-        NUM_PARAMS
-    };
-    enum Inputs {
-        NUM_INPUTS
-    };
-    enum Outputs {
-        NUM_OUTPUTS
-    };
     enum Lights {
         L_CONNECTED,
         NUM_LIGHTS
@@ -83,7 +67,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     void overlay_remove_macro(int64_t module, ssize_t knob) override;
     void overlay_add_macro(std::shared_ptr<MacroDescription> macro) override;
     void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) override;
-    
+
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;
 
@@ -97,10 +81,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-    // void onPortChange(const PortChangeEvent& e) override {
-    //     //modulation.onPortChange(e);
-    // }
-    void process_params(const ProcessArgs& args);
+    //void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -139,7 +120,6 @@ struct OverlayUi : ChemModuleWidget, IChemClient
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-xovr.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
     void appendContextMenu(Menu *menu) override;
 };

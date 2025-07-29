@@ -11,8 +11,23 @@ namespace pachde {
 enum MacroRange{ Bipolar, Unipolar, Custom };
 const uint8_t INVALID_MACRO{0};
 
+// modulated value for knob track
+// param_value = bipolar knob value, -1v to 1v
+// cv          = bipolar control voltage, -5v to 5v
+// amount      = bipolar amount in percent, -100% to 100%
+inline float xm_modulated_value(float param_value, float cv, float amount) {
+    if (0.f == amount) return param_value;
+    return clamp(param_value + (cv * (amount * .01)), -1.f, 1.f);
+}
+
 struct MacroDescription
 {
+    float param_value{0.f};
+    float cv{0.f};
+    float mod_amount{0.f};
+    float mod_value{0.f};
+
+    bool modulated{true};
     int64_t module_id{-1};
     ssize_t knob_id{-1};
     uint8_t macro_number{INVALID_MACRO};
@@ -20,7 +35,6 @@ struct MacroDescription
     MacroRange range{Bipolar};
     uint16_t min{0};
     uint16_t max{Haken::max14};
-    bool modulated{true};
 
     MacroDescription(json_t* root) {
         from_json(root);
@@ -32,6 +46,7 @@ struct MacroDescription
     }
 
     void clear() {
+//        value = 0;
         macro_number = INVALID_MACRO;
         name.clear();
         range = MacroRange::Bipolar;
@@ -42,6 +57,7 @@ struct MacroDescription
 
     void init (const MacroDescription& source)
     {
+//        value = source.value;
         module_id = source.module_id;
         knob_id = source.knob_id;
         macro_number = source.macro_number;

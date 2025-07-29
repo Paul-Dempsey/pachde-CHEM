@@ -4,6 +4,18 @@ using namespace pachde;
 
 namespace eaganmatrix {
 
+uint8_t macro_msb_cc(uint8_t macro_number)
+{
+    assert(in_range(static_cast<int>(macro_number), 1, 90));
+    if (macro_number <= 48) {
+        if (macro_number <   7) return 12 + macro_number - 1;
+        if (macro_number <= 30) return 40 + macro_number - 1;
+        return 102 + macro_number - 1;
+    }
+    if (macro_number <= 72) return 40 + macro_number - 1;
+    return 102 + macro_number - 1;
+}
+
 inline void hash_midi(crc::crc32& hasher, PackedMidiMessage m)
 {
     m.bytes.tag = 0;

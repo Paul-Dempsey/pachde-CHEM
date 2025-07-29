@@ -5,8 +5,9 @@ using namespace pachde;
 
 OverlayModule::OverlayModule()
 {
-    config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+    config(0, 0, 0, Lights::NUM_LIGHTS);
     configLight(L_CONNECTED, "Preset connected");
+
     mac_build.client_id = ChemId::Overlay;
     mac_build.set_on_complete([=](){ on_macro_request_complete(); });
 }
@@ -116,9 +117,6 @@ void OverlayModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
     device_claim = get_json_string(root, "haken-device");
-    if (!device_claim.empty()) {
-        //modulation.mod_from_json(root);
-    }
     auto j = json_object_get(root, "overlay-preset");
     if (j) {
         overlay_preset = std::make_shared<PresetInfo>();
@@ -167,10 +165,6 @@ void OverlayModule::onPresetChange()
         live_preset = std::make_shared<PresetInfo>(p);
         preset_connected = (nullptr != overlay_preset) && (p->name == overlay_preset->name);
     }
-    //    auto em = chem_host->host_matrix();
-
-    // modulation.set_em_and_param_low(P_R1, em->get_r1(), true);
-    //if (chem_ui) ui()->onPresetChange();
 }
 
 void OverlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -184,23 +178,18 @@ void OverlayModule::do_message(PackedMidiMessage message)
     mac_build.do_message(message);
 }
 
-void OverlayModule::process_params(const ProcessArgs& args)
-{
-    //modulation.pull_mod_amount();
-}
+// void OverlayModule::process_params(const ProcessArgs& args)
+// {
+// }
 
 void OverlayModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
     if (!chem_host || chem_host->host_busy()) return;
 
-    if (((args.frame + id) % 41) == 0) {
-        process_params(args);
-    }
-
-    // if (modulation.sync_params_ready(args)) {
-    //     modulation.sync_send();
-    // }    
+    // if (((args.frame + id) % 41) == 0) {
+    //     process_params(args);
+    // }
 
     if (0 == ((args.frame + id) % 47)) {
         getLight(L_CONNECTED).setBrightness(preset_connected);
