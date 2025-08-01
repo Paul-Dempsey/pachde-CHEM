@@ -165,14 +165,13 @@ void MidiPadModule::process(const ProcessArgs& args)
         }
     }
 
-    bool lights = (0 == ((args.frame + id) % 47));
-
     if (!chem_host || chem_host->host_busy()) return;
 
     if (((args.frame + id) % 41) == 0) {
         process_params(args);
     }
 
+    bool lights = (0 == ((args.frame + id) % 47));
     if (lights && !editing) {
         //modulation.update_mod_lights();
         for (int i = 0; i < 16; ++i) {
