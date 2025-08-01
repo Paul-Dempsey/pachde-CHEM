@@ -38,6 +38,8 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     MacroUsageBuilder mac_build{macro_usage};
     bool expect_preset_change{false};
     bool in_macro_request{false};
+    rack::dsp::Timer midi_timer;
+    bool sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate = MOD_MIDI_RATE);
 
     OverlayModule();
     virtual ~OverlayModule();
@@ -45,6 +47,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     OverlayUi* ui() { return reinterpret_cast<OverlayUi*>(chem_ui); };
 
     void reset();
+    void update_from_em();
     void on_macro_request_complete();
     void prune_missing_clients();
 
@@ -58,6 +61,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     MacroReadyState overlay_macros_ready() override;
     std::vector<MacroUsage>& overlay_macro_usage() override { return macro_usage; }
     std::shared_ptr<MacroDescription> overlay_get_macro(int64_t module, ssize_t knob) override { return macros.get_macro(module, knob); }
+    void used_macros(std::vector<uint8_t>* list) override;
     void overlay_remove_macro(int64_t module, ssize_t knob) override;
     void overlay_add_macro(std::shared_ptr<MacroDescription> macro) override;
     void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) override;
@@ -104,13 +108,13 @@ struct OverlayUi : ChemModuleWidget, IChemClient
     void set_fg_color(PackedColor color);
     PackedColor get_bg_color() { return my_module ? my_module->bg_color : 0; }
     PackedColor get_fg_color() { return my_module ? my_module->fg_color : parse_color("hsl(42,60%,50%)"); }
-    
+
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-xovr.svg"); }
     void setThemeName(const std::string& name, void * context) override;

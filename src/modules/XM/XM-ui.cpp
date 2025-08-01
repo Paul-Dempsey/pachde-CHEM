@@ -40,7 +40,7 @@ constexpr const float PORT_OFFSET   = 9.f;
 
 static const char * const KN{"12345678"};
 
-struct EditWireframe: OpaqueWidget 
+struct EditWireframe: OpaqueWidget
 {
     using Base = OpaqueWidget;
     XMUi* ui{nullptr};
@@ -50,7 +50,7 @@ struct EditWireframe: OpaqueWidget
     }
 
     void set_ui(XMUi* w) {
-        ui = w; 
+        ui = w;
         auto panel = createWidget<PanelBackgroundWidget>(Vec(0,15));
         panel->box.size.x = PANEL_WIDTH;
         panel->box.size.y = 380.f - 15.f - 12.f;
@@ -96,7 +96,7 @@ struct EditWireframe: OpaqueWidget
                 nvgFillColor(vg, co);
             }
             nvgText(vg, xy.x, xy.y, KN+i,KN+i+1);
-            
+
             if (md && (md->knob_id == i) && md->modulated) {
                 // input
                 xy = ui->input_center(i);
@@ -139,7 +139,7 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     TextInput* title_entry{nullptr};
     Palette1Button* palette_fg{nullptr};
     Palette2Button* palette_bg{nullptr};
-    
+
     TextLabel* knob_id{nullptr};
     TextInput* name_entry{nullptr};
     TextInput* macro_entry{nullptr};
@@ -150,7 +150,7 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     GlowKnob* max_knob{nullptr};
     PackedColor hi_color{0xffd9d9d9};
 
-    MacroEdit() 
+    MacroEdit()
     {
         using namespace me_constants;
         box.size = Vec{WIDTH, HEIGHT};
@@ -205,9 +205,11 @@ struct MacroMenu: Hamburger
             case MacroReadyState::Available: {
                 auto macros{overlay->overlay_macro_usage()};
                 if (macros.empty()) goto NO_MACROS;
+                std::vector<uint8_t> used;
+                overlay->used_macros(&used);
                 for (const MacroUsage& mu: macros) {
                     auto num = mu.macro_number;
-                    if (num < 7) {
+                    if (num < 7 || used.cend() != std::find(used.cbegin(), used.cend(), num)) {
                         menu->addChild(createMenuLabel(mu.to_string()));
                     } else {
                         menu->addChild(createMenuItem(mu.to_string(), "", [=](){
@@ -237,7 +239,7 @@ NO_MACROS:
     }
 };
 
-bool MacroEdit::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) 
+bool MacroEdit::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {
     auto style = theme->getStyle("ctl-label-hi");
     hi_color = style ? style->fillWithOpacity() : 0xffd9d9d9;
@@ -351,7 +353,7 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(macro_entry = createThemedTextInput(x, y, 65, 14,
         engine, theme,
         "",
-        [=](std::string s) { macro.macro_number = macro_number_from_string(s); }, 
+        [=](std::string s) { macro.macro_number = macro_number_from_string(s); },
         nullptr,
         "<macro # 7-90>"
         ));
@@ -384,8 +386,8 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(indicator);
     range_options.push_back(indicator);
     addChild(createLabel(Vec(x + 6.f, y), 50, "Bipolar", engine, theme, S::control_label_left));
-    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Bipolar), [=](int id, int) { 
-        set_range(MacroRange(id)); 
+    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Bipolar), [=](int id, int) {
+        set_range(MacroRange(id));
     }));
 
     y += SMALL_ROW_DY;
@@ -394,8 +396,8 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(indicator);
     range_options.push_back(indicator);
     addChild(createLabel(Vec(x + 6.f, y), 50, "Unipolar", engine, theme, S::control_label_left));
-    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Unipolar), [=](int id, int) { 
-        set_range(MacroRange(id)); 
+    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Unipolar), [=](int id, int) {
+        set_range(MacroRange(id));
     }));
 
     y += SMALL_ROW_DY;
@@ -404,8 +406,8 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(indicator);
     range_options.push_back(indicator);
     addChild(createLabel(Vec(x + 6.f, y), 50, "Custom", engine, theme, S::control_label_left));
-    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Custom), [=](int id, int) { 
-        set_range(MacroRange(id)); 
+    addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Custom), [=](int id, int) {
+        set_range(MacroRange(id));
     }));
 
     y += ROW_DY + 8.f;
@@ -573,7 +575,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
     if (!my_module) return;
 
     clear_dynamic_ui();
-    
+
     TrimPot* knob{nullptr};
     TrackWidget* track{nullptr};
 
@@ -638,7 +640,7 @@ Vec XMUi::knob_center(int index)
 Vec XMUi::input_center(int index)
 {
     return Vec {
-        index < 4 ? CENTER - PORT_OFFSET : CENTER + PORT_OFFSET, 
+        index < 4 ? CENTER - PORT_OFFSET : CENTER + PORT_OFFSET,
         PORT_TOP_CY + PORT_DY + ((index % 4) * PORT_DY)
     };
 }
@@ -760,7 +762,7 @@ void  XMUi::xm_clear() {
         title_fg = my_module->title_fg;
         title_bg = my_module->title_bg;
     }
-    
+
     this->title->text("");
     title_bar->color = title_bg;
     title->color(fromPacked(title_fg));
@@ -868,14 +870,14 @@ void XMUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Edit", "", 
+    menu->addChild(createCheckMenuItem("Edit", "",
         [=](){ return editing; },
         [=](){ set_edit_mode(!editing); },
         !get_overlay()
     ));
 
    // if (editing) return;
-    
+
     // bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
     // menu->addChild(createMenuItem("Zero modulation", "0", [this](){
     //     my_module->modulation.zero_modulation();
@@ -884,10 +886,10 @@ void XMUi::appendContextMenu(Menu *menu)
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

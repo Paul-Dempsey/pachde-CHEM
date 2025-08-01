@@ -13,7 +13,6 @@ MacroDescription::MacroDescription(int64_t module, ssize_t knob) : module_id(mod
 }
 
 void MacroDescription::clear() {
-//        value = 0;
     macro_number = INVALID_MACRO;
     name.clear();
     range = MacroRange::Bipolar;
@@ -24,7 +23,6 @@ void MacroDescription::clear() {
 
 void MacroDescription::init (const MacroDescription& source)
 {
-//        value = source.value;
     module_id = source.module_id;
     knob_id = source.knob_id;
     macro_number = source.macro_number;
@@ -46,6 +44,27 @@ void MacroDescription::set_range(MacroRange r) {
 
 bool MacroDescription::valid() {
     return (module_id >= int64_t(0)) && (knob_id >= 0) && in_range(macro_number, U8(7), U8(90));
+}
+
+void MacroDescription::set_em_value(uint16_t em)
+{
+    em_value = last_em_value = em;
+    param_value = static_cast<float>((static_cast<double>(em) - static_cast<double>(Haken::zero14)) * inv_zero14);
+    mod_value = xm_modulated_value(param_value, cv, mod_amount);
+}
+
+void MacroDescription::set_mod_amount(float amount)
+{
+    assert(in_range(amount, -100.f, 100.f));
+    mod_amount = amount;
+    mod_value = xm_modulated_value(param_value, cv, mod_amount);
+}
+
+void MacroDescription::set_value(float value)
+{
+    param_value = clamp(value, -1.f, 1.f);
+    mod_value = xm_modulated_value(param_value, cv, mod_amount);
+    em_value = xm_em_value(mod_value);
 }
 
 void MacroDescription::from_json(json_t* root) {

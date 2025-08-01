@@ -37,7 +37,6 @@ struct MidiInput : midi::Input
     void dispatch(float sampleTime);
     void drop(int count);
     rack::dsp::Timer midi_timer;
-
     MidiInput(const MidiInput &) = delete; // no copy constructor
     MidiInput(ChemId tag);
 

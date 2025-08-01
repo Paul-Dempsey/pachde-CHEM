@@ -85,6 +85,13 @@ void HakenMidi::select_preset(ChemId tag, eaganmatrix::PresetId id)
     }
 }
 
+void HakenMidi::extended_macro(ChemId tag, uint8_t macro, uint16_t value)
+{
+    assert(in_range(macro, U8(7), U8(90)));
+    send_message(Tag(MakeCC(Haken::ch1, macro_lsb_cc(macro), value & 0x7f), tag));
+    send_message(Tag(MakeCC(Haken::ch1, macro_msb_cc(macro), value >> 7), tag));
+}
+
 void HakenMidi::midi_rate(ChemId tag, HakenMidiRate rate)
 {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, static_cast<uint8_t>(rate)), tag));

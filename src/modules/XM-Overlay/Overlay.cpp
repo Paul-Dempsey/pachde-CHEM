@@ -10,6 +10,7 @@ OverlayModule::OverlayModule()
 
     mac_build.client_id = ChemId::Overlay;
     mac_build.set_on_complete([=](){ on_macro_request_complete(); });
+    midi_timer.time = (random::uniform() * MIDI_RATE); // jitter
 }
 
 OverlayModule::~OverlayModule()
@@ -109,6 +110,15 @@ MacroReadyState OverlayModule::overlay_macros_ready()
     return MacroReadyState::Available;
 }
 
+void OverlayModule::used_macros(std::vector<uint8_t> *list)
+{
+    if (!list) return;
+    list->clear();
+    for (auto macro: macros.data) {
+        list->push_back(macro->macro_number);
+    }
+}
+
 void OverlayModule::overlay_remove_macro(int64_t module, ssize_t knob)
 {
     macros.remove(module, knob);
@@ -183,6 +193,9 @@ void OverlayModule::onPresetChange()
     if (p) {
         live_preset = std::make_shared<PresetInfo>(p);
         preset_connected = (nullptr != overlay_preset) && (p->name == overlay_preset->name);
+        if (preset_connected) {
+            update_from_em();
+        }
     }
     if (expect_preset_change) {
         expect_preset_change = false;
@@ -196,33 +209,87 @@ void OverlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDe
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-
 void OverlayModule::do_message(PackedMidiMessage message)
 {
     if (mac_build.in_request) {
         mac_build.do_message(message);
     } else {
-        if (as_u8(ChemId::Unknown) == midi_tag(message)) return;
+        if (macros.empty()) return;
+        if (!chem_host) return;
+        if (Haken::ccStat1 != message.bytes.status_byte) return;
+        auto em = chem_host->host_matrix();
+        if (!em) return;
 
+        auto tag = midi_tag(message);
+        if (as_u8(ChemId::Unknown) == tag) return;
+        if (as_u8(ChemId::Overlay) == tag) return;
+        if (as_u8(ChemId::XM) == tag) return;
+
+        auto cc = midi_cc(message);
+        if (cc < Haken::ccM7 || cc > Haken::ccM90) return;
+
+        uint8_t number = 0;
+        if (cc <= Haken::ccM30) {
+            number = (cc - Haken::ccM7);
+        } else if (cc < Haken::ccM31) {
+            return;
+        } else if (cc <= Haken::ccM48) {
+            number = (cc - Haken::ccM31);
+        }
+        if (!number) return;
+        if (em->frac_hi) number += 48;
+
+        for (auto macro: macros.data) {
+            if (number == macro->macro_number) {
+                macro->set_em_value(em->get_macro_value(number));
+            }
+        }
     }
 }
 
-// void OverlayModule::process_params(const ProcessArgs& args)
-// {
-// }
+bool OverlayModule::sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate)
+{
+    if (midi_timer.process(args.sampleTime) > rate) {
+        midi_timer.reset();
+        return true;
+    }
+    return false;
+}
+
+void OverlayModule::update_from_em()
+{
+        if (chem_host && chem_host->host_preset()) {
+        auto em = chem_host->host_matrix();
+        if (!em) return;
+        for (auto macro: macros.data) {
+            auto em_value = em->get_macro_value(macro->macro_number);
+            macro->set_em_value(em_value);
+        }
+    }
+}
 
 void OverlayModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
     if (!chem_host || chem_host->host_busy()) return;
 
-    // if (((args.frame + id) % 41) == 0) {
-    //     process_params(args);
-    // }
-
     if (0 == ((args.frame + id) % 47)) {
         getLight(L_CONNECTED).setBrightness(preset_connected);
     }
+
+    if (macros.empty()) return;
+    auto haken = chem_host->host_haken();
+    if (!haken) return;
+
+    if (sync_params_ready(args)) {
+        for (auto macro: macros.data) {
+            if (macro->valid() && macro->pending()) {
+                macro->un_pend();
+                haken->extended_macro(ChemId::Overlay, macro->macro_number, macro->em_value);
+            }
+        }
+    }
+
 }
 
 Model *modelOverlay = createModel<OverlayModule, OverlayUi>("chem-overlay");

@@ -135,14 +135,14 @@ struct MacroUi : ChemModuleWidget, IChemClient
     void center_knobs();
 
     void unconnected_ui();
-    
+
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-macro.svg"); }
     void setThemeName(const std::string& name, void * context) override;

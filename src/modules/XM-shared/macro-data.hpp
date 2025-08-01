@@ -20,12 +20,22 @@ inline float xm_modulated_value(float param_value, float cv, float amount) {
     return clamp(param_value + ((cv * (1.f/5.f)) * (amount * .01f)), -1.f, 1.f);
 }
 
+inline uint16_t xm_em_value_any(float value) {
+    return static_cast<uint16_t>(std::round(rescale(clamp(value, -1.f, 1.f), -1.f, 1.f, 0.f, 16256.f)));
+}
+inline uint16_t xm_em_value(float value) {
+    assert(in_range(value, -1.f, 1.f));
+    return static_cast<uint16_t>(std::round(rescale(value, -1.f, 1.f, 0.f, 16256.f)));
+}
+
 struct MacroDescription
 {
     float param_value{0.f};
     float cv{0.f};
     float mod_amount{0.f};
     float mod_value{0.f};
+    uint16_t em_value{0xffff};
+    uint16_t last_em_value{0xffff};
 
     bool modulated{true};
     int64_t module_id{-1};
@@ -42,6 +52,14 @@ struct MacroDescription
     void init (const MacroDescription& source);
     void set_range(MacroRange r);
     bool valid();
+
+    void set_em_value(uint16_t em);
+    void set_mod_amount(float amount);
+    void set_value(float value);
+
+    bool pending() { return (em_value != last_em_value) && (0xffff != last_em_value); }
+    void un_pend() { last_em_value = em_value; }
+
     void from_json(json_t * root);
     json_t * to_json();
 };

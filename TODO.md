@@ -33,7 +33,7 @@
 
 ## Overlay macros
 
-- implement control & dispatch
+- Exclusion: Allow only one knob/macro across XM instances (currently excluded only in menu)
 - Proper host proxying: Overlay module should forward chem_host events, and clients do not independently register chem host?
 
 ## Osmose

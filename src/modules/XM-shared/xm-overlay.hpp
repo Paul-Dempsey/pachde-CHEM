@@ -23,6 +23,7 @@ struct IOverlay
     virtual void overlay_remove_macro(int64_t module, ssize_t knob) = 0;
     virtual void overlay_add_macro(std::shared_ptr<MacroDescription> macro) = 0;
     virtual void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) = 0;
+    virtual void used_macros(std::vector<uint8_t>* list) = 0;
 };
 
 IOverlay* find_adjacent_overlay(Module* client_module);

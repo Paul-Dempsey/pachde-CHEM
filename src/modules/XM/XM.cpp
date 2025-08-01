@@ -206,7 +206,7 @@ void XMModule::process_params(const ProcessArgs& args)
 {
     if (has_mod_knob && (mod_target >= 0)) {
         auto macro = my_macros.get_macro(getId(), mod_target);
-        macro->mod_amount = getParam(P_MODULATION).getValue();
+        macro->set_mod_amount(getParam(P_MODULATION).getValue());
     }
 }
 
@@ -242,9 +242,7 @@ void XMModule::process(const ProcessArgs& args)
     }
     for (auto macro: my_macros.data) {
         macro->cv = getInput(macro->knob_id).getVoltage();
-        macro->param_value = getParam(macro->knob_id).getValue();
-        float v = xm_modulated_value(macro->param_value, macro->cv, macro->mod_amount);
-        macro->mod_value = v;
+        macro->set_value(getParam(macro->knob_id).getValue());
     }
 
 }
