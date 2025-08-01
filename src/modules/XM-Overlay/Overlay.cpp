@@ -12,6 +12,17 @@ OverlayModule::OverlayModule()
     mac_build.set_on_complete([=](){ on_macro_request_complete(); });
 }
 
+OverlayModule::~OverlayModule()
+{
+    for (auto client: clients) {
+        client->on_overlay_change(nullptr);
+    }
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+    }
+}
+
+
 void OverlayModule::reset() {
     title = "";
     overlay_preset = nullptr;
@@ -38,9 +49,8 @@ void OverlayModule::overlay_request_macros()
 {
     if (!overlay_preset) return;
     if (!chem_host) return;
-    auto haken = chem_host->host_haken();
-    mac_build.haken = haken;
-    haken->request_archive_0(ChemId::Overlay);
+    in_macro_request = true;
+    mac_build.request_macros(chem_host->host_haken());
 }
 
 void send_store_preset(ChemId tag, HakenMidi* haken, std::shared_ptr<PresetInfo> preset)
@@ -78,6 +88,7 @@ void OverlayModule::on_macro_request_complete()
     }
     auto haken = chem_host->host_haken();
     send_store_preset(ChemId::Overlay, haken, overlay_preset);
+    expect_preset_change = true;
     haken->select_preset(ChemId::Overlay, overlay_preset->id);
 }
 
@@ -145,6 +156,14 @@ json_t* OverlayModule::dataToJson()
     return root;
 }
 
+void OverlayModule::onRemove(const RemoveEvent &e)
+{
+    for (auto client: clients) {
+        client->on_overlay_change(nullptr);
+    }
+    clients.clear();
+}
+
 // IChemClient
 ::rack::engine::Module* OverlayModule::client_module() { return this; }
 std::string OverlayModule::client_claim() { return device_claim; }
@@ -165,6 +184,11 @@ void OverlayModule::onPresetChange()
         live_preset = std::make_shared<PresetInfo>(p);
         preset_connected = (nullptr != overlay_preset) && (p->name == overlay_preset->name);
     }
+    if (expect_preset_change) {
+        expect_preset_change = false;
+    } else {
+        macro_usage.clear();
+    }
 }
 
 void OverlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
@@ -175,7 +199,12 @@ void OverlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDe
 
 void OverlayModule::do_message(PackedMidiMessage message)
 {
-    mac_build.do_message(message);
+    if (mac_build.in_request) {
+        mac_build.do_message(message);
+    } else {
+        if (as_u8(ChemId::Unknown) == midi_tag(message)) return;
+
+    }
 }
 
 // void OverlayModule::process_params(const ProcessArgs& args)

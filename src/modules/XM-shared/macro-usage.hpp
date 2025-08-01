@@ -55,17 +55,20 @@ struct MacroUsageBuilder
 {
     ChemId client_id{ChemId::Unknown};
     uint8_t form_id{0xff};
+    bool in_request{false};
     bool in_archive{false};
     bool in_form_poke{false};
     bool in_name{false};
     bool blend_mac{false};
 
-    HakenMidi* haken{nullptr};
     std::function<void()> on_complete{nullptr};
     std::string preset_name;
     std::vector<MacroUsage>& macros;
+
+    void request_macros(HakenMidi* haken);
     void set_on_complete(std::function<void()> fn) { on_complete = fn; }
     void do_message(PackedMidiMessage msg);
+
     MacroUsageBuilder(std::vector<MacroUsage>& m) : macros(m) {}
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "../../chem.hpp"
 #include "macro-usage.hpp"
-#include "xm-edit-common.hpp"
+#include "macro-data.hpp"
 using namespace eaganmatrix;
 
 namespace pachde {

@@ -6,7 +6,7 @@
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../widgets/widgets.hpp"
-#include "../XM-shared/xm-edit-common.hpp"
+#include "../XM-shared/macro-data.hpp"
 #include "../XM-shared/xm-overlay.hpp"
 
 using namespace pachde;
@@ -84,7 +84,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
             mod_target = id;
         }
     }
-
+    void center_knobs();
     void update_param_info();
     
     // IOverlayClient
@@ -92,24 +92,19 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     IOverlay* get_overlay() override { return overlay; }
     int64_t get_module_id() override { return id; }
 
-    // IDoMidi
-    void do_message(PackedMidiMessage msg) override;
-
     void xm_clear();
 
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
-    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void try_bind_overlay();
     
-    //void onExpanderChange(const ExpanderChangeEvent& e) override;
+    void onRemove(const RemoveEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;

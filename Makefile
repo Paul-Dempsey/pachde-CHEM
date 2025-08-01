@@ -115,6 +115,7 @@ SOURCES += src/modules/Preset/preset-tab.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
 
+SOURCES += src/modules/XM-shared/macro-data.cpp
 SOURCES += src/modules/XM-shared/macro-usage.cpp
 SOURCES += src/modules/XM-shared/xm-overlay.cpp
 

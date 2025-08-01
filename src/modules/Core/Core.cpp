@@ -680,6 +680,7 @@ void CoreModule::onRemove(const RemoveEvent &e)
     for (auto client : chem_clients) {
         client->onConnectHost(nullptr);
     }
+    chem_clients.clear();
 }
 
 void CoreModule::onReset(const ResetEvent &e)

@@ -10,7 +10,7 @@
    </defs>
    <g>
     <rect id="g-panel" fill="url(#gpanel)" x="0" y="0" width="45" height="380" />
-    <path id="d2--sgl" fill="none" stroke="#2d6885" stroke-width="0.75" d="M 4,144 h 36" />
+    <path id="d2--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,144 h 41" />
     <path id="d1--div" fill="none" stroke="#737373" stroke-width="0.75" d="M 2,274 h 41" />
   </g>
 </svg>

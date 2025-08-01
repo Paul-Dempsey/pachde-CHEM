@@ -7,12 +7,13 @@ using namespace svg_theme;
 using namespace pachde;
 
 std::string macro_number_to_string(uint8_t mn) {
-    if (mn < 7) return "(unset)";
+    if (!in_range(mn, U8(7), U8(90))) return "";
     return format_string("%d", mn);
 }
+
 uint8_t macro_number_from_string(std::string s)
 {
-    auto n = 0;
+    int n = 0;
     bool valid{true};
     for (auto ch : s) {
         if (std::isdigit(ch)) {
@@ -136,8 +137,8 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     MacroDescription macro{0,0};
 
     TextInput* title_entry{nullptr};
-    Palette1Button * palette_fg{nullptr};
-    Palette2Button * palette_bg{nullptr};
+    Palette1Button* palette_fg{nullptr};
+    Palette2Button* palette_bg{nullptr};
     
     TextLabel* knob_id{nullptr};
     TextInput* name_entry{nullptr};
@@ -145,7 +146,8 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     PlusMinusButton* input_port{nullptr};
     PlusMinusButton* modulation_button{nullptr};
     std::vector<StateIndicatorWidget*> range_options;
-
+    GlowKnob* min_knob{nullptr};
+    GlowKnob* max_knob{nullptr};
     PackedColor hi_color{0xffd9d9d9};
 
     MacroEdit() 
@@ -205,11 +207,15 @@ struct MacroMenu: Hamburger
                 if (macros.empty()) goto NO_MACROS;
                 for (const MacroUsage& mu: macros) {
                     auto num = mu.macro_number;
-                    menu->addChild(createMenuItem(mu.to_string(), "", [=](){
-                        edit->macro.macro_number = num;
-                        edit->update_from_macro();
-                        APP->event->setSelectedWidget(edit);
-                    }));
+                    if (num < 7) {
+                        menu->addChild(createMenuLabel(mu.to_string()));
+                    } else {
+                        menu->addChild(createMenuItem(mu.to_string(), "", [=](){
+                            edit->macro.macro_number = num;
+                            edit->update_from_macro();
+                            APP->event->setSelectedWidget(edit);
+                        }));
+                    }
                 }
                 } break;
 
@@ -250,11 +256,13 @@ void MacroEdit::update_from_macro()
         r->set_state(i == int(macro.range));
         ++i;
     }
-
-    if (ui->my_module) {
-        ui->my_module->getParam(XMModule::P_RANGE_MIN).setValue(macro.min);
-        ui->my_module->getParam(XMModule::P_RANGE_MAX).setValue(macro.max);
+    auto mod = ui->my_module;
+    if (mod) {
+        mod->getParam(XMModule::P_RANGE_MIN).setValue(macro.min);
+        mod->getParam(XMModule::P_RANGE_MAX).setValue(macro.max);
     }
+    min_knob->enable(macro.range == MacroRange::Custom);
+    max_knob->enable(macro.range == MacroRange::Custom);
 }
 
 void MacroEdit::set_from_macro(const MacroDescription& mac)
@@ -345,7 +353,7 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
         "",
         [=](std::string s) { macro.macro_number = macro_number_from_string(s); }, 
         nullptr,
-        "<macro number 7-90>"
+        "<macro # 7-90>"
         ));
 
     auto mm = createThemedWidget<MacroMenu>(Vec(x + 72.f, y + 1.5f), theme_engine, theme);
@@ -362,7 +370,7 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
         macro.modulated = input_port->plus;
     });
     addChild(input_port);
-    addChild(createLabel(Vec(x + 16.f, y), 60.f, "Input port", engine, theme, S::control_label_left));
+    addChild(createLabel(Vec(x + 16.f, y), 60.f, "Input jack", engine, theme, S::control_label_left));
 
     y += ROW_DY;
     addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), 60.f, "Range", engine, theme, r_label_style));
@@ -401,9 +409,9 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     }));
 
     y += ROW_DY + 8.f;
-    addChild(createChemKnob<GreenTrimPot>(Vec(me_CENTER - MINMAX_DX, y), ui->my_module, XMModule::P_RANGE_MIN, theme_engine, theme));
+    addChild(min_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER - MINMAX_DX, y), ui->my_module, XMModule::P_RANGE_MIN, theme_engine, theme));
     addChild(createLabel(Vec(me_CENTER - MINMAX_DX, y + 9.5f), 25, "min", theme_engine, theme, mini_label_style));
-    addChild(createChemKnob<GreenTrimPot>(Vec(me_CENTER + MINMAX_DX, y), ui->my_module, XMModule::P_RANGE_MAX, theme_engine, theme));
+    addChild(max_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER + MINMAX_DX, y), ui->my_module, XMModule::P_RANGE_MAX, theme_engine, theme));
     addChild(createLabel(Vec(me_CENTER + MINMAX_DX, y + 9.5f), 25, "max", theme_engine, theme, mini_label_style));
 
     y += ROW_DY + 8.f;
@@ -576,6 +584,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
     }
 
     draw_placeholders = my_module->my_macros.data.empty();
+    my_module->update_param_info();
 
     const NVGcolor co_port = PORT_CORN;
     float axis = -1.f;
@@ -600,11 +609,8 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
 
             pos = input_center(i);
             addChild(Center(createThemedColorInput(pos, my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-            {
-                float xoff = i < 4 ? -2.f : 2.f;
-                addChild(Center(createClickRegion(pos.x + xoff, pos.y, 22.f, 19.5f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
-            }
-            pos.x += axis*PORT_MOD_DX;
+            addChild(Center(createClickRegion(pos.x + 2 * axis, pos.y, 22.f, 19.5f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
+            pos.x += axis * PORT_MOD_DX;
             pos.y -= PORT_MOD_DY;
             addChild(Center(createLight<TinySimpleLight<GreenLight>>(pos, my_module, i)));
         }
@@ -621,6 +627,7 @@ void XMUi::glowing_knobs(bool glow)
 void XMUi::center_knobs()
 {
     if (!my_module) return;
+    my_module->center_knobs();
 }
 
 Vec XMUi::knob_center(int index)
@@ -630,9 +637,10 @@ Vec XMUi::knob_center(int index)
 
 Vec XMUi::input_center(int index)
 {
-    return Vec{
+    return Vec {
         index < 4 ? CENTER - PORT_OFFSET : CENTER + PORT_OFFSET, 
-        PORT_TOP_CY + PORT_DY + ((index % 4) * PORT_DY)};
+        PORT_TOP_CY + PORT_DY + ((index % 4) * PORT_DY)
+    };
 }
 
 void XMUi::set_edit_mode(bool edit)
@@ -842,7 +850,7 @@ void XMUi::draw(const DrawArgs& args)
 {
     Base::draw(args);
 
-    if (my_module && draw_placeholders) {
+    if (draw_placeholders) {
         auto vg = args.vg;
         auto co = placeholder_style.nvg_stroke_color();
         auto w = placeholder_style.width();

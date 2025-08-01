@@ -8,7 +8,7 @@
 #include "../../widgets/widgets.hpp"
 #include "../XM-shared/macro-usage.hpp"
 #include "../XM-shared/xm-overlay.hpp"
-#include "../XM-shared/xm-edit-common.hpp"
+#include "../XM-shared/macro-data.hpp"
 #include "v-text.hpp"
 
 using namespace pachde;
@@ -33,20 +33,14 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     std::vector<IOverlayClient*> clients;
     MacroData macros;
+
     std::vector<MacroUsage> macro_usage;
     MacroUsageBuilder mac_build{macro_usage};
+    bool expect_preset_change{false};
+    bool in_macro_request{false};
 
     OverlayModule();
-    ~OverlayModule() {
-        if (!clients.empty()) {
-            for (auto client: clients) {
-                client->on_overlay_change(nullptr);
-            }
-        }
-        if (chem_host) {
-            chem_host->unregister_chem_client(this);
-        }
-    }
+    virtual ~OverlayModule();
 
     OverlayUi* ui() { return reinterpret_cast<OverlayUi*>(chem_ui); };
 
@@ -81,6 +75,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void onRemove(const RemoveEvent& e) override;
     //void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };

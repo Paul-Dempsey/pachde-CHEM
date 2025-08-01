@@ -24,7 +24,8 @@ std::string MacroFormUsage::to_string() const
     return result;
 }
 
-std::string MacroUsage::to_string() const {
+std::string MacroUsage::to_string() const
+{
     std::string result = format_string("Macro %d", macro_number);
     if (!forms.empty()) {
         result.append(": ");
@@ -41,8 +42,17 @@ std::string MacroUsage::to_string() const {
     return result;
 }
 
-bool mu_order(const MacroUsage& a, const MacroUsage& b) {
+bool mu_order(const MacroUsage& a, const MacroUsage& b)
+{
     return a.macro_number < b.macro_number;
+}
+
+void MacroUsageBuilder::request_macros(HakenMidi* haken)
+{
+    assert(haken);
+    in_request = true;
+    macros.clear();
+    haken->request_archive_0(client_id);
 }
 
 void MacroUsageBuilder::do_message(PackedMidiMessage msg)
@@ -113,6 +123,7 @@ void MacroUsageBuilder::do_message(PackedMidiMessage msg)
 
             case Haken::archiveToFile:
                 in_archive = false;
+                in_request = false;
                 std::sort(macros.begin(), macros.end(), mu_order);
                 if (on_complete) on_complete();
                 break;
