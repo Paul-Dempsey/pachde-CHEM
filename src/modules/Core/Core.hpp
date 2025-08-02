@@ -72,7 +72,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     HakenMidiRate midi_rate{HakenMidiRate::Full};
     RelayMidi midi_relay;
     MidiLog* midi_log{nullptr};
-    
+
     EaganMatrix em;
     bool disconnected{false};
     bool is_busy{false};
@@ -137,6 +137,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     PresetResult load_full_user_presets();
     PresetResult scan_osmose_presets(uint8_t page);
     void notify_preset_list_changed(eaganmatrix::PresetTab which);
+    void sync_live_preset();
     // IPresetList
     void register_preset_list_client(IPresetListClient* client) override;
     void unregister_preset_list_client(IPresetListClient* client) override;
@@ -191,7 +192,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();
-    
+
     // IHandleEmEvents
     void onEditorReply(uint8_t reply) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
@@ -312,7 +313,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     void set_theme_colors(const std::string& theme = "");
 
     MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme);
-    
+
     void createMidiPickers(std::shared_ptr<SvgTheme> theme);
     void createRoundingLeds(float x, float y, float spread);
     void create_stop_button();
@@ -320,7 +321,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     void createIndicatorsCentered(float x, float y, float spread);
     void updateIndicators();
     void connect_midi(bool on);
-    
+
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
 

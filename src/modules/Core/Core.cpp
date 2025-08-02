@@ -149,16 +149,16 @@ PresetId CoreModule::prev_next_id(ssize_t increment)
         index = system_presets->index_of_id(em.preset.id);
         if (index >= 0) {
             index = index + increment;
-            index = (index < 0) 
-                ? system_presets->size() -1 
+            index = (index < 0)
+                ? system_presets->size() -1
                 : ((index >= system_presets->size()) ? 0 : index);
             id = system_presets->presets[index]->id;
         } else if (user_presets) {
             auto index = user_presets->index_of_id(em.preset.id);
             if (index >= 0) {
                 index = index + increment;
-                index = (index < 0) 
-                    ? user_presets->size() -1 
+                index = (index < 0)
+                    ? user_presets->size() -1
                     : ((index >= user_presets->size()) ? 0 : index);
                 id = user_presets->presets[index]->id;
             }
@@ -167,16 +167,16 @@ PresetId CoreModule::prev_next_id(ssize_t increment)
         index = system_presets->index_of_tag(em.preset.tag);
         if (index >= 0) {
             index = index + increment;
-            index = (index < 0) 
-                ? system_presets->size() -1 
+            index = (index < 0)
+                ? system_presets->size() -1
                 : ((index >= system_presets->size()) ? 0 : index);
             id = system_presets->presets[index]->id;
         } else if (user_presets) {
             auto index = user_presets->index_of_tag(em.preset.tag);
             if (index >= 0) {
                 index = index + increment;
-                index = (index < 0) 
-                    ? user_presets->size() -1 
+                index = (index < 0)
+                    ? user_presets->size() -1
                     : ((index >= user_presets->size()) ? 0 : index);
                 id = user_presets->presets[index]->id;
             }
@@ -311,6 +311,29 @@ void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which)
 {
     for (auto client: preset_list_clients) {
         client->on_list_changed(which);
+    }
+    sync_live_preset();
+}
+
+void CoreModule::sync_live_preset()
+{
+    if (em.preset.id.key()) return;
+    if (!em.preset.valid_tag()) return;
+    if (!em.is_osmose()) return;
+    if (user_presets && !user_presets->empty()) {
+        ssize_t index = user_presets->index_of_tag(em.preset.tag);
+        if (index >= 0) {
+            em.preset.id = user_presets->presets[index]->id;
+        }
+    }
+    if (!em.preset.id.valid() && system_presets && !system_presets->empty()) {
+        ssize_t index = system_presets->index_of_tag( em.preset.tag);
+        if (index >= 0) {
+            em.preset.id = system_presets->presets[index]->id;
+        }
+    }
+    if (em.preset.id.valid()) {
+        notify_preset_changed();
     }
 }
 
@@ -908,7 +931,7 @@ void CoreModule::process_gather(const ProcessArgs &args)
             full_build->start_building();
         }
         return;
-    } 
+    }
 
     if (full_build) {
         using PHASE = PresetListBuildCoordinator::Phase;
@@ -977,7 +1000,7 @@ void CoreModule::process(const ProcessArgs &args)
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
-    }    
+    }
 
     if (getInput(IN_C1_MUTE_GATE).isConnected()) {
         bool mute = getInput(IN_C1_MUTE_GATE).getVoltage() >= 0.8f;
@@ -990,7 +1013,7 @@ void CoreModule::process(const ProcessArgs &args)
         getParam(P_C2_MUTE).setValue(mute ? 1.f : 0.f);
         controller2_midi_in.enable(!mute);
     }
-    
+
     if (getOutput(OUT_READY).isConnected()) {
         getOutput(OUT_READY).setVoltage(host_busy() ? 0.0f : 10.0f);
     }

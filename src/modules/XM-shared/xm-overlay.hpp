@@ -33,9 +33,6 @@ struct IOverlayClient
 {
     // `host` is null when being destroyed
     virtual void on_overlay_change(IOverlay* host) = 0;
-    // Overlay's Core connection/device changed
-    //  virtual void on_overlay_connection_changed() = 0;
-    //  virtual void on_preset_changed() = 0;
     virtual IOverlay* get_overlay() = 0;
     virtual int64_t get_module_id() = 0;
 };

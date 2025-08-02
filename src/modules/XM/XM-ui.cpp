@@ -721,23 +721,6 @@ MacroDescription *XMUi::get_edit_macro()
     return edit_macro ? &edit_macro->macro : nullptr;
 }
 
-// void XMUi::setThemeName(const std::string& name, void * context)
-// {
-//     auto theme = theme_engine.getTheme(name);
-//     Base::setThemeName(name, context);
-// }
-
-void XMUi::onConnectHost(IChemHost* host)
-{
-    chem_host = host;
-    onConnectionChange(ChemDevice::Haken, host ? host->host_connection(ChemDevice::Haken) : nullptr);
-}
-
-void XMUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
-    //onConnectionChangeUiImpl(this, device, connection);
-}
-
 void XMUi::onHoverKey(const HoverKeyEvent &e)
 {
     if (my_module) {

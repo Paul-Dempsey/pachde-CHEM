@@ -59,7 +59,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     };
 
     std::string device_claim;
-    
+
     std::string title;
     PackedColor title_bg;
     PackedColor title_fg;
@@ -86,7 +86,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     }
     void center_knobs();
     void update_param_info();
-    
+
     // IOverlayClient
     void on_overlay_change(IOverlay* ovr) override;
     IOverlay* get_overlay() override { return overlay; }
@@ -95,15 +95,15 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     void xm_clear();
 
     // IChemClient
-    rack::engine::Module* client_module() override;
-    std::string client_claim() override;
+    rack::engine::Module* client_module() override { return this; }
+    std::string client_claim() override { return device_claim; }
     void onConnectHost(IChemHost* host) override;
-    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
+    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override {}
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void try_bind_overlay();
-    
+
     void onRemove(const RemoveEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;
     void process_params(const ProcessArgs& args);
@@ -115,11 +115,10 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 struct EditWireframe;
 struct MacroEdit;
 
-struct XMUi : ChemModuleWidget, IChemClient
+struct XMUi : ChemModuleWidget
 {
     using Base = ChemModuleWidget;
 
-    IChemHost* chem_host{nullptr};
     XMModule* my_module{nullptr};
 
     // LinkButton* link_button{nullptr};
@@ -127,7 +126,7 @@ struct XMUi : ChemModuleWidget, IChemClient
 
     ElementStyle edit_style{"xm-edit", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
     ElementStyle placeholder_style{"xm-placeholder", "hsl(0,0%,55%)", "hsl(0,0%,55%)", .25f};
-    
+
     Swatch* title_bar{nullptr};
     TextLabel * title{nullptr};
     PackedColor title_bg;
@@ -139,7 +138,7 @@ struct XMUi : ChemModuleWidget, IChemClient
     TrimPot* knobs[9]{nullptr};
     TrackWidget* tracks[8]{nullptr};
     TextLabel* labels[8]{nullptr};
-    
+
     XMUi(XMModule *module);
     virtual ~XMUi() {
         if (editing) set_edit_mode(false);
@@ -169,13 +168,6 @@ struct XMUi : ChemModuleWidget, IChemClient
     void set_header_text_color(PackedColor color);
     void set_header_text(std::string title);
 
-    // IChemClient
-    ::rack::engine::Module* client_module() override { return my_module; }
-    std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
-    void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override {}
-    void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-xm.svg"); }
     void setThemeName(const std::string& name, void * context) override;

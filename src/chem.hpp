@@ -94,7 +94,7 @@ void bind_host(TClientModule* client_module)
         }
         client_module->seek_host = false;
     }
-}    
+}
 
 template <typename TModule>
 void onConnectHostModuleImpl(TModule* self, IChemHost* host)
@@ -109,6 +109,20 @@ void onConnectHostModuleImpl(TModule* self, IChemHost* host)
         self->device_claim = "";
     }
     if (self->chem_ui) self->ui()->onConnectHost(host);
+}
+
+template <typename TModule>
+void onConnectHostModuleImpl_no_ui(TModule* self, IChemHost* host)
+{
+    self->chem_host = host;
+    if (host) {
+        auto conn = host->host_connection(ChemDevice::Haken);
+        if (conn) {
+            self->device_claim = conn->info.claim();
+        }
+    } else {
+        self->device_claim = "";
+    }
 }
 
 template <typename TModuleWidget>

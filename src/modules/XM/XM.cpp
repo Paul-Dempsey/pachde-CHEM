@@ -44,20 +44,13 @@ XMModule::~XMModule()
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
-    // if (chem_host) {
-    //     chem_host->unregister_chem_client(this);
-    // }
 }
 
 void XMModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
     device_claim = get_json_string(root, "haken-device");
-    if (!device_claim.empty()) {
-        //modulation.mod_from_json(root);
-    }
     glow_knobs = get_json_bool(root, "glow-knobs", false);
-
     title = get_json_string(root, "module-title");
     title_bg = parse_color(get_json_string(root, "title-bg"), RARE_COLOR);
     if (title_bg == RARE_COLOR) {
@@ -96,13 +89,7 @@ void XMModule::try_bind_overlay()
         overlay = find_an_overlay(this, device_claim, "");
     }
     if (overlay) {
-        if (chem_host) {
-            chem_host->unregister_chem_client(this);
-        }
         overlay->overlay_register_client(this);
-        onConnectHost(overlay->get_host());
-    } else  {
-        onConnectHost(nullptr);
     }
 }
 
@@ -111,10 +98,6 @@ void XMModule::onRemove(const RemoveEvent &e)
     if (overlay) {
         overlay->overlay_unregister_client(this);
         overlay = nullptr;
-    }
-    if (chem_host) {
-        chem_host->unregister_chem_client(this);
-        chem_host = nullptr;
     }
 }
 
@@ -146,10 +129,6 @@ void XMModule::on_overlay_change(IOverlay *ovr)
     overlay = ovr;
     if (overlay) {
         overlay->overlay_register_client(this);
-        chem_host = overlay->get_host();
-        if (chem_host) {
-            chem_host->register_chem_client(this);
-        }
     }
 }
 
@@ -163,22 +142,9 @@ void XMModule::xm_clear() {
 }
 
 // IChemClient
-::rack::engine::Module* XMModule::client_module() { return this; }
-std::string XMModule::client_claim() { return device_claim; }
-
 void XMModule::onConnectHost(IChemHost* host)
 {
-    onConnectHostModuleImpl(this, host);
-}
-
-// void XMModule::onPresetChange()
-// {
-//     if (chem_ui) ui()->onPresetChange();
-// }
-
-void XMModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
-    if (chem_ui) ui()->onConnectionChange(device, connection);
+    onConnectHostModuleImpl_no_ui(this, host);
 }
 
 void XMModule::onPortChange(const PortChangeEvent& e)
@@ -218,12 +184,8 @@ void XMModule::process(const ProcessArgs& args)
     if (!overlay && (0 == (jitter_frame % 120))) {
         try_bind_overlay();
     }
-    if (overlay && !chem_host && (0 == (jitter_frame % 97))) {
-        onConnectHost(overlay->get_host());
-        return;
-    }
 
-    bool free_host = chem_host && !chem_host->host_busy();
+    bool free_host = overlay && overlay->get_host();
 
     if (0 == (jitter_frame % 47)) {
         if (last_mod_target != mod_target) {
@@ -237,6 +199,7 @@ void XMModule::process(const ProcessArgs& args)
     }
 
     if (!free_host) return;
+
     if ((jitter_frame % 41) == 0) {
         process_params(args);
     }

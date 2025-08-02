@@ -52,7 +52,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     void prune_missing_clients();
 
     // IOverlay
-    IChemHost* get_host() override { return chem_host; }
+    IChemHost* get_host() override { return (chem_host && chem_host->host_busy()) ? nullptr : chem_host; }
     void overlay_register_client(IOverlayClient* client) override;
     void overlay_unregister_client(IOverlayClient* client) override;
     std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
