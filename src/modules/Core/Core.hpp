@@ -137,7 +137,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     PresetResult load_full_user_presets();
     PresetResult scan_osmose_presets(uint8_t page);
     void notify_preset_list_changed(eaganmatrix::PresetTab which);
-    void sync_live_preset();
+
     // IPresetList
     void register_preset_list_client(IPresetListClient* client) override;
     void unregister_preset_list_client(IPresetListClient* client) override;

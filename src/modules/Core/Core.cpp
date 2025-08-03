@@ -312,29 +312,6 @@ void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which)
     for (auto client: preset_list_clients) {
         client->on_list_changed(which);
     }
-    sync_live_preset();
-}
-
-void CoreModule::sync_live_preset()
-{
-    if (em.preset.id.key()) return;
-    if (!em.preset.valid_tag()) return;
-    if (!em.is_osmose()) return;
-    if (user_presets && !user_presets->empty()) {
-        ssize_t index = user_presets->index_of_tag(em.preset.tag);
-        if (index >= 0) {
-            em.preset.id = user_presets->presets[index]->id;
-        }
-    }
-    if (!em.preset.id.valid() && system_presets && !system_presets->empty()) {
-        ssize_t index = system_presets->index_of_tag( em.preset.tag);
-        if (index >= 0) {
-            em.preset.id = system_presets->presets[index]->id;
-        }
-    }
-    if (em.preset.id.valid()) {
-        notify_preset_changed();
-    }
 }
 
 void CoreModule::register_preset_list_client(IPresetListClient *client)
