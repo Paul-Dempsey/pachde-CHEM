@@ -107,7 +107,7 @@ void CoreModule::enable_logging(bool enable)
 {
     if (enable){
         midi_log = new MidiLog();
-        log_message("Core", format_string("Starting CHEM Core [%p] %s", this, string::formatTimeISO(system::getUnixTime()).c_str()));
+        LOG_MSG("Core", format_string("Starting CHEM Core [%p] %s", this, string::formatTimeISO(system::getUnixTime()).c_str()));
         haken_midi.set_logger(midi_log);
         haken_midi_out.set_logger(midi_log);
         haken_midi_in.set_logger("<<H", midi_log);
@@ -375,9 +375,8 @@ PresetResult CoreModule::end_scan()
     if (!gathering) return PresetResult::NotApplicable;
     auto gather = gathering;
     gathering = GatherFlags::None;
-    if (midi_log) {
-        midi_log->log_message("PLB", format_string("Completed in %.6f", full_build->total));
-    }
+    LOG_MSG("PLB", format_string("Completed in %.6f", full_build->total));
+
     PresetTab tab{PresetTab::Unset};
     if (gather_user(gather)) {
         em.end_user_scan();
@@ -472,7 +471,7 @@ void CoreModule::onPresetBegin()
 
 void CoreModule::onPresetChanged()
 {
-    log_message("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
+    LOG_MSG("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     if (!em.preset.empty()) {
         if (!startup_tasks.completed()) {
             startup_tasks.configuration_received();
@@ -481,7 +480,7 @@ void CoreModule::onPresetChanged()
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
                     if (em.preset.id.key() != full_build->iter->expected_id().key()) {
-                        log_message("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                        LOG_MSG("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     } else {
                         full_build->preset_received();
                         user_presets->add(&em.preset);
@@ -494,7 +493,7 @@ void CoreModule::onPresetChanged()
                 if (gather_full(gathering) && !id_builder) {
                     assert(gather_presets(gathering));
                     if (em.preset.id.key() != full_build->iter->expected_id().key()) {
-                        log_message("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
+                        LOG_MSG("PLB", format_string("[MISMATCH] em[%6x] plb[%6x]", em.osmose_id.key(), em.preset.id.key(), full_build->iter->expected_id().key()));
                     } else {
                         full_build->preset_received();
                         system_presets->add(&em.preset);
@@ -627,12 +626,12 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.channel = -1;
             load_preset_file(PresetTab::System);
             load_preset_file(PresetTab::User);
-            log_message("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            LOG_MSG("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
         } else {
             haken_midi_in.reset();
             haken_midi_out.output.reset();
             haken_midi_out.output.channel = -1;
-            log_message("Core", "--- disconnect HAKEN");
+            LOG_MSG("Core", "--- disconnect HAKEN");
         }
         em.reset();
         init_osmose();
@@ -642,14 +641,14 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi1:
         if (!disconnected && source->connection) {
-            log_message("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            LOG_MSG("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller1_midi_in.set_channel_reflect(is_em);
             getParam(P_C1_CHANNEL_MAP).setValue(controller1_midi_in.channel_reflect);
             controller1_midi_in.set_music_pass(is_em);
             getParam(P_C1_MUSIC_FILTER).setValue(controller1_midi_in.music_pass_filter);
         } else {
-            log_message("Core", "--- disconnect Midi 1");
+            LOG_MSG("Core", "--- disconnect Midi 1");
         }
         HandleMidiDeviceChange(&controller1_midi_in, source);
         notify_connection_changed(ChemDevice::Midi1, source->connection);
@@ -657,14 +656,14 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi2:
         if (!disconnected && source->connection) {
-            log_message("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            LOG_MSG("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller2_midi_in.set_channel_reflect(is_em);
             getParam(P_C2_CHANNEL_MAP).setValue(controller2_midi_in.channel_reflect);
             controller2_midi_in.set_music_pass(is_em);
             getParam(P_C2_MUSIC_FILTER).setValue(controller2_midi_in.music_pass_filter);
         } else {
-            log_message("Core", "--- disconnect Midi 2");
+            LOG_MSG("Core", "--- disconnect Midi 2");
         }
         HandleMidiDeviceChange(&controller2_midi_in, source);
         notify_connection_changed(ChemDevice::Midi2, source->connection);
@@ -685,7 +684,7 @@ void CoreModule::onRemove(const RemoveEvent &e)
 
 void CoreModule::onReset(const ResetEvent &e)
 {
-    log_message("Core", "onReset");
+    LOG_MSG("Core", "onReset");
     haken_device.clear();
     controller1.clear();
     controller2.clear();
@@ -953,7 +952,7 @@ void CoreModule::process(const ProcessArgs &args)
     if (!startup_tasks.completed()) {
         startup_tasks.process(args);
         if (startup_tasks.completed()) {
-            log_message("CoreStart", "----  Startup Tasks Complete  ----");
+            LOG_MSG("CoreStart", "----  Startup Tasks Complete  ----");
         }
     } else {
         if (!recurring_tasks.started) {

@@ -114,6 +114,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     void log_message(const char *prefix, const std::string& info) {
         if (midi_log) midi_log->log_message(prefix, info);
     }
+    #define LOG_MSG(prefix, ...) if (is_logging()) midi_log->log_message((prefix), __VA_ARGS__)
 
     std::string device_name(ChemDevice which);
 

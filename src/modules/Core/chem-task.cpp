@@ -113,16 +113,16 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
                 }
                 core->start_states[ChemTaskId::Heartbeat] = task.state;
                 break;
-                
+
             case ChemTask::Pending:
                 core->start_states[task.id] = task.state;
                 break;
-                
+
             case ChemTask::Complete:
                 core->start_states[ChemTaskId::Heartbeat] = ChemTask::State::Complete;
                 queue.pop_front();
                 break;
-                
+
             case ChemTask::State::Broken:
                 core->log_message("CoreStart", "heartbeat broken");
                 reset();
@@ -170,7 +170,7 @@ void ChemStartupTasks::heartbeat_received()
 {
     ChemTask& task = queue.front();
     if (ChemTaskId::Heartbeat == task.id) {
-        core->log_message("CoreStart", format_string("heartbeat in %.4f", task.time));
+        if (core->is_logging()) { core->log_message("CoreStart", format_string("heartbeat in %.4f", task.time)); }
         core->start_states[ChemTaskId::Heartbeat] = ChemTask::State::Complete;
         queue.pop_front();
     }
@@ -179,7 +179,7 @@ void ChemStartupTasks::configuration_received()
 {
     ChemTask& task = queue.front();
     if (ChemTaskId::PresetInfo == task.id) {
-        core->log_message("CoreStart", format_string("PresetInfo in %.4f", task.time));
+        if (core->is_logging()) { core->log_message("CoreStart", format_string("PresetInfo in %.4f", task.time)); }
         core->start_states[ChemTaskId::PresetInfo] = ChemTask::State::Complete;
         task.complete();
     }
@@ -210,7 +210,7 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
 
     if (heart_ready) {
         if (heartless) {
-            heart.complete();            
+            heart.complete();
         } else {
             core->log_message("Core", "Task Heartbeat");
             core->haken_midi.editor_present(ChemId::Core);

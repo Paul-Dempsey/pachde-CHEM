@@ -132,8 +132,8 @@ void PresetListBuildCoordinator::preset_received()
         phase = Phase::Receive;
     } else if (phase == Phase::Settle) {
         // sometimes osmose sends spurious copies of presets after selection
-        // in this case we want to wait until it's done whatever recovery 
-        // this is doing (I assume it's some kind of recovery), 
+        // in this case we want to wait until it's done whatever recovery
+        // this is doing (I assume it's some kind of recovery),
         // so we reset the settle timeout
         if (log) log->log_message("PLB", "extending settle time");
         settle = 0.0f;
@@ -174,7 +174,7 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, EaganMatrix * em, con
         case Phase::PendBegin:
             begin += args.sampleTime;
             if ((first && (begin > 2.0)) || (!first && (begin > begin_timeout))) {
-                if (log) log->log_message("PLB", format_string("PendBegin timeout %.6f > %.6f ", begin, first ? 2.0f : begin_timeout));
+                if (log) { log->log_message("PLB", format_string("PendBegin timeout %.6f > %.6f ", begin, first ? 2.0f : begin_timeout)); }
                 first  = false;
                 return false;
             }
@@ -184,7 +184,7 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, EaganMatrix * em, con
             if (log) {
                 begin += args.sampleTime;
                 log->log_message("PLB", format_string("preset_started() in %.6f", begin));
-            } 
+            }
             pend = 0.0f;
             phase = Phase::PendReceive;
             return true;
@@ -193,7 +193,7 @@ bool PresetListBuildCoordinator::process(HakenMidi* haken, EaganMatrix * em, con
             first  = false;
             pend += args.sampleTime;
             if (pend > receive_timeout) {
-                if (log) log->log_message("PLB", "PendReceive timeout");
+                if (log) { log->log_message("PLB", "PendReceive timeout"); }
                 return false;
             }
             return true;
