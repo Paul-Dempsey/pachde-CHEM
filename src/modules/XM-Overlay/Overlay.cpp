@@ -23,7 +23,6 @@ OverlayModule::~OverlayModule()
     }
 }
 
-
 void OverlayModule::reset() {
     title = "";
     overlay_preset = nullptr;
@@ -32,6 +31,7 @@ void OverlayModule::reset() {
 
 void OverlayModule::overlay_register_client(IOverlayClient *client)
 {
+    if (pending_client_clear) return;
     auto it = std::find(clients.cbegin(), clients.cend(), client);
     if (it == clients.cend()) {
         clients.push_back(client);
@@ -40,6 +40,7 @@ void OverlayModule::overlay_register_client(IOverlayClient *client)
 
 void OverlayModule::overlay_unregister_client(IOverlayClient *client)
 {
+    if (pending_client_clear) return;
     auto it = std::find(clients.begin(), clients.end(), client);
     if (it != clients.end()) {
         clients.erase(it);
@@ -168,10 +169,17 @@ json_t* OverlayModule::dataToJson()
 
 void OverlayModule::onRemove(const RemoveEvent &e)
 {
+    pending_client_clear = true;
     for (auto client: clients) {
         client->on_overlay_change(nullptr);
     }
     clients.clear();
+    pending_client_clear = false;
+
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+    }
+    chem_host = nullptr;
 }
 
 // IChemClient

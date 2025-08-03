@@ -24,6 +24,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     };
 
     bool preset_connected{false};
+    bool pending_client_clear{false};
     std::string device_claim;
     std::shared_ptr<PresetInfo> overlay_preset{nullptr};
     std::shared_ptr<PresetInfo> live_preset{nullptr};

@@ -121,12 +121,12 @@ void XMModule::update_param_info()
     }
 }
 
-void XMModule::on_overlay_change(IOverlay *ovr)
+void XMModule::on_overlay_change(IOverlay *new_overlay)
 {
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
-    overlay = ovr;
+    overlay = new_overlay;
     if (overlay) {
         overlay->overlay_register_client(this);
     }
