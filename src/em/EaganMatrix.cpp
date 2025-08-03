@@ -96,8 +96,8 @@ bool EaganMatrix::is_surface()
     case Haken::hw_fL: case Haken::hw_hL: case Haken::hw_fC: case Haken::hw_hC:
     case Haken::hw_Mini:
     case Haken::hw_s22: case Haken::hw_s46: case Haken::hw_s70:
-        return true; 
-    default: 
+        return true;
+    default:
         break;
     }
     return false;
@@ -340,7 +340,7 @@ void EaganMatrix::onChannelOneCC(uint8_t cc, uint8_t value)
     // not received - case Haken:: ccJack2:
     case Haken::ccPost:
         post = (value << 7) + frac_lsb;
-        frac_lsb = 0; 
+        frac_lsb = 0;
         break;
     }
 }
@@ -360,8 +360,8 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
     }
 
     // The ccs ccMod, ccBreath, ccUndef, ccFoot, ccVol, ccExpres
-    // can be used for pedal assignment. 
-    // When assigned, the cc comes to channel 16. 
+    // can be used for pedal assignment.
+    // When assigned, the cc comes to channel 16.
     // Other assigned ccs come to channel 1.
 
     if (get_jack_1_assign() == cc) {
@@ -384,8 +384,8 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
         break;
 
     // Check Haken. On Osmose request config is missing matClear.
-    // We need an in_preset_detail window that is the same between request config, 
-    // selecting from CHEM, and selecting on device, so that we can compute a 
+    // We need an in_preset_detail window that is the same between request config,
+    // selecting from CHEM, and selecting on device, so that we can compute a
     // consistent checksum for syncing to live when the preset id is missing.
     // the common start of a preset appears to still be ccCVCHigh
 
@@ -536,9 +536,10 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
         case MidiStatus_CC: {
             ch1.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelOneCC(msg.bytes.data1, msg.bytes.data2);
-            if (in_preset_detail) {
-                hash_midi(preset_hasher, msg);
-            }
+            // Config carries ambient changes like pedal/mod-wheel, so we can't checksum preset info on CH 1
+            // if (in_preset_detail) {
+            //     hash_midi(preset_hasher, msg);
+            // }
         } break;
         }
     } break;
@@ -593,7 +594,7 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
 
         case MidiStatus_PolyKeyPressure: {
             switch (data_stream) {
-            case -1: 
+            case -1:
                 break;
 
             case Haken::s_Name:
