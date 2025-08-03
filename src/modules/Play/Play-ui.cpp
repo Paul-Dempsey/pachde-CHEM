@@ -36,7 +36,7 @@ void PlayUi::set_track_live(bool track)
     if (live_preset) {
         scroll_to_live();
         auto wit = std::find_if(preset_widgets.begin(), preset_widgets.end(), [](PresetWidget* pw) {
-            return pw->is_live();            
+            return pw->is_live();
         });
         if (wit != preset_widgets.end()) {
             widgets_clear_current();
@@ -55,7 +55,7 @@ void PlayUi::presets_to_json(json_t * root)
     for (auto preset: presets) {
         json_array_append_new(jaru, preset->toJson(true, true, false));
     }
-    json_object_set_new(root, "playlist", jaru);
+    json_object_set_new(root, "presets", jaru);
 }
 
 void PlayUi::presets_from_json(json_t * root)
@@ -64,7 +64,7 @@ void PlayUi::presets_from_json(json_t * root)
     if (j) {
         playlist_device = json_string_value(j);
     }
-    auto jar = json_object_get(root, "playlist");
+    auto jar = json_object_get(root, "presets");
     if (jar) {
         json_t* jp;
         size_t index;
@@ -135,7 +135,7 @@ void PlayUi::sync_to_current_index()
         return pw->get_index() == current_index;
     });
     if (wit != preset_widgets.end()) {
-        onChoosePreset(*wit); 
+        onChoosePreset(*wit);
         return;
     }
     make_visible(current_index);
@@ -570,9 +570,9 @@ void PlayUi::fill(FillOptions which)
     case FillOptions::System:
         list_s = ipl->host_system_presets();
         break;
-    case FillOptions::All: 
+    case FillOptions::All:
         list_u = ipl->host_user_presets();
-        list_s = ipl->host_system_presets(); 
+        list_s = ipl->host_system_presets();
         break;
     }
     if (list_u) {
@@ -824,7 +824,7 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e)
             e.consume(this);
             return;
 
-        case GLFW_KEY_PAGE_UP: 
+        case GLFW_KEY_PAGE_UP:
             if (current_index < 0) {
                 page_up(false, false);
             } else {
@@ -834,7 +834,7 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e)
             e.consume(this);
             return;
 
-        case GLFW_KEY_PAGE_DOWN: 
+        case GLFW_KEY_PAGE_DOWN:
             if (current_index < 0) {
                 page_down(false, false);
             } else {

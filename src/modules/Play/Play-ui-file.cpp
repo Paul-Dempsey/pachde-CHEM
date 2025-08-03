@@ -4,7 +4,7 @@
 
 namespace fs = ghc::filesystem;
 using namespace pachde;
-
+const char * file_dialog_filter = "Playlists (.json):json;Any (*):*";
 bool PlayUi::load_playlist(std::string path, bool set_folder)
 {
     close_playlist();
@@ -57,7 +57,7 @@ void PlayUi::open_playlist()
             my_module->playlist_folder = kv->lookup("playlist-folder");
         }
     }
-    bool ok = openFileDialog(my_module->playlist_folder, "Playlists (.json):json;Any (*):*", playlist_name, path);
+    bool ok = openFileDialog(my_module->playlist_folder, file_dialog_filter, playlist_name, path);
     if (ok) {
         load_playlist(path, true);
     } else {
@@ -117,7 +117,7 @@ void PlayUi::save_as_playlist()
 {
     if (!my_module) return;
     std::string path;
-    bool ok = saveFileDialog(my_module->playlist_folder, "Playlists (.json):json;Any (*):*", playlist_name, path);
+    bool ok = saveFileDialog(my_module->playlist_folder, file_dialog_filter, playlist_name, path);
     if (ok) {
         my_module->playlist_folder = system::getDirectory(path);
         auto ext = system::getExtension(path);
@@ -146,7 +146,7 @@ void PlayUi::save_as_playlist()
         save_playlist();
         my_module->update_mru(path);
         set_modified(false);
-    }    
+    }
 }
 
 void PlayUi::clear_playlist(bool forget_file)

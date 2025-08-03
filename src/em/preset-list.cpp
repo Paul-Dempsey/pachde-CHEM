@@ -114,7 +114,7 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
 void PresetList::to_json(json_t* root, uint8_t hardware, const std::string& connection_info)
 {
     json_object_set_new(root, "connection", json_string(connection_info.c_str()));
-    json_object_set_new(root, "preset-class", json_string(PresetClassName(hardware))); // human-readable
+    json_object_set_new(root, "haken-device", json_string(PresetClassName(hardware))); // human-readable
     json_object_set_new(root, "order", json_integer(int(order)));
     auto jar = json_array();
     for (auto preset: presets) {
@@ -123,12 +123,14 @@ void PresetList::to_json(json_t* root, uint8_t hardware, const std::string& conn
     json_object_set_new(root, "presets", jar);
 }
 
-void PresetList::sort(PresetOrder order)
+void PresetList::sort(PresetOrder new_order)
 {
-    if (modified || (this->order != order)) {
-        this->order = order;
-        auto orderfn = getPresetSort(order);
-        std::sort(presets.begin(), presets.end(), orderfn);
+    if (modified || (order != new_order)) {
+        order = new_order;
+        if (PresetOrder::None != order) {
+            auto orderfn = getPresetSort(new_order);
+            std::sort(presets.begin(), presets.end(), orderfn);
+        }
         modified = true;
     }
 }

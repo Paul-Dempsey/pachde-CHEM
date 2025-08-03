@@ -2,9 +2,6 @@
 
 ## General
 
-- Unify preset file formats
-- **Core** Process() usually isn't called when there is no audio device selecteed.
-  We can check for this and display a message to tell user they need to connect an Audio device to Rack.
 - Preset and Play (Core?): onRandomize select random preset
 - Bug: rounding lights aren't quite same as Continuum
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
@@ -15,9 +12,9 @@
 
 ## Core
 
-- Fix: Osmose startup preset needs special code to get sync'd up when preset db is available.
-- Fix: Switching devices always requires a reset.
-- Add UI to clear only specific user pages.
+- Self-healing preset lists: when preset is sent but returned preset is different name/meta, update list.
+- Option for per-connection preset lists to support multiple devices.
+- Bug: Switching devices always requires a reset.
 
 ## Preset
 
@@ -43,6 +40,8 @@
 - Update doc images for final graphics/themes
 
 - Clean up unused events
+
+- Open issues for unresolved TODOs.
 
 - Sync Dark theme with master SVGs (no delta in appearance between Null and Dark)
 

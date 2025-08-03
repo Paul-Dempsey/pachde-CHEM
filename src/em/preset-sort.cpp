@@ -2,6 +2,11 @@
 
 namespace eaganmatrix {
 
+bool preset_no_order(const std::shared_ptr<PresetInfo>& p1, const std::shared_ptr<PresetInfo>& p2)
+{
+    return true;
+}
+
 bool preset_natural_order(const std::shared_ptr<PresetInfo>& p1, const std::shared_ptr<PresetInfo>& p2)
 {
     return p1->id.key() < p2->id.key();
@@ -51,10 +56,11 @@ bool preset_alpha_order(const std::shared_ptr<PresetInfo>& preset1, const std::s
     return false;
 }
 
-std::function<bool (const std::shared_ptr<PresetInfo>&, const std::shared_ptr<PresetInfo>&)> 
+std::function<bool (const std::shared_ptr<PresetInfo>&, const std::shared_ptr<PresetInfo>&)>
 getPresetSort(PresetOrder order)
 {
     switch (order) {
+    case PresetOrder::None: return preset_no_order;
     case PresetOrder::Natural: return preset_natural_order;
     case PresetOrder::Alpha: return preset_alpha_order;
     case PresetOrder::Category: return preset_category_order;
