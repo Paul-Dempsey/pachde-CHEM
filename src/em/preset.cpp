@@ -64,14 +64,14 @@ void PresetDescription::fromJson(const json_t* root)
 
 std::string PresetDescription::summary() const
 {
-    return format_string("[%d.%d.%d] %s%s", id.bank_hi(), id.bank_lo(), id.number(), valid() ? "": " (invalid) ", name.c_str());
+    return format_string("[%u.%u.%u] %s%s", id.bank_hi(), id.bank_lo(), id.number(), valid() ? "": " (invalid) ", name.c_str());
 }
 
 std::string PresetDescription::meta_text() const
 {
     if (text.empty()) return summary();
 
-    auto info = format_string("%s\n[%d.%d.%d]%s %u", name.c_str(), id.bank_hi(), id.bank_lo(), id.number(), valid() ? "": " (invalid) ", tag);
+    auto info = format_string("%s\n[%u.%u.%u]%s %u", name.c_str(), id.bank_hi(), id.bank_lo(), id.number(), valid() ? "": " (invalid) ", tag);
 
     auto macs = make_macro_summary(text);
     if (!macs.empty()) {
@@ -92,4 +92,14 @@ std::string PresetDescription::meta_text() const
     }
     return info;
 }
+
+bool preset_equal(const PresetDescription *a, const PresetDescription *b)
+{
+    return (a->id.key() == b->id.key())
+        && (a->tag == b->tag)
+        && (a->name == b->name)
+        && (a->text == b->text)
+        ;
+}
+
 }

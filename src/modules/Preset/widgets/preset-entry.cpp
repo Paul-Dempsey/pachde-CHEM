@@ -71,26 +71,32 @@ bool PresetEntry::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTh
 
 void PresetEntry::appendContextMenu(ui::Menu *menu)
 {
-    menu->addChild(createMenuLabel<HamburgerTitle>(preset->name));
-    menu->addChild(createMenuItem("Send", "", [this](){ send_preset(); }, !preset_id().valid()));
-    menu->addChild(createMenuItem("Set current", "", [this](){
-        for (auto pit = peers.begin(); pit != peers.end(); pit++) {
-            (*pit)->current = false;
-        }
-        current = true;
-        ui->set_current_index(preset_index);
-    }));
-    menu->addChild(createMenuItem("Copy info", "", [this](){
-        auto info = preset->meta_text();
-        glfwSetClipboardString(APP->window->win, info.c_str());
-    }));
+    if (preset) {
+        menu->addChild(createMenuLabel<HamburgerTitle>(preset->name));
+        menu->addChild(createMenuItem("Send", "", [this](){ send_preset(); }, !preset_id().valid()));
+        menu->addChild(createMenuItem("Set current", "", [this](){
+            for (auto pit = peers.begin(); pit != peers.end(); pit++) {
+                (*pit)->current = false;
+            }
+            current = true;
+            ui->set_current_index(preset_index);
+        }));
+        menu->addChild(createMenuItem("Copy info", "", [this](){
+            auto info = preset->meta_text();
+            glfwSetClipboardString(APP->window->win, info.c_str());
+        }));
+    }
+    // else {
+    //     menu->addChild(createMenuLabel<HamburgerTitle>("Slot Actions"));
+    //     menu->addChild(createMenuItem("Attempt auto-fill", "", [this](){ }));
+    // }
 }
 
 void PresetEntry::send_preset()
 {
+    if (!ui) return;
     auto id = preset_id();
     if (!id.valid()) return;
-    if (!ui) return;
     ui->send_preset(preset_index);
 }
 
@@ -164,7 +170,7 @@ void PresetEntry::draw(const DrawArgs &args)
     if (valid()) {
         auto font = GetPluginFontRegular();
         if (!FontOk(font)) return;
-    
+
         nvgSave(vg);
         SetTextStyle(vg, font, category_style.nvg_color(), 8.f);
         RightAlignText(vg, box.size.x - 1.5, label->box.size.y, preset->category_code().c_str(), nullptr, BaselineCorrection::Baseline);

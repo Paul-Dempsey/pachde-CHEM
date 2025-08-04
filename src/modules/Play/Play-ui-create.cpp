@@ -35,7 +35,7 @@ struct PlayMenu : Hamburger
         menu->addChild(createMenuItem("Save", "",       [this](){ ui->save_playlist(); } , false));
         menu->addChild(createMenuItem("Save as...", "", [this](){ ui->save_as_playlist(); } , false));
         menu->addChild(createMenuItem("Clear", "", [this](){ ui->clear_playlist(false); }, ui->presets.empty()));
-    
+
         if (ui->my_module) {
             menu->addChild(new MenuSeparator);
             menu->addChild(createSubmenuItem("Open recent", "", [=](Menu* menu) {
@@ -55,11 +55,12 @@ struct PlayMenu : Hamburger
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Sort alphabetically", "", [this](){ ui->sort_presets(PresetOrder::Alpha); }, false));
         menu->addChild(createMenuItem("Sort by category", "", [this](){ ui->sort_presets(PresetOrder::Category); }, false));
-        menu->addChild(createMenuItem("Sort by Natural (system) order", "", [this](){ ui->sort_presets(PresetOrder::Natural); }, false));
+        menu->addChild(createMenuItem("Sort by preset number", "", [this](){ ui->sort_presets(PresetOrder::Natural); }, false));
         if (ui->chem_host) {
             auto em = ui->chem_host->host_matrix();
             if (em) {
                 menu->addChild(createSubmenuItem("Append", "", [=](Menu* menu) {
+                    menu->addChild(createMenuItem("Ten available user slots", "", [this](){ ui->fill(FillOptions::Blanks); }));
                     menu->addChild(createMenuItem("User presets", "", [this](){ ui->fill(FillOptions::User); }));
                     menu->addChild(createMenuItem("System presets", "", [this](){ ui->fill(FillOptions::System); }));
                     menu->addChild(createMenuItem("All presets", "", [this](){ ui->fill(FillOptions::All); }));
@@ -84,7 +85,7 @@ struct PlayMenu : Hamburger
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Select none", "Esc",  [this](){ ui->select_none(); }, no_selection));
     }
-    
+
     void onHoverKey(const HoverKeyEvent& e) override
     {
         Base::onHoverKey(e);
@@ -156,7 +157,7 @@ PlayUi::PlayUi(PlayModule *module) :
         Vec(RIGHT_MARGIN_CENTER, 35.f),  35.f, "1 of 1", theme_engine, theme, style));
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), theme_engine, theme, "Add to playlist");
-    heart->setHandler([this](bool c, bool s){ 
+    heart->setHandler([this](bool c, bool s){
         add_live();
     });
     addChild(heart);
@@ -175,7 +176,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
     up_button->describe("Page up");
-    up_button->setHandler([this](bool c, bool s){ 
+    up_button->setHandler([this](bool c, bool s){
         page_up(c, s);
     });
     up_button->applyTheme(theme_engine, theme);
@@ -244,7 +245,7 @@ void PlayUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Track live preset", "", 
+    menu->addChild(createCheckMenuItem("Track live preset", "",
         [this](){ return my_module->track_live; },
         [this](){ set_track_live(!my_module->track_live); }
     ));

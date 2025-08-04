@@ -10,6 +10,7 @@ using namespace ::rack;
 namespace eaganmatrix {
 constexpr const uint32_t EMPTY_TAG{1888225264};
 
+
 struct PresetDescription
 {
     PresetId id;
@@ -17,7 +18,7 @@ struct PresetDescription
     std::string name;
     std::string text;
 
-    PresetDescription() : 
+    PresetDescription() :
         tag(0)
     {
         name.reserve(32);
@@ -58,9 +59,7 @@ struct PresetDescription
     std::string meta_text() const;
 };
 
-#ifdef HASH_PRESET
-extern crc::crc32 preset_hasher;
-#endif
+bool preset_equal(const PresetDescription* a, const PresetDescription* b);
 
 struct PresetInfo : PresetDescription {
     using Base = PresetDescription;

@@ -359,6 +359,7 @@ std::vector<std::shared_ptr<PresetInfo>> PlayUi::extract(const std::vector<int>&
 
 ssize_t PlayUi::index_of_id(PresetId id)
 {
+    if (!id.valid()) return -1;
     auto key = id.key();
     auto it = std::find_if(presets.cbegin(), presets.cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
     if (it == presets.cend()) return -1;
@@ -506,6 +507,14 @@ void PlayUi::onPresetChange()
         if (preset) {
             live_preset = std::make_shared<PresetInfo>();
             live_preset->init(preset);
+            auto index = index_of_id(preset->id);
+            if (index >= 0) {
+                auto p = presets[index];
+                if (!preset_equal(preset, p.get())) {
+                    p->init(preset);
+                    set_modified(true);
+                }
+            }
         } else {
             live_preset = nullptr;
         }
@@ -519,6 +528,7 @@ void PlayUi::onPresetChange()
     if (live_preset && my_module->track_live) {
         scroll_to_live();
     }
+
     auto live_id = get_live_id();
     for (auto pw : preset_widgets) {
         if (pw->empty()) break;
@@ -553,9 +563,38 @@ void PlayUi::check_playlist_device()
     }
 }
 
+struct PresetIdGenerator
+{
+    uint8_t hi;
+    uint8_t lo;
+    uint8_t number;
+    bool osmose;
+
+    PresetIdGenerator(bool osmose) :
+        hi(osmose ? 90 : 0),
+        lo(0),
+        number(0),
+        osmose(osmose)
+    {}
+
+    PresetId next() {
+        if (number > 127) {
+            if (osmose) {
+                ++hi;
+                number = 0;
+            } else {
+                return PresetId();
+            }
+        }
+        PresetId id(hi,lo,number);
+        ++number;
+        return id;
+    }
+};
+
 void PlayUi::fill(FillOptions which)
 {
-    if (!chem_host) return;
+    if (!chem_host || chem_host->host_busy()) return;
     auto ipl = chem_host->host_preset_list();
     if (!ipl) return;
 
@@ -574,6 +613,26 @@ void PlayUi::fill(FillOptions which)
         list_u = ipl->host_user_presets();
         list_s = ipl->host_system_presets();
         break;
+    case FillOptions::Blanks:
+        auto em = chem_host->host_matrix();
+        if (!em || !em->get_hardware()) return;
+        PresetIdGenerator idgen(em->is_osmose());
+        std::vector<PresetId> ids;
+        while (ids.size() != 10) {
+            PresetId id = idgen.next();
+            if (!id.valid()) break;
+            if (index_of_id(id) < 0) {
+                ids.push_back(id);
+            }
+        }
+        if (ids.empty()) return;
+        for (auto id: ids) {
+            auto p = std::make_shared<PresetInfo>(id, format_string("[%u.%u.%u]", id.bank_hi(), id.bank_lo(), id.number()), "");
+            presets.push_back(p);
+            set_modified(true);
+        }
+        sync_to_presets();
+        return;
     }
     if (list_u) {
         for (auto p: list_u->presets) {

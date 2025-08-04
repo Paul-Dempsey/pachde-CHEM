@@ -24,7 +24,7 @@ void PresetModule::dataFromJson(json_t *root)
             size_t index;
             json_array_foreach(jar, index, jp) {
                 user_filters[index] = parse_hex_u64(json_string_value(jp));
-            }   
+            }
         } else {
             memset(user_filters, 0, sizeof(user_filters));
         }
@@ -34,7 +34,7 @@ void PresetModule::dataFromJson(json_t *root)
             size_t index;
             json_array_foreach(jar, index, jp) {
                 system_filters[index] = parse_hex_u64(json_string_value(jp));
-            }   
+            }
         } else {
             memset(system_filters, 0, sizeof(system_filters));
         }
@@ -99,7 +99,7 @@ void PresetModule::onPresetChange()
     if (chem_ui) ui()->onPresetChange();
 }
 
-void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
+void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
@@ -119,3 +119,4 @@ void PresetModule::process(const ProcessArgs &args)
 }
 
 Model *modelPreset = createModel<PresetModule, PresetUi>("chem-preset");
+

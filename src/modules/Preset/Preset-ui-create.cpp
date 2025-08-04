@@ -58,7 +58,7 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
     item->color = (PresetOrder::Category == order) ? co_dot : RampGray(G_45);
     menu->addChild(item);
 
-    item = createMenuItem<ColorDotMenuItem>("Sort by Natural (system) order", "",
+    item = createMenuItem<ColorDotMenuItem>("Sort by preset number", "",
         [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
     item->color = (PresetOrder::Natural == order) ? co_dot : RampGray(G_45);
     menu->addChild(item);
@@ -75,19 +75,19 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         [this](){ ui->scroll_to_live(); },
         !ui->get_live_id().valid()
     ));
-    menu->addChild(createCheckMenuItem("Track live preset", "", 
+    menu->addChild(createCheckMenuItem("Track live preset", "",
         [this](){ return ui->my_module->track_live; },
         [this](){ ui->set_track_live(!ui->my_module->track_live); },
         !ui->my_module
     ));
-    
+
     //bool osmose = ui->is_osmose();
-    // menu->addChild(createCheckMenuItem("Use cached User presets", "", 
+    // menu->addChild(createCheckMenuItem("Use cached User presets", "",
     //     [this, osmose]() { return osmose || ui->my_module->use_cached_user_presets; },
     //     [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
     //     osmose || !ui->my_module
     // ));
-    menu->addChild(createCheckMenuItem("Keep search filters", "", 
+    menu->addChild(createCheckMenuItem("Keep search filters", "",
         [this]() { return ui->my_module->keep_search_filters; },
         [this]() { ui->my_module->keep_search_filters = !ui->my_module->keep_search_filters; },
         !ui->my_module
@@ -99,7 +99,7 @@ struct SearchMenu : PresetMenu
     void appendContextMenu(ui::Menu* menu) override {
         menu->addChild(createMenuLabel<HamburgerTitle>("Search Options"));
 
-        menu->addChild(createCheckMenuItem("Search preset Name", "", 
+        menu->addChild(createCheckMenuItem("Search preset Name", "",
             [this](){ return ui->my_module->search_name; },
             [this](){
                 ui->my_module->search_name = !ui->my_module->search_name;
@@ -113,7 +113,7 @@ struct SearchMenu : PresetMenu
         menu->addChild(createCheckMenuItem("Search preset Metadata", "",
             [this](){ return ui->my_module->search_meta; },
             [this](){
-                ui->my_module->search_meta = !ui->my_module->search_meta; 
+                ui->my_module->search_meta = !ui->my_module->search_meta;
                 if (!ui->my_module->search_meta) {
                     ui->my_module->search_name = true;
                 }
@@ -146,7 +146,7 @@ struct SearchMenu : PresetMenu
             item->color = RampGray(G_45);
         }
         menu->addChild(item);
-    
+
         item = createMenuItem<ColorDotMenuItem>("Search as you type", "",
             [this](){ ui->my_module->search_incremental = true; },  !ui->my_module);
         if (ui->my_module) {
@@ -167,9 +167,9 @@ PresetUi::PresetUi(PresetModule *module) :
     setModule(module);
     IHandleEmEvents::module_id = ChemId::Preset;
     IHandleEmEvents::em_event_mask = (IHandleEmEvents::EventMask)(
-        SystemBegin + 
-        SystemComplete + 
-        UserBegin + 
+        SystemBegin +
+        SystemComplete +
+        UserBegin +
         UserComplete
     );
     initThemeEngine();
@@ -182,7 +182,7 @@ PresetUi::PresetUi(PresetModule *module) :
 
     x = 23.5f;
     y = 18.f;
-    search_entry = createThemedTextInput(x, y, 114.f, 14.f, theme_engine, theme,         "", 
+    search_entry = createThemedTextInput(x, y, 114.f, 14.f, theme_engine, theme,         "",
         [=](std::string text){ on_search_text_changed(text); },
         [=](std::string text){ on_search_text_enter(); },
         "preset search");
@@ -218,7 +218,7 @@ PresetUi::PresetUi(PresetModule *module) :
     up_button = createWidgetCentered<UpButton>(Vec(x, y));
     up_button->describe("Page up");
     up_button->applyTheme(theme_engine, theme);
-    up_button->setHandler([this](bool c, bool s){ 
+    up_button->setHandler([this](bool c, bool s){
         page_up(c,s);
     });
     addChild(up_button);
@@ -245,7 +245,7 @@ PresetUi::PresetUi(PresetModule *module) :
     auto next = createWidgetCentered<NextButton>(Vec(x, y));
     next->describe("Select next preset");
     next->applyTheme(theme_engine, theme);
-    next->setHandler([this](bool c, bool s){ 
+    next->setHandler([this](bool c, bool s){
         next_preset(c,s);
     });
     addChild(next);
@@ -260,7 +260,7 @@ PresetUi::PresetUi(PresetModule *module) :
     const float FILTER_DY = 20.f;
     y = 205.f;
     FilterButton* filter{nullptr};
-    
+
     addChild(Center(filter = makeCatFilter(Vec(x,y), theme_engine, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
     filter_buttons.push_back(filter);
 
@@ -361,7 +361,7 @@ void PresetUi::createScrews(std::shared_ptr<SvgTheme> theme)
 {
     addChild(createThemedWidget<ThemeScrew>(Vec(5 * RACK_GRID_WIDTH, 0), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 6 * RACK_GRID_WIDTH, 0), theme_engine, theme));
-    
+
     addChild(createThemedWidget<ThemeScrew>(Vec(0, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }

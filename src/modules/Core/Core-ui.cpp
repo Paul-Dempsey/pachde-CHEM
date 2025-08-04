@@ -109,7 +109,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     }
     prev->applyTheme(theme_engine, theme);
     addChild(prev);
-    
+
     auto next = createWidgetCentered<NextButton>(Vec(CENTER + 9.f, NAV_ROW));
     if (my_module) {
         next->describe("Select next preset");
@@ -289,10 +289,10 @@ void CoreModuleWidget::updateIndicators()
                 w->setLook(taskStateColor(state), ChemTask::State::Untried != state);
             }
         }
-        system_presets_indicator->setLook(taskStateColor(my_module->system_presets->empty() 
+        system_presets_indicator->setLook(taskStateColor(my_module->system_presets->empty()
             ? ChemTask::State::Untried
             : (gather_system(my_module->gathering) ? ChemTask::State::Pending : ChemTask::State::Complete)));
-        user_presets_indicator->setLook(taskStateColor(my_module->user_presets->empty() 
+        user_presets_indicator->setLook(taskStateColor(my_module->user_presets->empty()
             ? ChemTask::State::Untried
             : (gather_user(my_module->gathering) ? ChemTask::State::Pending : ChemTask::State::Complete)));
     } else {
@@ -364,7 +364,7 @@ void CoreModuleWidget::setThemeName(const std::string& name, void * context)
 // IChemClient
 rack::engine::Module* CoreModuleWidget::client_module()
 {
-    return my_module; 
+    return my_module;
 }
 std::string CoreModuleWidget::client_claim()
 {
@@ -375,7 +375,7 @@ void CoreModuleWidget::onConnectHost(IChemHost* host)
     chem_host = host;
 }
 
-void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) 
+void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     std::string nothing = "";
     std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
@@ -481,7 +481,7 @@ void CoreModuleWidget::onLED(uint8_t led)
     case Haken::ledBlueGreen:   co = blue_green_light; break;
     }
     em_led->set_light_color(co);
-    em_led->set_brightness(bright); 
+    em_led->set_brightness(bright);
 }
 
 IndicatorWidget *CoreModuleWidget::widget_for_task(ChemTaskId task)
@@ -526,7 +526,7 @@ void drawDotHalo(NVGcontext* vg, float x, float y, const NVGcolor& co, bool halo
     if (halo) {
         CircularHalo(vg, x, y, halo_inner, halo_outer, co);
     }
-    Circle(vg, x, y, dotr, co);    
+    Circle(vg, x, y, dotr, co);
 }
 
 void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
@@ -600,16 +600,18 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 {
     auto my_module = ui->my_module;
     if (!my_module) return;
+    bool busy = my_module->host_busy();
 
     menu->addChild(createMenuLabel<HamburgerTitle>("Core Actions"));
 
-    menu->addChild(createSubmenuItem("Presets", "", [this, my_module](Menu* menu) {
+    menu->addChild(createSubmenuItem("Presets", "", [this, my_module, busy](Menu* menu) {
+
         menu->addChild(createMenuItem("Clear System presets", "", [=]() {
             my_module->clear_presets(PresetTab::System);
-        }));
+        }, busy));
         menu->addChild(createMenuItem("Clear User presets", "", [=]() {
             my_module->clear_presets(PresetTab::User);
-        }));
+        }, busy));
 
         menu->addChild(new MenuSeparator);
 
@@ -617,28 +619,28 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             menu->addChild(createMenuItem("Scan System preset database", "", [=]() {
                 ui->em_status_label->text("Scanning Full System presets...");
                 my_module->load_full_system_presets();
-            }));
+            }, busy));
             menu->addChild(createMenuItem("Scan User preset database", "(page 1)", [=]() {
                 ui->em_status_label->text("Scanning User presets (page 1)...");
                 my_module->load_full_user_presets();
-            }));
+            }, busy));
             menu->addChild(createSubmenuItem("Scan more User pages", "", [=](Menu* menu) {
                 menu->addChild(createMenuItem("Scan and append Page 2", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 2)...");
                     my_module->scan_osmose_presets(91);
-                }));
+                }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 3", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 3)...");
                     my_module->scan_osmose_presets(92);
-                }));
+                }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 4", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 4)...");
                     my_module->scan_osmose_presets(93);
-                }));
+                }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 5", "", [=]() {
                     ui->em_status_label->text("Scanning User presets (page 5)...");
                     my_module->scan_osmose_presets(94);
-                }));
+                }, busy));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
                 // menu->addChild(createMenuItem("Page 7", "", [my_module]() {}));
                 // menu->addChild(createMenuItem("Page 8", "", [my_module]() {}));
@@ -649,24 +651,24 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             menu->addChild(createMenuItem("Quick scan - System presets", "", [=]() {
                 ui->em_status_label->text("Scanning quick System presets...");
                 my_module->load_quick_system_presets();
-            }));
+            }, busy));
             menu->addChild(createMenuItem("Full scan - System preset database", "", [=]() {
                 ui->em_status_label->text("Scanning full System presets...");
                 my_module->load_full_system_presets();
                 ui->create_stop_button();
-            }));
+            }, busy));
 
             menu->addChild(new MenuSeparator);
 
             menu->addChild(createMenuItem("Quick scan - User presets", "", [=]() {
                 ui->em_status_label->text("Scanning quick User presets...");
                 my_module->load_quick_user_presets();
-            }));
+            }, busy));
             menu->addChild(createMenuItem("Full scan - User preset database", "", [=]() {
                 ui->em_status_label->text("Scanning full User presets...");
                 my_module->load_full_user_presets();
                 ui->create_stop_button();
-            }));
+            }, busy));
         }
     }));
 
@@ -677,59 +679,60 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
     menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
         [=](){ return my_module->disconnected; },
-        [=](){ ui->connect_midi(my_module->disconnected); }
+        [=](){ ui->connect_midi(my_module->disconnected); },
+        busy
     ));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [my_module](){ return my_module->glow_knobs; },
         [this, my_module](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             ui->glowing_knobs(my_module->glow_knobs);
         }
     ));
- 
+
     if (my_module->em.is_surface()) {
         menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {
             menu->addChild(createMenuItem("Reset calibration", "", [my_module]() {
                 my_module->haken_midi.reset_calibration(ChemId::Core);
-            }));
+            }, busy));
             menu->addChild(createMenuItem("Refine calibration", "", [my_module]() {
                 my_module->haken_midi.refine_calibration(ChemId::Core);
-            }));
+            }, busy));
             menu->addChild(createMenuItem("Factory calibration", "", [my_module]() {
                 my_module->haken_midi.factory_calibration(ChemId::Core);
-            }));
+            }, busy));
             menu->addChild(new MenuSeparator);
             menu->addChild(createMenuItem("Surface alignment", "", [my_module]() {
                 my_module->haken_midi.surface_alignment(ChemId::Core);
-            }));
+            }, busy));
         }));
     }
-    
+
     menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Editor Hello", "", [my_module]() {
             my_module->haken_midi.editor_present(ChemId::Core);
-        }));
+        }, busy));
         menu->addChild(createMenuItem("ConText", "", [my_module]() {
             my_module->haken_midi.request_con_text(ChemId::Core);
-        }));
+        }, busy));
         menu->addChild(createMenuItem("Updates", "", [my_module]() {
             my_module->haken_midi.request_updates(ChemId::Core);
         }));
         menu->addChild(createMenuItem("Configuration", "", [my_module]() {
             my_module->haken_midi.request_configuration(ChemId::Core);
-        }));
+        }, busy));
         menu->addChild(createMenuItem("User presets", "", [my_module]() {
             my_module->haken_midi.request_user(ChemId::Core);
-        }));
+        }, busy));
         menu->addChild(createMenuItem("System presets", "", [my_module]() {
             my_module->haken_midi.request_system(ChemId::Core);
-        }));
+        }, busy));
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Remake Mahling data", "", [my_module]() {
             my_module->haken_midi.remake_mahling(ChemId::Core);
-        }));
+        }, busy));
 
     }));
 

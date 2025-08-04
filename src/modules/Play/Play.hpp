@@ -23,23 +23,23 @@ struct PlayUi;
 struct PlayModule : ChemModule, IChemClient
 {
     std::string device_claim;
-    
+
     rack::dsp::SchmittTrigger prev_trigger;
     rack::dsp::SchmittTrigger next_trigger;
-    
+
     std::string playlist_folder;
     std::string playlist_file;
     std::deque<std::string> playlist_mru;
     bool track_live;
     EmBatchState em_batch;
-    
+
     PlayModule();
     ~PlayModule() {
         if (chem_host) {
             chem_host->unregister_chem_client(this);
         }
     }
-    
+
     PlayUi* ui() { return reinterpret_cast<PlayUi*>(chem_ui); }
 
     void update_mru(std::string path);
@@ -78,7 +78,7 @@ struct PlayModule : ChemModule, IChemClient
 };
 
 // -- Play UI -----------------------------------
-enum class FillOptions { None, User, System, All };
+enum class FillOptions { None, User, System, All, Blanks };
 struct PlayMenu;
 constexpr const int PAGE_CAPACITY = 15;
 
@@ -110,13 +110,13 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     PresetId get_live_id() { PresetId id; return live_preset ? live_preset->id : id; }
     std::shared_ptr<PresetInfo> current_preset;
     ssize_t current_index{-1};
-    
+
     std::deque<std::shared_ptr<PresetInfo>> presets;
     ssize_t preset_count() { return static_cast<ssize_t>(presets.size()); }
-    
+
     std::vector<PresetWidget*> preset_widgets;
     ssize_t scroll_top{0};  // index of top preset
-    
+
     std::string playlist_name;
     std::string playlist_device;
 
@@ -127,7 +127,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void select_preset(PresetId id);
     void sync_to_current_index();
     void widgets_clear_current();
-    
+
     std::vector<int> selected;
     int first_selected();
     int last_selected();
@@ -136,7 +136,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     bool is_selected(int index) { return selected.cend() != std::find(selected.cbegin(), selected.cend(), index); }
     void select_item(int index);
     void unselect_item(int index);
-    
+
     std::vector<std::shared_ptr<PresetInfo>> extract(const std::vector<int>& list);
     ssize_t index_of_id(PresetId id);
     void set_track_live(bool track);
@@ -181,7 +181,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // IPresetAction
     void onClearSelection() override;
     void onSetSelection(PresetWidget* source, bool on) override;

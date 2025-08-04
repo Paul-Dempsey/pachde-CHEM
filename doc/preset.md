@@ -54,7 +54,7 @@ The "hamburger" menu on the right is the *Preset Actions* menu.
 | -- | -- |
 | **Sort alphabetically** | Sort the presets alphabetically. This is the default. |
 | **Sort by category** | Sort the presets by Category, then alphabetically within the category. Categories are order alpha by category code: (**CL** Classic, **CV** Control Voltage, **DO** Drone, **KY** Keyboard, **MD** Midi, **OT** Other, **PE** Percussion, **PR** Processor, **PT** Tuned Percussion, **ST** Strings, **UT** Utility, **VO** Vocal, **WI** Winds, **ZZ** (Unkown)). If you see any presets in the **ZZ** category, the preset has an authoring error. |
-| **Sort by Natural (system) order** | Arrange the presets in the system order. This is the same order that presets are loaded when using the *Previous*/*Next* buttons on the **Core** module. |
+| **Sort by preset number** | Arrange the presets in the system order -- ascending preset number. |
 | **Show live preset** | Scrolls the *live* preset into view. |
 | **Track live preset** | The *current* preset follows the *live* preset. |
 | **Keep search filters** | When enabled, metadata filters are retained across invocations of Rack with the same Rack patch. If not enabled, each invocation starts fresh with all presets shown. |

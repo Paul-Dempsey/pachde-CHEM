@@ -35,7 +35,7 @@ struct PresetEntry : OpaqueWidget, IApplyTheme
     void set_current(ssize_t index);
     void clear_preset();
     bool valid() const { return preset && preset->valid(); }
-    PresetId preset_id() const { PresetId dead; return preset ? preset->id : dead; }
+    PresetId preset_id() const { return preset ? preset->id : PresetId(); }
     void send_preset();
 
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;

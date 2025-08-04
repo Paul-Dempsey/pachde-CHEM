@@ -12,7 +12,6 @@
 
 ## Core
 
-- Self-healing preset lists: when preset is sent but returned preset is different name/meta, update list.
 - Option for per-connection preset lists to support multiple devices.
 - Bug: Switching devices always requires a reset.
 

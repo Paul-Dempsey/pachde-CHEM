@@ -48,7 +48,7 @@ bool PresetUi::load_presets(PresetTab which)
 void PresetUi::sort_presets(PresetOrder order)
 {
     if (!my_module) return;
-    
+
     Tab & tab = active_tab();
     if (!tab.list.preset_list) return;
     if (0 == tab.count()) return;
@@ -80,20 +80,19 @@ void PresetUi::onSystemBegin()
 {
     other_system_gather = true;
     help_label->text("scanning System presets");
+    help_label->setVisible(true);
     live_preset_label->text("");
     live_preset_label->describe("");
 }
 
 void PresetUi::onSystemComplete()
 {
-    if (other_system_gather) {
-        other_system_gather = false;
-        return;
-    }
+    other_system_gather = false;
     system_tab.list.refresh_filter_view();
     if (active_tab_id == PresetTab::System) {
         scroll_to(0);
     }
+    help_label->setVisible(false);
     help_label->text("");
 }
 
@@ -101,6 +100,7 @@ void PresetUi::onUserBegin()
 {
     other_user_gather = true;
     help_label->text("scanning User presets");
+    help_label->setVisible(true);
     live_preset_label->text("");
     live_preset_label->describe("");
 }
@@ -112,6 +112,7 @@ void PresetUi::onUserComplete()
     if (active_tab_id == PresetTab::User) {
         scroll_to(0);
     }
+    help_label->setVisible(false);
     help_label->text("");
 }
 
@@ -125,14 +126,17 @@ void PresetUi::onPresetChange()
         if (preset) {
             live_preset = std::make_shared<PresetInfo>();
             live_preset->init(preset);
-            live_preset_label->text(live_preset->name);
+            live_preset_label->text(preset->name);
             live_preset_label->describe(live_preset->meta_text());
             Tab& tab = active_tab();
-            auto n = tab.list.index_of_id(live_preset->id);
+            auto n = tab.list.index_of_id(preset->id);
             if (n >= 0) {
                 auto p = tab.list.nth(n);
-                p->set_text(live_preset->text);
-                tab.list.set_dirty();
+                if (!preset_equal(preset, p.get()))
+                {
+                    p->init(preset);
+                    tab.list.set_dirty();
+                }
                 set_current_index(n);
             }
         } else {
@@ -146,10 +150,10 @@ void PresetUi::onPresetChange()
     if (live_preset && my_module->track_live) {
         scroll_to_live();
     }
+    auto current = active_tab().current_index;
     for (auto pw : preset_grid) {
         if (!pw->valid()) break;
         pw->live = live_preset && live_preset->valid() && (pw->preset_id() == live_preset->id);
-        auto current = active_tab().current_index;
         pw->current = (current >= 0) && (current == pw->preset_index);
     }
 }
@@ -424,8 +428,10 @@ void PresetUi::update_help()
     Tab& tab = active_tab();
     if (tab.list.empty()) {
         help_label->text("scan presets using the Core actions menu");
+        help_label->setVisible(true);
     } else {
         help_label->text("");
+        help_label->setVisible(false);
     }
 }
 
