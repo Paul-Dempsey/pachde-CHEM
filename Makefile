@@ -51,6 +51,7 @@ SOURCES += src/widgets/bits-widget.cpp
 SOURCES += src/widgets/color-picker.cpp
 SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
+SOURCES += src/widgets/knob-track-widget.cpp
 SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/PanelBorder.cpp
 SOURCES += src/widgets/pic.cpp
