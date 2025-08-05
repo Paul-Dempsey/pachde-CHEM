@@ -351,14 +351,38 @@ void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_rad
     nvgFill(vg);
 }
 
+constexpr const float PI_HALF = M_PI*.5f;
+
 void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color)
 {
     nvgBeginPath(vg);
-    nvgArc(vg, cx, cy, track_radius, minAngle - M_PI*.5f, maxAngle - M_PI*.5f, NVG_CW);
+    nvgArc(vg, cx, cy, track_radius, minAngle -PI_HALF, maxAngle - PI_HALF, NVG_CW);
     nvgStrokeWidth(vg, track_width);
     nvgStrokeColor(vg, color);
     nvgLineCap(vg, NVG_ROUND);
     nvgStroke(vg);
+}
+
+void TrackGliss(NVGcontext* vg, float cx, float cy,  float xg, float yg, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color)
+{
+    nvgBeginPath(vg);
+    float start_angle = minAngle -PI_HALF;
+    float end_angle = maxAngle - PI_HALF;
+    nvgArc(vg, cx, cy, track_radius + track_width*.5, start_angle, end_angle, NVG_CW);
+
+    float radius = track_radius - track_width*.5;
+    float x = cx + radius * std::sin(end_angle);
+    float y = cy + radius * std::cos(end_angle);
+    nvgLineTo(vg, x, y);
+    nvgArc(vg, cx, cy, radius, end_angle, start_angle, NVG_CCW);
+    nvgClosePath(vg);
+
+    NVGcolor ocol = nvgTransRGBAf(color, 0.f);
+
+    NVGpaint paint = nvgRadialGradient(vg, xg, yg, track_width*1.75f, track_radius, color, ocol);
+    nvgFillPaint(vg, paint);
+    nvgFill(vg);
+
 }
 
 }

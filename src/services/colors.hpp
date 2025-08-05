@@ -139,7 +139,7 @@ inline NVGcolor fromPackedOrDefault(PackedColor co, const NVGcolor& fallback)
 
 inline PackedColor toPacked(NVGcolor co) {
     return PackRGBA(
-        static_cast<uint32_t>(co.r * 255.f), 
+        static_cast<uint32_t>(co.r * 255.f),
         static_cast<uint32_t>(co.g * 255.f),
         static_cast<uint32_t>(co.b * 255.f),
         static_cast<uint32_t>(co.a * 255.f));
@@ -341,7 +341,7 @@ inline PackedColor GetPackedStockColor(StockColor id) {
 
 constexpr const float PI = 3.14159265358979323846;
 constexpr const float TWO_PI = 2.0f * PI;
-constexpr const float SQRT3 = 1.732050807568877f; 
+constexpr const float SQRT3 = 1.732050807568877f;
 
 // stb linearizes on load so we don't have to gamma-correct
 inline float LuminanceLinear(const NVGcolor& color) {
@@ -393,8 +393,8 @@ void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
 void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
 
-// VEC_ARGS(knob->box.getCenter())  , knob->minAngle, knob->maxAngle
 void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
+void TrackGliss(NVGcontext* vg, float cx, float cy, float xg, float yg, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 
 #ifdef IMPLEMENT_COLOR_MENU
 template <class TMenuItem = rack::ui::MenuEntry>
@@ -431,7 +431,7 @@ rack::ui::MenuEntry* createColorMenuItem(
     child->box.pos.x = 12.f;
     item->addChild(child);
     item->check_menu = child;
-   
+
 	return item;
 }
 #endif
