@@ -17,42 +17,21 @@ struct XMUi;
 struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 {
     enum Params {
-        P_1,
-        P_2,
-        P_3,
-        P_4,
-        P_5,
-        P_6,
-        P_7,
-        P_8,
+        P_1, P_2, P_3, P_4, P_5, P_6, P_7, P_8,
         P_MODULATION,
         P_RANGE_MIN,
         P_RANGE_MAX,
         NUM_PARAMS
     };
     enum Inputs {
-        IN_1,
-        IN_2,
-        IN_3,
-        IN_4,
-        IN_5,
-        IN_6,
-        IN_7,
-        IN_8,
+        IN_1, IN_2, IN_3, IN_4, IN_5, IN_6, IN_7, IN_8,
         NUM_INPUTS
     };
     enum Outputs {
         NUM_OUTPUTS
     };
     enum Lights {
-        L_IN_1,
-        L_IN_2,
-        L_IN_3,
-        L_IN_4,
-        L_IN_5,
-        L_IN_6,
-        L_IN_7,
-        L_IN_8,
+        L_IN_1, L_IN_2, L_IN_3, L_IN_4, L_IN_5, L_IN_6, L_IN_7, L_IN_8,
         L_OVERLAY,
         L_CORE,
         NUM_LIGHTS
@@ -63,12 +42,10 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     std::string title;
     PackedColor title_bg;
     PackedColor title_fg;
-    bool has_mod_knob;
 
     int mod_target{-1};
     int last_mod_target{-2};
     bool glow_knobs;
-    bool in_mat_poke;
 
     MacroData my_macros;
 
@@ -79,24 +56,29 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 
     XMUi* ui() { return reinterpret_cast<XMUi*>(chem_ui); };
 
-    void set_modulation_target(int id) {
-        if (getInput(id).isConnected()) {
-            mod_target = id;
-        }
-    }
+    bool has_mod_knob();
+    void set_modulation_target(int id);
     void center_knobs();
     void update_param_info();
+    void update_overlay_macros();
+    void remove_overlay_macros();
+    void update_from_em();
+
+    // IDoMidi
+    void do_message(PackedMidiMessage msg) override;
 
     // IOverlayClient
     void on_overlay_change(IOverlay* ovr) override;
     IOverlay* get_overlay() override { return overlay; }
     int64_t get_module_id() override { return id; }
+    void on_connect_preset() override;
 
     void xm_clear();
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
     std::string client_claim() override { return device_claim; }
+    IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override {}
 
@@ -106,7 +88,6 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
 
     void onRemove(const RemoveEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;
-    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -121,23 +102,25 @@ struct XMUi : ChemModuleWidget
 
     XMModule* my_module{nullptr};
 
-    // LinkButton* link_button{nullptr};
-    // IndicatorWidget* link{nullptr};
-
     ElementStyle edit_style{"xm-edit", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
     ElementStyle placeholder_style{"xm-placeholder", "hsl(0,0%,55%)", "hsl(0,0%,55%)", .25f};
 
-    Swatch* title_bar{nullptr};
-    TextLabel * title{nullptr};
-    PackedColor title_bg;
-    PackedColor title_fg;
-    MacroEdit* edit_macro{nullptr};
-    EditWireframe* wire_frame{nullptr};
     bool editing{false};
     bool draw_placeholders{true};
-    TrimPot* knobs[9]{nullptr};
-    TrackWidget* tracks[8]{nullptr};
-    TextLabel* labels[8]{nullptr};
+
+    PackedColor title_bg;
+    PackedColor title_fg;
+    Swatch * title_bar{nullptr};
+    TextLabel * title{nullptr};
+    MacroEdit * edit_macro{nullptr};
+    EditWireframe * wire_frame{nullptr};
+
+    TrimPot * knobs[9]{nullptr};
+    TrackWidget * tracks[8]{nullptr};
+    TextLabel * labels[8]{nullptr};
+    ThemeColorPort * ports[8]{nullptr};
+    ClickRegion * port_click[8]{nullptr};
+    TinySimpleLight<GreenLight> * port_light[8]{nullptr};
 
     XMUi(XMModule *module);
     virtual ~XMUi() {
@@ -157,8 +140,7 @@ struct XMUi : ChemModuleWidget
     void commit_macro();
     MacroDescription* get_edit_macro();
     std::shared_ptr<MacroDescription> get_persistent_macro(int index);
-    bool get_modulation();
-    void set_modulation(bool mod);
+    bool has_mod_knob();
 
     void xm_clear();
     std::string get_header_text();

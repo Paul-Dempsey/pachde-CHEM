@@ -59,7 +59,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-15.f), theme_engine, theme, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
-    
+
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
@@ -159,7 +159,7 @@ void OverlayUi::appendContextMenu(Menu *menu)
     label.append(over ? over->name : "<not configured>");
     menu->addChild(createMenuLabel(label));
 
-    menu->addChild(createMenuLabel(format_string("Macros: %d", my_module ? my_module->macros.size() : 0)));
+    menu->addChild(createMenuLabel(format_string("Macros: %u", my_module ? my_module->macros.size() : 0)));
 
     auto preset = my_module ? my_module->live_preset : nullptr;
     menu->addChild(createMenuItem("Use live preset", preset ? preset->name : "<none>", [=](){
@@ -174,7 +174,7 @@ void OverlayUi::appendContextMenu(Menu *menu)
         title_widget->set_text(DEFAULT_TITLE);
     }));
 
-    menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>", 
+    menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>",
         [=](Menu *menu) {
             menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, my_module ? my_module->title : "<title>", [=](std::string text) { set_title(text); }));
         }));

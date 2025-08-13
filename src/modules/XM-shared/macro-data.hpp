@@ -36,8 +36,8 @@ struct MacroDescription
     float mod_value{0.f};
     uint16_t em_value{0xffff};
     uint16_t last_em_value{0xffff};
-
-    bool modulated{true};
+    bool cv_port{true};
+    bool modulation{true};
     int64_t module_id{-1};
     ssize_t knob_id{-1};
     uint8_t macro_number{INVALID_MACRO};
@@ -52,10 +52,11 @@ struct MacroDescription
     void init (const MacroDescription& source);
     void set_range(MacroRange r);
     bool valid();
+    bool has_param_knob() { return cv_port ? modulation : true; }
 
     void set_em_value(uint16_t em);
     void set_mod_amount(float amount);
-    void set_value(float value);
+    void set_param_value(float value);
 
     bool pending() { return (em_value != last_em_value) && (0xffff != last_em_value); }
     void un_pend() { last_em_value = em_value; }
@@ -77,7 +78,6 @@ struct MacroData
     void add_update(std::shared_ptr<MacroDescription> macro);
     void remove(int64_t module_id, ssize_t knob_id);
     void remove(int64_t module_id);
-    void prune_leaving(const std::vector<int64_t>& preserve);
     std::shared_ptr<MacroDescription> get_macro(int64_t module_id, ssize_t knob_id);
     void from_json(json_t* root);
     void to_json(json_t* root);

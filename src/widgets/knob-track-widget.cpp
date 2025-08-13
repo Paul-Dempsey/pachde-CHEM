@@ -21,8 +21,7 @@ TrackWidget::TrackWidget() :
 
 void TrackWidget::set_active(bool enable) { active = enable; }
 void TrackWidget::set_value(float value) {
-    assert(in_range(value, min_value, max_value));
-    this->value = value;
+    this->value = clamp(value, min_value, max_value);
 }
 void TrackWidget::set_min_max_value(float min, float max) {
     assert(min < max);

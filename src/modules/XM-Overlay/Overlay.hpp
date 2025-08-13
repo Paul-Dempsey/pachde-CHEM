@@ -16,6 +16,14 @@ using namespace eaganmatrix;
 
 struct OverlayUi;
 
+struct ClientInfo
+{
+    IOverlayClient* client{nullptr};
+    bool pause{false};
+    ClientInfo(const ClientInfo&) = delete;
+    ClientInfo(IOverlayClient* guest) : client(guest) {};
+};
+
 struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 {
     enum Lights {
@@ -25,6 +33,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     bool preset_connected{false};
     bool pending_client_clear{false};
+
     std::string device_claim;
     std::shared_ptr<PresetInfo> overlay_preset{nullptr};
     std::shared_ptr<PresetInfo> live_preset{nullptr};
@@ -32,40 +41,41 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     PackedColor bg_color{0};
     PackedColor fg_color{0xffe6e6e6};
 
-    std::vector<IOverlayClient*> clients;
+    std::vector<std::shared_ptr<ClientInfo>> clients;
     MacroData macros;
-
+    int paused_clients{0};
     std::vector<MacroUsage> macro_usage;
     MacroUsageBuilder mac_build{macro_usage};
     bool expect_preset_change{false};
     bool in_macro_request{false};
     rack::dsp::Timer midi_timer;
-    bool sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate = MOD_MIDI_RATE);
 
     OverlayModule();
     virtual ~OverlayModule();
 
     OverlayUi* ui() { return reinterpret_cast<OverlayUi*>(chem_ui); };
 
+    bool sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate = MOD_MIDI_RATE);
     void reset();
     void update_from_em();
     void on_macro_request_complete();
-    void prune_missing_clients();
+    bool client_editing();
+    void notify_connect_preset();
 
     // IOverlay
     IChemHost* get_host() override { return (chem_host && chem_host->host_busy()) ? nullptr : chem_host; }
     void overlay_register_client(IOverlayClient* client) override;
     void overlay_unregister_client(IOverlayClient* client) override;
+    void overlay_client_pause(IOverlayClient* client, bool pausing) override;
     std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
     std::shared_ptr<PresetInfo> overlay_configured_preset() override { return overlay_preset; }
     void overlay_request_macros() override;
     MacroReadyState overlay_macros_ready() override;
     std::vector<MacroUsage>& overlay_macro_usage() override { return macro_usage; }
-    std::shared_ptr<MacroDescription> overlay_get_macro(int64_t module, ssize_t knob) override { return macros.get_macro(module, knob); }
-    void used_macros(std::vector<uint8_t>* list) override;
+    void overlay_used_macros(std::vector<uint8_t>* list) override;
     void overlay_remove_macro(int64_t module, ssize_t knob) override;
-    void overlay_add_macro(std::shared_ptr<MacroDescription> macro) override;
     void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) override;
+    bool overlay_preset_connected() override { return preset_connected; }
 
     // IDoMidi
     void do_message(PackedMidiMessage msg) override;

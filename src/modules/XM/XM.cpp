@@ -4,12 +4,9 @@ using namespace pachde;
 #include "../../services/rack-help.hpp"
 
 XMModule::XMModule() :
-//    modulation(this, ChemId::Unknown),
     title_bg(GetPackedStockColor(StockColor::pachde_blue_medium)),
     title_fg(GetPackedStockColor(StockColor::Gray_65p)),
-    has_mod_knob(false),
-    glow_knobs(false),
-    in_mat_poke(false)
+    glow_knobs(false)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
@@ -60,11 +57,9 @@ void XMModule::dataFromJson(json_t* root)
     if (title_fg == RARE_COLOR) {
         title_fg = GetPackedStockColor(StockColor::Gray_75p);
     }
-    has_mod_knob = get_json_bool(root, "modulation", false);
     my_macros.from_json(root);
-    update_param_info();
-
     try_bind_overlay();
+    update_param_info();
     ModuleBroker::get()->try_bind_client(this);
 }
 
@@ -76,7 +71,6 @@ json_t* XMModule::dataToJson()
     json_object_set_new(root, "module-title", json_string(title.c_str()));
     json_object_set_new(root, "title-bg", json_string(hex_string(title_bg).c_str()));
     json_object_set_new(root, "title-fg", json_string(hex_string(title_fg).c_str()));
-    json_object_set_new(root, "modulation", json_boolean(has_mod_knob));
     my_macros.to_json(root);
 
     return root;
@@ -90,14 +84,35 @@ void XMModule::try_bind_overlay()
     }
     if (overlay) {
         overlay->overlay_register_client(this);
+        update_overlay_macros();
     }
 }
 
 void XMModule::onRemove(const RemoveEvent &e)
 {
     if (overlay) {
+        remove_overlay_macros();
         overlay->overlay_unregister_client(this);
         overlay = nullptr;
+    }
+}
+
+bool XMModule::has_mod_knob()
+{
+    return std::any_of(my_macros.data.cbegin(), my_macros.data.cend(),
+        [](std::shared_ptr<pachde::MacroDescription> md){
+            return md->modulation;
+        });
+}
+
+void XMModule::set_modulation_target(int id)
+{
+    if (getInput(id).isConnected()) {
+        auto macro = my_macros.get_macro(getId(), id);
+        if (macro && macro->modulation) {
+            getParamQuantity(P_MODULATION)->setValue(macro->mod_amount);
+        }
+        mod_target = id;
     }
 }
 
@@ -121,15 +136,92 @@ void XMModule::update_param_info()
     }
 }
 
+void XMModule::update_overlay_macros()
+{
+    if (!overlay) return;
+    for (auto macro: my_macros.data) {
+        if (macro->valid()) {
+            overlay->overlay_add_update_macro(macro);
+        }
+    }
+}
+
+void XMModule::remove_overlay_macros()
+{
+    if (!overlay) return;
+    for (auto macro: my_macros.data) {
+        overlay->overlay_remove_macro(getId(), macro->knob_id);
+    }
+}
+
+void XMModule::update_from_em()
+{
+    if (chem_host && overlay && overlay->overlay_preset_connected()) {
+        auto em = chem_host->host_matrix();
+        if (!em) return;
+        for (auto macro: my_macros.data) {
+            auto em_value = em->get_macro_value(macro->macro_number);
+            macro->set_em_value(em_value);
+        }
+    }
+}
+
+void XMModule::do_message(PackedMidiMessage message)
+{
+
+    if (my_macros.empty()) return;
+    if (!chem_host) return;
+    if (!overlay->overlay_preset_connected()) return;
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    auto em = chem_host->host_matrix();
+    if (!em) return;
+
+    auto tag = midi_tag(message);
+    if (as_u8(ChemId::Unknown) == tag) return;
+    if (as_u8(ChemId::Overlay) == tag) return;
+    if (as_u8(ChemId::XM) == tag) return;
+
+    auto cc = midi_cc(message);
+    if (cc < Haken::ccM7 || cc > Haken::ccM90) return;
+
+    uint8_t number = 0;
+    if (cc <= Haken::ccM30) {
+        number = (cc - Haken::ccM7);
+    } else if (cc < Haken::ccM31) {
+        return;
+    } else if (cc <= Haken::ccM48) {
+        number = (cc - Haken::ccM31);
+    }
+    if (!number) return;
+    if (em->frac_hi) number += 48;
+
+    for (auto macro: my_macros.data) {
+        if (number == macro->macro_number) {
+            macro->set_em_value(em->get_macro_value(number));
+            getParamQuantity(macro->knob_id)->setValue(macro->param_value);
+            break;
+        }
+    }
+}
+
 void XMModule::on_overlay_change(IOverlay *new_overlay)
 {
+    if (overlay == new_overlay) return;
     if (overlay) {
+        remove_overlay_macros();
         overlay->overlay_unregister_client(this);
     }
     overlay = new_overlay;
     if (overlay) {
         overlay->overlay_register_client(this);
+        update_overlay_macros();
+        update_from_em();
     }
+}
+
+void XMModule::on_connect_preset()
+{
+    update_from_em();
 }
 
 // IExtendedMacro
@@ -137,7 +229,6 @@ void XMModule::xm_clear() {
     title= "";
     title_bg = GetPackedStockColor(StockColor::pachde_blue_medium);
     title_fg = GetPackedStockColor(StockColor::Gray_65p);
-
     if (chem_ui) { ui()->xm_clear(); }
 }
 
@@ -150,29 +241,28 @@ void XMModule::onConnectHost(IChemHost* host)
 void XMModule::onPortChange(const PortChangeEvent& e)
 {
     if (e.connecting) {
+        auto macro = my_macros.get_macro(getId(), e.portId);
         mod_target = e.portId;
+
+        if (macro && macro->modulation) {
+            auto pq = getParamQuantity(P_MODULATION);
+            if (pq) pq->setValue(macro->mod_amount);
+        }
     } else {
         if (mod_target == e.portId) {
             mod_target = -1;
             for (int i = 0; i < 8; ++i) {
                 if ((i != e.portId) && getInput(i).isConnected()) {
-                    mod_target = i;
-                    break;
+                    auto macro = my_macros.get_macro(getId(), i);
+                    if (macro && macro->modulation) {
+                        mod_target = i;
+                        auto pq = getParamQuantity(P_MODULATION);
+                        if (pq) pq->setValue(macro->mod_amount);
+                        break;
+                    }
                 }
             }
         }
-    }
-    if (mod_target >= 0) {
-        auto macro = my_macros.get_macro(getId(), mod_target);
-        getParam(P_MODULATION).setValue(macro ? macro->mod_amount : 0.f);
-    }
-}
-
-void XMModule::process_params(const ProcessArgs& args)
-{
-    if (has_mod_knob && (mod_target >= 0)) {
-        auto macro = my_macros.get_macro(getId(), mod_target);
-        macro->set_mod_amount(getParam(P_MODULATION).getValue());
     }
 }
 
@@ -185,29 +275,53 @@ void XMModule::process(const ProcessArgs& args)
         try_bind_overlay();
     }
 
-    bool free_host = overlay && overlay->get_host();
+    bool host_and_overlay = overlay && overlay->get_host();
 
     if (0 == (jitter_frame % 47)) {
         if (last_mod_target != mod_target) {
             for (int i = 0; i < 8; ++i) {
-                getLight(i).setSmoothBrightness((i == mod_target) ? 1.f : 0.f, 90);
+                getLight(i).setBrightness(0.f);
+            }
+            if (mod_target >= 0) {
+                getLight(mod_target).setBrightness(1.f);
             }
             last_mod_target = mod_target;
         }
         getLight(L_OVERLAY).setSmoothBrightness((overlay ? 1.0f : 0.f), 90);
-        getLight(L_CORE).setSmoothBrightness(free_host, 90);
+        getLight(L_CORE).setSmoothBrightness(host_and_overlay, 90);
+
+        auto edit_macro = chem_ui ? ui()->get_edit_macro() : nullptr;
+        if (edit_macro && (MacroRange::Custom == edit_macro->range)) {
+            float rmin = getParam(Params::P_RANGE_MIN).getValue();
+            float rmax = getParam(Params::P_RANGE_MAX).getValue();
+            float min = std::min(rmin, rmax);
+            float max = std::max(rmin, rmax);
+            edit_macro->min = min;
+            edit_macro->max = max;
+        }
     }
 
-    if (!free_host) return;
+    if (!host_and_overlay) return;
+    if (!overlay->overlay_preset_connected()) return;
+    if (!chem_ui) return;
+    if (ui()->editing) return;
 
-    if ((jitter_frame % 41) == 0) {
-        process_params(args);
-    }
     for (auto macro: my_macros.data) {
-        macro->cv = getInput(macro->knob_id).getVoltage();
-        macro->set_value(getParam(macro->knob_id).getValue());
+        auto knob = macro->knob_id;
+        if ((mod_target == knob) && macro->modulation) {
+            macro->set_mod_amount(getParam(P_MODULATION).getValue());
+        }
+        if (macro->cv_port && getInput(knob).isConnected()) {
+            if (macro->modulation) {
+                macro->cv = getInput(knob).getVoltage();
+            } else {
+                macro->cv = rescale(getInput(knob).getVoltage(), -5.f, 5.f, macro->min * 5.f, macro->max * 5.f);
+            }
+        }
+        if (0 == (jitter_frame % 31)) {
+            macro->set_param_value(getParam(macro->knob_id).getValue());
+        }
     }
-
 }
 
 Model *modelXM = createModel<XMModule, XMUi>("chem-xm");

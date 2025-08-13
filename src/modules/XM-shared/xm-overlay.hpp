@@ -16,14 +16,14 @@ struct IOverlay
     virtual void overlay_unregister_client(IOverlayClient* client) = 0;
     virtual std::shared_ptr<PresetInfo> overlay_live_preset() = 0;
     virtual std::shared_ptr<PresetInfo> overlay_configured_preset() = 0;
+    virtual bool overlay_preset_connected() = 0;
     virtual void overlay_request_macros() = 0;
     virtual MacroReadyState overlay_macros_ready() = 0;
     virtual std::vector<MacroUsage>& overlay_macro_usage() = 0;
-    virtual std::shared_ptr<MacroDescription> overlay_get_macro(int64_t module, ssize_t knob) = 0;
     virtual void overlay_remove_macro(int64_t module, ssize_t knob) = 0;
-    virtual void overlay_add_macro(std::shared_ptr<MacroDescription> macro) = 0;
     virtual void overlay_add_update_macro(std::shared_ptr<MacroDescription> macro) = 0;
-    virtual void used_macros(std::vector<uint8_t>* list) = 0;
+    virtual void overlay_used_macros(std::vector<uint8_t>* list) = 0;
+    virtual void overlay_client_pause(IOverlayClient* client, bool pausing) = 0;
 };
 
 IOverlay* find_adjacent_overlay(Module* client_module);
@@ -35,6 +35,7 @@ struct IOverlayClient
     virtual void on_overlay_change(IOverlay* host) = 0;
     virtual IOverlay* get_overlay() = 0;
     virtual int64_t get_module_id() = 0;
+    virtual void on_connect_preset() = 0;
 };
 
 }

@@ -22,6 +22,7 @@ struct GlowKnob : rack::RoundKnob {
 
     // enabling
     void enable(bool on) { enabled = on; }
+
     void onButton(const ButtonEvent& e) override{
         if (!enabled) {
             e.stopPropagating();
@@ -29,12 +30,14 @@ struct GlowKnob : rack::RoundKnob {
         }
         Base::onButton(e);
     }
+
     void onHoverScroll(const HoverScrollEvent& e) override {
         if (enabled) Base::onHoverScroll(e);
         e.consume(this);
     }
+
     void onChange(const ChangeEvent& e) override {
-        if (enabled) Base::onChange(e);
+        Base::onChange(e);
         e.consume(this);
     }
 

@@ -18,7 +18,7 @@ void MacroDescription::clear() {
     range = MacroRange::Bipolar;
     min = -1.f;
     max = 1.f;
-    modulated = true;
+    cv_port = true;
 }
 
 void MacroDescription::init (const MacroDescription& source)
@@ -30,7 +30,8 @@ void MacroDescription::init (const MacroDescription& source)
     range = source.range;
     min = source.min;
     max = source.max;
-    modulated = source.modulated;
+    cv_port = source.cv_port;
+    modulation = source.modulation;
 }
 
 void MacroDescription::set_range(MacroRange r) {
@@ -43,29 +44,30 @@ void MacroDescription::set_range(MacroRange r) {
 }
 
 bool MacroDescription::valid() {
-    return (module_id >= int64_t(0)) && (knob_id >= 0) && in_range(macro_number, U8(7), U8(90));
+    return (module_id >= int64_t(0)) && (knob_id >= 0) && (knob_id < 8) && in_range(macro_number, U8(7), U8(90));
 }
 
 void MacroDescription::set_em_value(uint16_t em)
 {
     em_value = last_em_value = em;
     param_value = static_cast<float>((static_cast<double>(em) - static_cast<double>(Haken::zero14)) * inv_zero14);
-    mod_value = xm_modulated_value(param_value, cv, mod_amount);
+    mod_value = xm_modulated_value(param_value, cv, modulation ? mod_amount : 100.f);
 }
 
 void MacroDescription::set_mod_amount(float amount)
 {
     assert(in_range(amount, -100.f, 100.f));
     mod_amount = amount;
-    mod_value = xm_modulated_value(param_value, cv, mod_amount);
+    mod_value = xm_modulated_value(param_value, cv, modulation ? mod_amount : 100.f);
 }
 
-void MacroDescription::set_value(float value)
+void MacroDescription::set_param_value(float value)
 {
     param_value = clamp(value, -1.f, 1.f);
-    mod_value = xm_modulated_value(param_value, cv, mod_amount);
-    em_value = xm_em_value(mod_value);
+    mod_value = xm_modulated_value(param_value, cv, modulation ? mod_amount : 100.f);
+    em_value = xm_em_value_any(mod_value);
 }
+
 
 void MacroDescription::from_json(json_t* root) {
     module_id = get_json_int64(root, "module", -1);
@@ -81,7 +83,8 @@ void MacroDescription::from_json(json_t* root) {
     } else {
         range = MacroRange::Custom;
     }
-    modulated = get_json_bool(root, "modulated", false);
+    cv_port = get_json_bool(root, "cv", true);
+    modulation = get_json_bool(root, "modulated", cv_port);
     mod_amount = get_json_float(root, "mod-amount", 0.f);
 }
 
@@ -93,7 +96,8 @@ json_t * MacroDescription::to_json() {
     json_object_set_new(root, "name", json_string(name.c_str()));
     json_object_set_new(root, "min", json_real(min));
     json_object_set_new(root, "max", json_real(max));
-    json_object_set_new(root, "modulated", json_boolean(modulated));
+    json_object_set_new(root, "cv", json_boolean(cv_port));
+    json_object_set_new(root, "modulated", json_boolean(modulation));
     json_object_set_new(root, "mod-amount", json_real(mod_amount));
     return root;
 }
@@ -154,20 +158,6 @@ void MacroData::remove(int64_t module_id)
     {
         data.erase(it);
         it = find_module(module_id);
-    }
-}
-
-void MacroData::prune_leaving(const std::vector<int64_t>& preserve)
-{
-    std::vector<int64_t> removals;
-    for (auto m: data) {
-        auto rit = std::find(preserve.cbegin(), preserve.cend(), m->module_id);
-        if (preserve.cend() == rit) {
-            removals.push_back(m->module_id);
-        }
-    }
-    for (auto id : removals) {
-        remove(id);
     }
 }
 

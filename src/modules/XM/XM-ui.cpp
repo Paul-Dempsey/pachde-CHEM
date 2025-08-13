@@ -97,7 +97,7 @@ struct EditWireframe: OpaqueWidget
             }
             nvgText(vg, xy.x, xy.y, KN+i,KN+i+1);
 
-            if (md && (md->knob_id == i) && md->modulated) {
+            if (md && (md->knob_id == i) && md->cv_port) {
                 // input
                 xy = ui->input_center(i);
                 OpenCircle(vg, xy.x, xy.y, 4.5, co, w*.5);
@@ -105,7 +105,7 @@ struct EditWireframe: OpaqueWidget
         }
 
         // mod knob
-        if (ui->get_modulation()) {
+        if (!md || md->modulation) {
             OpenCircle(vg, CENTER, PORT_TOP_CY, 8, co, w*.5);
         }
 
@@ -143,8 +143,8 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     TextLabel* knob_id{nullptr};
     TextInput* name_entry{nullptr};
     TextInput* macro_entry{nullptr};
-    PlusMinusButton* input_port{nullptr};
-    PlusMinusButton* modulation_button{nullptr};
+    PlusMinusButton* add_input_port{nullptr};
+    PlusMinusButton* add_modulation{nullptr};
     std::vector<StateIndicatorWidget*> range_options;
     GlowKnob* min_knob{nullptr};
     GlowKnob* max_knob{nullptr};
@@ -191,14 +191,15 @@ struct MacroMenu: Hamburger
                 menu->addChild(createMenuLabel("Overlay has no configured preset"));
                 return;
             }
+            std::string text = "Preset ";
+            if (conf) text.append(conf->summary());
+            menu->addChild(createMenuLabel(text));
+
             auto live = overlay->overlay_live_preset();
-            if (!live || conf->name.compare(live->name)) {
+            if (!live || (conf->id.key() != live->id.key())) {
                 menu->addChild(createMenuLabel("Live preset is not the configured preset"));
                 return;
             }
-            std::string text = "Preset ";
-            text.append(live->name);
-            menu->addChild(createMenuLabel(text));
 
             switch (overlay->overlay_macros_ready()) {
 
@@ -206,7 +207,7 @@ struct MacroMenu: Hamburger
                 auto macros{overlay->overlay_macro_usage()};
                 if (macros.empty()) goto NO_MACROS;
                 std::vector<uint8_t> used;
-                overlay->used_macros(&used);
+                overlay->overlay_used_macros(&used);
                 for (const MacroUsage& mu: macros) {
                     auto num = mu.macro_number;
                     if (num < 7 || used.cend() != std::find(used.cbegin(), used.cend(), num)) {
@@ -251,13 +252,17 @@ void MacroEdit::update_from_macro()
     knob_id->text(std::string(1, KN[macro.knob_id]));
     name_entry->setText (macro.name);
     macro_entry->setText(macro_number_to_string(macro.macro_number));
-    input_port->set_plus(!macro.modulated);
+    add_input_port->set_plus(!macro.cv_port);
+    add_modulation->set_plus(!macro.modulation);
 
     int i = 0;
     for (auto r: range_options) {
         r->set_state(i == int(macro.range));
         ++i;
     }
+
+    min_knob->enable(true);
+    max_knob->enable(true);
     auto mod = ui->my_module;
     if (mod) {
         mod->getParam(XMModule::P_RANGE_MIN).setValue(macro.min);
@@ -365,14 +370,24 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(mm);
 
     y += ROW_DY;
-    input_port = createWidget<PlusMinusButton>(Vec(x,y));
-    input_port->applyTheme(theme_engine, theme);
-    input_port->set_plus(!macro.modulated);
-    input_port->setHandler([=](bool, bool) {
-        macro.modulated = input_port->plus;
+    add_input_port = createWidget<PlusMinusButton>(Vec(x,y));
+    add_input_port->applyTheme(theme_engine, theme);
+    add_input_port->set_plus(!macro.cv_port);
+    add_input_port->setHandler([=](bool, bool) {
+        macro.cv_port = add_input_port->plus;
     });
-    addChild(input_port);
+    addChild(add_input_port);
     addChild(createLabel(Vec(x + 16.f, y), 60.f, "Input jack", engine, theme, S::control_label_left));
+
+    y += ROW_DY;
+    add_modulation = createWidget<PlusMinusButton>(Vec(x,y));
+    add_modulation->applyTheme(theme_engine, theme);
+    add_modulation->set_plus(!macro.modulation);
+    add_modulation->setHandler([=](bool, bool) {
+        macro.modulation = add_modulation->plus;
+    });
+    addChild(add_modulation);
+    addChild(createLabel(Vec(x + 16.f, y), 60.f, "Modulation", engine, theme, S::control_label_left));
 
     y += ROW_DY;
     addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), 60.f, "Range", engine, theme, r_label_style));
@@ -423,17 +438,6 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     addChild(resetButton);
     addChild(createLabel(Vec(x + 10.f, y), 60.f, "Reset", theme_engine, theme, S::control_label_left));
 
-    y = PORT_TOP_CY;
-    x = 12.f;
-    modulation_button = Center(createWidget<PlusMinusButton>(Vec(x,y)));
-    modulation_button->applyTheme(theme_engine, theme);
-    modulation_button->set_plus(!ui->get_modulation());
-    modulation_button->setHandler([=](bool, bool) {
-        ui->set_modulation(!ui->get_modulation());
-    });
-    addChild(modulation_button);
-    addChild(createLabel(Vec(x + 10.f, y- 7.f), 60.f, "Modulation", engine, theme, S::control_label_left));
-
     // tab order
     title_entry->nextField = name_entry;
     name_entry->nextField = macro_entry;
@@ -473,7 +477,7 @@ void MacroEdit::draw(const DrawArgs& args)
     Line(vg, 7.5f, kc.y, kc.x - 8, kc.y, co, .85f);
     Line(vg, kc.x + 8, kc.y, box.size.x - 7.5f, kc.y, co, .85f);
 
-    Line(vg, w*2, 275, box.size.x - w*2, 275, co, w);
+    //Line(vg, w*2, 275, box.size.x - w*2, 275, co, w);
 
 }
 
@@ -513,17 +517,27 @@ XMUi::XMUi(XMModule *module) :
 
     update_main_ui(theme);
 
-    // inputs
-
     // Browsing UI
     if (browsing) {
-        // all inputs
+
         addChild(createChemKnob<TrimPot>(Vec(CENTER, PORT_TOP_CY), my_module, XMModule::P_MODULATION, theme_engine, theme));
-        // TODO: track
+
         const NVGcolor co_port = PORT_CORN;
         float axis = -1.f;
+        Vec pos;
+        TrimPot* knob{nullptr};
+        TrackWidget* track{nullptr};
         for (int i = 0; i < 8; ++i) {
-            auto pos = input_center(i);
+
+            if (i < 2 || i > 3) {
+                pos = knob_center(i);
+                knob = createChemKnob<TrimPot>(pos, nullptr, i, theme_engine, theme);
+                addChild(knob);
+                track = createTrackWidget(knob, theme_engine, theme);
+                addChild(track);
+            }
+
+            pos = input_center(i);
             addChild(Center(createThemedColorInput(pos, my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
             pos.x += axis*PORT_MOD_DX;
             pos.y -= PORT_MOD_DY;
@@ -558,9 +572,24 @@ void XMUi::clear_dynamic_ui()
     memset(labels, 0, sizeof(labels));
     memset(tracks, 0, sizeof(tracks));
 
+    for (int i = 0; i < 8; ++i) {
+        auto pc = port_click[i];
+        if (pc) {
+            removeChild(pc);
+            delete pc;
+        }
+        auto pl = port_light[i];
+        if (pl) {
+            removeChild(pl);
+            delete pl;
+        }
+    }
+    memset(port_click, 0, sizeof(port_click));
+    memset(port_light, 0, sizeof(port_light));
+
     std::vector<Widget*> removals;
     for (Widget* child: children) {
-        if (in_range(child->box.pos.y, 8.f, 372.f)) {
+        if (in_range(child->box.pos.y, 6.f, PORT_TOP_CY)) {
             removals.push_back(child);
         }
     }
@@ -579,7 +608,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
     TrimPot* knob{nullptr};
     TrackWidget* track{nullptr};
 
-    if (get_modulation()) {
+    if (has_mod_knob()) {
         knob = createChemKnob<TrimPot>(Vec(CENTER, PORT_TOP_CY), my_module, XMModule::P_MODULATION, theme_engine, theme);
         knobs[XMModule::P_MODULATION] = knob;
         addChild(knob);
@@ -588,33 +617,60 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
     draw_placeholders = my_module->my_macros.data.empty();
     my_module->update_param_info();
 
+    bool inputs[8]{false};
     const NVGcolor co_port = PORT_CORN;
     float axis = -1.f;
-    for (auto macro : my_module->my_macros.data)
-    {
+    for (auto macro : my_module->my_macros.data) {
         int i = macro->knob_id;
         axis = (i < 4) ? -1.f : 1.f;
         auto pos = knob_center(i);
-        knob = createChemKnob<TrimPot>(pos, my_module, i, theme_engine, theme);
-        knobs[i] = knob;
-        addChild(knob);
+        if (macro->has_param_knob()) {
+            knob = createChemKnob<TrimPot>(pos, my_module, i, theme_engine, theme);
+            knobs[i] = knob;
+            addChild(knob);
+        }
 
         auto label = createLabel(Vec(pos.x, pos.y + 8.f), 45, macro->name, theme_engine, theme, S::med_control_label);
         labels[i] = label;
         addChild(label);
 
-        if (macro->modulated) {
-            track = createTrackWidget(knob, theme_engine, theme);
+        if (macro->cv_port) {
+            inputs[i] = true;
+            if (macro->has_param_knob()) {
+                track = createTrackWidget(knob, theme_engine, theme);
+            } else {
+                auto angle = 0.83 * M_PI;
+                track = Center(createTrackWidget<TrackIndicator>(pos, 12.f, -angle, angle, theme_engine, theme));
+            }
+            track->dot_radius = 1.75;
             track->set_min_max_value(-1.f, 1.f);
             tracks[i] = track;
             addChild(track);
 
             pos = input_center(i);
-            addChild(Center(createThemedColorInput(pos, my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-            addChild(Center(createClickRegion(pos.x + 2 * axis, pos.y, 22.f, 19.5f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
+            if (nullptr == ports[i]) {
+                ports[i] = Center(createThemedColorInput(pos, my_module, i, S::InputColorKey, co_port, theme_engine, theme));
+                addChild(ports[i]);
+            }
+            port_click[i] = Center(createClickRegion(pos.x + 2 * axis, pos.y, 22.f, 19.5f, i, [=](int id, int mods) { my_module->set_modulation_target(id); }));
+            addChild(port_click[i]);
+
             pos.x += axis * PORT_MOD_DX;
             pos.y -= PORT_MOD_DY;
-            addChild(Center(createLight<TinySimpleLight<GreenLight>>(pos, my_module, i)));
+            port_light[i] = Center(createLight<TinySimpleLight<GreenLight>>(pos, my_module, i));
+            addChild(port_light[i]);
+        } else {
+            auto port = ports[macro->knob_id];
+            if (port) {
+                ports[macro->knob_id] = nullptr;
+                port->requestDelete();
+            }
+        }
+    }
+    for (int i = 0; i < 8; ++i) {
+        if (ports[i] && !inputs[i]) {
+            ports[i]->requestDelete();
+            ports[i] = nullptr;
         }
     }
 }
@@ -647,8 +703,10 @@ Vec XMUi::input_center(int index)
 
 void XMUi::set_edit_mode(bool edit)
 {
-    editing = edit;
-    if (editing) {
+    if (edit) {
+        if (my_module && my_module->overlay) {
+            my_module->overlay->overlay_client_pause(my_module, true);
+        }
         clear_dynamic_ui();
         if (!wire_frame) {
             wire_frame = createWidget<EditWireframe>(Vec(0,0));
@@ -672,7 +730,12 @@ void XMUi::set_edit_mode(bool edit)
         update_main_ui(theme_engine.getTheme(getThemeName()));
         box.size.x = PANEL_WIDTH;
         APP->scene->rack->setModulePosForce(this, box.pos);
+
+        if (my_module && my_module->overlay) {
+            my_module->overlay->overlay_client_pause(my_module, false);
+        }
     }
+    editing = edit;
 }
 
 void XMUi::commit_macro()
@@ -716,7 +779,7 @@ void XMUi::set_edit_item(int index)
     }
 }
 
-MacroDescription *XMUi::get_edit_macro()
+MacroDescription* XMUi::get_edit_macro()
 {
     return edit_macro ? &edit_macro->macro : nullptr;
 }
@@ -726,10 +789,16 @@ void XMUi::onHoverKey(const HoverKeyEvent &e)
     if (my_module) {
         if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
             switch (e.key) {
-            case GLFW_KEY_0:
+            case GLFW_KEY_F2:
+                set_edit_mode(!editing);
                 e.consume(this);
-                //my_module->modulation.zero_modulation();
                 return;
+
+            // case GLFW_KEY_0:
+            //     //zero_modulation();
+            //     e.consume(this);
+            //     return;
+
             case GLFW_KEY_5:
                 center_knobs();
                 e.consume(this);
@@ -781,14 +850,9 @@ std::shared_ptr<MacroDescription> XMUi::get_persistent_macro(int index)
     return my_module->my_macros.get_macro(my_module->id, index);
 }
 
-bool XMUi::get_modulation()
+bool XMUi::has_mod_knob()
 {
-    return my_module ? my_module->has_mod_knob : true;
-}
-
-void XMUi::set_modulation(bool mod)
-{
-    if (my_module) my_module->has_mod_knob = mod;
+    return my_module ? my_module->has_mod_knob() : true;
 }
 
 void XMUi::step()
@@ -808,12 +872,11 @@ void XMUi::step()
     }
     panelBorder->setPartners(left, right);
 
-    if (knobs[XMModule::P_MODULATION]) {
-        knobs[XMModule::P_MODULATION]->enable(my_module->mod_target >= 0);
-    }
-
     for (auto macro : my_module->my_macros.data) {
         int i = macro->knob_id;
+        if ((i == my_module->mod_target) && knobs[XMModule::P_MODULATION]) {
+            knobs[XMModule::P_MODULATION]->enable(macro->modulation);
+        }
         if (tracks[i]) {
             tracks[i]->set_active(my_module->getInput(i).isConnected());
             tracks[i]->set_value(macro->mod_value);
@@ -835,7 +898,7 @@ void XMUi::draw(const DrawArgs& args)
 {
     Base::draw(args);
 
-    if (draw_placeholders) {
+    if (my_module && draw_placeholders) {
         auto vg = args.vg;
         auto co = placeholder_style.nvg_stroke_color();
         auto w = placeholder_style.width();
@@ -853,13 +916,11 @@ void XMUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Edit", "",
+    menu->addChild(createCheckMenuItem("Edit", "F2",
         [=](){ return editing; },
         [=](){ set_edit_mode(!editing); },
         !get_overlay()
     ));
-
-   // if (editing) return;
 
     // bool unconnected = (my_module->inputs.end() == std::find_if(my_module->inputs.begin(), my_module->inputs.end(), [](Input& in){ return in.isConnected(); }));
     // menu->addChild(createMenuItem("Zero modulation", "0", [this](){
