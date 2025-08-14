@@ -33,22 +33,23 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     bool preset_connected{false};
     bool pending_client_clear{false};
+    bool expect_preset_change{false};
+    bool in_macro_request{false};
 
+    PackedColor bg_color{0};
+    PackedColor fg_color{0xffe6e6e6};
+    int paused_clients{0};
+
+    rack::dsp::Timer midi_timer;
     std::string device_claim;
     std::shared_ptr<PresetInfo> overlay_preset{nullptr};
     std::shared_ptr<PresetInfo> live_preset{nullptr};
     std::string title;
-    PackedColor bg_color{0};
-    PackedColor fg_color{0xffe6e6e6};
 
     std::vector<std::shared_ptr<ClientInfo>> clients;
     MacroData macros;
-    int paused_clients{0};
     std::vector<MacroUsage> macro_usage;
     MacroUsageBuilder mac_build{macro_usage};
-    bool expect_preset_change{false};
-    bool in_macro_request{false};
-    rack::dsp::Timer midi_timer;
 
     OverlayModule();
     virtual ~OverlayModule();
@@ -91,7 +92,6 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void onRemove(const RemoveEvent& e) override;
-    //void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 
@@ -103,8 +103,8 @@ struct OverlayUi : ChemModuleWidget, IChemClient
 {
     using Base = ChemModuleWidget;
 
-    IChemHost*  chem_host{nullptr};
-    OverlayModule*   my_module{nullptr};
+    IChemHost* chem_host{nullptr};
+    OverlayModule* my_module{nullptr};
 
     LinkButton* link_button{nullptr};
     IndicatorWidget* link{nullptr};

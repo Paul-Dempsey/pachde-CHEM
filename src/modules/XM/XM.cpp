@@ -41,6 +41,9 @@ XMModule::~XMModule()
     if (overlay) {
         overlay->overlay_unregister_client(this);
     }
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+    }
 }
 
 void XMModule::dataFromJson(json_t* root)
@@ -85,6 +88,21 @@ void XMModule::try_bind_overlay()
     if (overlay) {
         overlay->overlay_register_client(this);
         update_overlay_macros();
+        try_bind_overlay_host();
+    }
+}
+
+void XMModule::try_bind_overlay_host()
+{
+    if (!overlay) return;
+    if (chem_host) {
+        assert(chem_host == overlay->get_host());
+    } else {
+        chem_host = overlay->get_host();
+        if (chem_host) {
+            chem_host->register_chem_client(this);
+            update_from_em();
+        }
     }
 }
 
@@ -94,6 +112,10 @@ void XMModule::onRemove(const RemoveEvent &e)
         remove_overlay_macros();
         overlay->overlay_unregister_client(this);
         overlay = nullptr;
+    }
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+        chem_host = nullptr;
     }
 }
 
@@ -168,9 +190,9 @@ void XMModule::update_from_em()
 
 void XMModule::do_message(PackedMidiMessage message)
 {
-
     if (my_macros.empty()) return;
     if (!chem_host) return;
+    if (!overlay) return;
     if (!overlay->overlay_preset_connected()) return;
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     auto em = chem_host->host_matrix();
@@ -212,9 +234,14 @@ void XMModule::on_overlay_change(IOverlay *new_overlay)
         overlay->overlay_unregister_client(this);
     }
     overlay = new_overlay;
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+        chem_host = nullptr;
+    }
     if (overlay) {
         overlay->overlay_register_client(this);
         update_overlay_macros();
+        try_bind_overlay_host();
         update_from_em();
     }
 }
@@ -274,8 +301,9 @@ void XMModule::process(const ProcessArgs& args)
     if (!overlay && (0 == (jitter_frame % 120))) {
         try_bind_overlay();
     }
-
-    bool host_and_overlay = overlay && overlay->get_host();
+    if (overlay && !chem_host && (0 == (jitter_frame % 90))) {
+        try_bind_overlay_host();
+    }
 
     if (0 == (jitter_frame % 47)) {
         if (last_mod_target != mod_target) {
@@ -288,7 +316,7 @@ void XMModule::process(const ProcessArgs& args)
             last_mod_target = mod_target;
         }
         getLight(L_OVERLAY).setSmoothBrightness((overlay ? 1.0f : 0.f), 90);
-        getLight(L_CORE).setSmoothBrightness(host_and_overlay, 90);
+        getLight(L_CORE).setSmoothBrightness(overlay && chem_host, 90);
 
         auto edit_macro = chem_ui ? ui()->get_edit_macro() : nullptr;
         if (edit_macro && (MacroRange::Custom == edit_macro->range)) {
@@ -301,7 +329,8 @@ void XMModule::process(const ProcessArgs& args)
         }
     }
 
-    if (!host_and_overlay) return;
+    if (!overlay) return;
+    if (!chem_host) return;
     if (!overlay->overlay_preset_connected()) return;
     if (!chem_ui) return;
     if (ui()->editing) return;

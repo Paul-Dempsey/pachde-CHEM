@@ -17,8 +17,6 @@
 
 ## Preset
 
-- Fix: Often requires clicking tab to refresh list.
-
 ## Play
 
 - Osmose: Append playlist page
@@ -29,7 +27,6 @@
 
 ## Overlay macros
 
-- Fix sending
 - Load Rack preset dies
 - Test! Needs some banging on to verify it works
 - Exclusion: Allow only one knob/macro across XM instances (currently excluded only in menu)

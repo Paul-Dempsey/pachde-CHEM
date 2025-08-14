@@ -85,6 +85,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void try_bind_overlay();
+    void try_bind_overlay_host();
 
     void onRemove(const RemoveEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;

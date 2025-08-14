@@ -145,7 +145,6 @@ void OverlayUi::step()
         right = e && (e->getModel() == modelXM);
     }
     panelBorder->setPartners(left, right);
-
 }
 
 void OverlayUi::appendContextMenu(Menu *menu)
@@ -156,15 +155,16 @@ void OverlayUi::appendContextMenu(Menu *menu)
 
     std::string label{"Overlay preset: "};
     auto over = my_module ? my_module->overlay_preset : nullptr;
-    label.append(over ? over->name : "<not configured>");
+    label.append(over ? over->summary() : "<not configured>");
     menu->addChild(createMenuLabel(label));
 
     menu->addChild(createMenuLabel(format_string("Macros: %u", my_module ? my_module->macros.size() : 0)));
 
     auto preset = my_module ? my_module->live_preset : nullptr;
-    menu->addChild(createMenuItem("Use live preset", preset ? preset->name : "<none>", [=](){
+    menu->addChild(createMenuItem("Use live preset", preset ? preset->summary() : "<none>", [=](){
        my_module->overlay_preset = my_module->live_preset;
-       // TODO: notify clients
+       my_module->preset_connected = true;
+       my_module->notify_connect_preset();
     }, !preset));
 
     menu->addChild(createMenuItem("Reset", "", [=](){

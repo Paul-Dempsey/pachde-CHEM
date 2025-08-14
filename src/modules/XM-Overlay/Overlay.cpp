@@ -15,6 +15,7 @@ OverlayModule::OverlayModule()
 
 OverlayModule::~OverlayModule()
 {
+    pending_client_clear = true;
     for (auto info: clients) {
         info->client->on_overlay_change(nullptr);
     }
@@ -25,8 +26,10 @@ OverlayModule::~OverlayModule()
 
 void OverlayModule::reset() {
     title = "";
-    overlay_preset = nullptr;
     bg_color = 0;
+    overlay_preset = nullptr;
+    preset_connected = false;
+    notify_connect_preset();
 }
 
 bool OverlayModule::client_editing()
@@ -166,7 +169,6 @@ void OverlayModule::dataFromJson(json_t* root)
     title = get_json_string(root, "overlay-title");
     bg_color = parse_color(get_json_string(root, "background-color"));
     fg_color = parse_color(get_json_string(root, "foreground-color"));
-   //macros.from_json(root);
 
     ModuleBroker::get()->try_bind_client(this);
 }
@@ -181,7 +183,6 @@ json_t* OverlayModule::dataToJson()
     json_object_set_new(root, "overlay-title", json_string(title.c_str()));
     json_object_set_new(root, "background-color", json_string(hex_string(bg_color).c_str()));
     json_object_set_new(root, "foreground-color", json_string(hex_string(fg_color).c_str()));
-    //macros.to_json(root);
 
     return root;
 }
@@ -198,8 +199,8 @@ void OverlayModule::onRemove(const RemoveEvent &e)
 
     if (chem_host) {
         chem_host->unregister_chem_client(this);
+        chem_host = nullptr;
     }
-    chem_host = nullptr;
 }
 
 // IChemClient
@@ -217,12 +218,12 @@ void OverlayModule::onPresetChange()
     live_preset = nullptr;
     preset_connected = false;
     if (!chem_host) return;
+
     auto p = chem_host->host_preset();
     if (p && !p->empty()) {
         live_preset = std::make_shared<PresetInfo>(p);
         preset_connected = (nullptr != overlay_preset) && (p->id.key() == overlay_preset->id.key());
         notify_connect_preset();
-
     }
     if (expect_preset_change) {
         expect_preset_change = false;
@@ -269,12 +270,19 @@ void OverlayModule::process(const ProcessArgs& args)
 
     getLight(L_CONNECTED).setBrightness(preset_connected);
 
-    if (!preset_connected
-        || in_macro_request
-        || expect_preset_change
-        || macros.empty()
-        || client_editing())
-    {
+    if (!preset_connected) {
+        return;
+    }
+    if (in_macro_request) {
+        return;
+    }
+    if (expect_preset_change) {
+        return;
+    }
+    if (macros.empty()) {
+        return;
+    }
+    if (client_editing()) {
         return;
     }
 
