@@ -73,7 +73,7 @@ struct PlayModule : ChemModule, IChemClient
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
-
+    void onRandomize() override;
     void process(const ProcessArgs& args) override;
 };
 
@@ -125,6 +125,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
 
     bool connected();
     void select_preset(PresetId id);
+    void select_random();
     void sync_to_current_index();
     void widgets_clear_current();
 

@@ -691,6 +691,20 @@ void CoreModule::onReset(const ResetEvent &e)
     reboot();
 }
 
+void CoreModule::onRandomize(const RandomizeEvent &e)
+{
+    if (host_busy()) return;
+    if (!user_presets && !system_presets) return;
+    if (user_presets->empty() && system_presets->empty()) return;
+
+    bool user = ::rack::random::uniform() < 0.5f;
+    auto list = user ? user_presets : system_presets;
+    if (!list || list->empty()) list = user ? system_presets : user_presets;
+    if (list->empty()) return;
+    auto index = std::round(::rack::random::uniform() * (list->size() - 1));
+    haken_midi.select_preset(ChemId::Core, list->presets[index]->id);
+}
+
 void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);

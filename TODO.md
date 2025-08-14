@@ -2,7 +2,6 @@
 
 ## General
 
-- Preset and Play (Core?): onRandomize select random preset
 - Bug: rounding lights aren't quite same as Continuum
 - Reconcile host availability states across modules ( `connected()`/`ready()` ...)
 - color picker

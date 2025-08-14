@@ -435,6 +435,15 @@ void PresetUi::update_help()
     }
 }
 
+void PresetUi::select_random_preset()
+{
+    Tab& tab = active_tab();
+    if (tab.list.empty()) return;
+    ssize_t index = std::round(rack::random::uniform() * (tab.count()-1));
+    scroll_to(index);
+    send_preset(index);
+}
+
 void PresetUi::send_preset(ssize_t index)
 {
     if (index < 0) return;

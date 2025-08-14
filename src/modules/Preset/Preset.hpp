@@ -72,6 +72,7 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
+    void onRandomize() override;
     void process(const ProcessArgs& args) override;
 };
 
@@ -151,8 +152,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
         case PresetTab::User: return user_tab;
        }
     }
-    bool is_osmose() { 
-        return chem_host 
+    bool is_osmose() {
+        return chem_host
             && chem_host->host_matrix()
             && chem_host->host_matrix()->is_osmose();
     }
@@ -174,7 +175,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void page_down(bool control, bool shift);
     void update_page_controls();
     void update_help();
-    
+    void select_random_preset();
     void send_preset(ssize_t index);
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
@@ -191,7 +192,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
     void createScrews(std::shared_ptr<SvgTheme> theme) override;

@@ -106,6 +106,13 @@ void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDev
 
 // Module
 
+void PresetModule::onRandomize()
+{
+    if (chem_ui) {
+        ui()->select_random_preset();
+    }
+}
+
 void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);

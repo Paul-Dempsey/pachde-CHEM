@@ -59,9 +59,9 @@ json_t* PlayModule::dataToJson()
                 kv->save();
             }
         }
-    }    
+    }
     json_object_set_new(root, "playlist-file", json_string(playlist_file.c_str()));
-    
+
     auto jaru = json_array();
     int count = 0;
     for (auto path: playlist_mru) {
@@ -73,6 +73,13 @@ json_t* PlayModule::dataToJson()
     json_object_set_new(root, "history", jaru);
 
     return root;
+}
+
+void PlayModule::onRandomize()
+{
+    if (chem_ui) {
+        ui()->select_random();
+    }
 }
 
 // IChemClient

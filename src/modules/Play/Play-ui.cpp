@@ -128,6 +128,14 @@ void PlayUi::select_preset(PresetId id)
     }
 }
 
+void PlayUi::select_random()
+{
+    if (presets.empty()) return;
+    ssize_t index = std::round(rack::random::uniform() * (preset_count() -1));
+    scroll_to(index);
+    select_preset(presets[index]->id);
+}
+
 void PlayUi::sync_to_current_index()
 {
     current_preset = presets[current_index];

@@ -255,7 +255,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     virtual void onReset(const ResetEvent& e) override;
     // virtual void onSetMaster(const SetMasterEvent& e) override;
     // void onUnsetMaster(const UnsetMasterEvent& e) override;
-    //virtual void onRandomize(const RandomizeEvent& e) override;
+    void onRandomize(const RandomizeEvent& e) override;
     //virtual void onSave(const SaveEvent& e) override;
 
     void dataFromJson(json_t* root) override;
