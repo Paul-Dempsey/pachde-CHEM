@@ -22,8 +22,8 @@ IOverlay* find_adjacent_overlay(Module* mod)
 
 IOverlay * find_an_overlay(Module *client_module, std::string claim, std::string preset)
 {
-    auto engine = APP->engine;
     std::vector<IOverlay*> candidates;
+    auto engine = APP->engine;
     auto mods = engine->getModuleIds();
     for (auto id: mods) {
         auto module = engine->getModule(id);

@@ -187,6 +187,26 @@ json_t* OverlayModule::dataToJson()
     return root;
 }
 
+void OverlayModule::onReset(const ResetEvent &e)
+{
+    macros.clear();
+    overlay_preset = nullptr;
+    preset_connected = false;
+    title = "";
+    bg_color = 0;
+    fg_color = parse_color("hsl(42,60%,50%)");
+    macro_usage.clear();
+    in_macro_request = false;
+    expect_preset_change = false;
+    if (chem_ui) {
+        auto my_ui = ui();
+        my_ui->set_bg_color(bg_color);
+        my_ui->set_fg_color(fg_color);
+        my_ui->set_title(title);
+    }
+    notify_connect_preset();
+}
+
 void OverlayModule::onRemove(const RemoveEvent &e)
 {
     pending_client_clear = true;

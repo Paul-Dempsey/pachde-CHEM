@@ -87,6 +87,7 @@ struct XMModule : ChemModule, IChemClient, IDoMidi, IOverlayClient
     void try_bind_overlay();
     void try_bind_overlay_host();
 
+    void onReset(const ResetEvent& e) override;
     void onRemove(const RemoveEvent& e) override;
     void onPortChange(const PortChangeEvent& e) override;
     void process(const ProcessArgs& args) override;

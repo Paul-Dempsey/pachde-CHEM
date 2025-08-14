@@ -69,6 +69,7 @@ struct MacroData
 {
     std::vector<std::shared_ptr<MacroDescription>> data;
     MacroData() {}
+    void clear() { data.clear(); }
     bool empty() { return data.empty(); }
     size_t size() { return data.size(); }
     std::vector<std::shared_ptr<MacroDescription>>::iterator find(int64_t module_id, ssize_t knob_id);

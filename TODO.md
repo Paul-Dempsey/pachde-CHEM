@@ -26,7 +26,6 @@
 
 ## Overlay macros
 
-- Load Rack preset dies
 - Test! Needs some banging on to verify it works
 - Exclusion: Allow only one knob/macro across XM instances (currently excluded only in menu)
 

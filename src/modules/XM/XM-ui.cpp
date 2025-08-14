@@ -528,7 +528,6 @@ XMUi::XMUi(XMModule *module) :
         TrimPot* knob{nullptr};
         TrackWidget* track{nullptr};
         for (int i = 0; i < 8; ++i) {
-
             if (i < 2 || i > 3) {
                 pos = knob_center(i);
                 knob = createChemKnob<TrimPot>(pos, nullptr, i, theme_engine, theme);
@@ -730,7 +729,6 @@ void XMUi::set_edit_mode(bool edit)
         update_main_ui(theme_engine.getTheme(getThemeName()));
         box.size.x = PANEL_WIDTH;
         APP->scene->rack->setModulePosForce(this, box.pos);
-
         if (my_module && my_module->overlay) {
             my_module->overlay->overlay_client_pause(my_module, false);
         }

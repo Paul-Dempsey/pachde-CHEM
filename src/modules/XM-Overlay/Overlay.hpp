@@ -91,6 +91,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
+    void onReset(const ResetEvent& e) override;
     void onRemove(const RemoveEvent& e) override;
     void process(const ProcessArgs& args) override;
 };

@@ -48,6 +48,19 @@ XMModule::~XMModule()
 
 void XMModule::dataFromJson(json_t* root)
 {
+    if (overlay) {
+        overlay->overlay_unregister_client(this);
+        overlay = nullptr;
+    }
+    if (chem_host) {
+        chem_host->unregister_chem_client(this);
+        chem_host = nullptr;
+    }
+    if (chem_ui) {
+        if (ui()->editing) {
+            ui()->set_edit_mode(false);
+        }
+    }
     ChemModule::dataFromJson(root);
     device_claim = get_json_string(root, "haken-device");
     glow_knobs = get_json_bool(root, "glow-knobs", false);
@@ -60,10 +73,12 @@ void XMModule::dataFromJson(json_t* root)
     if (title_fg == RARE_COLOR) {
         title_fg = GetPackedStockColor(StockColor::Gray_75p);
     }
+    my_macros.clear();
     my_macros.from_json(root);
-    try_bind_overlay();
     update_param_info();
-    ModuleBroker::get()->try_bind_client(this);
+    if (chem_ui) {
+        ui()->update_main_ui(theme_engine.getTheme(getThemeName()));
+    }
 }
 
 json_t* XMModule::dataToJson()
@@ -75,7 +90,6 @@ json_t* XMModule::dataToJson()
     json_object_set_new(root, "title-bg", json_string(hex_string(title_bg).c_str()));
     json_object_set_new(root, "title-fg", json_string(hex_string(title_fg).c_str()));
     my_macros.to_json(root);
-
     return root;
 }
 
@@ -103,6 +117,23 @@ void XMModule::try_bind_overlay_host()
             chem_host->register_chem_client(this);
             update_from_em();
         }
+    }
+}
+
+void XMModule::onReset(const ResetEvent &e)
+{
+    if (chem_ui) {
+        ui()->set_edit_mode(false);
+    }
+    if (overlay) {
+        remove_overlay_macros();
+        overlay->overlay_unregister_client(this);
+        overlay = nullptr;
+    }
+    my_macros.clear();
+    update_param_info();
+    if (chem_ui) {
+        ui()->update_main_ui(theme_engine.getTheme(ui()->getThemeName()));
     }
 }
 
@@ -148,13 +179,24 @@ void XMModule::center_knobs()
 
 void XMModule::update_param_info()
 {
-    for (auto m : my_macros.data) {
-        auto pq = getParamQuantity(m->knob_id);
-        pq->name = m->name;
-        pq->minValue = m->min;
-        pq->maxValue = m->max;
-        pq->setValue(pq->getValue()); // keep value in range
-        getInputInfo(m->knob_id)->name = m->name;
+    for (int i = 0; i < 8; ++i) {
+        auto m = my_macros.get_macro(getId(), i);
+        auto pq = getParamQuantity(i);
+        if (pq) {
+            if (m) {
+                pq->name = m->name;
+                pq->minValue = m->min;
+                pq->maxValue = m->max;
+                pq->setValue(pq->getValue()); // keep value in range
+                getInputInfo(i)->name = m->name;
+            } else {
+                pq->name = format_string("#%d", 1 + i);
+                pq->minValue = -1.f;
+                pq->maxValue = 1.f;
+                pq->setValue(0);
+                getInputInfo(i)->name = format_string("in-%d", 1 + i);
+            }
+        }
     }
 }
 
@@ -190,21 +232,21 @@ void XMModule::update_from_em()
 
 void XMModule::do_message(PackedMidiMessage message)
 {
-    if (my_macros.empty()) return;
-    if (!chem_host) return;
-    if (!overlay) return;
-    if (!overlay->overlay_preset_connected()) return;
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (my_macros.empty()) { return; }
+    if (!chem_host) { return; }
+    if (!overlay) { return; }
+    if (!overlay->overlay_preset_connected()) { return; }
+    if (Haken::ccStat1 != message.bytes.status_byte) { return; }
     auto em = chem_host->host_matrix();
-    if (!em) return;
+    if (!em) { return; }
 
     auto tag = midi_tag(message);
-    if (as_u8(ChemId::Unknown) == tag) return;
-    if (as_u8(ChemId::Overlay) == tag) return;
-    if (as_u8(ChemId::XM) == tag) return;
+    if (as_u8(ChemId::Unknown) == tag) { return; }
+    if (as_u8(ChemId::Overlay) == tag) { return; }
+    if (as_u8(ChemId::XM) == tag) { return; }
 
     auto cc = midi_cc(message);
-    if (cc < Haken::ccM7 || cc > Haken::ccM90) return;
+    if (cc < Haken::ccM7 || cc > Haken::ccM90) { return; }
 
     uint8_t number = 0;
     if (cc <= Haken::ccM30) {
@@ -228,7 +270,7 @@ void XMModule::do_message(PackedMidiMessage message)
 
 void XMModule::on_overlay_change(IOverlay *new_overlay)
 {
-    if (overlay == new_overlay) return;
+    if (overlay == new_overlay) { return; }
     if (overlay) {
         remove_overlay_macros();
         overlay->overlay_unregister_client(this);
