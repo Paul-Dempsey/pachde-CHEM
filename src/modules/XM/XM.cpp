@@ -96,7 +96,7 @@ void XMModule::try_bind_overlay_host()
 {
     if (!overlay) return;
     if (chem_host) {
-        assert(chem_host == overlay->get_host());
+        assert(!overlay->get_host() || (overlay->get_host() == chem_host));
     } else {
         chem_host = overlay->get_host();
         if (chem_host) {
@@ -242,7 +242,6 @@ void XMModule::on_overlay_change(IOverlay *new_overlay)
         overlay->overlay_register_client(this);
         update_overlay_macros();
         try_bind_overlay_host();
-        update_from_em();
     }
 }
 
@@ -329,11 +328,11 @@ void XMModule::process(const ProcessArgs& args)
         }
     }
 
-    if (!overlay) return;
-    if (!chem_host) return;
-    if (!overlay->overlay_preset_connected()) return;
-    if (!chem_ui) return;
-    if (ui()->editing) return;
+    if (!overlay) { return; }
+    if (!chem_host) { return; }
+    if (!overlay->overlay_preset_connected()) { return; }
+    if (!chem_ui) { return; }
+    if (ui()->editing) { return; }
 
     for (auto macro: my_macros.data) {
         auto knob = macro->knob_id;
@@ -341,11 +340,9 @@ void XMModule::process(const ProcessArgs& args)
             macro->set_mod_amount(getParam(P_MODULATION).getValue());
         }
         if (macro->cv_port && getInput(knob).isConnected()) {
-            if (macro->modulation) {
-                macro->cv = getInput(knob).getVoltage();
-            } else {
-                macro->cv = rescale(getInput(knob).getVoltage(), -5.f, 5.f, macro->min * 5.f, macro->max * 5.f);
-            }
+            macro->cv = macro->modulation
+                ? getInput(knob).getVoltage()
+                : rescale(getInput(knob).getVoltage(), -5.f, 5.f, macro->min * 5.f, macro->max * 5.f);
         }
         if (0 == (jitter_frame % 31)) {
             macro->set_param_value(getParam(macro->knob_id).getValue());
