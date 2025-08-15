@@ -59,7 +59,7 @@ void ChemModule::process(const ProcessArgs &args)
 {
     if (!seek_host && !get_host() && ((args.frame + id) % 80) == 0) {
         seek_host = true;
-    }    
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -317,4 +317,15 @@ NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, Stock
     if (theme.empty()) return GetStockColor(fallback);
     auto co = fromPacked(theme_engine.getFillColor(theme, color_name, true));
     return isColorVisible(co) ? co : GetStockColor(fallback);
+}
+
+namespace pachde {
+
+bool host_connected(IChemHost* chem_host)
+{
+    if (!chem_host) return false;
+    auto conn = chem_host->host_connection(ChemDevice::Haken);
+    return conn && conn->identified();
+}
+
 }

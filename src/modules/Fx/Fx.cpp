@@ -201,7 +201,7 @@ void FxModule::process_params(const ProcessArgs& args)
 void FxModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (((args.frame + id) % 41) == 0) {
         process_params(args);
@@ -209,7 +209,7 @@ void FxModule::process(const ProcessArgs& args)
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
-    }    
+    }
 
     if (0 == ((args.frame + id) % 47)) {
         modulation.update_mod_lights();

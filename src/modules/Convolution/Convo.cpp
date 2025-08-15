@@ -42,12 +42,12 @@ WidgetInfo widget_info[]
     /*29*/{ "Modulation amount", CM::P_MOD_AMOUNT, -1, -1 }
 };
 int info_index[] {
-    0, 1, 2, 3, // P_PRE_MIX, P_PRE_INDEX, P_POST_MIX, P_POST_INDEX    
+    0, 1, 2, 3, // P_PRE_MIX, P_PRE_INDEX, P_POST_MIX, P_POST_INDEX
     9, 15, 21, 27,  // P_1_TYPE, P_2_TYPE, P_3_TYPE, P_4_TYPE,
     4, 10, 16, 22, // P_1_LENGTH, P_2_LENGTH, P_3_LENGTH, P_4_LENGTH,
     5, 11, 17, 23, // P_1_TUNING, P_2_TUNING, P_3_TUNING, P_4_TUNING,
     6, 12, 18, 24, // P_1_WIDTH,  P_2_WIDTH,  P_3_WIDTH,  P_4_WIDTH,
-    7, 13, 19, 25, // P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT, 
+    7, 13, 19, 25, // P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT,
     8, 14, 20, 26, // P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
     29, // P_MOD_AMOUNT,
     28, // P_EXTEND,
@@ -64,7 +64,7 @@ ConvoModule::ConvoModule() :
     for (int i = P_PRE_MIX; i <= P_POST_INDEX; ++i) {
         dp4(configParam(i, 0.f, 10.f, 0.f, widget_info[i].name));
     }
-    
+
     std::vector<std::string> types {
         "Waterphone 1", "Waterphone 2", "Autoharp 1", "Autoharp 2",
         "Dark Guitar", "Finger Snap", "Wood", "Bright Metal",
@@ -74,7 +74,7 @@ ConvoModule::ConvoModule() :
     };
     for (int i = P_1_TYPE; i <= P_4_TYPE; ++i) {
         configSwitch(i, 0.f, 18.f, 6.f, param_info(i).name, types);
-    }    
+    }
 
     WidgetInfo* info = widget_info + 4;
     for (int i = 0; i < 4; ++i) {
@@ -100,7 +100,7 @@ ConvoModule::ConvoModule() :
         }
     }
 
-    // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for button lights 
+    // unconfigured L_EXTEND supresses the normal tooltip, which we don't want for button lights
 
     EmccPortConfig cfg[] = {
         EmccPortConfig::stream_poke(P_PRE_MIX, IN_PRE_MIX, L_PRE_MIX, Haken::s_Conv_Poke, Haken::id_c_mix1),
@@ -228,13 +228,13 @@ void ConvoModule::process_params(const ProcessArgs& args)
     {
         auto v = getParamInt(getParam(Params::P_EXTEND));
         getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
-    }    
+    }
 }
 
 void ConvoModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (init_from_em && modulation.sync_params_ready(args)) {
         modulation.sync_send();

@@ -105,7 +105,7 @@ void PlayModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
 
-    if (!chem_host || chem_host->host_busy() || !ui()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy() || !chem_ui) return;
 
     if (ui()->preset_count()) {
         auto prev_in = getInput(Inputs::IN_PRESET_PREV);

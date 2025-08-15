@@ -220,7 +220,7 @@ struct MacroMenu: Hamburger
                         }));
                     }
                 }
-                } break;
+            } break;
 
             case MacroReadyState::Unavailable:
 NO_MACROS:

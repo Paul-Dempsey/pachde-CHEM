@@ -277,7 +277,7 @@ void OverlayModule::do_message(PackedMidiMessage message)
 void OverlayModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     int64_t jitter_frame = args.frame + id;
 

@@ -43,11 +43,8 @@ PreModule::PreModule() :
     modulation.configure(Params::P_MOD_AMOUNT, NUM_MOD_PARAMS, cfg);
 }
 
-bool PreModule::connected()
-{
-    if (!chem_host) return false;
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    return conn && conn->identified();
+bool PreModule::connected() {
+    return host_connected(chem_host);
 }
 
 void PreModule::dataFromJson(json_t *root)
@@ -144,7 +141,7 @@ void PreModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
 
-    if (!connected() || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);

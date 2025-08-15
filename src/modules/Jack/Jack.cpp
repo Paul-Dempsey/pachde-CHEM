@@ -128,8 +128,7 @@ void JackModule::process_params(const ProcessArgs &args)
 void JackModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
-    if (!connected()) return;
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);
@@ -139,7 +138,7 @@ void JackModule::process(const ProcessArgs &args)
     if (em) {
         uint16_t j = em->get_jack_1();
         getOutput(OUT_JACK_1).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
-    
+
         j = em->get_jack_2();
         getOutput(OUT_JACK_2).setVoltage(j ? unipolar_14_to_rack(j) : 0.f);
     }

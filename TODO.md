@@ -18,16 +18,11 @@
 
 ## Play
 
-- Osmose: Append playlist page
-
 ## MidiPad
 
 - What might be some good factory presets?
 
 ## Overlay macros
-
-- Test! Needs some banging on to verify it works
-- Exclusion: Allow only one knob/macro across XM instances (currently excluded only in menu)
 
 ## Osmose
 
@@ -46,7 +41,7 @@
 
 - Update svg_theme project to sync with all the improvements from CHEM.
 
-## Consider
+## Ideas
 
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
 - Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)

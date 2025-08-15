@@ -109,7 +109,7 @@ void SusModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
 
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 45)) {
         process_params(args);

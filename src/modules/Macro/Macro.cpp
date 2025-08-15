@@ -148,15 +148,15 @@ void MacroModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
 
-    if (!chem_host || chem_host->host_busy()) return;
-    
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
+
     if (((args.frame + id) % 40) == 0) {
         process_params(args);
     }
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
-    }    
+    }
 
     if (((args.frame + id) % 63) == 0) {
         modulation.update_mod_lights();

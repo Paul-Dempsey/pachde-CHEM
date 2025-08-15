@@ -371,7 +371,7 @@ void XMModule::process(const ProcessArgs& args)
     }
 
     if (!overlay) { return; }
-    if (!chem_host) { return; }
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
     if (!overlay->overlay_preset_connected()) { return; }
     if (!chem_ui) { return; }
     if (ui()->editing) { return; }

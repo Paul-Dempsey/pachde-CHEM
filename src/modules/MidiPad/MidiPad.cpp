@@ -165,7 +165,7 @@ void MidiPadModule::process(const ProcessArgs& args)
         }
     }
 
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (((args.frame + id) % 41) == 0) {
         process_params(args);

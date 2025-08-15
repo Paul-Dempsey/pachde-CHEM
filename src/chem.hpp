@@ -80,8 +80,10 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback);
 NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback);
 
-// Impls
-
+// helpers/Impls
+namespace pachde {
+bool host_connected(IChemHost* chem_host);
+}
 // bind_host use from ModuleWidget::step()
 template<typename TClientModule>
 void bind_host(TClientModule* client_module)

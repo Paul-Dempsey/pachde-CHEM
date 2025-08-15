@@ -17,7 +17,7 @@ SettingsModule::SettingsModule() :
     configYParam(this, P_Y, "Y assign");
     configZParam(this, P_Z, "Z assign");
     configSwitch(P_NOTE_PROCESSING, 0.f, 5.f, 0.f, "Note processing", {
-        "Static velocity (127)", 
+        "Static velocity (127)",
         "Dynamic velocity",
         "Formula velocity (ƒV)",
         "No Notes",
@@ -106,7 +106,7 @@ SettingsModule::SettingsModule() :
         "Sync to incoming"
     });
 
-    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%")); 
+    dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, "Modulation amount", "%"));
 
     configInput(IN_ROUND_INITIAL, "Round initial gate");
     configInput(IN_ROUND_RATE, "Round rate");
@@ -155,7 +155,7 @@ void SettingsModule::onPortChange(const PortChangeEvent &e)
         if (e.connecting) {
             // nothing
         } else {
-            zero_modulation();        
+            zero_modulation();
         }
     }
 }
@@ -258,21 +258,21 @@ void SettingsModule::do_message(PackedMidiMessage message)
             audio_in_port.set_em_and_param_low(value);
             break;
 
-        case Haken::ccRoundRate:    
+        case Haken::ccRoundRate:
             value = midi_cc_value(message);
             em_values[P_ROUND_RATE] = value;
             rounding_port.set_em_and_param_low(value);
             break;
-    
-        case Haken::ccRndIni:     
+
+        case Haken::ccRndIni:
             update_from_em(P_ROUND_INITIAL, midi_cc_value(message));
             break;
-    
+
         case Haken::ccActuation:
             update_from_em(P_ACTUATION, midi_cc_value(message));
             break;
 
-        case Haken::ccMonoOn:            
+        case Haken::ccMonoOn:
             update_from_em(P_MONO, midi_cc_value(message));
             break;
         }
@@ -374,7 +374,7 @@ void SettingsModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
 
-    if (!connected() || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
     auto haken = chem_host->host_haken();
     auto em = chem_host->host_matrix();
 
@@ -427,7 +427,7 @@ void SettingsModule::process(const ProcessArgs &args)
 
         // s_Mat_Poke
         std::vector<PackedMidiMessage> stream_data;
-        
+
         uint8_t routing = get_param_routing();
         if (routing != em_values[P_MIDI_ROUTING]) {
             stream_data.push_back(MakeStreamData(ChemId::Settings, Haken::idRouting, routing));
@@ -465,9 +465,9 @@ void SettingsModule::process(const ProcessArgs &args)
         round_leds.set_mode(em->get_round_mode());
         round_leds.set_rate(em->get_round_rate());
         round_leds.update_lights(this, Lights::L_ROUND);
-    
+
         float v;
-        
+
         v = getParam(P_MONO).getValue();
         getLight(Lights::L_MONO).setBrightness(v);
 

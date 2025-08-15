@@ -37,7 +37,7 @@ struct JackModule : ChemModule, IChemClient
         }
     }
 
-    bool connected() { return chem_host && host_connection; }
+    bool connected() { return host_connected(chem_host); }
 
     // IChemClient
     rack::engine::Module* client_module() override;
@@ -53,9 +53,9 @@ struct JackModule : ChemModule, IChemClient
         P_ASSIGN_JACK_2,
 
         P_MIN_JACK_1,
-        P_MAX_JACK_1, 
+        P_MAX_JACK_1,
         P_MIN_JACK_2,
-        P_MAX_JACK_2, 
+        P_MAX_JACK_2,
         P_SHIFT,
         P_SHIFT_ACTION,
         P_KEEP,
@@ -115,7 +115,7 @@ struct JackUi : ChemModuleWidget, IChemClient
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-jack.svg"); }
     void setThemeName(const std::string& name, void * context) override;

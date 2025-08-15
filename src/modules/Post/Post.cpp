@@ -109,7 +109,7 @@ void PostModule::onPresetChange()
 }
 
 void PostModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{ 
+{
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
@@ -160,7 +160,7 @@ void PostModule::process(const ProcessArgs& args)
 {
     ChemModule::process(args);
 
-    if (!chem_host || chem_host->host_busy()) return;
+    if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (modulation.sync_params_ready(args)) {
         modulation.sync_send();
