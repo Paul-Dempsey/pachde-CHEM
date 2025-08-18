@@ -853,6 +853,15 @@ bool XMUi::has_mod_knob()
     return my_module ? my_module->has_mod_knob() : true;
 }
 
+void XMUi::setThemeName(const std::string& name, void * context)
+{
+    auto theme = theme_engine.getTheme(name);
+    edit_style.apply_theme(theme);
+    placeholder_style.apply_theme(theme);
+
+    Base::setThemeName(name, context);
+}
+
 void XMUi::step()
 {
     Base::step();
@@ -880,16 +889,11 @@ void XMUi::step()
             tracks[i]->set_value(macro->mod_value);
         }
     }
-
-}
-
-void XMUi::setThemeName(const std::string& name, void * context)
-{
-    auto theme = theme_engine.getTheme(name);
-    edit_style.apply_theme(theme);
-    placeholder_style.apply_theme(theme);
-
-    Base::setThemeName(name, context);
+    if (my_module->overlay) {
+        auto info = my_module->getLightInfo(XMModule::L_OVERLAY);
+        auto title = my_module->overlay->overlay_title();
+        info->name = title.empty() ? "Overlay" : title + " connected";
+    }
 }
 
 void XMUi::draw(const DrawArgs& args)

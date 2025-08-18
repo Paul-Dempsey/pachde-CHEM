@@ -23,33 +23,25 @@ struct DotWidget : TransparentWidget {
 struct IndicatorWidget : TipWidget
 {
     DotWidget* _dot = nullptr;
-    FramebufferWidget* _fb = nullptr;
 
     IndicatorWidget()
     {
         _dot = new DotWidget();
         box.size = _dot->box.size;
-        _fb = new widget::FramebufferWidget;
-        _fb->addChild(_dot);
-        box.size = _dot->box.size;
-        _fb->box.size = _dot->box.size;
-	    addChild(_fb);
-        dirty();
+        addChild(_dot);
     }
-    void dirty() { _fb->setDirty(); }
+
     void setLook(const NVGcolor color, bool fill = true) {
         _dot->color = color;
         _dot->filled = fill;
-        dirty();
     }
     void setColor(const NVGcolor color) {
         _dot->color = color;
-        dirty();
     }
     void setFill(bool  fill) {
         _dot->filled = fill;
-        dirty();
     }
+
 };
 
 inline IndicatorWidget * createIndicatorCentered(float x, float y, const NVGcolor co, const char * tip = nullptr, bool filled = true)
@@ -68,19 +60,18 @@ struct StateIndicatorWidget : IndicatorWidget, IApplyTheme
     ElementStyle option_on{"state-on", "hsl(216,50%,50%)", "hsl(216,50%,50%)", 1};
     ElementStyle option_off{"state-off", "#00000000", "#808080", .35f};
 
-    bool yes;
+    bool yes{true};
     bool get_state() { return yes; }
     void set_state(bool on) {
         yes = on;
         _dot->filled = on ? !wire : false;
         _dot->color  = on ? option_on.nvg_color() : option_off.nvg_stroke_color();
         _dot->stroke = on ? option_on.width() : option_off.width();
-        dirty();
     }
 
     bool wire{false};
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override 
+    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
         wire = (0 == theme->name.compare("Wire"));
         option_on.apply_theme(theme);

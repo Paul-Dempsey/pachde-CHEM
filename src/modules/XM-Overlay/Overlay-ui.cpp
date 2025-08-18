@@ -8,7 +8,7 @@ using namespace svg_theme;
 using namespace pachde;
 
 // -- UI --------------------------------------
-static const char * DEFAULT_TITLE{"Overlay Synth"};
+const char * DEFAULT_TITLE{"Overlay Synth"};
 
 OverlayUi::OverlayUi(OverlayModule *module) :
     my_module(module)
@@ -37,7 +37,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     addChild(title_widget);
     if (my_module) {
         title_widget->set_text_color(my_module->fg_color);
-        title_widget->set_text(my_module->title.empty() ? DEFAULT_TITLE : my_module->title);
+        title_widget->set_text(my_module->title);
     } else {
         title_widget->set_text(DEFAULT_TITLE);
         title_widget->set_text_color(0xffe6e6e6);

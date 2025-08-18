@@ -37,7 +37,6 @@ bool reloadThemes();
 
 bool isChemModule(Module* candidate);
 bool isPeerModule(Module* me, Module* candidate);
-bool isOverlayModule(Module* me, Module* candidate);
 
 // <rack-user>/<plugin>/<asset>
 inline std::string user_plugin_asset(const std::string& asset) {

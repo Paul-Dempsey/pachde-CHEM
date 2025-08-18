@@ -15,6 +15,7 @@ using namespace pachde;
 using namespace eaganmatrix;
 
 struct OverlayUi;
+extern const char * DEFAULT_TITLE;
 
 struct ClientInfo
 {
@@ -44,7 +45,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     std::string device_claim;
     std::shared_ptr<PresetInfo> overlay_preset{nullptr};
     std::shared_ptr<PresetInfo> live_preset{nullptr};
-    std::string title;
+    std::string title{DEFAULT_TITLE};
 
     std::vector<std::shared_ptr<ClientInfo>> clients;
     MacroData macros;
@@ -67,6 +68,7 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     IChemHost* get_host() override { return (chem_host && chem_host->host_busy()) ? nullptr : chem_host; }
     void overlay_register_client(IOverlayClient* client) override;
     void overlay_unregister_client(IOverlayClient* client) override;
+    const std::string& overlay_title() override { return title; }
     void overlay_client_pause(IOverlayClient* client, bool pausing) override;
     std::shared_ptr<PresetInfo> overlay_live_preset() override { return live_preset; }
     std::shared_ptr<PresetInfo> overlay_configured_preset() override { return overlay_preset; }

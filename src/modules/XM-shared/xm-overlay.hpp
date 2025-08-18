@@ -14,6 +14,7 @@ struct IOverlay
     virtual IChemHost* get_host() = 0;
     virtual void overlay_register_client(IOverlayClient* client) = 0;
     virtual void overlay_unregister_client(IOverlayClient* client) = 0;
+    virtual const std::string& overlay_title() = 0;
     virtual std::shared_ptr<PresetInfo> overlay_live_preset() = 0;
     virtual std::shared_ptr<PresetInfo> overlay_configured_preset() = 0;
     virtual bool overlay_preset_connected() = 0;

@@ -392,7 +392,6 @@ void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& st
 void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f, float stroke_width = .5f);
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
 void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
-
 void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 void TrackGliss(NVGcontext* vg, float cx, float cy, float xg, float yg, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 

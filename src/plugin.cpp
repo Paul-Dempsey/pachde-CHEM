@@ -57,15 +57,6 @@ bool isPeerModule(Module* me, Module* candidate)
 	return isChemModule(candidate);
 }
 
-bool isOverlayModule(Module* me, Module* candidate)
-{
-    if (!candidate) return false;
-	if (me == candidate) return false;
-	return ((modelXM == candidate->model)
-		|| (modelOverlay == candidate->model)
-	);
-}
-
 // Theming
 
 // The svg_theme engine is shared by all modules in the plugin
@@ -103,7 +94,7 @@ bool initThemeEngine()
 
 		ok = theme_engine.load(file);
 		if (!ok) break;
-	} 
+	}
 	return ok;
 }
 

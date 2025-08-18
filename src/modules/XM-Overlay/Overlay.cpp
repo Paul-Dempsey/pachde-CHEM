@@ -192,6 +192,8 @@ void OverlayModule::onReset(const ResetEvent &e)
     macros.clear();
     overlay_preset = nullptr;
     preset_connected = false;
+    getLightInfo(L_CONNECTED)->name = "Preset connected";
+
     title = "";
     bg_color = 0;
     fg_color = parse_color("hsl(42,60%,50%)");
@@ -243,6 +245,7 @@ void OverlayModule::onPresetChange()
     if (p && !p->empty()) {
         live_preset = std::make_shared<PresetInfo>(p);
         preset_connected = (nullptr != overlay_preset) && (p->id.key() == overlay_preset->id.key());
+        getLightInfo(L_CONNECTED)->name = preset_connected ? overlay_preset->name + " connected" : "Preset connected";
         notify_connect_preset();
     }
     if (expect_preset_change) {
@@ -285,7 +288,7 @@ void OverlayModule::process(const ProcessArgs& args)
         getLight(L_CONNECTED).setBrightness(preset_connected);
     }
     if (!preset_connected && (0 == (jitter_frame % 120))) {
-        onPresetChange();
+        onPresetChange(); // check for one
     }
 
     getLight(L_CONNECTED).setBrightness(preset_connected);
