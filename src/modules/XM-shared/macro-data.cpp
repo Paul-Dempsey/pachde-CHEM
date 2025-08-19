@@ -2,15 +2,13 @@
 
 namespace pachde {
 
-MacroDescription::MacroDescription(json_t* root) {
-    from_json(root);
+MacroDescription::MacroDescription(json_t* root, int64_t module_id) {
+    from_json(root, module_id);
 }
 
-MacroDescription::MacroDescription(int64_t module, ssize_t knob) : module_id(module), knob_id(knob) {
-    assert(-1 != module);
-    assert(-1 != knob);
-    //clear();
-}
+MacroDescription::MacroDescription(int64_t module, ssize_t knob) :
+    module_id(module), knob_id(knob)
+{}
 
 void MacroDescription::clear() {
     macro_number = INVALID_MACRO;
@@ -69,8 +67,8 @@ void MacroDescription::set_param_value(float value)
 }
 
 
-void MacroDescription::from_json(json_t* root) {
-    module_id = get_json_int64(root, "module", -1);
+void MacroDescription::from_json(json_t* root, int64_t module_id) {
+    module_id = module_id == -1 ? get_json_int64(root, "module", -1) : module_id;
     knob_id = get_json_int(root, "knob", -1);
     macro_number = get_json_int(root, "macro", INVALID_MACRO);
     name = get_json_string(root, "name");
@@ -167,7 +165,7 @@ std::shared_ptr<MacroDescription> MacroData::get_macro(int64_t module_id, ssize_
     return it == data.end() ? nullptr : *it;
 }
 
-void MacroData::from_json(json_t* root)
+void MacroData::from_json(json_t* root, int64_t module_id)
 {
     data.clear();
     auto jar = json_object_get(root, "macros");
@@ -175,7 +173,7 @@ void MacroData::from_json(json_t* root)
         json_t* jp;
         size_t index;
         json_array_foreach(jar, index, jp) {
-            auto macro = std::make_shared<MacroDescription>(jp);
+            auto macro = std::make_shared<MacroDescription>(jp, module_id);
             data.push_back(macro);
         }
     }

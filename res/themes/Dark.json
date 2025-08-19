@@ -25,10 +25,10 @@
             "dot-face-up": { "gradient": [{"index":0, "color": "#dfdfdf"}, {"index":1, "color": "#404040"}]},
             "dot-ring": { "stroke":"#202020" },
             "dytext": { "fill": "#5d8ed7" },
-            "entry_bg":     {"fill": "hsla(42, 20%, 100%, 5%)", "stroke": {"color": "hsl(42, 50%, 40%)", "width":0.5}},
+            "entry-bg":     {"fill": "hsla(42, 20%, 100%, 5%)", "stroke": {"color": "hsl(42, 50%, 40%)", "width":0.5}},
             "entry-text":   {"fill": "hsl(0, 0%, 65%)"},
             "entry-prompt": {"fill": "hsla(0, 0%, 55%, 75%)"},
-            "entry_sel":    {"fill": "hsl(200, 50%, 40%)"},
+            "entry-sel":    {"fill": "hsl(200, 50%, 40%)"},
             "favorite": { "stroke": "#e64747", "fill": "#e64747" },
             "fb-dir": { "fill": "#cf7917" },
             "fswhi": { "stroke": { "color":"g75", "width":1.5 }},
@@ -134,6 +134,8 @@
             "tsk-pend":  { "fill":"#aa40bf" },
             "tsk-wait":  { "fill":"#3b6ab0" },
             "warning": { "fill": "#e7e745" },
+            "xm-edit": { "fill": "hsl(60,80%,75%)", "stroke": { "color": "hsl(60,80%,75%)", "width": 0.85}},
+            "xm-placeholder": { "fill": "hsl(0,0%,55%)", "stroke": { "color": "hsl(0,0%,55%)", "width": 0.25}},
             "x": { "fill": "#000000" }
         }
     }

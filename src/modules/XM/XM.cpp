@@ -74,7 +74,10 @@ void XMModule::dataFromJson(json_t* root)
         title_fg = GetPackedStockColor(StockColor::Gray_75p);
     }
     my_macros.clear();
-    my_macros.from_json(root);
+    my_macros.from_json(root, getId());
+    for (auto macro: my_macros.data) {
+        macro->module_id = getId();
+    }
     update_param_info();
     if (chem_ui) {
         ui()->update_main_ui(theme_engine.getTheme(getThemeName()));

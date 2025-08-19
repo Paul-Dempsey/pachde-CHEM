@@ -12,10 +12,10 @@ struct TextInput : TextField, IApplyTheme
     using Base = TextField;
     float text_height = 12.f;
 
-    ElementStyle bg_style{"entry_bg", "hsla(42, 20%, 100%, 5%)", "hsl(42, 50%, 40%)", .25f};
+    ElementStyle bg_style{"entry-bg", "hsla(42, 20%, 100%, 5%)", "hsl(42, 50%, 40%)", .25f};
     ElementStyle text_style{"entry-text", "hsl(0, 0%, 65%)"};
     ElementStyle prompt_style{"entry-prompt", "hsla(0, 0%, 55%, 75%)"};
-    ElementStyle selection_style{"entry_sel", "hsl(200, 50%, 40%)"};
+    ElementStyle selection_style{"entry-sel", "hsl(200, 50%, 40%)"};
     std::function<void(std::string)> change_handler{nullptr};
     std::function<void(std::string)> enter_handler{nullptr};
     std::function<void(bool ctrl, bool shift)> tab_handler{nullptr};
@@ -96,7 +96,7 @@ struct TextInputMenu : TextInput
 
     void onChange(const ChangeEvent& e) override {
         Base::onChange(e);
-        if (change_handler) { 
+        if (change_handler) {
             change_handler(text);
         }
     }
@@ -110,7 +110,7 @@ struct TextInputMenu : TextInput
 
 template <typename Tin = TextInput>
 Tin* createThemedTextInput(
-    float x, float y, float width, float height, 
+    float x, float y, float width, float height,
     SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
     std::string content,
     std::function<void(std::string)> on_change = nullptr,

@@ -26,10 +26,10 @@ Start with the [**Core**](./core.md#chem-core) module.
 | [**Sustain**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sustain |
 | [**Sostenuto**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto |
 | [**Sostenuto 2**](./sus.md#chem-sustain-sostenuto-and-sostenuto-2)  | On-screen Sostenuto 2 |
-| [**MidiPad**](./midipad.md#chem-midipad) | 4x4 custom Midi pads. |
 | [**Settings**](./settings.md#chem-settings) | Surface direction, XYZ MIDI assignments, Polyphony, Note processing, Rounding, MIDI routing, and more. |
-
-More modules are planned to address macros 7-90 (which has interesting challenges in the context of VCV Rack).
+| [**MidiPad**](./midipad.md#chem-midipad) | 4x4 custom Midi pads. Configurable pads to send any Eagan Matrix Midi command. |
+| [**Overlay**](./overlay.md#chem-overlay) | Overlay Preset main module. Combine with one or more [**XM**](./xm.md#chem-xm) modules for controlling extended macros in an overlay preset. These are macros numbered 7 - 90. |
+| [**XM**](./xm.md#chem-xm) | Each instance can control up to 8 extended macros in an Overlay preset. |
 
 ## Community and Contacts
 

@@ -2,8 +2,8 @@
 
 ## General
 
-- Bug: rounding lights aren't quite same as Continuum
-- Reconcile host availability states across modules ( `connected()`/`ready()` ...)
+- Option to suppress #d logo in browser.
+
 - color picker
   - choose text syntax?
   - 100% transparent option
@@ -11,8 +11,16 @@
 
 ## Core
 
+- Allow DB Save As and Load.
+
+  — and/or —
+
 - Option for per-connection preset lists to support multiple devices.
+
+- Show loaded preset database.
+
 - Bug: Switching devices always requires a reset.
+- Bug: rounding lights aren't quite same as Continuum
 
 ## Preset
 
@@ -34,15 +42,11 @@
 
 - Open issues for unresolved TODOs.
 
-- Sync Dark theme with master SVGs (no delta in appearance between Null and Dark)
-
-- Ship Null theme? I don't realistically expect anyone to make a custom theme.
-  Better for the svg_theme project.
-
 - Update svg_theme project to sync with all the improvements from CHEM.
 
 ## Ideas
 
+- Shift moved modules back when toggling out of edit mode in XM and Midipad
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)?
 - Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)
 - Blinking or highlighted link button when not connected

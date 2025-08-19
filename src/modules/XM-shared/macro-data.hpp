@@ -46,7 +46,7 @@ struct MacroDescription
     float max{1.f};
     std::string name;
 
-    MacroDescription(json_t * root);
+    MacroDescription(json_t * root, int64_t module_id);
     MacroDescription(int64_t module, ssize_t knob);
     void clear();
     void init (const MacroDescription& source);
@@ -61,7 +61,7 @@ struct MacroDescription
     bool pending() { return (em_value != last_em_value) && (0xffff != last_em_value); }
     void un_pend() { last_em_value = em_value; }
 
-    void from_json(json_t * root);
+    void from_json(json_t * root, int64_t module_id);
     json_t * to_json();
 };
 
@@ -80,7 +80,7 @@ struct MacroData
     void remove(int64_t module_id, ssize_t knob_id);
     void remove(int64_t module_id);
     std::shared_ptr<MacroDescription> get_macro(int64_t module_id, ssize_t knob_id);
-    void from_json(json_t* root);
+    void from_json(json_t* root, int64_t module_id);
     void to_json(json_t* root);
 };
 

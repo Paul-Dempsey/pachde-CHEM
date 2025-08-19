@@ -123,11 +123,12 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-4x4.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
+    void onHoverKey(const HoverKeyEvent &e) override;
     void step() override;
     void appendContextMenu(Menu *menu) override;
 };

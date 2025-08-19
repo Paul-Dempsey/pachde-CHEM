@@ -52,8 +52,8 @@ struct EditWireframe: OpaqueWidget
     void set_ui(XMUi* w) {
         ui = w;
         auto panel = createWidget<PanelBackgroundWidget>(Vec(0,15));
-        panel->box.size.x = PANEL_WIDTH;
-        panel->box.size.y = 380.f - 15.f - 12.f;
+        panel->track();
+        panel->applyTheme(theme_engine, theme_engine.getTheme(ui->getThemeName()));
         addChild(panel);
 
         for (ssize_t i = 0; i < 8; ++i) {
@@ -72,6 +72,7 @@ struct EditWireframe: OpaqueWidget
         auto vg = args.vg;
         auto w = ui->edit_style.width();
         auto co = ui->edit_style.nvg_stroke_color();
+        auto cofill = ui->edit_style.nvg_color();
         auto font = GetPluginFontSemiBold();
         if (!FontOk(font)) return;
 
@@ -88,7 +89,7 @@ struct EditWireframe: OpaqueWidget
             }
 
             if (md && md->knob_id == i) {
-                Circle(vg, xy.x, xy.y, 8, co);
+                Circle(vg, xy.x, xy.y, 8, cofill);
                 OpenCircle(vg, xy.x, xy.y, 8, co, w);
                 nvgFillColor(vg, RampGray(G_0));
             } else {
@@ -134,7 +135,7 @@ struct MacroEdit : OpaqueWidget, IApplyTheme
     using Base = OpaqueWidget;
 
     XMUi* ui{nullptr};
-    MacroDescription macro{0,0};
+    MacroDescription macro{-1,-1};
 
     TextInput* title_entry{nullptr};
     Palette1Button* palette_fg{nullptr};
@@ -301,11 +302,14 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
     x = LEFT_AXIS;
     y = TOP;
 
-    addChild(createLabel(Vec(7.5f,y), FULL_WIDTH, "Section title:", theme_engine, theme, S::control_label_left));
+    addChild(createLabel(Vec(7.5f,y), FULL_WIDTH, "Title:", theme_engine, theme, S::control_label_left));
 
     y += SMALL_ROW_DY;
-    title_entry = createTextInput(7.5, y, FULL_WIDTH, 14.f, ui->get_header_text(),
-        [=](std::string text){ ui->set_header_text(text); });
+    title_entry = createThemedTextInput(7.5f, y, FULL_WIDTH, 14.f, theme_engine, theme,
+        ui->get_header_text(),
+        [=](std::string text){ ui->set_header_text(text); },
+        nullptr,
+        "module name");
     addChild(title_entry);
 
     y += SMALL_ROW_DY;
@@ -350,7 +354,7 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
         "",
         [=](std::string s){ macro.name = s; },
         nullptr,
-        "<knob label>");
+        "knob name");
     addChild(name_entry);
 
     y += ROW_DY;
@@ -360,7 +364,7 @@ void MacroEdit::create_ui(int knob_index, SvgThemeEngine& engine, std::shared_pt
         "",
         [=](std::string s) { macro.macro_number = macro_number_from_string(s); },
         nullptr,
-        "<macro # 7-90>"
+        "macro #"
         ));
 
     auto mm = createThemedWidget<MacroMenu>(Vec(x + 72.f, y + 1.5f), theme_engine, theme);

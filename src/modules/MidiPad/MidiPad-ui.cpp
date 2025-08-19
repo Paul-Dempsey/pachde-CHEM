@@ -40,7 +40,7 @@ struct PadEdit : OpaqueWidget
     MultiTextInput* midi_field{nullptr};
     TipLabel* status{nullptr};
 
-    PadEdit() { 
+    PadEdit() {
         using namespace pad_edit_constants;
         box.size = Vec(WIDTH, HEIGHT);
     }
@@ -171,7 +171,7 @@ struct PadEdit : OpaqueWidget
         addChild(close);
 
         y = 22.f;
-        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, theme_engine, theme, ui->my_module ? ui->my_module->title : "", 
+        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, theme_engine, theme, ui->my_module ? ui->my_module->title : "",
             [=](std::string text){ on_title_text_changed(text); },
             nullptr,
             "Module title");
@@ -185,7 +185,7 @@ struct PadEdit : OpaqueWidget
 
         addChild(createLabel(Vec(3.5, y), 28, "Name", theme_engine, theme, ::pachde::style::control_label_left));
 
-        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, theme_engine, theme, "", 
+        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, theme_engine, theme, "",
             [=](std::string text){ on_name_text_changed(text); },
             nullptr,
             "Pad name");
@@ -232,7 +232,7 @@ struct PadEdit : OpaqueWidget
         //midi_field->text_height = 10.f;
         midi_field = createWidget<MultiTextInput>(Vec(3.5, y));
         midi_field->box.size = Vec(113, 132);
-        midi_field->set_on_change( [=](std::string text){ 
+        midi_field->set_on_change( [=](std::string text){
             modified = true;
             status->text("");
             status->describe("");
@@ -312,7 +312,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     float y = 60.f;
     for (int i = 0; i < 16; ++i) {
         auto w = createWidget<PadWidget>(Vec(x,y));
-        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module, 
+        w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module,
             theme_engine, theme,
             [=](int id) { on_click_pad(id); });
         pad_ui[i] = w;
@@ -325,7 +325,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         }
     }
 
-    edit_button = Center(createThemedButton<EditButton>(Vec(box.size.x*.5, EDIT_CY), theme_engine, theme, "Edit"));
+    edit_button = Center(createThemedButton<EditButton>(Vec(box.size.x*.5, EDIT_CY), theme_engine, theme, "Edit (F2)"));
     edit_button->set_sticky(true);
     if (my_module) {
         edit_button->setHandler([=](bool c, bool s){ edit_mode(!my_module->editing); });
@@ -537,13 +537,29 @@ bool MidiPadUi::connected() {
     return true;
 }
 
+void MidiPadUi::onHoverKey(const HoverKeyEvent &e)
+{
+    if (my_module) {
+        if (e.action == GLFW_PRESS && ((e.mods & RACK_MOD_MASK) == 0)) {
+            switch (e.key) {
+            case GLFW_KEY_F2:
+                edit_mode(!my_module->editing);
+                e.consume(this);
+                return;
+
+            }
+        }
+    }
+    Base::onHoverKey(e);
+}
+
 void MidiPadUi::step()
 {
     Base::step();
     if (!my_module) return;
     bind_host(my_module);
 
-    // When closed by clicking flyout close, the edit button is in 
+    // When closed by clicking flyout close, the edit button is in
     // the wrong state (because it wasn't clicked). So we sync it up here.
     if (edit_button->latched != my_module->editing) {
         edit_button->latched = my_module->editing;

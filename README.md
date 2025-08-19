@@ -2,11 +2,11 @@
 
 ![CHEM Repository splash card](doc/image/repo-card.png)
 
-CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to #d **HC One**, which targeted firmware 10.09.
+CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to **HC One**, which targeted EaganMatrix firmware 10.09.
+CHEM supports EaganMatrix firmware 10.40 and greater.
+Today it is recommended to be running firmware 10.52 on all EaganMatrix devices, but 10.4x should be fine.
 
-Haken EaganMatrix firmware version 10.40 added many features and improvements to the MIDI protocol.
-The changes are big enough to warrant a redesign of the modularization and user interface, hence a new plugin.
-Today it is recommended to be running firmware 10.52, but 10.4x should be fine.
+If you've been holding back on updating your Osmose to the latest release, now's the time!
 
 [![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
 
@@ -14,24 +14,33 @@ To download the latest build, see the [Nightly Release](https://github.com/Paul-
 
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
-## July 11 2025
+## Aug 18 2025
 
-Osmose presets support is integrated!
+The final modules I'm targeting for this release (Overlay and XM) are complete.
+I'm polishing themes, writing documentation, taking final screen shots, fixing glitches, and making refinements I notice as I run through the docs.
+If you're an early user, now is the time to get your bugs and requests submitted.
 
-Supporting presets for Osmose brings some significant changes to the way presets are managed.
-When starting to use a new EaganMatrix device or first using CHEM,
-you must manually build databases for System and User presets on the device
-in order to use preset-related functions such as the Preset and Play modules.
-
-This is now completely manual, because the process of building the databases can take a significant amount of time.
-It can take an hour on Osmose for System presets. The good news is that the System databases must be built only once.
-
-After adding user presets on the device, you must re-scan User presets to pick up your changes.
-
-See the documentation for Preset and Core for instructions.
+My goal is to submit to the VCV library by Sept 10.
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
+
+## Building CHEM from source
+
+Building CHEM is like building any other vanilla VCV Rack plugin.
+The only difference is that CHEM has proper debug/release builds supported by its makefile.
+A normal `make`, or `make install` builds a release version.
+To build CHEM for debugging with asserts enabled, use `make DEBUG_BUILD=1`.
+
+I do not use the Rack SDK.
+I build Rack from source with optimization off to make debugging through Rack easier.
+The CHEM source is built and run in-place in it's plugin folder under Rack.
+
+I do my primary development on Windows.
+I use VSCode to write code and debug, but I build from the console.
+I have two MSYS2 MINGW64 consoles in the new Windows terminal, one for building and running `./Rack -d`, and one for building CHEM (or one of my other Rack plugins).
+
+I occasionally build and test on a Mac and Linux.
 
 ## Acknowledgements
 
