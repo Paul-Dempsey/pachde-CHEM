@@ -764,7 +764,7 @@ void CoreModule::connect_midi(bool on)
 
 void CoreModule::init_osmose()
 {
-    bool osmose = em.is_osmose() ? true : is_osmose(haken_device.get_claim());
+    bool osmose = em.is_osmose() ? true : is_osmose_name(haken_device.get_claim());
     haken_midi.osmose_target = osmose;
 
     EmControlPort& port = modulation.get_port(0);

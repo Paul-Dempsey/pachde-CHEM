@@ -44,6 +44,7 @@ json_t* SusModule::dataToJson()
 
 void SusModule::do_message(PackedMidiMessage message)
 {
+    if (!connected()) return;
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(chem_id) == midi_tag(message)) return;
     if (my_cc == midi_cc(message)) {
@@ -73,9 +74,7 @@ void SusModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevice
 
 bool SusModule::connected()
 {
-    if (!chem_host) return false;
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    return conn && conn->identified();
+    return host_connected(chem_host) && !chem_host->host_busy();
 }
 
 void SusModule::onPortChange(const PortChangeEvent &e)
@@ -86,7 +85,6 @@ void SusModule::onPortChange(const PortChangeEvent &e)
 
 void SusModule::update_from_em()
 {
-    if (!connected()) return;
     modulation.set_em_and_param_low(P_VALUE, from_em(), true);
 }
 

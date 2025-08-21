@@ -119,6 +119,8 @@ PlayUi::PlayUi(PlayModule *module) :
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
     if (S::show_screws()) {
+        addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), theme_engine, theme));
         addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
     }
 

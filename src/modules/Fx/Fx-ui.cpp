@@ -149,6 +149,8 @@ void FxUi::center_knobs()
 
 void FxUi::createScrews(std::shared_ptr<SvgTheme> theme)
 {
+    addChild(createThemedWidget<ThemeScrew>(Vec(2*RACK_GRID_WIDTH, 0), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, 0), theme_engine, theme));
     addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
 }
 
@@ -276,13 +278,13 @@ void FxUi::appendContextMenu(Menu *menu)
     menu->addChild(createMenuItem("Zero modulation", "0", [this](){
         my_module->modulation.zero_modulation();
     }, unconnected));
-    
+
     menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

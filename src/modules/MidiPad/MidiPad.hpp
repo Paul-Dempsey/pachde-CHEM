@@ -36,7 +36,7 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     };
 
     std::string device_claim;
-    std::string title;
+    std::string title{"Midi Pad"};
     std::shared_ptr<MidiPad> pad_defs[16]{nullptr};
     rack::dsp::SchmittTrigger trig[16];
 
@@ -125,7 +125,7 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // ChemModuleWidget
-    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-4x4.svg"); }
+    std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-midipad.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
     void onHoverKey(const HoverKeyEvent &e) override;

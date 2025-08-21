@@ -74,7 +74,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
     ChemTask& task = queue.front();
     switch (task.id) {
     case ChemTaskId::SyncDevices:
-        assert(false);
+        assert(false); // recurring, not startup task
         queue.pop_front();
         break;
 
@@ -115,7 +115,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
                 break;
 
             case ChemTask::Pending:
-                core->start_states[task.id] = task.state;
+                core->start_states[ChemTaskId::Heartbeat] = task.state;
                 break;
 
             case ChemTask::Complete:
@@ -142,7 +142,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
                 core->start_states[ChemTaskId::EmInit] = ChemTask::State::Complete;
             }
         } else {
-            core->start_states[task.id] = task.state;
+            core->start_states[ChemTaskId::EmInit] = task.state;
         }
     } break;
 
@@ -175,13 +175,14 @@ void ChemStartupTasks::heartbeat_received()
         queue.pop_front();
     }
 }
+
 void ChemStartupTasks::configuration_received()
 {
     ChemTask& task = queue.front();
     if (ChemTaskId::PresetInfo == task.id) {
         if (core->is_logging()) { core->log_message("CoreStart", format_string("PresetInfo in %.4f", task.time)); }
-        core->start_states[ChemTaskId::PresetInfo] = ChemTask::State::Complete;
         task.complete();
+        core->start_states[ChemTaskId::PresetInfo] = ChemTask::State::Complete;
     }
 }
 

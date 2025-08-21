@@ -41,7 +41,7 @@ bool is_EMDevice(const std::string& name)
         && std::string::npos != text.find("osmose");
 }
 
-bool is_osmose(const std::string& name)
+bool is_osmose_name(const std::string& name)
 {
     if (name.empty()) { return false; }
     if (std::string::npos == name.find_first_of('2')) return false;
@@ -82,7 +82,7 @@ bool matchInOut(const std::string& input, const std::string& output)
     if (0 == input.compare(output)) return true;
 #if defined ARCH_WIN
     return (0 == input.compare(0,7, "MIDIIN2", 0,7))
-        && (0 == output.compare(0,8, "MIDIOUT2", 0,8)) 
+        && (0 == output.compare(0,8, "MIDIOUT2", 0,8))
         && std::string::npos != input.find("Osmose")
         && std::string::npos != output.find("Osmose");
 #endif
@@ -183,7 +183,7 @@ std::string MidiDeviceConnectionInfo::friendly(TextFormatLength length) const
     if (sequence > 0) {
         result.append(format_string("#%d", sequence));
     }
-    
+
     if (TextFormatLength::Long == length) {
         if (!output_device_name.empty()) {
             result.append(" and ");
@@ -249,7 +249,7 @@ std::vector<std::shared_ptr<MidiDeviceConnection>> EnumerateMidiConnections(bool
                 if (output_name != (*item)->info.input_device_name) {
                     (*item)->info.output_device_name = output_name;
                 }
-            } 
+            }
             // else {
             //     DEBUG("No match for output device %s:%s:%d", driver->getName().c_str(), output_name.c_str(), seq);
             // }

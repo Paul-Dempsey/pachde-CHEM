@@ -305,7 +305,10 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         flyout_background->applyTheme(theme_engine, theme);
         addChildBottom(flyout_background);
     }
-
+    if (S::show_screws()) {
+        addChild(createThemedWidget<ThemeScrew>(Vec(0, 0), theme_engine, theme));
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, 0), theme_engine, theme));
+    }
     addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", theme_engine, theme, LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
 
     float x = 15.f;

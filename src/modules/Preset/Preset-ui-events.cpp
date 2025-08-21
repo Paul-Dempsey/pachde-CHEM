@@ -103,7 +103,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             }
             e.consume(this);
             return;
-            
+
         case GLFW_KEY_PAGE_DOWN:
             if (0 == mods) {
                 if (tab.current_index < 0) {
@@ -194,7 +194,7 @@ void PresetUi::draw(const DrawArgs &args)
 {
     Base::draw(args);
     if (start_delay.running()) {
-        FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 6.f, page_label->get_color());
+        FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 3.f, page_label->get_color());
     }
     #ifdef LAYOUT_HELP
     if (hints) {
@@ -206,7 +206,7 @@ void PresetUi::draw(const DrawArgs &args)
 void PresetUi::appendContextMenu(Menu *menu)
 {
     // menu->addChild(new MenuSeparator);
-    // menu->addChild(createCheckMenuItem("Track live preset", "", 
+    // menu->addChild(createCheckMenuItem("Track live preset", "",
     //     [this](){ return my_module->track_live; },
     //     [this](){ set_track_live(!my_module->track_live); }
     // ));

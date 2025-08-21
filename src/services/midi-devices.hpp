@@ -13,7 +13,7 @@ enum class TextFormatLength { Short, Long, Compact, Abbreviated };
 bool ExcludeDriver(const std::string & name);
 bool ExcludeDevice(const std::string & name);
 bool is_EMDevice(const std::string& name);
-bool is_osmose(const std::string& name);
+bool is_osmose_name(const std::string& name);
 std::string FilterDeviceName(const std::string& raw);
 bool matchInOut(const std::string& input, const std::string& output);
 

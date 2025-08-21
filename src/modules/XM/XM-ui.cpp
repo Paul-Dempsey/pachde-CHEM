@@ -51,9 +51,9 @@ struct EditWireframe: OpaqueWidget
 
     void set_ui(XMUi* w) {
         ui = w;
+        auto theme = theme_engine.getTheme(ui->getThemeName());
         auto panel = createWidget<PanelBackgroundWidget>(Vec(0,15));
         panel->track();
-        panel->applyTheme(theme_engine, theme_engine.getTheme(ui->getThemeName()));
         addChild(panel);
 
         for (ssize_t i = 0; i < 8; ++i) {
@@ -63,6 +63,7 @@ struct EditWireframe: OpaqueWidget
             }));
             addChild(cr);
         }
+        ApplyChildrenTheme(this, theme_engine, theme);
     }
 
     void draw(const DrawArgs& args) override
@@ -498,6 +499,8 @@ XMUi::XMUi(XMModule *module) :
 
     initThemeEngine();
     auto theme = theme_engine.getTheme(getThemeName());
+    edit_style.apply_theme(theme);
+    placeholder_style.apply_theme(theme);
     auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
     panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
     setPanel(panel);
