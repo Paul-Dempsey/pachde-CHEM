@@ -9,7 +9,7 @@ namespace pachde {
 
 const char CLAIM_SEPARATOR = '~';
 
-enum class TextFormatLength { Short, Long, Compact, Abbreviated };
+enum class NameFormat { Short, Long, Compact };
 bool ExcludeDriver(const std::string & name);
 bool ExcludeDevice(const std::string & name);
 bool is_EMDevice(const std::string& name);
@@ -57,7 +57,7 @@ struct MidiDeviceConnectionInfo
     }
     bool parse(const std::string & spec);
     std::string claim() const;
-    std::string friendly(TextFormatLength length) const;
+    std::string friendly(NameFormat length) const;
 };
 
 struct MidiDeviceConnection

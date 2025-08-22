@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../services/kv-store.hpp"
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
@@ -378,7 +379,7 @@ void CoreModuleWidget::onConnectHost(IChemHost* host)
 void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     std::string nothing = "";
-    std::string name = connection ? connection->info.friendly(TextFormatLength::Short) : nothing;
+    std::string name = connection ? connection->info.friendly(NameFormat::Short) : nothing;
     switch (device) {
     case ChemDevice::Haken:
         em_status_label->text(nothing);
@@ -606,20 +607,10 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module, busy](Menu* menu) {
 
-        menu->addChild(createMenuItem("Clear System presets", "", [=]() {
-            my_module->clear_presets(PresetTab::System);
-        }, busy));
         menu->addChild(createMenuItem("Clear User presets", "", [=]() {
             my_module->clear_presets(PresetTab::User);
         }, busy));
-
-        menu->addChild(new MenuSeparator);
-
         if (my_module->em.is_osmose()) {
-            menu->addChild(createMenuItem("Scan System preset database", "", [=]() {
-                ui->em_status_label->text("Scanning Full System presets...");
-                my_module->load_full_system_presets();
-            }, busy));
             menu->addChild(createMenuItem("Scan User preset database", "(page 1)", [=]() {
                 ui->em_status_label->text("Scanning User presets (page 1)...");
                 my_module->load_full_user_presets();
@@ -648,18 +639,6 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 // menu->addChild(createMenuItem("Page 10", "", [my_module]() {}));
             }));
         } else {
-            menu->addChild(createMenuItem("Quick scan - System presets", "", [=]() {
-                ui->em_status_label->text("Scanning quick System presets...");
-                my_module->load_quick_system_presets();
-            }, busy));
-            menu->addChild(createMenuItem("Full scan - System preset database", "", [=]() {
-                ui->em_status_label->text("Scanning full System presets...");
-                my_module->load_full_system_presets();
-                ui->create_stop_button();
-            }, busy));
-
-            menu->addChild(new MenuSeparator);
-
             menu->addChild(createMenuItem("Quick scan - User presets", "", [=]() {
                 ui->em_status_label->text("Scanning quick User presets...");
                 my_module->load_quick_user_presets();
@@ -669,6 +648,26 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 my_module->load_full_user_presets();
                 ui->create_stop_button();
             }, busy));
+        }
+
+        menu->addChild(new MenuSeparator);
+
+        menu->addChild(createMenuItem("Clear System presets", "", [=]() {
+            my_module->clear_presets(PresetTab::System);
+        }, busy));
+
+        if (my_module->em.is_osmose()) {
+            menu->addChild(createMenuItem("Scan System preset database", "", [=]() {
+                ui->em_status_label->text("Scanning Full System presets...");
+                my_module->load_full_system_presets();
+            }, busy));
+        } else {
+            menu->addChild(createMenuItem("Full scan - System preset database", "", [=]() {
+                ui->em_status_label->text("Scanning full System presets...");
+                my_module->load_full_system_presets();
+                ui->create_stop_button();
+            }, busy));
+
         }
     }));
 
@@ -680,6 +679,19 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
         [=](){ return my_module->disconnected; },
         [=](){ ui->connect_midi(my_module->disconnected); },
+        busy
+    ));
+
+    bool logos = style::show_browser_logo();
+    menu->addChild(createCheckMenuItem("Show logos in browser", "",
+        [=](){ return logos; },
+        [=](){
+            auto kv = get_plugin_kv_store();
+            if (kv && kv->load()) {
+                const char* key = "browser-logo";
+                kv->update(key, KVStore::bool_text(!logos));
+            }
+        },
         busy
     ));
 

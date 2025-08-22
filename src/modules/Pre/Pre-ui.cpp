@@ -18,11 +18,11 @@ bool PreUi::connected() {
     return my_module->connected();
 }
 
-enum K { 
-    K_PRE_LEVEL, 
-    K_MIX, 
-    K_THRESH_DRIVE, 
-    K_ATTACK_X, 
+enum K {
+    K_PRE_LEVEL,
+    K_MIX,
+    K_THRESH_DRIVE,
+    K_ATTACK_X,
     K_RATIO_MAKEUP,
     K_MODULATION
 };
@@ -112,7 +112,7 @@ PreUi::PreUi(PreModule *module) :
     addChild(in_ratio_makeup = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", theme_engine, theme, S::in_port_label));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
-    
+
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
@@ -128,7 +128,7 @@ PreUi::PreUi(PreModule *module) :
 
     // Browsing UI
 
-    if (browsing) {
+    if (browsing && S::show_browser_logo()) {
         auto logo = new OpaqueLogo(0.75f);
         logo->box.pos = Vec(CENTER, box.size.y*.5);
         addChild(Center(logo));
@@ -270,10 +270,10 @@ void PreUi::appendContextMenu(Menu *menu)
 
     menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

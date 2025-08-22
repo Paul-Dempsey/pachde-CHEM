@@ -139,7 +139,15 @@ void MacroModule::update_from_em()
     }
 }
 
-void MacroModule::process_params(const ProcessArgs& args)
+void MacroModule::onRandomize()
+{
+    for (int i = 0; i < NUM_MOD_PARAMS; ++i) {
+        modulation.ports[i].set_mod_amount((random::uniform() * 200.0) - 100.0);
+        modulation.set_em_and_param(i, randomZeroTo(Haken::max14), true);
+    }
+}
+
+void MacroModule::process_params(const ProcessArgs &args)
 {
     modulation.pull_mod_amount();
 }

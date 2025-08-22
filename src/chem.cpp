@@ -253,7 +253,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 
     menu->addChild(new MenuSeparator);
     bool screws = style::show_screws();
-    menu->addChild(createMenuItem(screws ? "Banish screws" : "Allow screws", "",
+    menu->addChild(createMenuItem(screws ? "Banish screws" : "Show screws", "",
         [=](){
             auto kv = get_plugin_kv_store();
             if (kv && kv->load()) {

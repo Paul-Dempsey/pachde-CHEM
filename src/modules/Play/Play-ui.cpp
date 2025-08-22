@@ -124,7 +124,8 @@ void PlayUi::select_preset(PresetId id)
         if (haken->log) {
             haken->log->log_message("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
         }
-        haken->select_preset(ChemId::Play, id);
+        chem_host->request_preset(ChemId::Play, id);
+        //haken->select_preset(ChemId::Play, id);
     }
 }
 
@@ -603,7 +604,7 @@ struct PresetIdGenerator
 void PlayUi::fill(FillOptions which)
 {
     if (!chem_host || chem_host->host_busy()) return;
-    auto ipl = chem_host->host_preset_list();
+    auto ipl = chem_host->host_ipreset_list();
     if (!ipl) return;
 
     std::shared_ptr<eaganmatrix::PresetList> list_u{nullptr};
@@ -732,9 +733,10 @@ void PlayUi::onChoosePreset(PresetWidget* source)
         if (haken->log) {
             haken->log->log_message("play", format_string("Selecting %s", current_preset->summary().c_str()));
         }
-        auto em = chem_host->host_matrix();
-        if (em) em->set_osmose_id(id);
-        haken->select_preset(ChemId::Play, id);
+        // auto em = chem_host->host_matrix();
+        // if (em) em->set_osmose_id(id);
+        // haken->select_preset(ChemId::Play, id);
+        chem_host->request_preset(ChemId::Play, id);
     }
 }
 

@@ -46,7 +46,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float PP_CENTER = 114.f;
     const float knob_dx = 42.f;
     const float center_dx = 22.f;
-    float pcx[] { 
+    float pcx[] {
         PP_CENTER - center_dx - knob_dx,
         PP_CENTER - center_dx,
         PP_CENTER + center_dx,
@@ -149,7 +149,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             x += PORT_DX;
         }
     }
-    
+
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
@@ -165,7 +165,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
 
     // Browsing UI
 
-    if (browsing) {
+    if (browsing && S::show_browser_logo()) {
         addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 136)));
     }
 
@@ -269,10 +269,10 @@ void ConvoUi::appendContextMenu(Menu *menu)
     menu->addChild(createMenuItem("Zero modulation", "0", [this](){
             my_module->modulation.zero_modulation();
     }, unconnected));
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

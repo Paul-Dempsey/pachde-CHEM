@@ -368,7 +368,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     }
     addChild(link_button);
 
-    if (!my_module) {
+    if (!my_module && S::show_browser_logo()) {
         auto logo = new OpaqueLogo(.55f);
         logo->box.pos = Vec(box.size.x*.5f, 232.f);
         addChild(Center(logo));

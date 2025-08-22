@@ -46,7 +46,7 @@ bool is_osmose_name(const std::string& name)
     if (name.empty()) { return false; }
     if (std::string::npos == name.find_first_of('2')) return false;
     auto text = to_lower_case(name);
-    return std::string::npos != text.find("osmose");
+    return std::string::npos != text.find("(osmose)");
 }
 
 #if defined ARCH_MAC
@@ -140,39 +140,35 @@ std::string MidiDeviceConnectionInfo::claim() const
     return claim_spec;
 }
 
-std::string MidiDeviceConnectionInfo::friendly(TextFormatLength length) const
+std::string MidiDeviceConnectionInfo::friendly(NameFormat length) const
 {
     if (input_device_name.empty()) return "(Unknown)";
     std::string result = input_device_name;
 
     switch (length) {
-    case TextFormatLength::Short: {
-        if (0 == result.compare("MIDIIN2 (Osmose)")) {
+    case NameFormat::Short: {
+        if (std::string::npos != result.find("Osmose")) {
             result = "Osmose";
+        }  else if (0 == result.compare(0, 12, "ContinuuMini", 0, 12)) {
+            result.erase(0, 8); // "Mini"
+        } else if (0 == result.compare(0, 17, "EaganMatrix Micro")) {
+            result.replace(0, 11, "EM"); // "EM Micro"
+        }  else if (0 == result.compare(0, 18, "EaganMatrix Module")) {
+            result.replace(0, 18, "EMM");
         }
     } break;
 
-    case TextFormatLength::Compact: {
+    case NameFormat::Compact: {
         if (0 == result.compare(0, 9, "Continuum", 0, 9)) {
             result.replace(0, 10, "Cont-");
         } else if (0 == result.compare(0, 12, "ContinuuMini", 0, 12)) {
             result.erase(0, 8); // "Mini"
-        } else if (0 == result.compare("EaganMatrix Module")) {
+        } else if (0 == result.compare(0, 17, "EaganMatrix Micro")) {
+            result.erase(0, 12); // "Micro"
+        } else if (0 == result.compare(0, 18, "EaganMatrix Module")) {
             result.replace(0, 18, "EMM");
-        } else if (0 == result.compare("MIDIIN2 (Osmose)")) {
+        } else if (std::string::npos != result.find("Osmose")) {
             result = "Osmose";
-        }
-    } break;
-
-    case TextFormatLength::Abbreviated:{
-        if (0 == result.compare(0, 9, "Continuum", 0, 9)) {
-            result.replace(1, 9, "C-");
-        } else if (0 == result.compare(0, 12, "ContinuuMini", 0, 12)) {
-            result.replace(0, 12, "M-");
-        } else if (0 == result.compare(0, 18, "EaganMatrix Module", 0 , 18)) {
-            result.replace(0, 18, "EMM");
-        } else if (0 == result.compare("MIDIIN2 (Osmose)")) {
-            result = "Os";
         }
     } break;
 
@@ -184,7 +180,7 @@ std::string MidiDeviceConnectionInfo::friendly(TextFormatLength length) const
         result.append(format_string("#%d", sequence));
     }
 
-    if (TextFormatLength::Long == length) {
+    if (NameFormat::Long == length) {
         if (!output_device_name.empty()) {
             result.append(" and ");
             result.append(output_device_name);

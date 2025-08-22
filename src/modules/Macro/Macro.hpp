@@ -28,8 +28,8 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
         P_M4,
         P_M5,
         P_M6,
-        P_MOD_AMOUNT, 
-        NUM_PARAMS, 
+        P_MOD_AMOUNT,
+        NUM_PARAMS,
         NUM_MOD_PARAMS = P_MOD_AMOUNT,
         NUM_KNOBS = NUM_PARAMS
     };
@@ -93,6 +93,7 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
+    void onRandomize() override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };

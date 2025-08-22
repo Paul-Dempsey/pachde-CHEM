@@ -77,6 +77,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool disconnected{false};
     bool is_busy{false};
     bool in_reboot{false};
+    bool in_preset_request{false};
     // ui options
     bool glow_knobs{false};
 
@@ -182,6 +183,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool host_busy() override {
         return is_busy
             || disconnected
+            || in_preset_request
             || in_reboot
             || !em.ready
             || em.busy()
@@ -189,7 +191,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
             || gathering
             ;
     }
-    IPresetList* host_preset_list() override { return host_busy() ? nullptr : this; }
+    IPresetList* host_ipreset_list() override { return host_busy() ? nullptr : this; }
+    void request_preset(ChemId tag, PresetId id) override;
 
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
     void notify_preset_changed();

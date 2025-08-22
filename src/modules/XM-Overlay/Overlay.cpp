@@ -128,7 +128,8 @@ void OverlayModule::on_macro_request_complete()
     auto haken = chem_host->host_haken();
     send_store_preset(ChemId::Overlay, haken, overlay_preset);
     expect_preset_change = true;
-    haken->select_preset(ChemId::Overlay, overlay_preset->id);
+    chem_host->request_preset(ChemId::Overlay, overlay_preset->id);
+    //haken->select_preset(ChemId::Overlay, overlay_preset->id);
 }
 
 MacroReadyState OverlayModule::overlay_macros_ready()

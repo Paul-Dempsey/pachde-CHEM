@@ -59,9 +59,9 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(tracks[M4] = createTrackWidget(knobs[M4], theme_engine, theme));
     addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M5, theme_engine, theme)); y += MACRO_DY;
     addChild(tracks[M5] = createTrackWidget(knobs[M5], theme_engine, theme));
-    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme)); 
+    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), module, MacroModule::P_M6, theme_engine, theme));
     addChild(tracks[M6] = createTrackWidget(knobs[M6], theme_engine, theme));
-    
+
     addChild(preset_label = createLabel<TipLabel>(
         Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "", theme_engine, theme,
         LabelStyle{"curpreset", TextAlignment::Center, 12.f, false}));
@@ -141,7 +141,9 @@ MacroUi::MacroUi(MacroModule *module) :
         m1_ped_label->text("p1");
         m3_ped_label->text("p2");
 
-        addChild(createWidgetCentered<OpaqueLogo>(Vec(68, box.size.y*.25)));
+        if (S::show_browser_logo()) {
+            addChild(createWidgetCentered<OpaqueLogo>(Vec(68, box.size.y*.25)));
+        }
     }
 
     // init
@@ -304,10 +306,10 @@ void MacroUi::appendContextMenu(Menu *menu)
 
     menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

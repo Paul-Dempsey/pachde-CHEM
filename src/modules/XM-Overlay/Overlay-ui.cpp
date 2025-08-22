@@ -47,9 +47,10 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     if (my_module) {
         set_preset_button->setHandler([=](bool c, bool f) {
             if (!chem_host) return;
-            auto haken = chem_host->host_haken();
+            //auto haken = chem_host->host_haken();
             if (my_module->overlay_preset) {
-                haken->select_preset(ChemId::Overlay, my_module->overlay_preset->id);
+                chem_host->request_preset(ChemId::Overlay, my_module->overlay_preset->id);
+                //haken->select_preset(ChemId::Overlay, my_module->overlay_preset->id);
             }
         });
     }
@@ -68,7 +69,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     addChild(link_button);
 
     // Browsing UI
-    if (browsing) {
+    if (browsing && S::show_browser_logo()) {
         auto logo = new Logo(0.25f);
         logo->box.pos = Vec(box.size.x * .5f, 60);
         addChild(Center(logo));
@@ -95,7 +96,7 @@ void OverlayUi::onConnectHost(IChemHost* host)
 void OverlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (connection) {
-        link->describe(connection->info.friendly(TextFormatLength::Long));
+        link->describe(connection->info.friendly(NameFormat::Long));
         link->setFill(true);
         link->setColor(PORT_BLUE);
     } else {

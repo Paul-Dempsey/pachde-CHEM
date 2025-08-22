@@ -134,10 +134,37 @@ void PresetList::sort(PresetOrder new_order)
     }
 }
 
-std::string preset_file_name(eaganmatrix::PresetTab which, uint8_t hardware)
+std::string EMFileId(const std::string& device_name)
 {
-    valid_tab(which);
-    auto preset_filename = format_string("%s-%s.json", PresetClassName(hardware), (eaganmatrix::PresetTab::User == which) ? "user": "system");
+    std::string result = device_name;
+    if (0 == result.compare(0, 12, "ContinuuMini", 0, 12)) {
+        result.erase(0, 8); // "Mini ..."
+    } else if (0 == result.compare(0, 17, "EaganMatrix Micro")) {
+        result.erase(0, 12); // "Micro ..."
+    } else if (0 == result.compare(0, 18, "EaganMatrix Module")) {
+        result.replace(0, 18, "EMM ...");
+    } else if (std::string::npos != result.find("(Osmose)")) {
+        return "Osmose";
+    }
+    std::replace(result.begin(), result.end(), ' ', '-');
+    return result;
+}
+
+std::string preset_file_name(eaganmatrix::PresetTab which, uint8_t hardware, const std::string& device_name)
+{
+    //valid_tab(which);
+    std::string preset_filename;
+    switch (which) {
+    case PresetTab::User:
+        preset_filename = format_string("%s-user.json", EMFileId(device_name).c_str());
+        break;
+    case PresetTab::System:
+        preset_filename = format_string("%s-system.json", PresetClassName(hardware));
+        break;
+    default:
+        assert(false);
+        break;
+    }
     return user_plugin_asset(preset_filename);
 }
 

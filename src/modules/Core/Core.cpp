@@ -192,8 +192,9 @@ void CoreModule::next_preset()
     if (em.is_osmose()) {
         PresetId id = prev_next_id(1);
         if (id.valid()) {
-            em.set_osmose_id(id);
-            haken_midi.select_preset(ChemId::Core, id);
+            //em.set_osmose_id(id);
+            //haken_midi.select_preset(ChemId::Core, id);
+            request_preset(ChemId::Core, id);
         }
     } else {
         haken_midi.next_system_preset(ChemId::Core);
@@ -206,8 +207,9 @@ void CoreModule::prev_preset()
     if (em.is_osmose()) {
         PresetId id = prev_next_id(-1);
         if (id.valid()) {
-            em.set_osmose_id(id);
-            haken_midi.select_preset(ChemId::Core, id);
+            //em.set_osmose_id(id);
+            //haken_midi.select_preset(ChemId::Core, id);
+            request_preset(ChemId::Core, id);
         }
     } else {
         haken_midi.previous_system_preset(ChemId::Core);
@@ -219,7 +221,13 @@ void CoreModule::clear_presets(eaganmatrix::PresetTab which)
     valid_tab(which);
     auto list = which == PresetTab::User ? user_presets : system_presets;
     list->clear();
-    auto path = preset_file_name(which, em.hardware);
+    std::string path;
+    if (haken_device.connection
+        && haken_device.connection->identified()
+        && em.hardware)
+    {
+        path = preset_file_name(which, em.hardware, haken_device.connection->info.input_device_name);
+    }
     if (!path.empty()) {
         system::remove(path);
     }
@@ -230,8 +238,9 @@ PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load)
 {
     valid_tab(which);
     if (!busy_load && host_busy()) return PresetResult::NotReady;
+    if (!haken_device.connection || !haken_device.connection->identified()) return PresetResult::NotReady;
     if (!em.hardware) return PresetResult::NotReady;
-    auto path = preset_file_name(which, em.hardware);
+    auto path = preset_file_name(which, em.hardware, haken_device.connection->info.input_device_name);
     auto list = which == PresetTab::User ? user_presets : system_presets;
     auto result = list->load(path) ? PresetResult::Ok : PresetResult::FileNotFound;
     if (result == PresetResult::Ok) {
@@ -244,7 +253,6 @@ PresetResult CoreModule::load_quick_user_presets()
 {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(PresetTab::User)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -258,7 +266,6 @@ PresetResult CoreModule::load_quick_system_presets()
 {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
-    if (PresetResult::Ok == load_preset_file(PresetTab::System)) return PresetResult::Ok;
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
@@ -378,15 +385,17 @@ PresetResult CoreModule::end_scan()
     LOG_MSG("PLB", format_string("Completed in %.6f", full_build->total));
 
     PresetTab tab{PresetTab::Unset};
+    MidiDeviceConnectionInfo info;
+    info.parse(haken_device.device_claim);
     if (gather_user(gather)) {
         em.end_user_scan();
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware), em.hardware, haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
         tab = PresetTab::User;
     } else {
         assert(gather_system(gather));
         em.end_system_scan();
         system_presets->sort(PresetOrder::Alpha);
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware), em.hardware, haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
         tab = PresetTab::System;
     }
     if (chem_ui) {
@@ -472,6 +481,8 @@ void CoreModule::onPresetBegin()
 void CoreModule::onPresetChanged()
 {
     LOG_MSG("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
+    in_preset_request = false;
+
     if (!em.preset.empty()) {
         if (!startup_tasks.completed()) {
             startup_tasks.configuration_received();
@@ -549,7 +560,9 @@ void CoreModule::onUserComplete()
         ui()->remove_stop_button();
     }
     if (QuickUserPresets == gathering) {
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware), em.hardware, haken_device.device_claim);
+        MidiDeviceConnectionInfo info;
+        info.parse(haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
 }
@@ -568,7 +581,9 @@ void CoreModule::onSystemComplete()
         ui()->remove_stop_button();
     }
     if (QuickSystemPresets == gathering) {
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware), em.hardware, haken_device.device_claim);
+        MidiDeviceConnectionInfo info;
+        info.parse(haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
         gathering = GatherFlags::None;
     }
 }
@@ -583,6 +598,14 @@ void CoreModule::onMahlingComplete()
 {
     is_busy = false;
     if (chem_ui) ui()->show_busy(is_busy);
+}
+
+void CoreModule::request_preset(ChemId tag, PresetId id)
+{
+    if (host_busy()) return;
+    in_preset_request = true;
+    em.set_osmose_id(id);
+    haken_midi.select_preset(tag, id);
 }
 
 // IChemHost
@@ -626,7 +649,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_out.output.channel = -1;
             load_preset_file(PresetTab::System);
             load_preset_file(PresetTab::User);
-            LOG_MSG("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(TextFormatLength::Short).c_str()).c_str());
+            LOG_MSG("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(NameFormat::Short).c_str()).c_str());
         } else {
             haken_midi_in.reset();
             haken_midi_out.output.reset();
@@ -641,7 +664,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi1:
         if (!disconnected && source->connection) {
-            LOG_MSG("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            LOG_MSG("Core", format_string("+++ connect MIDI 1 %s", source->connection->info.friendly(NameFormat::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller1_midi_in.set_channel_reflect(is_em);
             getParam(P_C1_CHANNEL_MAP).setValue(controller1_midi_in.channel_reflect);
@@ -656,7 +679,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
 
     case ChemDevice::Midi2:
         if (!disconnected && source->connection) {
-            LOG_MSG("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(TextFormatLength::Short).c_str()));
+            LOG_MSG("Core", format_string("+++ connect MIDI 2 %s", source->connection->info.friendly(NameFormat::Short).c_str()));
             bool is_em = is_EMDevice(source->connection->info.input_device_name);
             controller2_midi_in.set_channel_reflect(is_em);
             getParam(P_C2_CHANNEL_MAP).setValue(controller2_midi_in.channel_reflect);
@@ -702,7 +725,8 @@ void CoreModule::onRandomize(const RandomizeEvent &e)
     if (!list || list->empty()) list = user ? system_presets : user_presets;
     if (list->empty()) return;
     auto index = std::round(::rack::random::uniform() * (list->size() - 1));
-    haken_midi.select_preset(ChemId::Core, list->presets[index]->id);
+    request_preset(ChemId::Core, list->presets[index]->id);
+    //haken_midi.select_preset(ChemId::Core, list->presets[index]->id);
 }
 
 void CoreModule::dataFromJson(json_t *root)

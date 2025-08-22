@@ -552,10 +552,11 @@ XMUi::XMUi(XMModule *module) :
                 axis = 1.f;
             }
         }
-
-        auto logo = new OpaqueLogo(.35f);
-        logo->box.pos = Vec(CENTER, box.size.y*.3);
-        addChild(Center(logo));
+        if (S::show_browser_logo()) {
+            auto logo = new OpaqueLogo(.35f);
+            logo->box.pos = Vec(CENTER, box.size.y*.3);
+            addChild(Center(logo));
+        }
     }
 
     addChild(createLightCentered<TinyLight<GreenLight>>(Vec(CENTER-5, box.size.y - 3.5f), my_module, XMModule::L_OVERLAY));

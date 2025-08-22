@@ -20,11 +20,11 @@ bool PostUi::connected() {
     return true;
 }
 
-enum K { 
-    K_POST_LEVEL, 
-    K_MIX, 
-    K_TILT, 
-    K_FREQUENCY, 
+enum K {
+    K_POST_LEVEL,
+    K_MIX,
+    K_TILT,
+    K_FREQUENCY,
     K_MODULATION
 };
 
@@ -51,7 +51,7 @@ PostUi::PostUi(PostModule *module) :
     addChild(Center(createThemedParamLightButton<LargeRoundParamButton, SmallLight<RedLight>>(
         Vec(x, y), my_module, PostModule::P_MUTE, PostModule::L_MUTE, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x,y + 14.f), 40.f, "Mute", theme_engine, theme, knob_label_style));
-    
+
     y = 104.f;
     addChild(effect_label = createLabel<TextLabel>(Vec(x, y), 100.f, "EQ", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
     y += 34;
@@ -79,7 +79,7 @@ PostUi::PostUi(PostModule *module) :
     y = S::PORT_TOP;
     x = CENTER - S::PORT_DX;
     addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, PostModule::P_MOD_AMOUNT, theme_engine, theme));
-    
+
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), my_module, PostModule::IN_MUTE, S::InputColorKey, PORT_RED, theme_engine, theme)));
     addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width + 5.f, "MUTE", theme_engine, theme, S::in_port_label));
@@ -123,7 +123,7 @@ PostUi::PostUi(PostModule *module) :
     }
     addChild(link_button);
 
-    if (!module) {
+    if (!module && S::show_browser_logo()) {
         auto logo = new OpaqueLogo(0.75f);
         logo->box.pos = Vec(CENTER, box.size.y*.5);
         addChild(Center(logo));
@@ -224,10 +224,10 @@ void PostUi::appendContextMenu(Menu *menu)
 
     menu->addChild(createMenuItem("Center knobs", "5", [this](){ center_knobs(); }));
 
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             glowing_knobs(my_module->glow_knobs);
         }
     ));

@@ -335,7 +335,7 @@ PresetUi::PresetUi(PresetModule *module) :
         createScrews(theme);
     }
 
-    if (!module) {
+    if (!module && S::show_browser_logo()) {
         auto logo = new WatermarkLogo(1.8f);
         logo->box.pos = Vec(84.f, 180.f - logo->box.size.y*.6);
         addChild(logo);
@@ -350,7 +350,7 @@ PresetUi::PresetUi(PresetModule *module) :
 PresetUi::~PresetUi()
 {
     if (chem_host) {
-        auto ipl = chem_host->host_preset_list();
+        auto ipl = chem_host->host_ipreset_list();
         if (ipl) {
             ipl->unregister_preset_list_client(this);
         }

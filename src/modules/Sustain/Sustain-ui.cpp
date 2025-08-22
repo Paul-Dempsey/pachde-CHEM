@@ -61,7 +61,7 @@ void SusUi::create_ui()
     }
     addChild(link_button);
 
-    if (!module) {
+    if (!module && S::show_browser_logo()) {
         auto logo = new OpaqueLogo(0.25f);
         logo->box.pos = Vec(CENTER, 60);
         addChild(Center(logo));
@@ -87,7 +87,7 @@ void SusUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConn
 {
     if (device != ChemDevice::Haken) return;
     if (connection) {
-        link->describe(connection->info.friendly(TextFormatLength::Long));
+        link->describe(connection->info.friendly(NameFormat::Long));
         link->setFill(true);
         link->setColor(PORT_BLUE);
     } else {
@@ -114,10 +114,10 @@ void SusUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             mod_knob->glowing(my_module->glow_knobs);
         }
     ));

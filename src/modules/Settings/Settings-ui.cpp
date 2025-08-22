@@ -61,17 +61,17 @@ struct AesMenu : Hamburger
             int current = getParamInt(settings->getParam(SM::P_AES3));
 
             // 48k
-            menu->addChild(createCheckMenuItem(pq->labels[0], "", 
+            menu->addChild(createCheckMenuItem(pq->labels[0], "",
                 [=](){ return current == 2; },
                 [=](){ settings->getParam(SM::P_AES3).setValue(2.f); }, false));
 
             // 96k
-            menu->addChild(createCheckMenuItem(pq->labels[1], "", 
+            menu->addChild(createCheckMenuItem(pq->labels[1], "",
                 [=](){ return current == 0; },
                 [=](){ settings->getParam(SM::P_AES3).setValue(0.f); }, false));
 
             // Sync
-            menu->addChild(createCheckMenuItem(pq->labels[2], "", 
+            menu->addChild(createCheckMenuItem(pq->labels[2], "",
                 [=](){ return current == 1; },
                 [=](){ settings->getParam(SM::P_AES3).setValue(1.f); }, false));
         } else {
@@ -163,11 +163,11 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     auto slider = createSlider<BasicHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_FINE, theme_engine, theme);
     slider->increment = 1.f;
     addChild(slider);
-    
+
     y += row_dy;
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Expand", theme_engine, theme, label_right_style));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, SM::P_EXPAND_POLYPHONY, theme_engine, theme)));
-    
+
     addChild(createLabel<TextLabel>(Vec(x2,y-value_dy), 60.f, "Actuation", theme_engine, theme, label_right_style));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_ACTUATION, theme_engine, theme);
     slider->increment = 1.f;
@@ -180,7 +180,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x2,y-value_dy), 60.f, "Audio in", theme_engine, theme, label_right_style));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_AUDIO_IN, theme_engine, theme);
     addChild(slider);
-    
+
     x = menu_axis;
     y += row_dy;
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note processing", theme_engine, theme, label_right_style));
@@ -214,7 +214,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Rounding", theme_engine, theme, label_right_style));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_ROUND_TYPE));
     addChild(round_type_value = createLabel<TextLabel>(Vec(x+value_dx, y-value_dy), 60.f, "", theme_engine, theme, value_style));
-    
+
     y += row_dy;
 
     addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round initial", theme_engine, theme, label_right_style));
@@ -297,7 +297,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     // Browsing UI
 
-    if (browsing) {
+    if (browsing && S::show_browser_logo()) {
         auto logo = new Logo(0.8f);
         logo->box.pos = Vec(CENTER, 144.f);
         addChild(logo);
@@ -333,8 +333,8 @@ void SettingsUi::onConnectHost(IChemHost* host)
 void SettingsUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(TextFormatLength::Short) : S::NotConnected);
-    haken_device_label->describe(connection ? connection->info.friendly(TextFormatLength::Long) : S::NotConnected);
+    haken_device_label->text(connection ? connection->info.friendly(NameFormat::Short) : S::NotConnected);
+    haken_device_label->describe(connection ? connection->info.friendly(NameFormat::Long) : S::NotConnected);
 }
 
 void sync_switch_label(Module* module, int param_id, TextLabel* label)

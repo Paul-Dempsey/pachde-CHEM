@@ -2,8 +2,6 @@
 
 ## General
 
-- Option to suppress #d logo in browser.
-
 - color picker
   - choose text syntax?
   - 100% transparent option

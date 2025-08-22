@@ -43,16 +43,15 @@ JackUi::JackUi(JackModule *module) :
     symbols.add_source("res/symbols/pedal-pot.svg");
     symbols.add_source("res/symbols/pedal-other.svg");
     symbols.applyTheme(theme_engine, theme);
-    
+
     float x, y;
-    bool browsing = !module;
 
     auto assign_style = S::pedal_label;
     assign_style.align = TextAlignment::Center;
     assign_style.height = 10.f;
 
     LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 10.f, false};
-    
+
     x = CENTER;
     y = 34.f;
     addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
@@ -90,7 +89,7 @@ JackUi::JackUi(JackModule *module) :
         pedal_image_2->box.pos = Vec(CENTER, y);
         pedal_image_2->set_index(0);
         addChild(Center(pedal_image_2));
-    } else {
+    } else if (S::show_browser_logo()) {
         auto logo = new OpaqueLogo(.35f);
         logo->box.pos = Vec(CENTER, y);
         addChild(Center(logo));
@@ -110,7 +109,7 @@ JackUi::JackUi(JackModule *module) :
 
     // outputs
     auto co_port = PORT_ORANGE;
-    
+
     x = CENTER;
     y = S::PORT_TOP;
     addChild(level_1 = createWidgetCentered<LevelWidget>(Vec(CENTER - 14.25f, y - 5.f)));
@@ -133,11 +132,6 @@ JackUi::JackUi(JackModule *module) :
         });
     }
     addChild(link_button);
-
-    // Browsing UI
-
-    if (browsing) {
-    }
 
     // init
     sync_labels();
@@ -166,7 +160,7 @@ void JackUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
 {
     if (device != ChemDevice::Haken) return;
     if (connection) {
-        link->describe(connection->info.friendly(TextFormatLength::Long));
+        link->describe(connection->info.friendly(NameFormat::Long));
         link->setLook(PORT_BLUE);
     } else {
         link->describe("[not connected]");
@@ -213,7 +207,7 @@ void JackUi::sync_labels()
                 pedal_image_2->set_index(p2);
                 last_p2 = p2;
             }
-        }        
+        }
     }
 }
 

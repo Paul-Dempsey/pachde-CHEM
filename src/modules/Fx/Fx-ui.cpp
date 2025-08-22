@@ -116,7 +116,7 @@ FxUi::FxUi(FxModule *module) :
 
     // Browsing UI
 
-    if (browsing) {
+    if (browsing && S::show_browser_logo()) {
         addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 150.f)));
     }
 

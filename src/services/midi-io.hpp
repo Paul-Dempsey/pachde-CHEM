@@ -18,7 +18,7 @@ inline PackedMidiMessage MakeStreamData(ChemId tag, uint8_t id, uint8_t value) {
     return Tag(MakePolyKeyPressure(15, id, value), tag);
 }
 
-constexpr const float MIDI_RATE = 0.005f;
+constexpr const float MIDI_RATE = 0.001f;
 constexpr const float DISPATCH_NOW = MIDI_RATE;
 
 struct MidiInput : midi::Input

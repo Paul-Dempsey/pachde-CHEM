@@ -6,7 +6,7 @@ namespace style {
 
 constexpr const float U1 = 15.f;
 constexpr const float UHALF = 7.5f;
-   
+
 constexpr const ssize_t SSIZE_0 = 0;
 
 constexpr const float PORT_SECTION = 290.f;
@@ -42,4 +42,6 @@ extern const char * const InputColorKey;
 extern const char * const OutputColorKey;
 
 bool show_screws();
+bool show_browser_logo();
+
 }}

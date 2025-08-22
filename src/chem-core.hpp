@@ -47,7 +47,8 @@ struct IChemHost
     virtual HakenMidi* host_haken() = 0;
     virtual eaganmatrix::EaganMatrix* host_matrix() = 0;
     virtual const eaganmatrix::PresetDescription* host_preset() = 0;
-    virtual IPresetList* host_preset_list() = 0;
+    virtual IPresetList* host_ipreset_list() = 0;
+    virtual void request_preset(ChemId tag, PresetId id) = 0;
 };
 
 struct IChemClient

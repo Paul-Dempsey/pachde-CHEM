@@ -18,7 +18,7 @@ ModuleBroker::ModuleBroker()
 }
 
 ModuleBroker::~ModuleBroker()
-{ 
+{
 }
 
 void ModuleBroker::register_host(IChemHost* host)
@@ -35,7 +35,7 @@ void ModuleBroker::unregister_host(IChemHost* host)
     auto item = std::find(hosts.cbegin(), hosts.cend(), host);
     if (item != hosts.cend()) {
         hosts.erase(item);
-    }  
+    }
 }
 
 bool ModuleBroker::is_primary(IChemHost* host)
@@ -96,17 +96,17 @@ void ModuleBroker::addHostPickerMenu(ui::Menu* menu, IChemClient* client)
         auto conn = host->host_connection(ChemDevice::Haken);
         std::string item;
         if (conn) {
-            item = conn->info.friendly(TextFormatLength::Short);
+            item = conn->info.friendly(NameFormat::Short);
         } else {
             auto claim = host->host_claim();
             MidiDeviceConnectionInfo info;
             info.parse(claim);
-            item = info.friendly(TextFormatLength::Short);
+            item = info.friendly(NameFormat::Short);
         }
         bool available = !host->host_has_client_model(client);
         bool mine = host->host_has_client(client);
-        menu->addChild(createCheckMenuItem(item, "", 
-            [=](){ return mine; }, 
+        menu->addChild(createCheckMenuItem(item, "",
+            [=](){ return mine; },
             [=](){
                 if (current_host) {
                     current_host->unregister_chem_client(client);

@@ -12,11 +12,10 @@ inline void valid_tab(PresetTab which) { assert((PresetTab::User == which) || (P
 struct PresetList
 {
     PresetList(const PresetList&) = delete;
-    
+
     PresetOrder order{PresetOrder::Natural};
     std::vector<std::shared_ptr<PresetInfo>> presets;
     bool modified{false};
-    
     PresetList(){}
 
     ssize_t size() { return presets.size(); }
@@ -33,6 +32,6 @@ struct PresetList
     void sort(PresetOrder order);
 };
 
-std::string preset_file_name(PresetTab which, uint8_t hardware);
+std::string preset_file_name(PresetTab which, uint8_t hardware, const std::string& device_name);
 
 }

@@ -207,7 +207,7 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_PREV, S::InputColorKey, PORT_CORN, theme_engine, theme)));
     addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_NEXT, S::InputColorKey, PORT_CORN, theme_engine, theme)));
 
-    if (!module) {
+    if (!module && S::show_browser_logo()) {
         auto logo = new WatermarkLogo(1.25f);
         logo->box.pos = Vec(90.f, box.size.y*.5);
         addChild(Center(logo));

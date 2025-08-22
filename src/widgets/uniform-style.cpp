@@ -34,4 +34,20 @@ bool show_screws()
     return true;
 }
 
+bool show_browser_logo()
+{
+    auto kv = get_plugin_kv_store();
+    if (kv && kv->load()) {
+        const char* key = "browser-logo";
+        auto value = kv->lookup(key);
+        if (value.empty()) {
+            kv->update(key, KVStore::bool_text(true));
+            kv->save();
+            return true;
+        }
+        return KVStore::bool_value(value);
+    }
+    return true;
+}
+
 }};

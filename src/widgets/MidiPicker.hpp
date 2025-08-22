@@ -28,7 +28,7 @@ struct MidiPicker : TipWidget, IApplyTheme
         sw = new widget::SvgWidget;
         fb->addChild(sw);
     }
-    
+
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
     {
         sw->setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/midi-button.svg"), theme));
@@ -79,7 +79,7 @@ struct MidiPicker : TipWidget, IApplyTheme
                     bool mine = (0 == current_claim.compare(item_claim));
                     bool unavailable = mine ? false : !broker->available(item_claim);
 
-                    menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
+                    menu->addChild(createCheckMenuItem(conn->info.friendly(NameFormat::Long), "",
                         [=](){ return mine; },
                         [=](){ setter->connect(conn); }, unavailable));
                 }
@@ -92,7 +92,7 @@ struct MidiPicker : TipWidget, IApplyTheme
                     bool mine = (0 == current_claim.compare(item_claim));
                     bool unavailable = mine ? false : !broker->available(item_claim);
 
-                    menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
+                    menu->addChild(createCheckMenuItem(conn->info.friendly(NameFormat::Long), "",
                         [=](){ return mine; },
                         [=](){ setter->connect(conn); }, unavailable));
                 }
@@ -103,8 +103,8 @@ struct MidiPicker : TipWidget, IApplyTheme
                 auto item_claim = conn->info.claim();
                 bool mine = (0 == current_claim.compare(item_claim));
                 bool unavailable = mine ? false : 0 == item_claim.compare(em_holder->get_claim());
-                
-                menu->addChild(createCheckMenuItem(conn->info.friendly(TextFormatLength::Long), "",
+
+                menu->addChild(createCheckMenuItem(conn->info.friendly(NameFormat::Long), "",
                     [=](){ return mine; },
                     [=](){ setter->connect(conn); }, unavailable));
             }

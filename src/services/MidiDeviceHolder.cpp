@@ -45,11 +45,11 @@ void MidiDeviceHolder::unsubscribe(IMidiDeviceNotify *client)
 std::string MidiDeviceHolder::device_name()
 {
     if (connection) {
-        return connection->info.friendly(TextFormatLength::Short);
+        return connection->info.friendly(NameFormat::Short);
     } else if (!device_claim.empty()) {
         MidiDeviceConnectionInfo info;
         info.parse(device_claim);
-        return info.friendly(TextFormatLength::Short);
+        return info.friendly(NameFormat::Short);
     }
     return "";
 }

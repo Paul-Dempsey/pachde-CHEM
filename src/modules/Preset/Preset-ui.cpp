@@ -20,7 +20,7 @@ void PresetUi::on_list_changed(eaganmatrix::PresetTab which)
     Tab& tab = get_tab(which);
     std::shared_ptr<PresetList> ppl{nullptr};
     if (chem_host) {
-        auto ipl = chem_host->host_preset_list();
+        auto ipl = chem_host->host_ipreset_list();
         if (ipl) {
             switch (which) {
             case PresetTab::Unset: break;
@@ -38,7 +38,7 @@ bool PresetUi::load_presets(PresetTab which)
 {
     valid_tab(which);
     if (!host_available()) return false;
-    auto pl = chem_host->host_preset_list();
+    auto pl = chem_host->host_ipreset_list();
     if (!pl) return false;
     Tab & tab = get_tab(which);
     tab.list.preset_list = (PresetTab::User == which) ? pl->host_user_presets() : pl->host_system_presets();
@@ -61,8 +61,11 @@ void PresetUi::sort_presets(PresetOrder order)
     tab.list.sort(order);
     if (host_available()) {
         auto hw = chem_host->host_matrix()->get_hardware();
-        auto file = preset_file_name(active_tab_id, hw);
-        tab.list.save(file, hw, chem_host->host_claim());
+        auto conn = chem_host->host_connection(ChemDevice::Haken);
+        if (conn && conn->identified()) {
+            auto file = preset_file_name(active_tab_id, hw, conn->info.input_device_name);
+            tab.list.save(file, hw, chem_host->host_claim());
+        }
     }
 
     if (my_module->track_live) {
@@ -181,7 +184,7 @@ void PresetUi::onConnectHost(IChemHost *host)
     if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em) em->subscribeEMEvents(this);
-        auto ipl = chem_host->host_preset_list();
+        auto ipl = chem_host->host_ipreset_list();
         if (ipl) {
             ipl->register_preset_list_client(this);
         }
@@ -451,8 +454,9 @@ void PresetUi::send_preset(ssize_t index)
     if (index >= ssize_t(tab.count())) return;
     auto preset = tab.list.nth(index);
     if (preset && host_available()) {
-        chem_host->host_matrix()->set_osmose_id(preset->id);
-        chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
+        chem_host->request_preset(ChemId::Preset, preset->id);
+        //chem_host->host_matrix()->set_osmose_id(preset->id);
+        //chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
     }
 }
 

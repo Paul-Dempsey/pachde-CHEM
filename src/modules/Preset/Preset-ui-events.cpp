@@ -30,7 +30,8 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
         case GLFW_KEY_ENTER:
             if (0 == mods)  {
                 if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
-                    chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+                    chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+                    //chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
                 }
             }
             e.consume(this);
