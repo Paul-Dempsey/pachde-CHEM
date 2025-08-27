@@ -168,45 +168,41 @@ void JackUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
     }
 }
 
-void JackUi::onPresetChange()
-{
-}
-
 void JackUi::sync_labels()
 {
-    if (my_module) {
-        float current = my_module->getParam(JackModule::P_ASSIGN_JACK_1).getValue();
-        if (current != last_1) {
-            last_1 = current;
-            auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_1));
-            if (q) {
-                assign_1_label->text(q->getDisplayValueString());
-            }
-        }
+    if (!my_module) return;
 
-        current = my_module->getParam(JackModule::P_ASSIGN_JACK_2).getValue();
-        if (current != last_2) {
-            last_2 = current;
-            auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_2));
-            if (q) {
-                assign_2_label->text(q->getDisplayValueString());
-            }
+    float current = my_module->getParam(JackModule::P_ASSIGN_JACK_1).getValue();
+    if (current != last_1) {
+        last_1 = current;
+        auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_1));
+        if (q) {
+            assign_1_label->text(q->getDisplayValueString());
         }
+    }
 
-        if (chem_host) {
-            auto em = chem_host->host_matrix();
-            if (!em) return;
-            auto pt = em->get_pedal_types();
-            auto p1 = pt & Haken::bPedType0;
-            auto p2 = (pt & Haken::bPedType1) >> Haken::sPedType1;
-            if (last_p1 != p1) {
-                pedal_image_1->set_index(p1);
-                last_p1 = p1;
-            }
-            if (last_p2 != p2) {
-                pedal_image_2->set_index(p2);
-                last_p2 = p2;
-            }
+    current = my_module->getParam(JackModule::P_ASSIGN_JACK_2).getValue();
+    if (current != last_2) {
+        last_2 = current;
+        auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_2));
+        if (q) {
+            assign_2_label->text(q->getDisplayValueString());
+        }
+    }
+
+    if (chem_host) {
+        auto em = chem_host->host_matrix();
+        if (!em) return;
+        auto pt = em->get_pedal_types();
+        auto p1 = pt & Haken::bPedType0;
+        auto p2 = (pt & Haken::bPedType1) >> Haken::sPedType1;
+        if (last_p1 != p1) {
+            pedal_image_1->set_index(p1);
+            last_p1 = p1;
+        }
+        if (last_p2 != p2) {
+            pedal_image_2->set_index(p2);
+            last_p2 = p2;
         }
     }
 }
@@ -224,11 +220,6 @@ void JackUi::step()
         }
     }
     sync_labels();
-}
-
-void JackUi::draw(const DrawArgs& args)
-{
-    Base::draw(args);
 }
 
 void JackUi::appendContextMenu(Menu *menu)

@@ -5,7 +5,6 @@ using namespace pachde;
 
 JackModule::JackModule()
 :   glow_knobs(false),
-    host_connection(false),
     last_assign_1(-1),
     last_assign_2(-1),
     last_keep(-1),
@@ -58,17 +57,16 @@ std::string JackModule::client_claim() { return device_claim; }
 void JackModule::onConnectHost(IChemHost* host)
 {
     onConnectHostModuleImpl(this, host);
+    pull_jack_data();
 }
 
 void JackModule::onPresetChange()
 {
     pull_jack_data();
-    if (chem_ui) ui()->onPresetChange();
 }
 
 void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    host_connection = connection ? connection->identified() : false;
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
@@ -93,9 +91,10 @@ void JackModule::pull_jack_data()
     getParam(P_KEEP).setValue(last_keep);
 }
 
-int JackModule::update_send(std::vector<PackedMidiMessage>& stream_data, int paramId, uint8_t haken_id, int last_value) {
+int JackModule::update_send(std::vector<PackedMidiMessage>& stream_data, int paramId, uint8_t haken_id, int last_value)
+{
     int param_value = getParamInt(getParam(paramId));
-    if ((-1 != last_value) && (last_value != param_value)) {
+    if (last_value != param_value) {
         stream_data.push_back(MakeStreamData(ChemId::Jack, haken_id, U8(param_value)));
     }
     return param_value;
@@ -106,22 +105,18 @@ void JackModule::process_params(const ProcessArgs &args)
     assert(chem_host);
     std::vector<PackedMidiMessage> stream_data;
 
-    last_assign_1 = update_send(stream_data, P_ASSIGN_JACK_1, Haken::idPedal1, last_assign_1);
-    last_assign_2 = update_send(stream_data, P_ASSIGN_JACK_2, Haken::idPedal2, last_assign_2);
+    last_assign_1 = update_send(stream_data, P_ASSIGN_JACK_1, Haken::idPedal1,    last_assign_1);
+    last_assign_2 = update_send(stream_data, P_ASSIGN_JACK_2, Haken::idPedal2,    last_assign_2);
     last_shift    = update_send(stream_data, P_SHIFT,         Haken::idJackShift, last_shift);
     last_action   = update_send(stream_data, P_SHIFT_ACTION,  Haken::idSwTogInst, last_action);
-    last_keep     = update_send(stream_data, P_KEEP,          Haken::idPresPed, last_keep);
+    last_keep     = update_send(stream_data, P_KEEP,          Haken::idPresPed,   last_keep);
 
+    auto haken = chem_host->host_haken();
     if (!stream_data.empty()) {
-        auto haken = chem_host->host_haken();
         if (haken->log) {
             haken->log->log_message("Jack", "Pedal assign");
         }
-        haken->begin_stream(ChemId::Jack, Haken::s_Mat_Poke);
-        for (auto msg: stream_data) {
-            haken->send_message(msg);
-        }
-        haken->end_stream(ChemId::Jack); // optional for poke streams
+        haken->send_stream(ChemId::Jack, Haken::s_Mat_Poke, stream_data);
     }
 }
 

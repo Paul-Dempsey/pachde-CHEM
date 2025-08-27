@@ -23,7 +23,6 @@ struct JackModule : ChemModule, IChemClient
     JackUi* ui() { return reinterpret_cast<JackUi*>(chem_ui); }
 
     bool glow_knobs;
-    bool host_connection;
     int last_assign_1;
     int last_assign_2;
     int last_keep;
@@ -113,7 +112,7 @@ struct JackUi : ChemModuleWidget, IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
+    void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // ChemModuleWidget
@@ -122,7 +121,6 @@ struct JackUi : ChemModuleWidget, IChemClient
 
     void sync_labels();
     void step() override;
-    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 
