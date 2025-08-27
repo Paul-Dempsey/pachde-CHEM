@@ -30,7 +30,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
         P_1_LENGTH, P_2_LENGTH, P_3_LENGTH, P_4_LENGTH,
         P_1_TUNING, P_2_TUNING, P_3_TUNING, P_4_TUNING,
         P_1_WIDTH,  P_2_WIDTH,  P_3_WIDTH,  P_4_WIDTH,
-        P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT, 
+        P_1_LEFT,   P_2_LEFT,   P_3_LEFT,   P_4_LEFT,
         P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
 
         P_MOD_AMOUNT,
@@ -47,7 +47,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
         IN_1_LENGTH, IN_2_LENGTH, IN_3_LENGTH, IN_4_LENGTH,
         IN_1_TUNING, IN_2_TUNING, IN_3_TUNING, IN_4_TUNING,
         IN_1_WIDTH,  IN_2_WIDTH,  IN_3_WIDTH,  IN_4_WIDTH,
-        IN_1_LEFT,   IN_2_LEFT,   IN_3_LEFT,   IN_4_LEFT, 
+        IN_1_LEFT,   IN_2_LEFT,   IN_3_LEFT,   IN_4_LEFT,
         IN_1_RIGHT,  IN_2_RIGHT,  IN_3_RIGHT,  IN_4_RIGHT,
 
         NUM_INPUTS
@@ -100,6 +100,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
+    IDoMidi* client_do_midi() override { return this; }
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
@@ -144,7 +145,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     void createScrews(std::shared_ptr<SvgTheme> theme) override;
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-convolution.svg"); }
