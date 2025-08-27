@@ -24,46 +24,59 @@ void HakenMidi::end_stream(ChemId tag)
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccStream, 127), tag));
 }
 
+void HakenMidi::send_stream(ChemId tag, uint8_t stream, std::vector<PackedMidiMessage> &data)
+{
+    if (!data.empty()) return;
+
+    begin_stream(tag, stream);
+    for (auto msg: data) {
+        send_message(msg);
+    }
+    if (!in_range(stream, U8(Haken::s_Mat_Poke), U8(Haken::s_Conv_Poke))) {
+        end_stream(tag);
+    }
+}
+
 void HakenMidi::disable_recirculator(ChemId tag, bool disable)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idNoRecirc, disable);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::recirculator_type(ChemId tag, uint8_t kind)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idReciType, kind);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::compressor_option(ChemId tag, bool tanh)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idCompOpt, tanh);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::keep_pedals(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresPed, keep);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::keep_surface(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresSurf, keep);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::keep_midi(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
     key_pressure(tag, Haken::ch16, Haken::idPresEnc, keep);
-    end_stream(tag);
+    //end_stream(tag);
 }
 
 void HakenMidi::select_preset(ChemId tag, eaganmatrix::PresetId id)

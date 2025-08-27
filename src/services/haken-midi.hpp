@@ -37,6 +37,7 @@ struct HakenMidi
     void begin_stream(ChemId tag, uint8_t stream);
     void stream_data(ChemId tag, uint8_t d1, uint8_t d2);
     void end_stream(ChemId tag);
+    void send_stream(ChemId tag, uint8_t stream, std::vector<PackedMidiMessage>& data);
 
     void select_preset(ChemId tag, eaganmatrix::PresetId id);
     void extended_macro(ChemId tag, uint8_t macro, uint16_t value);

@@ -53,7 +53,7 @@ void EmControlPort::set_mod_amount(float amount)
 {
     assert(in_range(amount, -100.f, 100.f));
     mod_amount = amount;
-    mod_value = modulated_value(param_value, cv, mod_amount); 
+    mod_value = modulated_value(param_value, cv, mod_amount);
 }
 
 void EmControlPort::set_param_and_em(float value)
@@ -86,7 +86,7 @@ bool Modulation::sync_params_ready(const rack::engine::Module::ProcessArgs &args
     return false;
 }
 
-Modulation::Modulation(ChemModule *module, ChemId client_tag) : 
+Modulation::Modulation(ChemModule *module, ChemId client_tag) :
     module(module),
     mod_target(-1),
     last_mod_target(-1),
@@ -176,7 +176,7 @@ void Modulation::set_modulation_target(int target)
     auto pq = module->getParamQuantity(mod_param);
     if (pq) {
         pq->setImmediateValue(port.modulation());
-    }        
+    }
 }
 
 void Modulation::sync_send()
@@ -219,11 +219,7 @@ void Modulation::sync_send()
         if (!stream_data.empty()) {
             auto haken{module->chem_host->host_haken()};
             assert(haken);
-            haken->begin_stream(client_tag, stream);
-            for (auto msg : stream_data) {
-                haken->send_message(msg);
-            }
-            haken->end_stream(client_tag);
+            haken->send_stream(client_tag, stream, stream_data);
         }
     } else {
         for (auto pit = ports.begin();pit != ports.end(); pit++) {

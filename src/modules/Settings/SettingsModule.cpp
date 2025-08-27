@@ -451,13 +451,7 @@ void SettingsModule::process(const ProcessArgs &args)
         build_update(stream_data, P_KEEP_SURFACE, Haken::idPresSurf);
         build_update(stream_data, P_AES3, Haken::idAes3);
 
-        if (!stream_data.empty()) {
-            haken->begin_stream(ChemId::Settings, Haken::s_Mat_Poke);
-            for (auto msg: stream_data) {
-                haken->send_message(msg);
-            }
-            haken->end_stream(ChemId::Settings);
-        }
+        haken->send_stream(ChemId::Settings, Haken::s_Mat_Poke, stream_data);
     }
 
     if (((args.frame + id) % 61) == 0) {
