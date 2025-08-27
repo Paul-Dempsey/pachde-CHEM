@@ -59,14 +59,7 @@ void PresetUi::sort_presets(PresetOrder order)
     }
 
     tab.list.sort(order);
-    if (host_available()) {
-        auto hw = chem_host->host_matrix()->get_hardware();
-        auto conn = chem_host->host_connection(ChemDevice::Haken);
-        if (conn && conn->identified()) {
-            auto file = preset_file_name(active_tab_id, hw, conn->info.input_device_name);
-            tab.list.save(file, hw, chem_host->host_claim());
-        }
-    }
+    tab.list.save();
 
     if (my_module->track_live) {
         scroll_to_live();

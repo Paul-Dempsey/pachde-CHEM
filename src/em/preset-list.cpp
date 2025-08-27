@@ -62,15 +62,23 @@ bool PresetList::load(const std::string &path)
         return false;
     }
 	DEFER({json_decref(root);});
-    bool ok = from_json(root, path);
+    bool ok = from_json(root);
     if (ok) {
         modified = false;
     }
     return ok;
 }
 
-bool PresetList::save(const std::string &path, uint8_t hardware, const std::string& connection_info)
+bool PresetList::save()
 {
+    std::string path = filename;
+    return save(filename, hardware);
+}
+
+bool PresetList::save(const std::string &path, uint8_t hardware)
+{
+    filename.clear();
+    hardware = 0;
     if (path.empty()) return false;
     auto dir = system::getDirectory(path);
     system::createDirectories(dir);
@@ -83,15 +91,17 @@ bool PresetList::save(const std::string &path, uint8_t hardware, const std::stri
     auto root = json_object();
     if (!root) { return false; }
 	DEFER({json_decref(root);});
-    to_json(root, hardware, connection_info);
+    to_json(root, hardware);
     bool ok = json_dumpf(root, file, JSON_INDENT(2)) < 0 ? false : true;
     if (ok) {
         modified = false;
+        filename = path;
+        this->hardware = hardware;
     }
     return ok;
 }
 
-bool PresetList::from_json(const json_t* root,const std::string &path)
+bool PresetList::from_json(const json_t* root)
 {
     clear();
 
@@ -110,9 +120,8 @@ bool PresetList::from_json(const json_t* root,const std::string &path)
     return true;
 }
 
-void PresetList::to_json(json_t* root, uint8_t hardware, const std::string& connection_info)
+void PresetList::to_json(json_t* root, uint8_t hardware)
 {
-    json_object_set_new(root, "connection", json_string(connection_info.c_str()));
     json_object_set_new(root, "haken-device", json_string(PresetClassName(hardware))); // human-readable
     json_object_set_new(root, "order", json_integer(int(order)));
     auto jar = json_array();

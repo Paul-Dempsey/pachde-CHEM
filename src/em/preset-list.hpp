@@ -14,8 +14,11 @@ struct PresetList
     PresetList(const PresetList&) = delete;
 
     PresetOrder order{PresetOrder::Natural};
-    std::vector<std::shared_ptr<PresetInfo>> presets;
     bool modified{false};
+    std::vector<std::shared_ptr<PresetInfo>> presets;
+    std::string filename;
+    uint8_t hardware{0};
+
     PresetList(){}
 
     ssize_t size() { return presets.size(); }
@@ -26,9 +29,10 @@ struct PresetList
     void add(const PresetDescription* preset);
     void clear();
     bool load(const std::string& path);
-    bool save(const std::string& path, uint8_t hardware, const std::string& connection_info);
-    bool from_json(const json_t* root, const std::string &path);
-    void to_json(json_t* root, uint8_t hardware, const std::string& connection_info);
+    bool save();
+    bool save(const std::string& path, uint8_t hardware);
+    bool from_json(const json_t* root);
+    void to_json(json_t* root, uint8_t hardware);
     void sort(PresetOrder order);
 };
 

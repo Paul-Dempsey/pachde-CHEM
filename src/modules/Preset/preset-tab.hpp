@@ -55,8 +55,7 @@ struct PresetTabList
         preset_list = nullptr;
     }
 
-    bool load(const std::string& path);
-    bool save(const std::string& path, uint8_t hardware, const std::string& connection_info);
+    bool save();
     void sort(PresetOrder order);
     std::shared_ptr<PresetInfo> nth(ssize_t which) {
         if (which < 0) which = 0;

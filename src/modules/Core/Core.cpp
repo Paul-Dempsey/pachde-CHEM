@@ -389,13 +389,13 @@ PresetResult CoreModule::end_scan()
     info.parse(haken_device.device_claim);
     if (gather_user(gather)) {
         em.end_user_scan();
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware);
         tab = PresetTab::User;
     } else {
         assert(gather_system(gather));
         em.end_system_scan();
         system_presets->sort(PresetOrder::Alpha);
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware);
         tab = PresetTab::System;
     }
     if (chem_ui) {
@@ -562,7 +562,7 @@ void CoreModule::onUserComplete()
     if (QuickUserPresets == gathering) {
         MidiDeviceConnectionInfo info;
         info.parse(haken_device.device_claim);
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
+        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware);
         gathering = GatherFlags::None;
     }
 }
@@ -583,7 +583,7 @@ void CoreModule::onSystemComplete()
     if (QuickSystemPresets == gathering) {
         MidiDeviceConnectionInfo info;
         info.parse(haken_device.device_claim);
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware, haken_device.device_claim);
+        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware);
         gathering = GatherFlags::None;
     }
 }

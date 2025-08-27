@@ -11,13 +11,9 @@
 
 - Allow DB Save As and Load.
 
-  — and/or —
-
-- Option for per-connection preset lists to support multiple devices.
-
 - Show loaded preset database.
 
-- Bug: Switching devices always requires a reset.
+- Bug: Switching devices usually requires a reset (maybe just Osmose?).
 - Bug: rounding lights aren't quite same as Continuum
 
 ## Preset
@@ -35,8 +31,6 @@
 ## Before release
 
 - Update doc images for final graphics/themes
-
-- Clean up unused events
 
 - Open issues for unresolved TODOs.
 

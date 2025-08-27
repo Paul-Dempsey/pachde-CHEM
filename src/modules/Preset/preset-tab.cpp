@@ -20,7 +20,7 @@ std::size_t common_prefix_length_insensitive(
 {
     int common = 0;
     for (; ((a != end_a) && (b != end_b)) && ((*a == *b) || (std::tolower(*a) == std::tolower(*b)));
-        ++a, ++b, ++common) { 
+        ++a, ++b, ++common) {
         // nothing
     }
     return common;
@@ -57,15 +57,9 @@ bool search_match(const std::string &query, const std::string &text, bool anchor
 
 }
 
-
-bool PresetTabList::load(const std::string &path)
+bool PresetTabList::save()
 {
-    return preset_list->load(path);
-}
-
-bool PresetTabList::save(const std::string &path, uint8_t hardware, const std::string& connection_info)
-{
-    return preset_list->save(path, hardware, connection_info);
+    return preset_list->save();
 }
 
 void PresetTabList::set_filter(FilterId index, uint64_t mask)
@@ -134,7 +128,7 @@ inline bool zip_any_filter(uint64_t* a, uint64_t* b)
 
 void PresetTabList::refresh_filter_view()
 {
-    preset_view.clear(); 
+    preset_view.clear();
     if (filtering && preset_list) {
         auto inserter = std::back_inserter(preset_view);
         for (auto p: preset_list->presets) {
