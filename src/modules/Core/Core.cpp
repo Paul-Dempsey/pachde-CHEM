@@ -11,6 +11,9 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
 {
     ticker.set_interval(1.0f);
     module_id = ChemId::Core;
+
+    InitMidiRate();
+
     using EME = IHandleEmEvents::EventMask;
     em_event_mask = static_cast<EME>(
         EME::EditorReply
@@ -991,6 +994,7 @@ void CoreModule::process(const ProcessArgs &args)
         startup_tasks.process(args);
         if (startup_tasks.completed()) {
             LOG_MSG("CoreStart", "----  Startup Tasks Complete  ----");
+            notify_preset_changed();
         }
     } else {
         if (!recurring_tasks.started) {

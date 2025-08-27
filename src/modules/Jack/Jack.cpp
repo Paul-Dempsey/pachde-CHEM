@@ -5,6 +5,7 @@ using namespace pachde;
 
 JackModule::JackModule()
 :   glow_knobs(false),
+    initialized(false),
     last_assign_1(-1),
     last_assign_2(-1),
     last_keep(-1),
@@ -57,7 +58,6 @@ std::string JackModule::client_claim() { return device_claim; }
 void JackModule::onConnectHost(IChemHost* host)
 {
     onConnectHostModuleImpl(this, host);
-    pull_jack_data();
 }
 
 void JackModule::onPresetChange()
@@ -67,14 +67,21 @@ void JackModule::onPresetChange()
 
 void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
+    pull_jack_data();
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
 void JackModule::pull_jack_data()
 {
-    assert(chem_host);
+    if (!chem_host) {
+        initialized = false;
+        return;
+    }
     auto em = chem_host->host_matrix();
-    if (!em) return;
+    if (!em) {
+        initialized = false;
+        return;
+    }
     last_assign_1 = em->get_jack_1_assign();
     last_assign_2 = em->get_jack_2_assign();
     getParam(P_ASSIGN_JACK_1).setValue(last_assign_1);
@@ -89,6 +96,7 @@ void JackModule::pull_jack_data()
 
     last_keep = em->is_keep_pedals();
     getParam(P_KEEP).setValue(last_keep);
+    initialized = true;
 }
 
 int JackModule::update_send(std::vector<PackedMidiMessage>& stream_data, int paramId, uint8_t haken_id, int last_value)
@@ -126,6 +134,9 @@ void JackModule::process(const ProcessArgs &args)
     if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
     if (0 == ((args.frame + id) % 45)) {
+        if (!initialized) {
+            pull_jack_data();
+        }
         process_params(args);
     }
 

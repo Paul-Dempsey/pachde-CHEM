@@ -24,14 +24,6 @@ OverlayModule::~OverlayModule()
     }
 }
 
-void OverlayModule::reset() {
-    title = "";
-    bg_color = 0;
-    overlay_preset = nullptr;
-    preset_connected = false;
-    notify_connect_preset();
-}
-
 bool OverlayModule::client_editing()
 {
     return paused_clients > 0;
@@ -195,7 +187,7 @@ void OverlayModule::onReset(const ResetEvent &e)
     preset_connected = false;
     getLightInfo(L_CONNECTED)->name = "Preset connected";
 
-    title = "";
+    title = DEFAULT_TITLE;
     bg_color = 0;
     fg_color = parse_color("hsl(42,60%,50%)");
     macro_usage.clear();

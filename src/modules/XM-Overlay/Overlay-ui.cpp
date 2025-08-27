@@ -168,13 +168,6 @@ void OverlayUi::appendContextMenu(Menu *menu)
        my_module->notify_connect_preset();
     }, !preset));
 
-    menu->addChild(createMenuItem("Reset", "", [=](){
-        if (module) my_module->reset();
-        bg_widget->color = 0;
-        title_widget->set_text_color(0xffe6e6e6);
-        title_widget->set_text(DEFAULT_TITLE);
-    }));
-
     menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>",
         [=](Menu *menu) {
             menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, my_module ? my_module->title : "<title>", [=](std::string text) { set_title(text); }));

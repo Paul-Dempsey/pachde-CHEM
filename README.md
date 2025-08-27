@@ -12,6 +12,8 @@ If you've been holding back on updating your Osmose to the latest release, now's
 
 To download the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
+When CHEM is released, you will be able to subscribe to the **#d CHEM** plugin in the VCV Rack library.
+
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
 ## Aug 18 2025

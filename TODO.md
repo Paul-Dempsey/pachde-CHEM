@@ -2,6 +2,8 @@
 
 ## General
 
+- Document CHEM-kv.txt, Midilog, and all files in plugin folder.
+
 - color picker
   - choose text syntax?
   - 100% transparent option

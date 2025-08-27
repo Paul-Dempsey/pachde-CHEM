@@ -58,7 +58,6 @@ struct OverlayModule : ChemModule, IChemClient, IDoMidi, IOverlay
     OverlayUi* ui() { return reinterpret_cast<OverlayUi*>(chem_ui); };
 
     bool sync_params_ready(const rack::engine::Module::ProcessArgs &args, float rate = MOD_MIDI_RATE);
-    void reset();
     void update_from_em();
     void on_macro_request_complete();
     bool client_editing();

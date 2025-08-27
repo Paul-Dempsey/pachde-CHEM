@@ -2,13 +2,23 @@
 
 ![CHEM banner](./image/repo-banner.svg)
 
-To get started, you must have installed VCV Rack and download the CHEM `.vcvplugin` file from GitHub.
+To get started, you must have installed [VCV Rack](https://vcvrack.com/manual/) and download the CHEM `.vcvplugin` file from GitHub.
 To download and install the latest build of **#d CHEM**, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
 
 When CHEM is released, you will be able to subscribe to the **#d CHEM** plugin in the VCV Rack library.
-A subscription is recommended so that you are automatically updated when the plugin is revised with new modules, features, and bug fixes.
+Once subscribed, a red dot appears on the **Library** menu where you can update.
+CHEM will be downlaoded and installed (along with any other modules with updates).
+A subscription is recommended so that you are automatically updated when CHEM is revised with new modules, features, and bug fixes.
 
-Start with the [**Core**](./core.md#chem-core) module.
+If you aren't familiar with VCV Rack, it's best to become familiar with basic Rack operation first.
+The Rack manual is at [VCV Rack](https://vcvrack.com/manual/).
+
+The VCV Rack Community _Getting Started_ threads are a great resource for learning Rack:
+
+- [Getting started with VCV Rack](https://community.vcvrack.com/t/getting-started-with-vcv-rack/747)
+- [Getting started with VCV Rack - Video tutorials](https://community.vcvrack.com/t/getting-started-with-vcv-rack-video-tutorials/11204)
+
+To get started with CHEM, first read the [**Core**](./core.md#chem-core) module docs.
 
 ## Module Index
 

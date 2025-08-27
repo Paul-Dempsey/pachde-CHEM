@@ -1,11 +1,28 @@
 #include <rack.hpp>
 #include "midi-io.hpp"
 #include "../plugin.hpp"
+#include "../services/kv-store.hpp"
 #include "../services/misc.hpp"
 #include "../em/wrap-HakenMidi.hpp"
 using namespace ::rack;
 
 namespace pachde {
+
+float MIDI_RATE = DEFAULT_MIDI_RATE;
+
+void InitMidiRate()
+{
+    MIDI_RATE = DEFAULT_MIDI_RATE;
+    auto kv = get_plugin_kv_store();
+    if (kv && kv->load()) {
+        auto key = "midi-rate";
+        float rate = KVStore::float_value(kv->lookup(key), DEFAULT_MIDI_RATE);
+        if ((rate < 0.0001f) || (rate > 0.1f)) rate = DEFAULT_MIDI_RATE;
+        MIDI_RATE = rate;
+        kv->update(key, format_string("%.4f", rate));
+        kv->save();
+    }
+}
 
 midi::Message rackFromPacked(PackedMidiMessage message)
 {
@@ -43,7 +60,7 @@ PackedMidiMessage packedFromRack(const midi::Message& source, ChemId tag)
         return Tag(MakeRawBase(0, 0, 0), tag);
     }
 }
-    
+
 inline bool is_note_cc(uint8_t cc)
 {
     switch (cc) {
@@ -89,7 +106,7 @@ void reflect_channels(PackedMidiMessage& source)
     if (0 == channel || 15 == channel) return;
     midi_set_channel(source, 16 - channel);
 }
-    
+
 void MidiInput::set_logger(const std::string& source, MidiLog* logger)
 {
     source_name = source;
@@ -144,7 +161,7 @@ void MidiInput::queueMessage(PackedMidiMessage msg)
 
 void MidiInput::enable(bool enabled)
 {
-    mute = !enabled; 
+    mute = !enabled;
     if (mute) {
         ring.clear();
     }

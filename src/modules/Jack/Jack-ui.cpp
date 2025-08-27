@@ -170,14 +170,16 @@ void JackUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCon
 
 void JackUi::sync_labels()
 {
-    if (!my_module) return;
+    if (!my_module || !my_module->initialized) return;
 
     float current = my_module->getParam(JackModule::P_ASSIGN_JACK_1).getValue();
     if (current != last_1) {
         last_1 = current;
         auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_1));
-        if (q) {
+        if (q && (0 != q->getValue())) {
             assign_1_label->text(q->getDisplayValueString());
+        } else {
+            assign_1_label->text("");
         }
     }
 
@@ -185,8 +187,10 @@ void JackUi::sync_labels()
     if (current != last_2) {
         last_2 = current;
         auto q = dynamic_cast<JackQuantity*>(my_module->getParamQuantity(JackModule::P_ASSIGN_JACK_2));
-        if (q) {
+        if (q && (0 != q->getValue())) {
             assign_2_label->text(q->getDisplayValueString());
+        } else {
+            assign_2_label->text("");
         }
     }
 
@@ -211,6 +215,7 @@ void JackUi::step()
 {
     Base::step();
     if (!my_module) return;
+
     bind_host(my_module);
     if (chem_host) {
         auto em = chem_host->host_matrix();

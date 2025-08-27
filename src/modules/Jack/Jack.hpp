@@ -23,6 +23,7 @@ struct JackModule : ChemModule, IChemClient
     JackUi* ui() { return reinterpret_cast<JackUi*>(chem_ui); }
 
     bool glow_knobs;
+    bool initialized;
     int last_assign_1;
     int last_assign_2;
     int last_keep;
