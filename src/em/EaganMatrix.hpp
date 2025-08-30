@@ -96,12 +96,11 @@ struct EaganMatrix
 
     bool busy() {
         return in_preset
+            || pending_config
+            || in_scan
             || in_user
             || in_system
             || in_mahling
-            || in_scan
-            || pending_config
-            || pending_EditorReply
             ;
     }
     // raw channel cc data
@@ -128,7 +127,7 @@ struct EaganMatrix
 
     uint16_t get_macro_value(int id) { return macro[id]; }
     float get_macro_voltage(int id);
-    
+
     uint16_t get_jack_1() { return jack_1; }
     uint16_t get_jack_2() { return jack_2; }
     uint16_t get_post() { return post; }
@@ -284,7 +283,7 @@ struct EaganMatrix
 	uint8_t get_conv_ir2_length () { return conv[Haken::id_c_lth1]; }
 	uint8_t get_conv_ir3_length () { return conv[Haken::id_c_lth2]; }
 	uint8_t get_conv_ir4_length () { return conv[Haken::id_c_lth3]; }
-    
+
     uint8_t get_conv_ir_shift (int index) { return conv[Haken::id_c_shf0 + index]; }
 	uint8_t get_conv_ir1_shift() { return conv[Haken::id_c_shf0]; }
 	uint8_t get_conv_ir2_shift() { return conv[Haken::id_c_shf1]; }

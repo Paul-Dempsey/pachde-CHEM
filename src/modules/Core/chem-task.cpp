@@ -183,6 +183,8 @@ void ChemStartupTasks::configuration_received()
         if (core->is_logging()) { core->log_message("CoreStart", format_string("PresetInfo in %.4f", task.time)); }
         task.complete();
         core->start_states[ChemTaskId::PresetInfo] = ChemTask::State::Complete;
+        core->load_preset_file(PresetTab::System, true);
+        core->load_preset_file(PresetTab::User, true);
     }
 }
 
@@ -218,7 +220,7 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
             heart.start();
         }
     }
-    if (sync_ready && !heart.pending() && !heart.broken()) {
+    if (sync_ready && !heart.pending()) {
         auto broker = ModuleBroker::get();
         sync.start();
         if (broker->is_primary(core)) {

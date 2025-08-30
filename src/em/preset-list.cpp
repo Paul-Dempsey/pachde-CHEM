@@ -44,6 +44,7 @@ ssize_t PresetList::index_of_id(PresetId id)
 void PresetList::clear()
 {
     modified = false;
+    filename.clear();
     presets.clear();
 }
 
@@ -65,6 +66,7 @@ bool PresetList::load(const std::string &path)
     bool ok = from_json(root);
     if (ok) {
         modified = false;
+        filename = path;
     }
     return ok;
 }

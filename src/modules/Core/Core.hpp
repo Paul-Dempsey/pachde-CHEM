@@ -188,7 +188,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
             || !em.ready
             || em.busy()
             || !startup_tasks.completed()
-            || gathering
+            || (gathering != GatherFlags::None)
             ;
     }
     IPresetList* host_ipreset_list() override { return host_busy() ? nullptr : this; }
@@ -199,6 +199,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     // IHandleEmEvents
     void onEditorReply(uint8_t reply) override;
+    void onTaskMessage(uint8_t code) override;
     void onHardwareChanged(uint8_t hardware, uint16_t firmware_version) override;
     void onPresetBegin() override;
     void onPresetChanged() override;

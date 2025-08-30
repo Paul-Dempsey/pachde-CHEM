@@ -6,7 +6,7 @@ std::shared_ptr<MidiDeviceBroker> the_broker_instance = std::make_shared<MidiDev
 
 std::shared_ptr<MidiDeviceBroker> MidiDeviceBroker::get()
 {
-    return the_broker_instance; 
+    return the_broker_instance;
 }
 
 MidiDeviceBroker::MidiDeviceBroker()
@@ -64,17 +64,19 @@ void MidiDeviceBroker::sync()
         auto cit = connections.find(holder_claim);
         if (cit != connections.cend()) {
             if (holder->connection) {
-                auto c1 = holder->connection;
+                auto hc = holder->connection;
                 auto c2 = cit->second;
-                if ((c1->input_device_id != c2->input_device_id) 
-                    || (c1->driver_id != c2->driver_id)
-                    || (c1->output_device_id != c2->output_device_id))
+                if ((hc->input_device_id != c2->input_device_id)
+                    || (hc->driver_id != c2->driver_id)
+                    || (hc->output_device_id != c2->output_device_id))
                 {
                     holder->connect(c2);
                 }
             } else {
                 holder->connect(cit->second);
             }
+        } else {
+            holder->connect(nullptr);
         }
     }
 }

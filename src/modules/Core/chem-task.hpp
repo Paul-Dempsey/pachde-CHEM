@@ -50,8 +50,8 @@ struct RecurringChemTasks
     bool started{false};
     CoreModule* core{nullptr};
     ChemTask heart{ChemTaskId::Heartbeat, 2.0, 12.0};
-    ChemTask sync{ChemTaskId::SyncDevices, 0.0, 30.f};
-    
+    ChemTask sync{ChemTaskId::SyncDevices, 0.0, 10.f};
+
     RecurringChemTasks()
     {
         sync.start();

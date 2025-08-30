@@ -607,6 +607,12 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module, busy](Menu* menu) {
 
+        std::string preset_file = my_module->user_presets ? system::getFilename(my_module->user_presets->filename) : "";
+        if (preset_file.empty()) {
+            preset_file = "(none)";
+        }
+        menu->addChild(createMenuLabel(format_string("File: %s", preset_file.c_str())));
+
         menu->addChild(createMenuItem("Clear User presets", "", [=]() {
             my_module->clear_presets(PresetTab::User);
         }, busy));
@@ -651,6 +657,12 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
         }
 
         menu->addChild(new MenuSeparator);
+
+        preset_file = my_module->system_presets ? system::getFilename(my_module->system_presets->filename) : "";
+        if (preset_file.empty()) {
+            preset_file = "(none)";
+        }
+        menu->addChild(createMenuLabel(format_string("File: %s", preset_file.c_str())));
 
         menu->addChild(createMenuItem("Clear System presets", "", [=]() {
             my_module->clear_presets(PresetTab::System);

@@ -24,6 +24,7 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
         + EME::UserComplete
         + EME::SystemBegin
         + EME::SystemComplete
+        + EME::TaskMessage
         + EME::MahlingBegin
         + EME::MahlingComplete
     );
@@ -223,14 +224,8 @@ void CoreModule::clear_presets(eaganmatrix::PresetTab which)
 {
     valid_tab(which);
     auto list = which == PresetTab::User ? user_presets : system_presets;
+    std::string path = list->filename;
     list->clear();
-    std::string path;
-    if (haken_device.connection
-        && haken_device.connection->identified()
-        && em.hardware)
-    {
-        path = preset_file_name(which, em.hardware, haken_device.connection->info.input_device_name);
-    }
     if (!path.empty()) {
         system::remove(path);
     }
@@ -466,6 +461,13 @@ void CoreModule::onEditorReply(uint8_t reply)
     }
 }
 
+void CoreModule::onTaskMessage(uint8_t code)
+{
+    if (Haken::helloWorld == code) {
+        reset_tasks();
+    }
+}
+
 void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 {
     saved_hardware = hardware;
@@ -650,8 +652,6 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
             haken_midi_in.setDeviceId(source->connection->input_device_id);
             haken_midi_out.output.setDeviceId(source->connection->output_device_id);
             haken_midi_out.output.channel = -1;
-            load_preset_file(PresetTab::System);
-            load_preset_file(PresetTab::User);
             LOG_MSG("Core", format_string("+++ connect HAKEN %s", source->connection->info.friendly(NameFormat::Short).c_str()).c_str());
         } else {
             haken_midi_in.reset();
