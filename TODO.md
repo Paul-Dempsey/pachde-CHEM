@@ -13,14 +13,13 @@
 
 - Allow DB Save As and Load.
 
-- Show loaded preset database.
-
-- Bug: Switching devices usually requires a reset (maybe just Osmose?).
 - Bug: rounding lights aren't quite same as Continuum
 
 ## Preset
 
 ## Play
+
+- Consider persisting unsaved list in patch
 
 ## MidiPad
 

@@ -139,6 +139,17 @@ The gate will be high when the EM is ready for input, and low when it is busy wi
 The **M1** and **M2** input ports (blue ports) are gate inputs to turn the corresponding controller's data stream off and on.
 When the gate is high, the controller is blocked (muted), and the corresponding button led is lit.
 
+## Additional options
+
+There are a few additional options in the hamburger menu:
+
+| Menu Item |  Description |
+| -- | -- |
+| Log midi | Keeps a log file of the MIDI sent and received by Core. This is used for debugging CHEM, and other peeking under the hood to see what happened in a session. The log file is saved in the pachde-CHEM folder under your Rack user folder. |
+| Show logos in Browser | CHEM shows a logo on every panel in the module browser by default. You can turn this off if you find that it's a bit too much. |
+| Glowing knobs | The Volume knob stays bright in a darkened room. |
+| Haken requests | Send some basic Haken MIDI requests. Hopefully you won't need to use these, except as part of diagnosing a problem.  |
+
 ---
 
 // Copyright © Paul Chase Dempsey\
