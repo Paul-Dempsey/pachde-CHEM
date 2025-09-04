@@ -10,6 +10,7 @@
 #include "relay-midi.hpp"
 #include "chem-task.hpp"
 #include "preset-enum.hpp"
+#include "preset-file-info.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -26,7 +27,7 @@ struct CoreMenu : Hamburger
     void onHoverKey(const HoverKeyEvent& e) override;
 };
 
-enum GatherFlags {
+enum GatherFlags : uint8_t {
     None    = 0,
     System  = 1,
     User    = (1 << 1),
@@ -81,8 +82,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     // ui options
     bool glow_knobs{false};
 
-    uint8_t saved_hardware{0};
-
     std::shared_ptr<PresetList> user_presets{nullptr};
     std::shared_ptr<PresetList> system_presets{nullptr};
     std::vector<IPresetListClient*> preset_list_clients;
@@ -90,6 +89,9 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     PresetIdListBuilder* id_builder{nullptr};
     PresetListBuildCoordinator* full_build{nullptr};
     bool stop_scan{false};
+
+    std::vector<std::shared_ptr<PresetFileInfo>> user_preset_file_infos;
+    std::string stash_user_preset_file; // for repopulating custom user preset file
 
     WallTimer ticker;
     RecurringChemTasks recurring_tasks;
@@ -139,6 +141,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     PresetResult load_full_user_presets();
     PresetResult scan_osmose_presets(uint8_t page);
     void notify_preset_list_changed(eaganmatrix::PresetTab which);
+    void update_user_preset_file_infos();
 
     // IPresetList
     void register_preset_list_client(IPresetListClient* client) override;
@@ -188,10 +191,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
             || !em.ready
             || em.busy()
             || !startup_tasks.completed()
-            || (gathering != GatherFlags::None)
+            || gathering
             ;
     }
-    IPresetList* host_ipreset_list() override { return host_busy() ? nullptr : this; }
+    IPresetList* host_ipreset_list() override { return this; }
     void request_preset(ChemId tag, PresetId id) override;
 
     void notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection);
@@ -288,6 +291,9 @@ enum ThemeColor {
 
 struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
+    CoreModuleWidget(CoreModule *module);
+    virtual ~CoreModuleWidget();
+
     CoreModule* my_module = nullptr;
     bool spinning{false};
 
@@ -326,9 +332,8 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     void createIndicatorsCentered(float x, float y, float spread);
     void updateIndicators();
     void connect_midi(bool on);
-
-    CoreModuleWidget(CoreModule *module);
-    virtual ~CoreModuleWidget();
+    void open_user_preset_file();
+    void save_as_user_preset_file();
 
     void show_busy(bool busy);
     bool showing_busy() { return spinning; }

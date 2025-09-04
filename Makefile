@@ -75,6 +75,7 @@ SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
 SOURCES += src/modules/Core/chem-task.cpp
 SOURCES += src/modules/Core/preset-enum.cpp
+SOURCES += src/modules/Core/preset-file-info.cpp
 
 SOURCES += src/modules/Play/Play.cpp
 SOURCES += src/modules/Play/Play-ui.cpp

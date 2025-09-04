@@ -1,11 +1,14 @@
 #include "Core.hpp"
 #include "../../services/ModuleBroker.hpp"
 #include "../../services/kv-store.hpp"
+#include "../../services/open-file.hpp"
 #include "../../widgets/draw-button.hpp"
 #include "../../widgets/theme-button.hpp"
 #include "../../widgets/theme-knob.hpp"
 #include "../../em/preset-meta.hpp"
 using EME = IHandleEmEvents::EventMask;
+const char * preset_list_file_dialog_filter = "Preset list (.json):json;Any (*):*";
+constexpr const float LOGO_CENTER{62.f};
 
 CoreModuleWidget::~CoreModuleWidget()
 {
@@ -15,27 +18,6 @@ CoreModuleWidget::~CoreModuleWidget()
     if (chem_host) {
         chem_host->unregister_chem_client(this);
     }
-}
-
-constexpr const float LOGO_CENTER{62.f};
-
-void CoreModuleWidget::show_busy(bool busy)
-{
-    if (busy) {
-        if (!spinning) {
-            startSpinner(this, Vec(box.size.x*.5, LOGO_CENTER));
-        }
-        spinning = true;
-    } else {
-        stopSpinner(this);
-        spinning = false;
-        em_status_label->text("");
-    }
-}
-
-void CoreModuleWidget::glowing_knobs(bool glow)
-{
-    attenuation_knob->glowing(glow);
 }
 
 // Layout
@@ -328,6 +310,61 @@ void CoreModuleWidget::connect_midi(bool on)
     }
 }
 
+void CoreModuleWidget::show_busy(bool busy)
+{
+    if (busy) {
+        if (!spinning) {
+            startSpinner(this, Vec(box.size.x*.5, LOGO_CENTER));
+        }
+        spinning = true;
+    } else {
+        stopSpinner(this);
+        spinning = false;
+        em_status_label->text("");
+    }
+}
+
+void CoreModuleWidget::glowing_knobs(bool glow)
+{
+    attenuation_knob->glowing(glow);
+}
+
+void CoreModuleWidget::save_as_user_preset_file()
+{
+    if (!my_module) return;
+    if (!my_module->user_presets) return;
+    if (my_module->user_presets->empty()) return;
+
+    std::string folder = asset::user(pluginInstance->slug.c_str());
+    std::string path;
+    bool ok = saveFileDialog(folder, preset_list_file_dialog_filter, my_module->user_presets->filename, path);
+    if (ok) {
+        auto ext = system::getExtension(path);
+        if (ext.empty()) {
+            path.append(".json");
+        }
+        auto hardware = my_module->em.get_hardware();
+        assert(hardware);
+        my_module->user_presets->save(path, hardware);
+        my_module->update_user_preset_file_infos();
+    }
+}
+
+void CoreModuleWidget::open_user_preset_file()
+{
+    if (!my_module) return;
+    if (!my_module->user_presets) return;
+
+    std::string folder = asset::user(pluginInstance->slug.c_str());
+    std::string path;
+    bool ok = openFileDialog(folder, preset_list_file_dialog_filter, my_module->user_presets->filename, path);
+    if (ok) {
+        //TODO: check hardware
+        my_module->user_presets->load(path);
+        my_module->update_user_preset_file_infos();
+    }
+}
+
 MidiPicker* CoreModuleWidget::createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme)
 {
     auto picker = createThemedWidget<MidiPicker>(Vec(x, y), theme_engine, theme);
@@ -607,11 +644,25 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
     menu->addChild(createSubmenuItem("Presets", "", [this, my_module, busy](Menu* menu) {
 
+        // User Presets section
+
         std::string preset_file = my_module->user_presets ? system::getFilename(my_module->user_presets->filename) : "";
-        if (preset_file.empty()) {
+        bool no_file = preset_file.empty();
+        if (no_file) {
             preset_file = "(none)";
         }
         menu->addChild(createMenuLabel(format_string("File: %s", preset_file.c_str())));
+
+        bool no_presets = (nullptr ==  my_module->user_presets) ||  my_module->user_presets->empty();
+        menu->addChild(createMenuItem("Save as...", "", [=]() {
+            ui->save_as_user_preset_file();
+        }, busy || no_file || no_presets));
+
+        menu->addChild(createMenuItem(format_string("Open...", preset_file.c_str()), "", [=]() {
+            ui->open_user_preset_file();
+        }, busy || no_file));
+
+        menu->addChild(new MenuSeparator);
 
         menu->addChild(createMenuItem("Clear User presets", "", [=]() {
             my_module->clear_presets(PresetTab::User);
@@ -656,12 +707,16 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             }, busy));
         }
 
+        // System Presets section
+
         menu->addChild(new MenuSeparator);
 
         preset_file = my_module->system_presets ? system::getFilename(my_module->system_presets->filename) : "";
-        if (preset_file.empty()) {
+        no_file = preset_file.empty();
+        if (no_file) {
             preset_file = "(none)";
         }
+
         menu->addChild(createMenuLabel(format_string("File: %s", preset_file.c_str())));
 
         menu->addChild(createMenuItem("Clear System presets", "", [=]() {
@@ -674,12 +729,14 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 my_module->load_full_system_presets();
             }, busy));
         } else {
+            menu->addChild(createMenuItem("Quick scan - System presets", "", [=]() {
+                my_module->load_quick_system_presets();
+            }, busy));
             menu->addChild(createMenuItem("Full scan - System preset database", "", [=]() {
                 ui->em_status_label->text("Scanning full System presets...");
                 my_module->load_full_system_presets();
                 ui->create_stop_button();
             }, busy));
-
         }
     }));
 
@@ -691,7 +748,7 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
     menu->addChild(createCheckMenuItem("Disconnect MIDI", "",
         [=](){ return my_module->disconnected; },
         [=](){ ui->connect_midi(my_module->disconnected); },
-        busy
+        my_module->disconnected ? false : busy
     ));
 
     bool logos = style::show_browser_logo();

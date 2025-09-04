@@ -83,6 +83,7 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
 
     system_presets = std::make_shared<PresetList>();
     user_presets = std::make_shared<PresetList>();
+    load_pfis(pfis_filename(), user_preset_file_infos);
 }
 
 CoreModule::~CoreModule()
@@ -105,6 +106,8 @@ CoreModule::~CoreModule()
     broker->unRegisterDeviceHolder(&haken_device);
     broker->unRegisterDeviceHolder(&controller1);
     broker->unRegisterDeviceHolder(&controller2);
+
+    save_pfis(pfis_filename(), user_preset_file_infos);
 }
 
 void CoreModule::enable_logging(bool enable)
@@ -189,15 +192,12 @@ PresetId CoreModule::prev_next_id(ssize_t increment)
     return id;
 }
 
-
 void CoreModule::next_preset()
 {
     load_lists();
     if (em.is_osmose()) {
         PresetId id = prev_next_id(1);
         if (id.valid()) {
-            //em.set_osmose_id(id);
-            //haken_midi.select_preset(ChemId::Core, id);
             request_preset(ChemId::Core, id);
         }
     } else {
@@ -211,8 +211,6 @@ void CoreModule::prev_preset()
     if (em.is_osmose()) {
         PresetId id = prev_next_id(-1);
         if (id.valid()) {
-            //em.set_osmose_id(id);
-            //haken_midi.select_preset(ChemId::Core, id);
             request_preset(ChemId::Core, id);
         }
     } else {
@@ -225,6 +223,16 @@ void CoreModule::clear_presets(eaganmatrix::PresetTab which)
     valid_tab(which);
     auto list = which == PresetTab::User ? user_presets : system_presets;
     std::string path = list->filename;
+
+    if ((PresetTab::User == which) && !path.empty() && !user_preset_file_infos.empty()) {
+        auto it = std::find_if(user_preset_file_infos.begin(), user_preset_file_infos.end(),
+            [path](std::shared_ptr<PresetFileInfo> pfi){
+                return 0 == path.compare(pfi->file);
+            });
+        if (it != user_preset_file_infos.end()) {
+            user_preset_file_infos.erase(it);
+        }
+    }
     list->clear();
     if (!path.empty()) {
         system::remove(path);
@@ -237,8 +245,21 @@ PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load)
     valid_tab(which);
     if (!busy_load && host_busy()) return PresetResult::NotReady;
     if (!haken_device.connection || !haken_device.connection->identified()) return PresetResult::NotReady;
-    if (!em.hardware) return PresetResult::NotReady;
-    auto path = preset_file_name(which, em.hardware, haken_device.connection->info.input_device_name);
+    auto hardware = em.get_hardware();
+    if (!hardware) return PresetResult::NotReady;
+    std::string path;
+    if ((PresetTab::User == which) && !user_preset_file_infos.empty()) {
+        auto conn = haken_device.get_claim();
+        auto it = std::find_if(user_preset_file_infos.begin(), user_preset_file_infos.end(), [conn](std::shared_ptr<PresetFileInfo> pfi){
+            return 0 == conn.compare(pfi->connection);
+        });
+        if (it != user_preset_file_infos.end()) {
+            path = (*it)->file;
+        }
+    }
+    if (path.empty()) {
+        path = preset_file_name(which, hardware, haken_device.connection->info.input_device_name);
+    }
     auto list = which == PresetTab::User ? user_presets : system_presets;
     auto result = list->load(path) ? PresetResult::Ok : PresetResult::FileNotFound;
     if (result == PresetResult::Ok) {
@@ -256,6 +277,8 @@ PresetResult CoreModule::load_quick_user_presets()
         ui()->show_busy(true);
     }
     gathering = QuickUserPresets;
+    stash_user_preset_file = user_presets->filename;
+    user_presets->clear();
     haken_midi.request_user(ChemId::Core);
     return PresetResult::Ok;
 }
@@ -264,7 +287,6 @@ PresetResult CoreModule::load_quick_system_presets()
 {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
-
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
     }
@@ -276,6 +298,7 @@ PresetResult CoreModule::load_quick_system_presets()
 PresetResult CoreModule::load_full_user_presets()
 {
     if (host_busy()) return PresetResult::NotReady;
+    stash_user_preset_file = user_presets->filename;
     user_presets->clear();
 
     if (chem_ui && !ui()->showing_busy()) {
@@ -316,6 +339,30 @@ void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which)
 {
     for (auto client: preset_list_clients) {
         client->on_list_changed(which);
+    }
+}
+
+void CoreModule::update_user_preset_file_infos()
+{
+    if (!haken_device.connection) return;
+    auto hardware = em.get_hardware();
+    if (!hardware) return;
+    auto default_path = preset_file_name(PresetTab::User, hardware, haken_device.connection->info.input_device_name);
+
+    auto conn = host_claim();
+    auto it = std::find_if(user_preset_file_infos.begin(), user_preset_file_infos.end(), [conn](std::shared_ptr<PresetFileInfo> pfi) {
+        return 0 == conn.compare(pfi->connection);
+    });
+    if (it == user_preset_file_infos.end()) {
+        if (0 != default_path.compare(user_presets->filename)) {
+            user_preset_file_infos.push_back(std::make_shared<PresetFileInfo>(hardware, conn, user_presets->filename));
+        }
+    } else {
+        if (0 == default_path.compare(user_presets->filename)) {
+            user_preset_file_infos.erase(it);
+        } else {
+            (*it)->file = user_presets->filename;
+        }
     }
 }
 
@@ -387,13 +434,18 @@ PresetResult CoreModule::end_scan()
     info.parse(haken_device.device_claim);
     if (gather_user(gather)) {
         em.end_user_scan();
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware);
+        if (stash_user_preset_file.empty()) {
+            user_presets->save(preset_file_name(PresetTab::User, em.get_hardware(), info.input_device_name), em.get_hardware());
+        } else {
+            user_presets->save(stash_user_preset_file, em.get_hardware());
+            stash_user_preset_file = "";
+        }
         tab = PresetTab::User;
     } else {
         assert(gather_system(gather));
         em.end_system_scan();
         system_presets->sort(PresetOrder::Alpha);
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware);
+        system_presets->save(preset_file_name(PresetTab::System, em.get_hardware(), info.input_device_name), em.get_hardware());
         tab = PresetTab::System;
     }
     if (chem_ui) {
@@ -411,7 +463,7 @@ PresetResult CoreModule::end_scan()
 void CoreModule::load_lists()
 {
     if (host_busy()) return;
-    if (!em.hardware) return;
+    if (!em.get_hardware()) return;
     if (system_presets->empty()) {
         if (PresetResult::Ok == load_preset_file(PresetTab::System)) {
             notify_preset_list_changed(PresetTab::System);
@@ -470,7 +522,6 @@ void CoreModule::onTaskMessage(uint8_t code)
 
 void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 {
-    saved_hardware = hardware;
     init_osmose();
 }
 
@@ -523,6 +574,8 @@ void CoreModule::onPresetChanged()
             }
         }
     }
+
+    // patch preset id for Osmose
     if (!gathering && (em.preset.id.key() == 0) && em.is_osmose() && em.preset.valid_tag()) {
         bool found{false};
         if (user_presets->empty()) {
@@ -545,6 +598,7 @@ void CoreModule::onPresetChanged()
             }
         }
     }
+
     update_from_em();
     if (startup_tasks.completed() && !gathering) {
         notify_preset_changed();
@@ -567,7 +621,12 @@ void CoreModule::onUserComplete()
     if (QuickUserPresets == gathering) {
         MidiDeviceConnectionInfo info;
         info.parse(haken_device.device_claim);
-        user_presets->save(preset_file_name(PresetTab::User, em.hardware, info.input_device_name), em.hardware);
+        if (stash_user_preset_file.empty()) {
+            user_presets->save(preset_file_name(PresetTab::User, em.get_hardware(), info.input_device_name), em.get_hardware());
+        } else {
+            user_presets->save(stash_user_preset_file, em.get_hardware());
+            stash_user_preset_file = "";
+        }
         gathering = GatherFlags::None;
     }
 }
@@ -588,7 +647,7 @@ void CoreModule::onSystemComplete()
     if (QuickSystemPresets == gathering) {
         MidiDeviceConnectionInfo info;
         info.parse(haken_device.device_claim);
-        system_presets->save(preset_file_name(PresetTab::System, em.hardware, info.input_device_name), em.hardware);
+        system_presets->save(preset_file_name(PresetTab::System, em.get_hardware(), info.input_device_name), em.get_hardware());
         gathering = GatherFlags::None;
     }
 }
@@ -621,7 +680,8 @@ void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<Mi
     }
 }
 
-void CoreModule::notify_preset_changed() {
+void CoreModule::notify_preset_changed()
+{
     for (auto client : chem_clients) {
         client->onPresetChange();
     }
@@ -729,14 +789,12 @@ void CoreModule::onRandomize(const RandomizeEvent &e)
     if (list->empty()) return;
     auto index = std::round(::rack::random::uniform() * (list->size() - 1));
     request_preset(ChemId::Core, list->presets[index]->id);
-    //haken_midi.select_preset(ChemId::Core, list->presets[index]->id);
 }
 
 void CoreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
     haken_device.set_claim(get_json_string(root, "haken-device"));
-    saved_hardware = get_json_int(root, "hardware", 0);
     controller1.set_claim(get_json_string(root, "controller-1"));
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
@@ -747,10 +805,10 @@ json_t* CoreModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(haken_device.get_claim().c_str()));
-    json_object_set_new(root, "hardware", json_integer(em.get_hardware()));
     json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
     json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
     json_object_set_new(root, "log-midi", json_boolean(is_logging()));
+    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
 }
 

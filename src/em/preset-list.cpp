@@ -74,13 +74,13 @@ bool PresetList::load(const std::string &path)
 bool PresetList::save()
 {
     std::string path = filename;
-    return save(filename, hardware);
+    return save(path, hardware);
 }
 
 bool PresetList::save(const std::string &path, uint8_t hardware)
 {
     filename.clear();
-    hardware = 0;
+    this->hardware = 0;
     if (path.empty()) return false;
     auto dir = system::getDirectory(path);
     system::createDirectories(dir);
@@ -153,7 +153,7 @@ std::string EMFileId(const std::string& device_name)
     } else if (0 == result.compare(0, 17, "EaganMatrix Micro")) {
         result.erase(0, 12); // "Micro ..."
     } else if (0 == result.compare(0, 18, "EaganMatrix Module")) {
-        result.replace(0, 18, "EMM ...");
+        result.replace(0, 18, "EMM"); // "EMM [...]"
     } else if (std::string::npos != result.find("(Osmose)")) {
         return "Osmose";
     }
