@@ -1,12 +1,12 @@
 #include "XM.hpp"
-//#include "../../em/em-hardware.h"
 #include "add-remove-button.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
 
-std::string macro_number_to_string(uint8_t mn) {
+std::string macro_number_to_string(uint8_t mn)
+{
     if (!in_range(mn, U8(7), U8(90))) return "";
     return format_string("%d", mn);
 }

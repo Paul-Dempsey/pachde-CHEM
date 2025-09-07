@@ -31,7 +31,7 @@ void BasicTextLabel::render(const DrawArgs& args)
 
     nvgSave(vg);
     SetTextStyle(vg, font, _color, _style.height);
-    float x, y;
+    float x{0}, y{0};
     switch (_style.align) {
         case TextAlignment::Left: x = 0; break;
         case TextAlignment::Center: x = box.size.x * .5; break;

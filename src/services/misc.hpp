@@ -6,9 +6,7 @@
 using namespace ::rack;
 namespace pachde {
 
-#if !defined U8
 #define U8(arg) static_cast<uint8_t>(arg)
-#endif
 
 std::string format_string(const char *fmt, ...);
 size_t format_buffer(char * buffer, size_t length, const char* fmt, ...);
@@ -17,7 +15,7 @@ inline std::string u64_to_string(uint64_t value) { return format_string("%0.8llx
 uint64_t parse_hex_u64(const std::string& str);
 const char * printable(const std::string& s); // returns a printable string, even if str is empty
 char printable(char ch);
-bool alpha_order(const std::string& a, const std::string& b); 
+bool alpha_order(const std::string& a, const std::string& b);
 std::size_t common_prefix_length(const std::string& alpha, const std::string& beta);
 std::size_t common_prefix_length_insensitive(const std::string& alpha, const std::string& beta);
 inline bool match_insensitive(const std::string& alpha, const std::string& beta) {
@@ -110,7 +108,7 @@ public:
     bool stopped() { return start_time <= 0.0; }
     bool running() { return !stopped(); }
 
-    void set_interval(double interval) { 
+    void set_interval(double interval) {
         assert(interval > 0.0);
         this->interval = interval;
     }

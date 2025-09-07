@@ -16,7 +16,7 @@
             "g70": "#b2b2b2", "g75": "#bfbfbf",
             "g80": "#cccccc", "g85": "#d9d9d9",
             "g90": "#e5e5e5", "g95": "#f2f2f2",
-            
+
             "rack-BLACK": "#000000",
             "rack-WHITE": "#ffffff",
             "rack-RED": "#ed2c24",
@@ -28,9 +28,6 @@
             "rack-PURPLE": "#d52bed",
             "rack-LIGHT_GRAY": "#e6e6e6",
             "rack-DARK_GRAY": "#171717",
-
-            "test-rgb": "rgb(21, 250, 121)",
-            "test-hsl": "hsl(235, 34.40%, 50.40%)",
 
             "fingerboard-red": "#c32222",
             "white": "#ffffff",

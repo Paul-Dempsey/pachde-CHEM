@@ -52,7 +52,7 @@ void load_pfis(std::string path, std::vector<std::shared_ptr<PresetFileInfo>>& d
 
 bool save_pfis(std::string path, std::vector<std::shared_ptr<PresetFileInfo>> &data)
 {
-    std::remove_if(data.begin(), data.end(), [](std::shared_ptr<PresetFileInfo>pfi){ return pfi->empty(); });
+    (void)std::remove_if(data.begin(), data.end(), [](std::shared_ptr<PresetFileInfo>pfi){ return pfi->empty(); });
     if (data.empty()) {
         system::remove(path);
         return true;
@@ -81,6 +81,7 @@ bool save_pfis(std::string path, std::vector<std::shared_ptr<PresetFileInfo>> &d
 
 std::string pfis_filename()
 {
-    return user_plugin_asset("CHEM-pfl.json");
+    return user_plugin_asset("CHEM-device-user-lists.json");
 }
+
 }

@@ -13,7 +13,7 @@ bool KVStore::bool_value(const std::string& text, bool default_value)
     case 0:
         return default_value;
 
-    case 1: 
+    case 1:
         if ('1' == *text.cbegin()) return true;
         if ('0' == *text.cbegin()) return false;
         break;
@@ -80,6 +80,10 @@ bool KVStore::load() {
     auto f = std::fopen(path.c_str(), "rb");
     if (!f) return false;
     char* bytes = (char*)malloc(size);
+    if (!bytes) {
+        std::fclose(f);
+        return false;
+    }
     auto red = std::fread(bytes, 1, size, f);
     std::fclose(f);
     if (red != size) {

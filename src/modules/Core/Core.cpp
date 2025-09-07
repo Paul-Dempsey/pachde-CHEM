@@ -275,6 +275,7 @@ PresetResult CoreModule::load_quick_user_presets()
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
+        ui()->em_status_label->text("Scanning quick User presets...");
     }
     gathering = QuickUserPresets;
     stash_user_preset_file = user_presets->filename;
@@ -304,6 +305,7 @@ PresetResult CoreModule::load_full_user_presets()
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
+        ui()->em_status_label->text("Scanning full User presets...");
     }
     em.begin_user_scan();
     if (em.is_osmose()) {
@@ -327,6 +329,7 @@ PresetResult CoreModule::scan_osmose_presets(uint8_t page)
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
+        ui()->em_status_label->text(format_string("Scanning User presets (page %d)...", page-90+1));
     }
     em.begin_user_scan();
     full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, page));
@@ -405,6 +408,7 @@ PresetResult CoreModule::load_full_system_presets()
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
+        ui()->em_status_label->text("Scanning Full System presets...");
     }
     em.begin_system_scan();
     if (em.is_osmose()) {

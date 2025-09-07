@@ -53,7 +53,7 @@ struct HclCompiler
     Opcode code;
     std::map<std::string, uint16_t> variables;
 
-    void error(std::string error, const char * pos);
+    void error(const std::string& error, const char * pos);
 
     std::vector<PackedMidiMessage>* dest{nullptr};
     bool compile(const std::string& program, std::vector<PackedMidiMessage>* midi);

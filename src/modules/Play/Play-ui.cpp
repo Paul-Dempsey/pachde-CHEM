@@ -276,7 +276,7 @@ void PlayUi::scroll_to(ssize_t pos)
 
     scroll_top = pos;
     auto live_id = get_live_id();
-    auto sit = get_selected_indices().cbegin();
+    auto sit = selected.cbegin();
 
     auto pit = presets.cbegin() + pos;
     for (auto pw : preset_widgets) {

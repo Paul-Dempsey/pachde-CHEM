@@ -14,12 +14,12 @@ const char * default_pad_name[] = {
     "D1", "D2", "D3", "D4"
 };
 
-MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c), text_color(0xff000000)
+MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c), text_color(0xff000000), error_pos(0)
 {
     name = default_pad_name[id];
 }
 
-MidiPad::MidiPad(json_t *j)
+MidiPad::MidiPad(json_t *j) : error_pos(0)
 {
     from_json(j);
 }
@@ -27,7 +27,7 @@ MidiPad::MidiPad(json_t *j)
 bool MidiPad::compile()
 {
     HclCompiler hc;
-    ok = hc.compile(this->def, &this->midi); 
+    ok = hc.compile(this->def, &this->midi);
     if (ok) {
         error_message = "";
         error_pos = 0;
@@ -88,7 +88,7 @@ std::string PadWidget::extract_description()
 }
 
 void PadWidget::init(
-    int identifier, 
+    int identifier,
     std::shared_ptr<MidiPad> the_pad,
     Module* module,
     SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
@@ -151,15 +151,15 @@ void PadWidget::onButton(const ButtonEvent &e)
     if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
         if (e.action == GLFW_PRESS) {
             button_down = true;
-        } else if (e.action == GLFW_RELEASE) { 
+        } else if (e.action == GLFW_RELEASE) {
             button_down = false;
             if (on_click) {
                 on_click(id);
-            }    
+            }
         }
     }
     Base::onButton(e);
-}    
+}
 
 bool PadWidget::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {

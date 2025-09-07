@@ -33,7 +33,7 @@ namespace pachde {
           conv-poke : `vp` pair-list
 */
 #define TABLE_BIT(m) (uint64_t(1) << uint64_t(m))
-constexpr const uint64_t LO_14BIT_CC = 
+constexpr const uint64_t LO_14BIT_CC =
     TABLE_BIT(Haken::ccMod) |
     TABLE_BIT(Haken::ccBreath) |
     TABLE_BIT(Haken::ccUndef) |
@@ -79,7 +79,7 @@ constexpr const uint64_t LO_14BIT_CC =
     TABLE_BIT(Haken::ccM29) |
     TABLE_BIT(Haken::ccM30);
 #define HI_TABLE_BIT(m) (uint64_t(1) << (uint64_t(m) - 64))
-constexpr const uint64_t HI_14BIT_CC = 
+constexpr const uint64_t HI_14BIT_CC =
     HI_TABLE_BIT(Haken::ccBrightness) |
     HI_TABLE_BIT(Haken::ccReci5) |
     HI_TABLE_BIT(Haken::ccReci6) |
@@ -247,7 +247,7 @@ uint8_t macro_cc(uint8_t macro_number)
 }
 
 bool is_rational_start(char c) {
-    return 
+    return
         ('+' == c)
         || ('-' == c)
         || ('.' == c)
@@ -260,7 +260,7 @@ bool is_name_start(char c) {
 }
 
 bool is_name_char(char c) {
-    return ('_' == c) 
+    return ('_' == c)
         || ('-' == c)
         || ('$' == c)
         || std::isalnum(c)
@@ -682,7 +682,7 @@ const char * HclCompiler::parse_opcode(const char *scan)
     return scan;
 }
 
-void HclCompiler::error(std::string error, const char *pos)
+void HclCompiler::error(const std::string& error, const char *pos)
 {
     ok = false;
     error_message = error;

@@ -669,24 +669,19 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
         }, busy));
         if (my_module->em.is_osmose()) {
             menu->addChild(createMenuItem("Scan User preset database", "(page 1)", [=]() {
-                ui->em_status_label->text("Scanning User presets (page 1)...");
                 my_module->load_full_user_presets();
             }, busy));
             menu->addChild(createSubmenuItem("Scan more User pages", "", [=](Menu* menu) {
                 menu->addChild(createMenuItem("Scan and append Page 2", "", [=]() {
-                    ui->em_status_label->text("Scanning User presets (page 2)...");
                     my_module->scan_osmose_presets(91);
                 }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 3", "", [=]() {
-                    ui->em_status_label->text("Scanning User presets (page 3)...");
                     my_module->scan_osmose_presets(92);
                 }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 4", "", [=]() {
-                    ui->em_status_label->text("Scanning User presets (page 4)...");
                     my_module->scan_osmose_presets(93);
                 }, busy));
                 menu->addChild(createMenuItem("Scan and append Page 5", "", [=]() {
-                    ui->em_status_label->text("Scanning User presets (page 5)...");
                     my_module->scan_osmose_presets(94);
                 }, busy));
                 // menu->addChild(createMenuItem("Page 6", "", [my_module]() {}));
@@ -697,13 +692,10 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             }));
         } else {
             menu->addChild(createMenuItem("Quick scan - User presets", "", [=]() {
-                ui->em_status_label->text("Scanning quick User presets...");
                 my_module->load_quick_user_presets();
             }, busy));
             menu->addChild(createMenuItem("Full scan - User preset database", "", [=]() {
-                ui->em_status_label->text("Scanning full User presets...");
                 my_module->load_full_user_presets();
-                ui->create_stop_button();
             }, busy));
         }
 
@@ -725,7 +717,6 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
         if (my_module->em.is_osmose()) {
             menu->addChild(createMenuItem("Scan System preset database", "", [=]() {
-                ui->em_status_label->text("Scanning Full System presets...");
                 my_module->load_full_system_presets();
             }, busy));
         } else {
@@ -733,9 +724,7 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
                 my_module->load_quick_system_presets();
             }, busy));
             menu->addChild(createMenuItem("Full scan - System preset database", "", [=]() {
-                ui->em_status_label->text("Scanning full System presets...");
                 my_module->load_full_system_presets();
-                ui->create_stop_button();
             }, busy));
         }
     }));

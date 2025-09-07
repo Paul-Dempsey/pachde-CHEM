@@ -13,7 +13,7 @@ struct TextButton : FrameButton
     PackedColor color = 0xffe8e8e8;
     PackedColor bg = 0xff181818;
     LabelStyle label_style{"ctl-glyph", TextAlignment::Center, VAlignment::Middle, 12.f, true};
-    
+
     void set_text(std::string t) { text = t; }
     void set_style(LabelStyle style) { label_style = style; }
 
@@ -36,13 +36,13 @@ struct TextButton : FrameButton
 
         if (isVisibleColor(bg)) {
             FillRect(vg, 0, 0, box.size.x, box.size.y, fromPacked(bg));
-        }    
+        }
 
         Base::draw(args);
 
         nvgScissor(vg, 1, 1, box.size.x-2, box.size.y -2);
 
-        float x, y;
+        float x{0}, y{0};
         switch (label_style.align) {
         case TextAlignment::Left: x = 0; break;
         case TextAlignment::Center: x = box.size.x * .5; break;

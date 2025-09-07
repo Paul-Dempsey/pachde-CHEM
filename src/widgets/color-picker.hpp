@@ -9,7 +9,7 @@ using namespace ::rack;
 namespace pachde {
 
 struct Swatch: Widget {
-    PackedColor color;
+    PackedColor color{0};
     void draw(const DrawArgs& args) override
     {
         if (color) {
@@ -30,11 +30,11 @@ struct ColorPicker : OpaqueWidget
     TextInput* text_input;
     ColorSyntax syntax = ColorSyntax::Hex;
 
-    float hue;
-    float saturation;
-    float lightness;
+    float hue{0.0f};
+    float saturation{1.f};
+    float lightness{1.f};
     NVGcolor nvg_color;
-    PackedColor color;
+    PackedColor color{0};
     std::function<void(PackedColor)> on_new_color{nullptr};
 
     void set_on_new_color(std::function<void(PackedColor)> callback)

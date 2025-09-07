@@ -16,13 +16,10 @@ When CHEM is released, you will be able to subscribe to the **#d CHEM** plugin i
 
 Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
-## Aug 18 2025
+## Sep 4 2025
 
-The final modules I'm targeting for this release (Overlay and XM) are complete.
-I'm polishing themes, writing documentation, taking final screen shots, fixing glitches, and making refinements I notice as I run through the docs.
-If you're an early user, now is the time to get your bugs and requests submitted.
-
-My goal is to submit to the VCV library by Sept 10.
+All planned features are complete. I am running through my final release checklist.
+My goal is to submit to the VCV library during the week of Sept 10.
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.

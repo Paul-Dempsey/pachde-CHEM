@@ -21,7 +21,7 @@ struct MidiPad
     bool ok{true};
     PackedColor color;
     PackedColor text_color;
-    std::string name;    
+    std::string name;
     std::string def;
     std::vector<PackedMidiMessage> midi;
     std::string error_message;
@@ -72,7 +72,7 @@ struct PadWidget : TipWidget, IApplyTheme
     std::string extract_description();
 
     void init(
-        int identifier, 
+        int identifier,
         std::shared_ptr<MidiPad> the_pad,
         Module* module,
         SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,

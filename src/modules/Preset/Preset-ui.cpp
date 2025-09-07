@@ -30,8 +30,9 @@ void PresetUi::on_list_changed(eaganmatrix::PresetTab which)
         }
     }
     tab.set_list(ppl);
-    onPresetChange();
     update_help();
+    onPresetChange();
+    if (!my_module->track_live) scroll_to_live();
 }
 
 bool PresetUi::load_presets(PresetTab which)
@@ -448,8 +449,6 @@ void PresetUi::send_preset(ssize_t index)
     auto preset = tab.list.nth(index);
     if (preset && host_available()) {
         chem_host->request_preset(ChemId::Preset, preset->id);
-        //chem_host->host_matrix()->set_osmose_id(preset->id);
-        //chem_host->host_haken()->select_preset(ChemId::Preset, preset->id);
     }
 }
 
