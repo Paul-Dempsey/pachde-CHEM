@@ -236,7 +236,8 @@ void XMModule::update_from_em()
 void XMModule::do_message(PackedMidiMessage message)
 {
     if (my_macros.empty()) { return; }
-    if (!chem_host) { return; }
+    if (!chem_host || chem_host->host_busy()) return;
+
     if (!overlay) { return; }
     if (!overlay->overlay_preset_connected()) { return; }
     if (Haken::ccStat1 != message.bytes.status_byte) { return; }

@@ -184,6 +184,7 @@ void ConvoModule::update_from_em()
 
 void ConvoModule::do_message(PackedMidiMessage message)
 {
+    if (!chem_host || chem_host->host_busy()) return;
     if (as_u8(ChemId::Convo) == message.bytes.tag) return;
     if (init_from_em) {
         conv.do_message(message);
@@ -205,6 +206,7 @@ void ConvoModule::onConnectHost(IChemHost* host)
 
 void ConvoModule::onPresetChange()
 {
+    if (!chem_host || chem_host->host_busy()) return;
     update_from_em();
     //if (chem_ui) ui()->onPresetChange();
 }

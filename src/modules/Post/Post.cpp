@@ -68,6 +68,7 @@ void PostModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Post) == midi_tag(message)) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     int param = -1;
     switch (midi_cc(message)) {
@@ -103,7 +104,7 @@ void PostModule::onConnectHost(IChemHost* host)
 
 void PostModule::onPresetChange()
 {
-    if (!connected()) return;
+    if (!chem_host || chem_host->host_busy()) return;
     update_from_em();
     //if (chem_ui) ui()->onPresetChange(); // ui doesn't do anything on preset change
 }

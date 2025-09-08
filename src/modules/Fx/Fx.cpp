@@ -97,6 +97,7 @@ void FxModule::onConnectHost(IChemHost* host)
 
 void FxModule::onPresetChange()
 {
+    if (chem_host->host_busy()) return;
     auto em = chem_host->host_matrix();
     if (!em) return;
     auto disable = em->is_disable_recirculator();
@@ -123,6 +124,7 @@ void FxModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
 void FxModule::do_message(PackedMidiMessage message)
 {
     if (as_u8(ChemId::Fx) == midi_tag(message)) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     switch (message.bytes.status_byte) {
     case Haken::ccStat1: {

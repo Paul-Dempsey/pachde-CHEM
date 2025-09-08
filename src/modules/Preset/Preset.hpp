@@ -49,7 +49,7 @@ struct PresetModule : ChemModule, IChemClient, IDoMidi
     bool search_name{true};
     bool search_meta{true};
     bool search_anchor{false};
-    bool search_incremental{false};
+    bool search_incremental{true};
 
     PresetModule();
     ~PresetModule() {

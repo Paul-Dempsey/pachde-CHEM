@@ -66,13 +66,12 @@ struct MidiPadModule : ChemModule, IChemClient, IDoMidi
     std::string client_claim() override;
     IDoMidi* client_do_midi() override { return this; }
     void onConnectHost(IChemHost* host) override;
-    void onPresetChange() override;
+    void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void onReset() override;
-    void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };
 

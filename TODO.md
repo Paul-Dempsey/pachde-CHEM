@@ -2,6 +2,7 @@
 
 ## General
 
+- Suppress ui/param updates, etc while scanning across modules.
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
 
 ## Core

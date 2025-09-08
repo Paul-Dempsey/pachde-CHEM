@@ -16,7 +16,7 @@
     {
       "slug": "chem-core",
       "name": "CHEM Core",
-      "description": "CHEM Core for Haken Eagan Matrix",
+      "description": "CHEM Core for Haken EaganMatrix",
       "tags": [
         "Controller"
       ]
@@ -24,7 +24,7 @@
     {
       "slug": "chem-macro",
       "name": "CHEM Macro",
-      "description": "CHEM Macro for Haken Eagan Matrix",
+      "description": "CHEM Macro for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -33,7 +33,7 @@
     {
       "slug": "chem-pre",
       "name": "CHEM Pre",
-      "description": "CHEM Pre for Haken Eagan Matrix",
+      "description": "CHEM Pre for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -42,7 +42,7 @@
     {
       "slug": "chem-fx",
       "name": "CHEM Fx",
-      "description": "CHEM Fx (aka Recirculator) for Haken Eagan Matrix",
+      "description": "CHEM Fx (aka Recirculator) for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -51,7 +51,7 @@
     {
       "slug": "chem-post",
       "name": "CHEM Post",
-      "description": "CHEM Post for Haken Eagan Matrix",
+      "description": "CHEM Post for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -60,7 +60,7 @@
     {
       "slug": "chem-convo",
       "name": "CHEM Convolution",
-      "description": "CHEM Convolution for Haken Eagan Matrix",
+      "description": "CHEM Convolution for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -69,7 +69,7 @@
     {
       "slug": "chem-jack",
       "name": "CHEM jack",
-      "description": "CHEM Jack (pedals) for Haken Eagan Matrix",
+      "description": "CHEM Jack (pedals) for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -78,7 +78,7 @@
     {
       "slug": "chem-play",
       "name": "CHEM Play",
-      "description": "CHEM Playlist for Haken Eagan Matrix",
+      "description": "CHEM Playlist for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -87,7 +87,7 @@
     {
       "slug": "chem-sus",
       "name": "CHEM Sustain",
-      "description": "CHEM Sustain for Haken Eagan Matrix",
+      "description": "CHEM Sustain for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -96,7 +96,7 @@
     {
       "slug": "chem-sos",
       "name": "CHEM Sostenuto",
-      "description": "CHEM Sostenuto for Haken Eagan Matrix",
+      "description": "CHEM Sostenuto for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -105,7 +105,7 @@
     {
       "slug": "chem-sos2",
       "name": "CHEM Sostenuto 2",
-      "description": "CHEM Sostenuto 2 for Haken Eagan Matrix",
+      "description": "CHEM Sostenuto 2 for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -114,7 +114,7 @@
     {
       "slug": "chem-settings",
       "name": "CHEM Settings",
-      "description": "CHEM Settings for Haken Eagan Matrix",
+      "description": "CHEM Settings for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -123,7 +123,7 @@
     {
       "slug": "chem-preset",
       "name": "CHEM Preset",
-      "description": "CHEM Presets for Haken Eagan Matrix",
+      "description": "CHEM Presets for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"
@@ -132,7 +132,7 @@
     {
       "slug": "chem-overlay",
       "name": "CHEM Overlay",
-      "description": "CHEM Overlay for Haken Eagan Matrix",
+      "description": "CHEM Overlay for Haken EaganMatrix. Use with CHEM Extended Macro.",
       "tags": [
         "Controller",
         "Expander"
@@ -141,7 +141,7 @@
     {
       "slug": "chem-xm",
       "name": "CHEM Extended Macro",
-      "description": "CHEM Extended Macro for Haken Eagan Matrix",
+      "description": "CHEM Extended Macro for Haken EaganMatrix. Use with CHEM Overlay",
       "tags": [
         "Controller",
         "Expander"
@@ -150,7 +150,7 @@
     {
       "slug": "chem-midi-pad",
       "name": "CHEM Midi Pad",
-      "description": "CHEM Midi pad for Haken Eagan Matrix",
+      "description": "CHEM Midi pad for Haken EaganMatrix",
       "tags": [
         "Controller",
         "Expander"

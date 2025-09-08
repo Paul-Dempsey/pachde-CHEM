@@ -84,7 +84,7 @@ void MacroModule::onConnectHost(IChemHost* host)
 void MacroModule::onPresetChange()
 {
     if (chem_host) {
-        if (batch_busy()) return;
+        if (batch_busy() || chem_host->host_busy()) return;
         auto preset = chem_host->host_preset();
         if (preset) {
             macro_names.fill_macro_names();
@@ -103,6 +103,8 @@ void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
 void MacroModule::do_message(PackedMidiMessage message)
 {
     em_batch.do_message(message);
+    if (em_batch.busy()) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Macro) == midi_tag(message)) return;

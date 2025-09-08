@@ -90,6 +90,7 @@ void PreModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Pre) == message.bytes.tag) return;
+    if (!chem_host || chem_host->host_busy()) return;
 
     int param = -1;
     switch (midi_cc(message)) {
@@ -112,7 +113,7 @@ void PreModule::onConnectHost(IChemHost* host)
 
 void PreModule::onPresetChange()
 {
-    if (connected()) {
+    if (connected() && !chem_host->host_busy()) {
         update_from_em();
         //if (chem_ui) ui()->onPresetChange(); // ui does nothing
     }

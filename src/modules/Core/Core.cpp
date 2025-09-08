@@ -870,6 +870,7 @@ void CoreModule::do_message(PackedMidiMessage message)
 {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Core) == midi_tag(message)) return;
+    if (host_busy()) return;
 
     auto cc = midi_cc(message);
     switch (cc) {

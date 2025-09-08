@@ -43,3 +43,38 @@ For pokes and streams, all values must be 7-bit so you don't use the -1..+1 or t
 | Kinetic poke  | `kp` _stream-data_ | Sends a list of Kinetic pokes. |
 | Biquad/Sinebank poke | `bp` _stream-data_ | Sends a list of Biquad/Sinebank pokes. |
 | Convolution poke | `cv` _stream-data_ | Sends a list of Convolution pokes |
+
+Another way to think of the syntax is with the following pseudo-BNF notation.
+Items in single quotes are literal values -- the things you type.
+Something followed by `+` means "one or more", `*` means zero or more.
+Pipe (`|`) means "or". Alternates are often grouped in parentheses.
+
+```bnf
+            comment : '"' nonquote* '"'
+           variable : `{` name `=` value `}`
+
+     channel-number : 1 .. 16
+                 n7 : 0 .. 127
+                n14 : 0 .. 16256
+      stream-number : 0 .. 27
+       macro-number : 1 .. 90
+           cc-value : n7 | n14
+        macro-value : n7 | n14 | signed-rational
+             digits : '0' .. '9' | '_'
+    signed-rational : '-1' | '+1' | 'zero' | ['+'|'-']('.'|',')digits
+               pair : n7 n7
+          pair-list : '[' pair+ ']'
+               list : '[' n7+ ']'
+
+            channel : 'ch' channel-number
+       control-code : 'cc' n7 cc-value
+     program-change : 'pc' n7
+              macro : 'm'macro-number macro-value
+             stream : 's'stream-number list
+        matrix-poke : 'mp' pair-list
+       formula-poke : 'fp' pair-list
+         graph-poke : ('gp'|'gp1'|'gp2') pair-list
+         kinet-poke : 'kp' pair-list
+         bqsin-poke : 'bp' pair-list
+          conv-poke : 'vp' pair-list
+```

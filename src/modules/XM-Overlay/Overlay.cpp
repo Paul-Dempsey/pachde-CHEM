@@ -230,6 +230,8 @@ void OverlayModule::onConnectHost(IChemHost* host)
 
 void OverlayModule::onPresetChange()
 {
+    if (chem_host && chem_host->host_busy()) return;
+
     live_preset = nullptr;
     preset_connected = false;
     if (!chem_host) return;

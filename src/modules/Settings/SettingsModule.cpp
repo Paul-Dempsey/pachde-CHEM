@@ -243,6 +243,8 @@ uint8_t SettingsModule::get_param_routing()
 void SettingsModule::do_message(PackedMidiMessage message)
 {
     if (as_u8(ChemId::Settings) == message.bytes.tag) return;
+    if (!chem_host || chem_host->host_busy()) return;
+
     uint8_t value;
     switch (message.bytes.status_byte) {
     case Haken::ccStat1: {
@@ -345,7 +347,7 @@ void SettingsModule::onConnectHost(IChemHost* host)
 
 void SettingsModule::onPresetChange()
 {
-    if (connected()) {
+    if (connected() && !chem_host->host_busy()) {
         update_from_em();
         //if (chem_ui) ui()->onPresetChange(); // ui does nothing
     }

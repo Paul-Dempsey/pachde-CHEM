@@ -62,6 +62,7 @@ void JackModule::onConnectHost(IChemHost* host)
 
 void JackModule::onPresetChange()
 {
+    if (chem_host->host_busy()) return;
     pull_jack_data();
 }
 

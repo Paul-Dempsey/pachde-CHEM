@@ -58,6 +58,7 @@ void MacroUsageBuilder::request_macros(HakenMidi* haken)
 void MacroUsageBuilder::do_message(PackedMidiMessage msg)
 {
     if (as_u8(ChemId::Haken) != msg.bytes.tag) return;
+
     switch (msg.bytes.status_byte) {
     case Haken::ccStat1:
         in_form_poke = false;

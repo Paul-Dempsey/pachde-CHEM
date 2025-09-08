@@ -512,6 +512,7 @@ void PlayUi::onPresetChange()
     if (my_module && my_module->batch_busy()) return;
 
     if (chem_host) {
+        if (chem_host->host_busy()) return;
         auto preset = chem_host->host_preset();
         if (preset) {
             live_preset = std::make_shared<PresetInfo>();

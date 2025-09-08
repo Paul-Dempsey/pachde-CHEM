@@ -63,7 +63,7 @@ void SusModule::onConnectHost(IChemHost* host)
 
 void SusModule::onPresetChange()
 {
-    if (!connected()) return;
+    if (!connected() || chem_host->host_busy()) return;
     update_from_em();
 }
 

@@ -125,20 +125,9 @@ void MidiPadModule::onConnectHost(IChemHost* host)
     onConnectHostModuleImpl(this, host);
 }
 
-void MidiPadModule::onPresetChange()
-{
-//    auto em = chem_host->host_matrix();
-
-    //if (chem_ui) ui()->onPresetChange();
-}
-
 void MidiPadModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (chem_ui) ui()->onConnectionChange(device, connection);
-}
-
-void MidiPadModule::process_params(const ProcessArgs& args)
-{
 }
 
 void MidiPadModule::process(const ProcessArgs& args)
@@ -166,10 +155,6 @@ void MidiPadModule::process(const ProcessArgs& args)
     }
 
     if (!host_connected(chem_host) || chem_host->host_busy()) return;
-
-    if (((args.frame + id) % 41) == 0) {
-        process_params(args);
-    }
 
     bool lights = (0 == ((args.frame + id) % 47));
     if (lights && !editing) {
