@@ -1,17 +1,18 @@
 # CHEM MidiPad
 
-Each *MidiPad** instance lets you define up to 16 Pads that can send a wide range of EaganMatrix (EM) configuration commands.
+Each **MidiPad** instance lets you define up to 16 Pads that can send a wide range of EaganMatrix (EM) configuration commands.
 This is useful for things not covered in a dedicated CHEM modules, and designed to be basic support for Overlay Synths
-(see [Overlay and XM](./overlay-xm.md#chem-overlay-and-xm) for mor einformation).
+(see [Overlay and XM](./overlay-xm.md#chem-overlay-and-xm) for more information).
 
 The EaganMatrix is controlled entirely by MIDI, and this module has special knowledge of the unique MIDI protocol used in the EM.
 
 This is an advanced module, so you'll need to get technical to define the MIDI stream to be sent.
 You will need to have the _Continuum User Guide_, the `HakenMidi.h` or `HakenMidi.pdf`,
 or one of Richard Kram's fine technical guides at hand to define useful MIDI streams for your pads.
+Most of these are included in the Haken Editor distribution package under _User Guides_.
 
 The MIDI definition is text-based using what I've dubbed the "Haken Control Language", or HCL.
-The reference for HCL is here: [HCL: Haken Control Language](.\hcl.md#hcl_haken_control_language).
+The reference for HCL is here: [HCL: Haken Control Language](./hcl.md#hcl_haken_control_language).
 
 Here is a connected MidiPad with no pads defined yet:
 
@@ -52,6 +53,11 @@ Click the **compile** button, or press Ctrl+Enter to compile the definition.
 If there are errors, the error is displayed below the buttons.
 Selecting another pad or closing the flyout will automatically compile with any changes you've made.
 When not editing, a pad with an erroneous definition will have a red light, and the error will appear in the tooltip for the pad.
+
+## See also
+
+- [HCL: Haken Control Language](./hcl.md#hcl_haken_control_language)
+- [Overlay and XM](./overlay-xm.md#chem-overlay-and-xm)
 
 ---
 

@@ -2,25 +2,19 @@
 
 ## General
 
-- Suppress ui/param updates, etc while scanning across modules.
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
 
 ## Core
 
-- Bug: rounding lights aren't quite same as Continuum
+- Bug: rounding lights aren't always same as Continuum
 
-## MidiPad
-
-- What might be some good factory presets?
-
-## Before release
-
-- Update doc images for final graphics/themes
+## After release
 
 - Update svg_theme project to sync with all the improvements from CHEM.
 
 ## Ideas
 
+- Factory presets for MidiPad
 - More controllers in Core
 - Save unsaved Play list in patch
 - Shift moved modules back when toggling out of edit mode in XM and Midipad
@@ -30,6 +24,6 @@
 - Setting files (surface, rounding, polyphony) (Rack presets sufficient?)
 - Preset-associated settings (re settings files) i.e. Customize sys preset - parameters per-module
 - color picker
-  - choose text syntax?
+  - choose text syntax
   - 100% transparent option
   - transparency slider

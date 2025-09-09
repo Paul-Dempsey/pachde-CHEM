@@ -7,7 +7,7 @@
   "author": "pachde",
   "authorEmail": "pcdempsey@live.com",
   "authorUrl": "",
-  "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/index.md",
+  "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/index.md#pachde-chem",
   "sourceUrl": "https://github.com/Paul-Dempsey/pachde-CHEM",
   "donateUrl": "https://venmo.com/u/pcdempsey",
   "changelogUrl": "",
@@ -25,6 +25,7 @@
       "slug": "chem-macro",
       "name": "CHEM Macro",
       "description": "CHEM Macro for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/macro.md#chem-macro",
       "tags": [
         "Controller",
         "Expander"
@@ -34,6 +35,7 @@
       "slug": "chem-pre",
       "name": "CHEM Pre",
       "description": "CHEM Pre for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/pre.md#chem-pre",
       "tags": [
         "Controller",
         "Expander"
@@ -43,6 +45,7 @@
       "slug": "chem-fx",
       "name": "CHEM Fx",
       "description": "CHEM Fx (aka Recirculator) for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/fx.md#chem-fx",
       "tags": [
         "Controller",
         "Expander"
@@ -52,6 +55,7 @@
       "slug": "chem-post",
       "name": "CHEM Post",
       "description": "CHEM Post for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/post.md#chem-post",
       "tags": [
         "Controller",
         "Expander"
@@ -61,6 +65,7 @@
       "slug": "chem-convo",
       "name": "CHEM Convolution",
       "description": "CHEM Convolution for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/convo.md#chem-convolution",
       "tags": [
         "Controller",
         "Expander"
@@ -70,6 +75,7 @@
       "slug": "chem-jack",
       "name": "CHEM jack",
       "description": "CHEM Jack (pedals) for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/jack.md#chem-jack",
       "tags": [
         "Controller",
         "Expander"
@@ -79,6 +85,7 @@
       "slug": "chem-play",
       "name": "CHEM Play",
       "description": "CHEM Playlist for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/play.md#chem-play",
       "tags": [
         "Controller",
         "Expander"
@@ -88,6 +95,7 @@
       "slug": "chem-sus",
       "name": "CHEM Sustain",
       "description": "CHEM Sustain for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/sus.md#chem#chem-sustain-sostenuto-and-sostenuto-2",
       "tags": [
         "Controller",
         "Expander"
@@ -97,6 +105,7 @@
       "slug": "chem-sos",
       "name": "CHEM Sostenuto",
       "description": "CHEM Sostenuto for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/sus.md#chem#chem-sustain-sostenuto-and-sostenuto-2",
       "tags": [
         "Controller",
         "Expander"
@@ -106,6 +115,7 @@
       "slug": "chem-sos2",
       "name": "CHEM Sostenuto 2",
       "description": "CHEM Sostenuto 2 for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/sus.md#chem#chem-sustain-sostenuto-and-sostenuto-2",
       "tags": [
         "Controller",
         "Expander"
@@ -115,6 +125,7 @@
       "slug": "chem-settings",
       "name": "CHEM Settings",
       "description": "CHEM Settings for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/settings.md#chem#chem-settings",
       "tags": [
         "Controller",
         "Expander"
@@ -124,6 +135,7 @@
       "slug": "chem-preset",
       "name": "CHEM Preset",
       "description": "CHEM Presets for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/preset.md#chem-preset",
       "tags": [
         "Controller",
         "Expander"
@@ -133,6 +145,7 @@
       "slug": "chem-overlay",
       "name": "CHEM Overlay",
       "description": "CHEM Overlay for Haken EaganMatrix. Use with CHEM Extended Macro.",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/overlay.md#chem-overlay",
       "tags": [
         "Controller",
         "Expander"
@@ -142,6 +155,7 @@
       "slug": "chem-xm",
       "name": "CHEM Extended Macro",
       "description": "CHEM Extended Macro for Haken EaganMatrix. Use with CHEM Overlay",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/xm.md#chem-xm",
       "tags": [
         "Controller",
         "Expander"
@@ -151,6 +165,7 @@
       "slug": "chem-midi-pad",
       "name": "CHEM Midi Pad",
       "description": "CHEM Midi pad for Haken EaganMatrix",
+      "manualUrl": "https://github.com/Paul-Dempsey/pachde-CHEM/blob/main/doc/midipad.md#chem-midipad",
       "tags": [
         "Controller",
         "Expander"
