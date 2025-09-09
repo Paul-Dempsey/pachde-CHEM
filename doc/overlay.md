@@ -15,6 +15,9 @@ Once a preset is configured, you can select it as the live preset at any time by
 When the live preset's id matches the configured preset id, the green light at the top of Overlay turns on.
 
 Overlay module's right-click menu also allow you to configure a custom title and set the color of the panel and the title.
+In the image below, the _Text color_ is being changed.
+
+![Editing the Overlay Module](./image/overlay-edit.png)
 
 ---
 

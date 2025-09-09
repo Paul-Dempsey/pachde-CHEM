@@ -31,12 +31,12 @@ The module expands with a flyout to the right (pushing any adjacent modules).
   To select a pad for editing, click it. The selected pad is highlighted and its light comes on.
 - Give the pad a name using the **Name** edit box. The default name for a new pad is it's coordinate.
 - You can choose a color for the name text and for the pad itself by clicking the palette buttons.
-- The large edit are in the middle is for your MIDI definition, expressed in [HCL](./hcl.md).
+- The large edit area in the middle is for your MIDI definition, expressed in [HCL](./hcl.md).
   - When the definition begins with a comment (text in quotes) before anything else, that comment is used in the tool tip for the pad.
-- The three buttons below the MIDI definition. Allow you **clear** the pad definition and start over, **compile** the HCL you've entered, and **send** the MIDI you've defined to check that it does what you want it to do.
+- The three buttons below the MIDI definition. Allow you to **clear** the pad definition and start over, **compile** the HCL you've entered (checking for errors), and **send** the MIDI you've defined to check that it does what you want it to do.
 
 Below, we have given the module a title, and defined three pads.
- We're editing the A1 pad.
+We're editing the A1 pad.
 
 ![MidiPad with the editing flyout opened, editing the first of three pads](./image/midipad-edit3.png)
 

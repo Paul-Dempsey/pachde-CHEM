@@ -15,7 +15,7 @@ Right click an **IR** knob to see a menu of IR data, or turn (drag) the knob to 
 For each of the 4 convolutions you can choose the parameters for applying the IR to the signal (*Length*, *Tuning*, and *Width*), the *Left* and *Right* strength, and which impule-response data to use.
 Modulating *Length*, *Tuning*, and *Width* can introduce artifacts, so should be used sparingly or controlled using fixed voltages.
 
-The **Extend** button enables extended computation, which increases the quality at the expense of DSP usage.
+The **Extend** button enables extended computation, which increases the audio quality at the expense of DSP usage.
 
 The modulation inputs and **Modulation amount** knob work the same across all CHEM modules.
 See [CHEM Modulation](./modulation.md#chem-modulation-voltage-control) for details.

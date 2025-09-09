@@ -22,7 +22,7 @@ You can tune how you want to search by clicking the **Search options** hamburger
 - You can choose to search only preset names, only metadata, or both (the default). At least one must be selected.
 - **Match at Word start** lists only matches that occur at the start of a word or code in the name or metadata (prefix match).
 - **Clear filters** clears all metadata filters and search text.
-- Choose to **Search on ENTER** (the default) or **Search as you type** (incremental search) to update the list for each character you type or any other change in the edit search box.
+- Choose to **Search on ENTER** or **Search as you type** (incremental) to update the list for each character you type or any other change in the edit search box.
 
 Keyboard is the focus for searching, so these gestures are available for preset navigation from the keyboard:
 
@@ -43,6 +43,7 @@ For example, most EM devices contain no presets tagged with **DP** (Demo Preset)
 
 A "Quick scan" of presets does not include all metadata.
 For example, Category information is available, but Author information is not included.
+For complete information, do a full scan using the **Core** module's _Core actions_ menu.
 
 ## Preset actions menu
 

@@ -1,7 +1,7 @@
 # CHEM Modulation (voltage control)
 
 CHEM applies a common means to work with modulation.
-To avoid clutter in the user interface, each module has a single purple **Modulation amount** knob to control how much modulation is applied for a given CV input. When no cables are connected, the **Modulation amount** knob is disabled.
+To avoid clutter in the user interface, each module has a single **Modulation amount** knob in the input area to control how much modulation is applied for a given CV input. When no cables are connected, the **Modulation amount** knob is disabled.
 
 | Unconnected | Connected | Modulated |
 | :--: | :--: | :--: |
@@ -16,8 +16,9 @@ A negative amount inverts the input voltage.
 
 Modulation signals are assumed to be bipolar -5v to 5v, per the VCV Rack voltage standards.
 
-To select a different connected jack for adjusting modulation, click somewhere near the jack, such as on it's label.
+To select a different connected jack for adjusting modulation, click the jack or somewhere near the jack, such as on it's label (if it has one).
 The previous light (if any) will go off, and your clicked jack's light will come on.
+The Modulation amoutn knob changes position to indicate the current modulation amount for that input.
 
 ---
 

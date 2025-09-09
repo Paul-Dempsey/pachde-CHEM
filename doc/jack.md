@@ -20,7 +20,7 @@ Choose from *Switch*, *Toggle*, and *Instant*.
 The orange output jacks provide a CV signal for the pedal value that you can use to control EM features by connecting the output to a modulation input on another CHEM module, or anything else with CV control in your Rack patch.
 To use the pedal purely for CV control without affecting the sound produced by the EaganMatrix, the best candidates are **Levels**/**Audio in** (if you aren't using AES audio input on the Continuum), or any unused **Macro**.
 
-**Extras** are also available for sending a number of general MIDI control codes, but may have undesirable side effects on EM sound generation, depending on the preset.
+**Extras** are also available for sending a number of general MIDI control codes, but may have undesirable side effects on sound generation, depending on the preset.
 
 ---
 
