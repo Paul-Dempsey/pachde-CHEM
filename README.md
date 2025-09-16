@@ -53,7 +53,7 @@ And thanks everyone (you know who you are) for all the support and encouragement
 
 The pachde line of software for Eagan Matrix devices is a labor of love. The products are free to use.
 Creating them requires an large investment of time and $$.
-You can show appreciation for the value these tools bring to your music-making, buy making a donation or leaving a tip.
+You can show appreciation for the value these tools bring to your music-making, by making a donation or leaving a tip.
 
 [Click to Show appreciation (VenMo)](https://venmo.com/u/pcdempsey). \
 Thank you!
