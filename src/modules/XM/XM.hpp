@@ -5,6 +5,7 @@
 #include "../../services/color-help.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../services/rack-help.hpp"
 #include "../../widgets/widgets.hpp"
 #include "../XM-shared/macro-data.hpp"
 #include "../XM-shared/xm-overlay.hpp"
@@ -116,6 +117,7 @@ struct XMUi : ChemModuleWidget
     TextLabel * title{nullptr};
     MacroEdit * edit_macro{nullptr};
     EditWireframe * wire_frame{nullptr};
+    std::vector<saveModulePos> module_positions;
 
     TrimPot * knobs[9]{nullptr};
     TrackWidget * tracks[8]{nullptr};
@@ -137,6 +139,8 @@ struct XMUi : ChemModuleWidget
     IOverlay* get_overlay() { return my_module ? my_module->get_overlay() : nullptr; }
     Vec knob_center(int index);
     Vec input_center(int index);
+    void save_module_positions();
+    void restore_module_positions();
     void set_edit_mode(bool edit);
     void set_edit_item(int index);
     void commit_macro();

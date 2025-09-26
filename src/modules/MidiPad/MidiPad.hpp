@@ -4,6 +4,7 @@
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
+#include "../../services/rack-help.hpp"
 #include "../../widgets/widgets.hpp"
 #include "midi-pad.hpp"
 
@@ -94,13 +95,15 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     PadWidget* pad_ui[16]{nullptr};
     EditButton* edit_button{nullptr};
     PadEdit* edit_ui{nullptr};
-
+    std::vector<saveModulePos> module_positions;
     int edit_pad{-1};
 
     MidiPadUi(MidiPadModule *module);
 
     bool connected();
     void refresh();
+    void save_module_positions();
+    void restore_module_positions();
     void edit_mode(bool editing);
     void set_edit_pad(int id);
     void on_click_pad(int id);

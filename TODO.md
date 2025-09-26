@@ -17,7 +17,6 @@
 - Factory presets for MidiPad
 - More controllers in Core
 - Save unsaved Play list in patch
-- Shift moved modules back when toggling out of edit mode in XM and Midipad
 - Undo for _Center knobs_ (5) and _Zero modulation_ (0)
 - Kinetic module (shelved for the moment - matrix may not be that useful in Rack scenario)
 - Blinking or highlighted link button when not connected
