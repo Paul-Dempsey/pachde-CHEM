@@ -398,6 +398,17 @@ void MidiPadUi::refresh()
     }
 }
 
+void MidiPadUi::save_module_positions()
+{
+    fill_right_module_positions(module_positions, this, pad_edit_constants::WIDTH);
+}
+
+void MidiPadUi::restore_module_positions()
+{
+    restore_right_module_positions(module_positions, this);
+    module_positions.clear();
+}
+
 void MidiPadUi::edit_mode(bool editing)
 {
     if (!my_module) return;
@@ -410,10 +421,12 @@ void MidiPadUi::edit_mode(bool editing)
             auto pad = my_module->first_pad();
             edit_id = pad ? pad->id : 0;
         }
+
+        save_module_positions();
+
         float x = box.size.x;
         box.size.x += pad_edit_constants::WIDTH;
         changePanelWidth(dynamic_cast<SvgPanel*>(getPanel()), box.size.x);
-
         APP->scene->rack->setModulePosForce(this, box.pos);
 
         edit_ui = createWidget<PadEdit>(Vec(x, 0));
@@ -432,6 +445,8 @@ void MidiPadUi::edit_mode(bool editing)
         box.size.x = PANEL_WIDTH;
         changePanelWidth(dynamic_cast<SvgPanel*>(getPanel()), PANEL_WIDTH);
         APP->scene->rack->setModulePosForce(this, box.pos);
+
+        restore_module_positions();
     }
 }
 

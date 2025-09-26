@@ -708,6 +708,17 @@ Vec XMUi::input_center(int index)
     };
 }
 
+void XMUi::save_module_positions()
+{
+    fill_right_module_positions(module_positions, this, me_constants::WIDTH);
+}
+
+void XMUi::restore_module_positions()
+{
+    restore_right_module_positions(module_positions, this);
+    module_positions.clear();
+}
+
 void XMUi::set_edit_mode(bool edit)
 {
     if (edit) {
@@ -719,6 +730,8 @@ void XMUi::set_edit_mode(bool edit)
             wire_frame = createWidget<EditWireframe>(Vec(0,0));
             wire_frame->set_ui(this);
             addChild(wire_frame);
+
+            save_module_positions();
             box.size.x += me_constants::WIDTH;
             APP->scene->rack->setModulePosForce(this, box.pos);
         }
@@ -735,8 +748,11 @@ void XMUi::set_edit_mode(bool edit)
             wire_frame = nullptr;
         }
         update_main_ui(theme_engine.getTheme(getThemeName()));
+
         box.size.x = PANEL_WIDTH;
         APP->scene->rack->setModulePosForce(this, box.pos);
+        restore_module_positions();
+
         if (my_module && my_module->overlay) {
             my_module->overlay->overlay_client_pause(my_module, false);
         }

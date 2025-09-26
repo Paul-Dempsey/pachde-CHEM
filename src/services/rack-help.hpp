@@ -29,4 +29,19 @@ inline ParamQuantity* snap(ParamQuantity* p) {
     return p;
 }
 
+// sort fn for widgets in left-to-right, top-to-bottom order.
+bool lrtb_widget_sort(const Widget* a, const Widget* b);
+
+struct saveModulePos {
+    ModuleWidget* module_widget;
+    Vec saved_pos;
+};
+
+// collect the positions of all mopdules to the right of modwidget.
+// if there is more than 'extra' space to the immediate right of modwidget,
+// module_positiosn will be empty
+void fill_right_module_positions(std::vector<saveModulePos>& module_positions, ModuleWidget* this_widget, float extra);
+
+void restore_right_module_positions(std::vector<saveModulePos>& module_positions, ModuleWidget* this_widget);
+
 }

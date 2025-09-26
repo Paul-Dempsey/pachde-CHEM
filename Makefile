@@ -42,6 +42,7 @@ SOURCES += src/services/MidiDeviceHolder.cpp
 SOURCES += src/services/misc.cpp
 SOURCES += src/services/ModuleBroker.cpp
 SOURCES += src/services/open-file.cpp
+SOURCES += src/services/rack-help.cpp
 SOURCES += src/services/svgtheme.cpp
 SOURCES += src/services/text.cpp
 
