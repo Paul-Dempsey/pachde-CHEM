@@ -2,19 +2,23 @@
 
 ![CHEM Repository splash card](doc/image/repo-card.png)
 
-CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix) is the successor to **HC One**, which targeted EaganMatrix firmware 10.09.
-CHEM supports EaganMatrix firmware 10.40 and greater.
-Today it is recommended to be running at least firmware 10.52 on all EaganMatrix devices, but anything 10.40 and later should be fine.
+CHEM (**C**ontroller for the **H**aken **E**agan **M**atrix).
 
+CHEM supports EaganMatrix firmware 10.40 and greater on all EaganMatrix devices, including Osmose.
+Today it is recommended to be running at least firmware 10.52 on all EaganMatrix devices, but anything 10.40 and later should be fine.
 If you've been holding back on updating your Osmose to the latest release, now's the time!
 
+Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com/pachde-CHEM).
+
+To get started, be sure to read the [Documentation](./doc/index.md#pachde-chem).
+
+**#d CHEM** is the successor to **HC One**, which targeted EaganMatrix firmware 10.09.
+
+## Development builds
+
+To download the latest development build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
+
 [![Build Status](https://github.com/Paul-Dempsey/pachde-CHEM/actions/workflows/build-plugin.yml/badge.svg)](https://github.com/Paul-Dempsey/pachde--CHEM/actions/workflows/build-plugin.yml)
-
-To download the latest build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
-
-When CHEM is released, you will be able to subscribe to the **pachde CHEM** plugin in the VCV Rack library.
-
-Read the [Documentation](./doc/index.md#pachde-chem) for more information on **#d CHEM**.
 
 > **Note** –
 > Pachde and **CHEM** are not officially affiliated with or sponsored by Haken Audio.
