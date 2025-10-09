@@ -6,14 +6,14 @@ To get started:
 
 1. You must have installed [VCV Rack](https://vcvrack.com/manual/)
 
-1. Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com/pachde-CHEM)
-  Make sure to subscribe tot he entire plugin, not individual modules.
+1. Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com/pachde-CHEM).
+   Make sure to subscribe to the entire plugin, not individual modules.
 
-   Once subscribed, a red dot appears on the **Library** menu where you can update.
+   Once subscribed, a red dot appears on the **Library** menu when you next start Rack, and where you can update.
    CHEM will be downlaoded and installed (along with any other modules with updates).
-   A subscription is recommended so that you are automatically updated when CHEM is revised with new modules,  features, and bug fixes.
+   A subscription is recommended so that you are automatically updated when CHEM is revised with new modules, features, and bug fixes.
 
-1. Read the [**Core**](./core.md#chem-core) module docs.
+1. Read the [**Core**](./core.md#chem-core) module docs first to get set up.
 
 If you aren't familiar with VCV Rack, it's helpful to learn basic Rack operation first.
 The Rack manual is at [VCV Rack](https://vcvrack.com/manual/).
@@ -24,14 +24,13 @@ The VCV Rack Community _Getting Started_ threads are a great resource for learni
 
 - [Getting started with VCV Rack - Video tutorials](https://community.vcvrack.com/t/getting-started-with-vcv-rack-video-tutorials/11204)
 
-
 > **Note** CHEM has features to address a broad section of the documented Haken MIDI protocol.
-However, some features are non-functional on the Osmose or currently released EM firmware (e.g. alternate tunings in 10.52).
+> However, some features are non-functional on the Osmose or currently released EM firmware (e.g. alternate tunings in 10.52).
 >
 > If you come across something that doesn't work, please open an issue so that I can fix CHEM issues and document limitations in either Expressive E or Haken Audio's implementation.
 >
 > I am currently not disabling or removing features for Osmose or specific firmware versions.
-Instead, I hope that these issues get fixed by Expressive E or Haken Audio in software updates.
+> Instead, I hope that these issues get fixed by Expressive E or Haken Audio in software updates.
 
 ## Module Index
 
@@ -126,7 +125,6 @@ For when the lights are down, choose **Glowing knobs** in the right click menu f
 ## Development builds
 
 To download and install the latest build of **#d CHEM**, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
-
 
 ---
 
