@@ -12,14 +12,6 @@
 
 - Update svg_theme project to sync with all the improvements from CHEM.
 
-## Preset
-
-- Improve contrast in grid and filter dialogs.
-
-## Overlay
-
-- Options in hamburger menu
-
 ## Ideas
 
 - Factory presets for MidiPad

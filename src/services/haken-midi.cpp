@@ -26,7 +26,7 @@ void HakenMidi::end_stream(ChemId tag)
 
 void HakenMidi::send_stream(ChemId tag, uint8_t stream, std::vector<PackedMidiMessage> &data)
 {
-    if (!data.empty()) return;
+    if (data.empty()) return;
 
     begin_stream(tag, stream);
     for (auto msg: data) {

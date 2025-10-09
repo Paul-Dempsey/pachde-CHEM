@@ -40,11 +40,15 @@ void ConvolutionParams::do_message(PackedMidiMessage msg)
     case Haken::ccStat16:
         if (Haken::ccStream == midi_cc(msg)) {
             in_conv_stream = (Haken::s_Conv_Poke == midi_cc_value(msg));
+        } else {
+            in_conv_stream = false;
         }
         break;
 
-    default: break;
-    }    
+    default:
+        in_conv_stream = false;
+        break;
+    }
 }
 
 }
