@@ -1,13 +1,8 @@
 RACK_DIR ?= ../..
 
-ifdef BUILD_DEBUG
+ifdef DEV_BUILD
 FLAGS += -O0
 FLAGS += -DLAYOUT_HELP
-
-# template not listed in plugin.json, etc.
-SOURCES += src/modules/_template/template.cpp
-SOURCES += src/modules/_template/template-ui.cpp
-
 else
 FLAGS += -O3
 FLAGS += -DNDEBUG
@@ -65,13 +60,6 @@ SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
 
 # modules
-ifdef BUILD_DEBUG
-SOURCES += src/modules/_proto/proto.cpp
-SOURCES += src/modules/_proto/proto-ui.cpp
-SOURCES += src/modules/_template/template.cpp
-SOURCES += src/modules/_template/template-ui.cpp
-endif
-
 SOURCES += src/modules/Core/Core.cpp
 SOURCES += src/modules/Core/Core-ui.cpp
 SOURCES += src/modules/Core/chem-task.cpp
