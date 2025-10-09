@@ -7,6 +7,56 @@ namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
 
+
+struct OverlayMenu: Hamburger
+{
+    using Base = Hamburger;
+    OverlayUi* ui{nullptr};
+    void setUi(OverlayUi* w) { ui = w; }
+    void appendContextMenu(ui::Menu* menu) override {
+        if (!ui || !ui->module) return;
+
+        menu->addChild(createMenuLabel<HamburgerTitle>("Overlay"));
+
+        std::string label{"Overlay preset: "};
+        auto over = ui->my_module ? ui->my_module->overlay_preset : nullptr;
+        label.append(over ? over->summary() : "<not configured>");
+        menu->addChild(createMenuLabel(label));
+
+        menu->addChild(createMenuLabel(format_string("Macros: %u", ui->my_module ? ui->my_module->macros.size() : 0)));
+
+        auto preset = ui->my_module ? ui->my_module->live_preset : nullptr;
+        menu->addChild(createMenuItem("Use live preset", preset ? preset->summary() : "<none>", [=](){
+            ui->my_module->overlay_preset = ui->my_module->live_preset;
+            ui->my_module->preset_connected = true;
+            ui->my_module->notify_connect_preset();
+        }, !preset));
+
+        menu->addChild(createSubmenuItem("Title", ui->my_module ? ui->my_module->title : "<none>",
+            [=](Menu *menu) {
+                menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, ui->my_module ? ui->my_module->title : "<title>", [=](std::string text) { ui->set_title(text); }));
+            }));
+
+        menu->addChild(createSubmenuItem("Background", "", [=](Menu* menu) {
+            auto picker = new ColorPickerMenu();
+            picker->set_color(ui->get_bg_color());
+            picker->set_on_new_color([=](PackedColor color) {
+                ui->set_bg_color(color);
+            });
+            menu->addChild(picker);
+        }));
+
+        menu->addChild(createSubmenuItem("Text color", "", [=](Menu* menu) {
+            auto picker = new ColorPickerMenu();
+            picker->set_color(ui->get_fg_color());
+            picker->set_on_new_color([=](PackedColor color) {
+                ui->set_fg_color(color);
+            });
+            menu->addChild(picker);
+        }));
+    }
+};
+
 // -- UI --------------------------------------
 const char * DEFAULT_TITLE{"Overlay Synth"};
 
@@ -43,7 +93,12 @@ OverlayUi::OverlayUi(OverlayModule *module) :
         title_widget->set_text_color(0xffe6e6e6);
     }
 
-    auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(box.size.x*.5f, 24.f), theme_engine, theme, "Select overlay preset"));
+    auto menu = Center(createThemedWidget<OverlayMenu>(Vec(15.f, 24.f), theme_engine, theme));
+    menu->setUi(this);
+    menu->describe("Overlay menu");
+    addChild(menu);
+
+    auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(15.f, 36.f), theme_engine, theme, "Select overlay preset"));
     if (my_module) {
         set_preset_button->setHandler([=](bool c, bool f) {
             if (!chem_host) return;
@@ -151,45 +206,5 @@ void OverlayUi::step()
 void OverlayUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
-
-    menu->addChild(createMenuLabel<HamburgerTitle>("Overlay"));
-
-    std::string label{"Overlay preset: "};
-    auto over = my_module ? my_module->overlay_preset : nullptr;
-    label.append(over ? over->summary() : "<not configured>");
-    menu->addChild(createMenuLabel(label));
-
-    menu->addChild(createMenuLabel(format_string("Macros: %u", my_module ? my_module->macros.size() : 0)));
-
-    auto preset = my_module ? my_module->live_preset : nullptr;
-    menu->addChild(createMenuItem("Use live preset", preset ? preset->summary() : "<none>", [=](){
-       my_module->overlay_preset = my_module->live_preset;
-       my_module->preset_connected = true;
-       my_module->notify_connect_preset();
-    }, !preset));
-
-    menu->addChild(createSubmenuItem("Title", my_module ? my_module->title : "<none>",
-        [=](Menu *menu) {
-            menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, my_module ? my_module->title : "<title>", [=](std::string text) { set_title(text); }));
-        }));
-
-
-    menu->addChild(createSubmenuItem("Background", "", [=](Menu* menu) {
-        auto picker = new ColorPickerMenu();
-        picker->set_color(get_bg_color());
-        picker->set_on_new_color([=](PackedColor color) {
-            set_bg_color(color);
-        });
-        menu->addChild(picker);
-    }));
-
-    menu->addChild(createSubmenuItem("Text color", "", [=](Menu* menu) {
-        auto picker = new ColorPickerMenu();
-        picker->set_color(get_fg_color());
-        picker->set_on_new_color([=](PackedColor color) {
-            set_fg_color(color);
-        });
-        menu->addChild(picker);
-    }));
     Base::appendContextMenu(menu);
 }

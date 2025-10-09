@@ -17,7 +17,7 @@ struct PresetMenu : Hamburger
     PresetMenu() : ui(nullptr) { }
 
     void setUi(PresetUi* w) { ui = w; }
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    //bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
     void appendContextMenu(ui::Menu* menu) override;
 
     void onHoverKey(const HoverKeyEvent& e) override
@@ -35,10 +35,10 @@ struct PresetMenu : Hamburger
     }
 };
 
-bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
-{
-    return Base::applyTheme(engine, theme);
-}
+// bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+// {
+//     return Base::applyTheme(engine, theme);
+// }
 
 void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
