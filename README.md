@@ -14,6 +14,10 @@ To get started, be sure to read the [Documentation](./doc/index.md#pachde-chem).
 
 **#d CHEM** is the successor to **HC One**, which targeted EaganMatrix firmware 10.09.
 
+## Change log
+
+See [CHANGELOG](./CHANGELOG.md#chem-change-log)
+
 ## Development builds
 
 To download the latest development build, see the [Nightly Release](https://github.com/Paul-Dempsey/pachde-CHEM/releases/tag/Nightly) page.
