@@ -5,12 +5,11 @@
 using namespace ::rack;
 
 namespace pachde {
-    
 
 constexpr const uint16_t UNSET_16 = 0xffff;
 constexpr const uint8_t UNSET_8 = 0xff;
 constexpr const uint8_t INVALID_STREAM = UNSET_8;
-enum PortKind { NoSend, CC, Stream };
+enum PortKind : uint8_t { NoSend, CC, Stream, StreamIndex };
 
 struct EmccPortConfig
 {
@@ -31,7 +30,7 @@ struct EmccPortConfig
         input_id(input),
         light_id(light)
     {
-        assert(in_range((int)kind, (int)PortKind::NoSend, (int) PortKind::Stream));
+        assert(in_range((int)kind, (int)PortKind::NoSend, (int) PortKind::StreamIndex));
     }
 
     static EmccPortConfig no_send(int param_id, int input_id, int light_id, uint8_t d1, uint8_t d2, bool low_res = false)
@@ -48,6 +47,11 @@ struct EmccPortConfig
     static EmccPortConfig stream_poke(int param_id, int input_id, int light_id, uint8_t stream_id, uint8_t poke_id)
     {
         return EmccPortConfig{PortKind::Stream, stream_id, poke_id, true, param_id, input_id, light_id};
+    }
+
+    static EmccPortConfig stream_index_poke(int param_id, int input_id, int light_id, uint8_t stream_id, uint8_t poke_id)
+    {
+        return EmccPortConfig{PortKind::StreamIndex, stream_id, poke_id, true, param_id, input_id, light_id};
     }
 };
 
@@ -98,9 +102,9 @@ struct EmControlPort
 
     uint8_t data_a() { assert(no_send()); return channel_stream; }
     uint8_t data_b() { assert(no_send()); return cc_id; }
-    
+
     bool no_send() { return PortKind::NoSend == kind; }
-    bool is_stream_poke() { return PortKind::Stream == kind; }
+    bool is_stream_poke() { return PortKind::Stream == kind || PortKind::StreamIndex == kind; }
     bool is_cc() { return PortKind::CC == kind; }
 
     bool pending() { return (em_value != last_em_value) && (UNSET_16 != last_em_value); }
@@ -111,7 +115,7 @@ struct EmControlPort
     float parameter() { return param_value; }
     float modulated() { return mod_value; }
     float modulation() { return mod_amount; }
-    
+
     void pull_param_cv(Module* module);
     void set_mod_amount(float amount);
     void set_param_and_em(float value);
@@ -121,7 +125,7 @@ struct EmControlPort
     void set_em_and_param_low(uint8_t u7) { set_em_and_param(u7 << 7); }
     float modulate();
     float modulated_em_value(uint16_t u14) const {
-        return modulated_value(unipolar_14_to_rack(u14), cv, mod_amount); 
+        return modulated_value(unipolar_14_to_rack(u14), cv, mod_amount);
     }
 
     void force_send_at_next_opportunity() { last_em_value = UNSET_16; }
@@ -168,7 +172,7 @@ struct Modulation
     bool has_target() { return mod_target >= 0; }
     void mod_to_json(json_t* root);
     void mod_from_json(json_t* root);
- 
+
     void set_em_and_param(int index, uint16_t em_value, bool with_module);
     void set_em_and_param_low(int index, uint8_t em_value, bool with_module);
 

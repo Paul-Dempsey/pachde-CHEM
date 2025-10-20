@@ -36,6 +36,11 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
         //haken->end_stream(tag); // HakenMidi.h says optional for poke streams
         break;
 
+    case PortKind::StreamIndex:
+        haken->begin_stream(tag, channel_stream);
+        haken->stream_data(tag, cc_id, em_value & 0x7f);
+        break;
+
     default:
         assert(false);
         break;
@@ -51,6 +56,7 @@ void EmControlPort::pull_param_cv(Module* module)
 
 void EmControlPort::set_mod_amount(float amount)
 {
+    assert(kind != PortKind::StreamIndex);
     assert(in_range(amount, -100.f, 100.f));
     mod_amount = amount;
     mod_value = modulated_value(param_value, cv, mod_amount);
@@ -59,13 +65,17 @@ void EmControlPort::set_mod_amount(float amount)
 void EmControlPort::set_param_and_em(float value)
 {
     param_value = value;
-    em_value = unipolar_rack_to_unipolar_14(modulate());
+    em_value = (kind == PortKind::StreamIndex)
+        ? static_cast<int>(std::floor(param_value))
+        : unipolar_rack_to_unipolar_14(modulate());
 }
 
 void EmControlPort::set_em_and_param(uint16_t u14)
 {
     em_value = last_em_value = u14;
-    param_value = unipolar_14_to_rack(u14);
+    param_value = (kind == PortKind::StreamIndex)
+        ? static_cast<float>(u14)
+        : unipolar_14_to_rack(u14);
 }
 
 float EmControlPort::modulate()
@@ -206,6 +216,19 @@ void Modulation::sync_send()
                 pit->pull_param_cv(module);
                 if (pit->pending()) {
                     stream_data.push_back(MakeStreamData(client_tag, pit->cc_id, pit->em_low()));
+                    pit->un_pend();
+                }
+                break;
+
+            case PortKind::StreamIndex:
+                if (stream == INVALID_STREAM) {
+                    stream = pit->channel_stream;
+                } else {
+                    assert(stream == pit->channel_stream); // multiple streams in one modulation not implemented
+                }
+                pit->set_param_and_em(module->getParam(pit->param_id).getValue());
+                if (pit->pending()) {
+                    stream_data.push_back(MakeStreamData(client_tag, pit->cc_id, pit->em_value & 0xf));
                     pit->un_pend();
                 }
                 break;
