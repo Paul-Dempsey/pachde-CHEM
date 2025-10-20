@@ -14,6 +14,7 @@ SOURCES += src/chem.cpp
 
 # EaganMatrix
 SOURCES += src/em/EaganMatrix.cpp
+SOURCES += src/em/convolution.cpp
 SOURCES += src/em/em-hardware.cpp
 SOURCES += src/em/midi-message.cpp
 SOURCES += src/em/preset.cpp
@@ -86,7 +87,6 @@ SOURCES += src/modules/Post/Post-ui.cpp
 
 SOURCES += src/modules/Convolution/Convo.cpp
 SOURCES += src/modules/Convolution/Convo-ui.cpp
-SOURCES += src/modules/Convolution/convolution.cpp
 
 SOURCES += src/modules/Jack/Jack.cpp
 SOURCES += src/modules/Jack/Jack-ui.cpp

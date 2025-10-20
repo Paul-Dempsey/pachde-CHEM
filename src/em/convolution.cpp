@@ -1,8 +1,8 @@
 #include "convolution.hpp"
 
-namespace pachde {
+namespace eaganmatrix {
 
-const uint8_t default_convolution_parameters[] = {
+const uint8_t default_convolution_parameters[30] = {
     0, 0, 0, 0,         // idx, mix, idx, mix
     Haken::cd_Wood,
     Haken::cd_MetalBright,
@@ -17,8 +17,7 @@ const uint8_t default_convolution_parameters[] = {
     0                   // pad
 };
 
-ConvolutionParams::ConvolutionParams() :
-    in_conv_stream(false)
+ConvolutionParams::ConvolutionParams()
 {
     set_default();
 }
@@ -33,20 +32,35 @@ void ConvolutionParams::do_message(PackedMidiMessage msg)
     switch (msg.bytes.status_byte) {
     case PKP16:
         if (in_conv_stream) {
+            data[stream_counter++] = msg.bytes.data1;
+            data[stream_counter++] = msg.bytes.data2;
+            assert(stream_counter <= 30);
+        } else if (in_conv_poke) {
+            assert(msg.bytes.data1 < 30);
             data[msg.bytes.data1] = msg.bytes.data2;
         }
         break;
 
     case Haken::ccStat16:
         if (Haken::ccStream == midi_cc(msg)) {
-            in_conv_stream = (Haken::s_Conv_Poke == midi_cc_value(msg));
-        } else {
-            in_conv_stream = false;
+            stream_counter = 0;
+            auto cc_value = midi_cc_value(msg);
+            switch (cc_value) {
+            case Haken::s_Conv:
+                in_conv_stream = true;
+                break;
+            case Haken::s_Conv_Poke:
+                in_conv_poke = true;
+                break;
+            case Haken::s_StreamEnd:
+            default:
+                in_conv_stream = in_conv_poke = false;
+                break;
+            }
         }
         break;
 
     default:
-        in_conv_stream = false;
         break;
     }
 }

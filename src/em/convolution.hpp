@@ -1,15 +1,18 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../em/midi-message.h"
+#include "wrap-HakenMidi.hpp"
+#include "midi-message.h"
 
-namespace pachde {
+namespace eaganmatrix {
+extern const uint8_t default_convolution_parameters[30];
 
 struct ConvolutionParams
 {
+    bool in_conv_stream{false};
+    bool in_conv_poke{false};
+    int stream_counter{0};
     uint8_t data[30];
-    bool in_conv_stream;
 
     ConvolutionParams();
 
@@ -24,7 +27,7 @@ struct ConvolutionParams
     void set_pre_mix    (uint8_t value) { data[Haken::id_c_mix1] = value; }
     void set_post_index (uint8_t value) { data[Haken::id_c_idx2] = value; }
     void set_post_mix   (uint8_t value) { data[Haken::id_c_mix2] = value; }
-    
+
     uint8_t get_ir_type (int index) { return data[Haken::id_c_dat0 + index]; }
     uint8_t get_ir1_type () { return data[Haken::id_c_dat0]; }
 	uint8_t get_ir2_type () { return data[Haken::id_c_dat1]; }

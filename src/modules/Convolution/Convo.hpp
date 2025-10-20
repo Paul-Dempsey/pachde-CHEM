@@ -1,6 +1,7 @@
 #pragma once
 #include "../../plugin.hpp"
 #include "../../chem.hpp"
+#include "../../em/convolution.hpp"
 #include "../../services/colors.hpp"
 #include "../../services/em-midi-port.hpp"
 #include "../../services/ModuleBroker.hpp"
@@ -10,7 +11,6 @@
 #include "../../widgets/theme-knob.hpp"
 #include "../../widgets/tip-label-widget.hpp"
 #include "../../widgets/knob-track-widget.hpp"
-#include "convolution.hpp"
 
 using namespace pachde;
 
@@ -76,6 +76,9 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
     bool glow_knobs;
 
     ConvolutionParams conv;
+    bool in_conv_stream{false};
+    bool in_conv_poke{false};
+    bool running{false};
 
     ConvoModule();
     ~ConvoModule() {
@@ -107,6 +110,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
     void onPortChange(const PortChangeEvent& e) override {
         modulation.onPortChange(e);
     }
+    void onReset(const ResetEvent& e) override;
     void process_params(const ProcessArgs& args);
     void process(const ProcessArgs& args) override;
 };

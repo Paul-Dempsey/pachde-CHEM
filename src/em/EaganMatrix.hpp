@@ -4,6 +4,7 @@
 #include "wrap-HakenMidi.hpp"
 #include "midi-message.h"
 #include "em-hardware.h"
+#include "convolution.hpp"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
 #include "../services/crc.hpp"
@@ -106,14 +107,12 @@ struct EaganMatrix
     // raw channel cc data
     ChannelData ch1;
     ChannelData ch16;
-
     uint16_t macro[90];
     uint8_t mat[128]; // Haken::s_MatPoke
-    uint8_t conv[30]; // Haken::s_ConvPoke
-
     uint16_t jack_1;
     uint16_t jack_2;
     uint16_t post;
+    ConvolutionParams convolution;
 
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
@@ -135,6 +134,8 @@ struct EaganMatrix
     bool is_osmose() { return (Haken::hw_o49 == hardware); }
     // device has a touch surface any Continuum or ContinuuMini
     bool is_surface();
+
+    ConvolutionParams& get_convolution() { return convolution; }
 
     // simple cc value retreival
     uint8_t get_led() { return ch16.cc[Haken::ccEdState] & Haken::sLedBits; }
@@ -267,49 +268,6 @@ struct EaganMatrix
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }
     bool is_transmit_updates() { return mat[Haken::idCfgOut]; }
 
-    uint8_t get_conv_pre_index() { return conv[Haken::id_c_idx1]; }
-    uint8_t get_conv_pre_mix() { return conv[Haken::id_c_mix1]; }
-    uint8_t get_conv_post_index() { return conv[Haken::id_c_idx2]; }
-    uint8_t get_conv_post_mix() { return conv[Haken::id_c_mix2]; }
-
-    uint8_t get_conv_ir_type (int index) { return conv[Haken::id_c_dat0 + index]; }
-    uint8_t get_conv_ir1_type () { return conv[Haken::id_c_dat0]; }
-	uint8_t get_conv_ir2_type () { return conv[Haken::id_c_dat1]; }
-	uint8_t get_conv_ir3_type () { return conv[Haken::id_c_dat2]; }
-	uint8_t get_conv_ir4_type () { return conv[Haken::id_c_dat3]; }
-
-    uint8_t get_conv_ir_length (int index) { return conv[Haken::id_c_lth0 + index]; }
-    uint8_t get_conv_ir1_length () { return conv[Haken::id_c_lth0]; }
-	uint8_t get_conv_ir2_length () { return conv[Haken::id_c_lth1]; }
-	uint8_t get_conv_ir3_length () { return conv[Haken::id_c_lth2]; }
-	uint8_t get_conv_ir4_length () { return conv[Haken::id_c_lth3]; }
-
-    uint8_t get_conv_ir_shift (int index) { return conv[Haken::id_c_shf0 + index]; }
-	uint8_t get_conv_ir1_shift() { return conv[Haken::id_c_shf0]; }
-	uint8_t get_conv_ir2_shift() { return conv[Haken::id_c_shf1]; }
-	uint8_t get_conv_ir3_shift() { return conv[Haken::id_c_shf2]; }
-	uint8_t get_conv_ir4_shift() { return conv[Haken::id_c_shf3]; }
-
-    uint8_t get_conv_ir_width (int index) { return conv[Haken::id_c_wid0 + index]; }
-	uint8_t get_conv_ir1_width () { return conv[Haken::id_c_wid0]; }
-	uint8_t get_conv_ir2_width () { return conv[Haken::id_c_wid1]; }
-	uint8_t get_conv_ir3_width () { return conv[Haken::id_c_wid2]; }
-	uint8_t get_conv_ir4_width () { return conv[Haken::id_c_wid3]; }
-
-    uint8_t get_conv_ir_left (int index) { return conv[Haken::id_c_atL0 + index]; }
-    uint8_t get_conv_ir1_left () { return conv[Haken::id_c_atL0]; }
-	uint8_t get_conv_ir2_left () { return conv[Haken::id_c_atL1]; }
-	uint8_t get_conv_ir3_left () { return conv[Haken::id_c_atL2]; }
-	uint8_t get_conv_ir4_left () { return conv[Haken::id_c_atL3]; }
-
-    uint8_t get_conv_ir_right (int index) { return conv[Haken::id_c_atR0 + index]; }
-    uint8_t get_conv_ir1_right () { return conv[Haken::id_c_atR0]; }
-	uint8_t get_conv_ir2_right () { return conv[Haken::id_c_atR1]; }
-	uint8_t get_conv_ir3_right () { return conv[Haken::id_c_atR2]; }
-	uint8_t get_conv_ir4_right () { return conv[Haken::id_c_atR3]; }
-
-    uint8_t get_conv_phase_cancellation () { return conv[Haken::id_c_phc]; }
-
     std::vector<IHandleEmEvents*> clients;
     void clearClients() { clients.clear(); }
     void subscribeEMEvents(IHandleEmEvents* client);
@@ -342,7 +300,6 @@ struct EaganMatrix
     bool set_checked_data_stream(uint8_t stream_id);
     bool handle_macro_cc(uint8_t cc, uint8_t value);
     void onChannelOneCC(uint8_t cc, uint8_t value);
-    void onChannelTwoCC(uint8_t cc, uint8_t value);
     void onChannel16CC(PackedMidiMessage msg);
     void onMessage(PackedMidiMessage msg);
 

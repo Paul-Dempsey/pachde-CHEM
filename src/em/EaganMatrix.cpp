@@ -401,6 +401,7 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
     // } break;
 
     case Haken::ccStream: {
+        convolution.do_message(msg);
         switch (value) {
         case Haken::s_Name: {
             name_buffer.clear();
@@ -416,9 +417,12 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
             set_checked_data_stream(value);
         } break;
 
+        case Haken::s_Conv: {
+            set_checked_data_stream(value);
+        } break;
+
         case Haken::s_Mat_Poke: {
             set_checked_data_stream(value);
-            // zero mat?
         } break;
 
         case Haken::s_Conv_Poke: {
@@ -537,9 +541,6 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
             ch1.cc[msg.bytes.data1] = msg.bytes.data2;
             onChannelOneCC(msg.bytes.data1, msg.bytes.data2);
             // Config carries ambient changes like pedal/mod-wheel, so we can't checksum preset info on CH 1
-            // if (in_preset_detail) {
-            //     hash_midi(preset_hasher, msg);
-            // }
         } break;
         }
     } break;
@@ -610,13 +611,18 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
                 }
                 break;
 
+            case Haken::s_Conv:
+                convolution.do_message(msg);
+                if (in_preset_detail) hash_midi(preset_hasher, msg);
+                break;
+
             case Haken::s_Mat_Poke:
                 mat[msg.bytes.data1] = msg.bytes.data2;
                 if (in_preset_detail) hash_midi(preset_hasher, msg);
                 break;
 
             case Haken:: s_Conv_Poke:
-                conv[msg.bytes.data1] = msg.bytes.data2;
+                convolution.do_message(msg);
                 if (in_preset_detail) hash_midi(preset_hasher, msg);
                 break;
 

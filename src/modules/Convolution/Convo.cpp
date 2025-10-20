@@ -6,9 +6,9 @@ using namespace pachde;
 WidgetInfo widget_info[]
 {
     /*0*/{ "Pre mix",    CM::P_PRE_MIX,    CM::IN_PRE_MIX,    CM::L_PRE_MIX },
-    /*1*/{ "Pre index",  CM::P_PRE_INDEX,  CM::IN_PRE_INDEX,  CM:: L_PRE_INDEX },
-    /*2*/{ "Post mix",   CM::P_POST_MIX,   CM::IN_POST_MIX,   CM:: L_POST_MIX },
-    /*3*/{ "Post index", CM::P_POST_INDEX, CM::IN_POST_INDEX, CM:: L_POST_INDEX },
+    /*1*/{ "Pre index",  CM::P_PRE_INDEX,  CM::IN_PRE_INDEX,  CM::L_PRE_INDEX },
+    /*2*/{ "Post mix",   CM::P_POST_MIX,   CM::IN_POST_MIX,   CM::L_POST_MIX },
+    /*3*/{ "Post index", CM::P_POST_INDEX, CM::IN_POST_INDEX, CM::L_POST_INDEX },
 
     /*4*/{ "IR 1 Length", CM::P_1_LENGTH, CM::IN_1_LENGTH, CM::L_1_LENGTH },
     /*5*/{ "IR 1 Tuning", CM::P_1_TUNING, CM::IN_1_TUNING, CM::L_1_TUNING },
@@ -72,9 +72,10 @@ ConvoModule::ConvoModule() :
         "Eowave Gong", "LVDL Pyramide", "LVDL Gong", "LVDL Onde",
         "White", "Grey"
     };
-    for (int i = P_1_TYPE; i <= P_4_TYPE; ++i) {
-        configSwitch(i, 0.f, 18.f, 6.f, param_info(i).name, types);
-    }
+    configSwitch(P_1_TYPE, 0.f, 18.f, Haken::cd_Wood,        param_info(P_1_TYPE).name, types);
+    configSwitch(P_2_TYPE, 0.f, 18.f, Haken::cd_MetalBright, param_info(P_2_TYPE).name, types);
+    configSwitch(P_3_TYPE, 0.f, 18.f, Haken::cd_Fiber,       param_info(P_3_TYPE).name, types);
+    configSwitch(P_4_TYPE, 0.f, 18.f, Haken::cd_Wood,        param_info(P_4_TYPE).name, types);
 
     WidgetInfo* info = widget_info + 4;
     for (int i = 0; i < 4; ++i) {
@@ -93,7 +94,7 @@ ConvoModule::ConvoModule() :
         if (wi.input >= 0) {
             configInput(wi.input, wi.name);
         }
-        if (wi.light >= 0 && CM::L_EXTEND != wi.light) {
+        if ((wi.light >= 0) && (CM::L_EXTEND != wi.light)) {
             std::string name{"Modulation amount on "};
             name.append(wi.name);
             configLight(wi.light, name);
@@ -107,10 +108,10 @@ ConvoModule::ConvoModule() :
         EmccPortConfig::stream_poke(P_PRE_INDEX, IN_PRE_INDEX, L_PRE_INDEX, Haken::s_Conv_Poke, Haken::id_c_idx1),
         EmccPortConfig::stream_poke(P_POST_MIX, IN_POST_MIX, L_POST_MIX, Haken::s_Conv_Poke, Haken::id_c_mix2),
         EmccPortConfig::stream_poke(P_POST_INDEX, IN_POST_INDEX, L_POST_INDEX, Haken::s_Conv_Poke, Haken::id_c_idx2),
-        EmccPortConfig::stream_poke(P_1_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat0),
-        EmccPortConfig::stream_poke(P_2_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat1),
-        EmccPortConfig::stream_poke(P_3_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat2),
-        EmccPortConfig::stream_poke(P_4_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat3),
+        EmccPortConfig::stream_index_poke(P_1_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat0),
+        EmccPortConfig::stream_index_poke(P_2_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat1),
+        EmccPortConfig::stream_index_poke(P_3_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat2),
+        EmccPortConfig::stream_index_poke(P_4_TYPE, -1, -1, Haken::s_Conv_Poke, Haken::id_c_dat3),
         EmccPortConfig::stream_poke(P_1_LENGTH, IN_1_LENGTH, L_1_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth0),
         EmccPortConfig::stream_poke(P_2_LENGTH, IN_2_LENGTH, L_2_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth1),
         EmccPortConfig::stream_poke(P_3_LENGTH, IN_3_LENGTH, L_3_LENGTH, Haken::s_Conv_Poke, Haken::id_c_lth2),
@@ -131,7 +132,7 @@ ConvoModule::ConvoModule() :
         EmccPortConfig::stream_poke(P_2_RIGHT, IN_2_RIGHT, L_2_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR1),
         EmccPortConfig::stream_poke(P_3_RIGHT, IN_3_RIGHT, L_3_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR2),
         EmccPortConfig::stream_poke(P_4_RIGHT, IN_4_RIGHT, L_4_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR3),
-        EmccPortConfig::stream_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc)
+        EmccPortConfig::stream_index_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc)
     };
     modulation.configure(Params::P_MOD_AMOUNT, Params::NUM_MODS, cfg);
 }
@@ -142,7 +143,7 @@ void ConvoModule::dataFromJson(json_t* root)
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "glow-knobs", glow_knobs);
 
-    if (!device_claim.empty()) {
+    if (running && !device_claim.empty()) {
         modulation.mod_from_json(root);
     }
     ModuleBroker::get()->try_bind_client(this);
@@ -152,42 +153,66 @@ json_t* ConvoModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    if (!device_claim.empty()) {
+    if (running && !device_claim.empty()) {
         modulation.mod_to_json(root);
     }
     json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
     return root;
 }
 
-void ConvoModule::params_from_internal()
-{
-    for (auto pit = modulation.ports.begin(); pit != modulation.ports.end(); pit++) {
-        pit->set_em_and_param_low(conv.data[pit->cc_id]);
-    }
-}
-
 void ConvoModule::update_from_em()
 {
-    if (chem_host && chem_host->host_preset()) {
+    if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em) {
-            memcpy(conv.data, em->conv, 30);
-            params_from_internal();
+            auto conv = em->get_convolution();
+            for (auto pit = modulation.ports.begin(); pit != modulation.ports.end(); pit++) {
+                if (pit->kind == PortKind::StreamIndex) {
+                    pit->set_em_and_param(conv.data[pit->cc_id]);
+                } else {
+                    pit->set_em_and_param_low(conv.data[pit->cc_id]);
+                }
+                modulation.module->getParam(pit->param_id).setValue(pit->parameter());
+            }
             init_from_em = true;
             return;
         }
     }
-    conv.set_default();
-    params_from_internal();
     init_from_em = false;
 }
 
 void ConvoModule::do_message(PackedMidiMessage message)
 {
-    if (!chem_host || chem_host->host_busy()) return;
     if (as_u8(ChemId::Convo) == message.bytes.tag) return;
-    if (init_from_em) {
-        conv.do_message(message);
+    if (!chem_host) return;
+    auto em = chem_host->host_matrix();
+    if (!em) return;
+    if (Haken::ccStat16 == message.bytes.status_byte) {
+        bool was = in_conv_stream || in_conv_poke;
+        if (Haken::ccStream == midi_cc(message)) {
+            auto cc_value = midi_cc_value(message);
+            if (Haken::s_StreamEnd == cc_value) {
+                in_conv_stream = false;
+            } else {
+                switch (cc_value) {
+                case Haken::s_Conv:
+                    in_conv_stream = true;
+                    break;
+                case Haken::s_Conv_Poke:
+                    in_conv_poke = true;
+                    break;
+                default:
+                    in_conv_poke = false;
+                }
+            }
+            assert(!(in_conv_poke && in_conv_stream));
+
+        } else {
+            in_conv_stream = in_conv_poke = false;
+        }
+        if (was && !(in_conv_stream || in_conv_poke)) {
+            update_from_em();
+        }
     }
 }
 
@@ -220,21 +245,29 @@ void ConvoModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDevi
     if (chem_ui) ui()->onConnectionChange(device, connection);
 }
 
-uint8_t get_u7_param(::rack::engine::Module* module, int param_id) {
-    return unipolar_rack_to_unipolar_7(module->getParam(param_id).getValue());
+// uint8_t get_u7_param(::rack::engine::Module* module, int param_id) {
+//     return unipolar_rack_to_unipolar_7(module->getParam(param_id).getValue());
+// }
+
+void ConvoModule::onReset(const ResetEvent &e)
+{
+    if (!chem_host) return;
+    auto em = chem_host->host_matrix();
+    if (!em) return;
+    em->get_convolution().set_default();
+    update_from_em();
 }
 
-void ConvoModule::process_params(const ProcessArgs& args)
+void ConvoModule::process_params(const ProcessArgs &args)
 {
     modulation.pull_mod_amount();
-    {
-        auto v = getParamInt(getParam(Params::P_EXTEND));
-        getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
-    }
+    auto v = getParamInt(getParam(Params::P_EXTEND));
+    getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
 }
 
 void ConvoModule::process(const ProcessArgs& args)
 {
+    running = true;
     ChemModule::process(args);
     if (!host_connected(chem_host) || chem_host->host_busy()) return;
 
