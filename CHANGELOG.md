@@ -2,8 +2,12 @@
 
 ## 2.0.2
 
-- Fix issue #5. Broken stream sends were the Convolution issue, and prob. elsewhere. Bad bug, trivial fix.
+- #5, Not correctly initializing conv data.
+- #5, Broken stream sends were a Convolution issue, and prob. elsewhere.
+- #5, Add stream index pokes in Modulation class
+- Move all conv data into EM
 - Move main Overlay options from the module menu to a new hamburger menu
-- Contrast improvements in Preset lists and filters
+- UI contrast improvements in Preset lists and filters
+- Continuous selection (drag) in color pickers
 
 ## 2.0.1 - First release

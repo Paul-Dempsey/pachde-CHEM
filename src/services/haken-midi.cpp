@@ -32,7 +32,7 @@ void HakenMidi::send_stream(ChemId tag, uint8_t stream, std::vector<PackedMidiMe
     for (auto msg: data) {
         send_message(msg);
     }
-    if (!in_range(stream, U8(Haken::s_Mat_Poke), U8(Haken::s_Conv_Poke))) {
+    if (!in_range(stream, U8(Haken::s_Form_Poke), U8(Haken::s_Conv_Poke))) {
         end_stream(tag);
     }
 }

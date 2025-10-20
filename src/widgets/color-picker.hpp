@@ -71,7 +71,7 @@ struct ColorPickerMenu : rack::ui::MenuItem
 
     ColorPickerMenu() {
         box.size = ColorPicker::get_size().plus(Vec(8.f, 8.f));
-        picker = createWidgetCentered<ColorPicker>(Vec(box.size.x*.5f, box.size.y*.5f));
+        picker = createWidgetCentered<ColorPicker>(box.getCenter());
         addChild(picker);
     }
 
@@ -89,7 +89,7 @@ struct ColorPickerMenu : rack::ui::MenuItem
 
     void step() override
     {
-        OpaqueWidget::step();
+        OpaqueWidget::step(); // Bypass MenuItem::step() (resizing)
     }
 
     void draw(const DrawArgs& args) override

@@ -51,11 +51,6 @@ std::string GetTag(NSVGshape* shape)
     return id;
 }
 
-inline const char * skip_space(const char * s) {
-    while (' ' == *s) ++s;
-    return s;
-}
-
 std::string strip_space(const std::string &s) {
     if (std::string::npos == s.find(' ')) return s;
     std::string r;
@@ -104,7 +99,7 @@ bool is_hsl(const std::string& text) {
     if ('h' == *scan++) {
         if ('s' == *scan++) {
             if ('l' == *scan++) {
-                if ('a' == *scan) { scan++; } 
+                if ('a' == *scan) { scan++; }
                 return '(' == *scan;
             }
         }
@@ -121,13 +116,12 @@ inline int hex_value(unsigned char ch) {
     return 10 + ch - 'a';
 }
 
-
 bool isValidHexColor(std::string hex) {
     if (*hex.cbegin() != '#') return false;
     switch (hex.size()) {
-        case 1 + 3: 
+        case 1 + 3:
         case 1 + 4:
-        case 1 + 6: 
+        case 1 + 6:
         case 1 + 8: break;
         default: return false;
     }
@@ -154,9 +148,9 @@ std::vector<unsigned char> ParseHex(std::string hex) {
     //  long: #rrggbb, #rrggbbaa
     bool long_hex = true;
     switch (hex.size()) {
-        case 1 + 3: 
+        case 1 + 3:
         case 1 + 4: long_hex = false; break;
-        case 1 + 6: 
+        case 1 + 6:
         case 1 + 8: long_hex = true; break;
         default: return result;
     }
@@ -346,8 +340,8 @@ std::shared_ptr<SvgTheme> SvgThemeEngine::getTheme(const std::string& name)
 bool SvgThemeEngine::requireValidColor(const std::string& spec, const char * name)
 {
     if (isValidHexColor(spec)) return true;
-    if (is_rgb(spec)) return true; 
-    if (is_hsl(spec)) return true; 
+    if (is_rgb(spec)) return true;
+    if (is_hsl(spec)) return true;
     if (isLogging()) logError(ErrorCode::InvalidColor, format_string("'%s': invalid hex/rgb color: '%s'", name, spec.c_str()));
     return false;
 }
@@ -457,13 +451,13 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
                     if (!(0 == stop.index || 1 == stop.index)) {
                         if (isLogging()) logError(ErrorCode::GradientStopIndexZeroOrOne, "Gradient stop index must be 0 or 1");
                         ok = false;
-                    } 
+                    }
                 } else {
                     stop.index = 0;
                     ok = false;
                 }
             }
-            
+
             auto ocolor = json_object_get(item, "color");
             if (ocolor) {
                 if (requireString(ocolor, "color")) {
@@ -476,7 +470,7 @@ bool SvgThemeEngine::parseGradient(json_t* ogradient, Gradient& gradient)
                     ok = false;
                 }
             }
-            
+
             auto ooffset = json_object_get(item, "offset");
             if (ooffset) {
                 if (requireNumber(ooffset, "offset")) {
@@ -552,7 +546,7 @@ bool SvgThemeEngine::parseStroke(json_t* root, std::shared_ptr<Style> style)
                 style->stroke.setNone();
             } else {
                 if (!parseColor(value, "stroke", &color)) {
-                    return false; 
+                    return false;
                 }
                 style->stroke.setColor(color);
             }
@@ -762,7 +756,7 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
 
                 if (!((target.type == NSVG_PAINT_RADIAL_GRADIENT)
                     || (target.type == NSVG_PAINT_LINEAR_GRADIENT))) {
-                    if (isLogging()) logWarning(ErrorCode::GradientNotPresent, 
+                    if (isLogging()) logWarning(ErrorCode::GradientNotPresent,
                         format_string("'%s': Skipping SVG element without a gradient", tag.c_str()));
                     return false;
                 }
@@ -771,7 +765,7 @@ bool SvgThemeEngine::applyPaint(std::string tag, NSVGpaint & target, Paint& sour
                 for (auto n = 0; n < gradient->nstops; ++n) {
                     const GradientStop& stop = gradient->stops[n];
                     if (stop.index > target.gradient->nstops) {
-                        if (isLogging()) logWarning(ErrorCode::GradientStopNotPresent, 
+                        if (isLogging()) logWarning(ErrorCode::GradientStopNotPresent,
                             format_string("'%s': Gradient stop %d not present in SVG", tag.c_str()));
                     } else {
                         NSVGgradientStop& target_stop = target.gradient->stops[stop.index];
@@ -836,7 +830,7 @@ bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, NSVGimage* svg)
 std::shared_ptr<::rack::window::Svg> SvgThemeEngine::loadSvg(const std::string& filename, const std::shared_ptr<SvgTheme> theme)
 {
     auto key = filename;
-    key.append( ":" + theme->name); 
+    key.append( ":" + theme->name);
 	const auto& pair = svgs.find(key);
 	if (pair != svgs.end()) {
 		return pair->second;
@@ -860,7 +854,7 @@ std::shared_ptr<::rack::window::Svg> SvgThemeEngine::loadSvg(const std::string& 
 bool SvgThemeEngine::applyTheme(std::shared_ptr<SvgTheme> theme, std::string filename, std::shared_ptr<rack::window::Svg>& svg)
 {
 	auto newSvg = this->loadSvg(filename, theme);
- 
+
 	if (newSvg && (newSvg != svg)) {
 		svg = newSvg;
 		return true;

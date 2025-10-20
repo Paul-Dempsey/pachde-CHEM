@@ -80,9 +80,8 @@ struct GradientStop {
     int index;
     float offset;
     PackedColor color;
- 
+
     GradientStop()  : index(-1), offset(NoOffset), color(OPAQUE_BLACK) {}
-    //GradientStop(int index, float offset, PackedColor color) : index(index), offset(offset), color(color) {}
     bool hasIndex() const { return index >= 0; }
     bool hasOffset() const { return !std::isnan(offset); }
 };
@@ -220,7 +219,7 @@ public:
     bool applyTheme(std::shared_ptr<SvgTheme> theme, std::string svgFile, std::shared_ptr<rack::window::Svg>& svg);
 
     // Apply the theme to an NSVGImage
-    // Most client code should not call this directly, to avoid contaminating a cached SVG 
+    // Most client code should not call this directly, to avoid contaminating a cached SVG
     // (either the themed cache, or the global Rack cache).
     // Returns true if the SVG was modified.
     bool applyTheme(std::shared_ptr<SvgTheme> theme, NSVGimage* svg);
@@ -296,15 +295,15 @@ private:
 
 // Widgets that support theming should implement IApplyTheme.
 //
-// IApplyTheme is what enables the VCV Rack helper ApplyChildrenTheme to update 
+// IApplyTheme is what enables the VCV Rack helper ApplyChildrenTheme to update
 // all your UI to a new theme in one line of code.
 //
-// The modified flag returned by theme_engine.applyTheme(theme, ...) should be 
+// The modified flag returned by theme_engine.applyTheme(theme, ...) should be
 // propagated back to the caller, so it can can initiate the appropriate
 // Dirty event as needed.
 //
-// Here's the complete example implementation of a themable SVG screw (not 
-// including the svg and the theme). 
+// Here's the complete example implementation of a themable SVG screw (not
+// including the svg and the theme).
 // See the Demo to see all the bits and pieces come together.
 //
 // ```cpp
@@ -359,7 +358,7 @@ struct IThemeHolder
  * This software depends on and extends nanosvg.
  * nanosvg, Copyright (c) 2013-14 Mikko Mononen memon@inside.org
  * See nanosvg.h for license information.
- * 
+ *
  * This software depends on Jansson for JSON deserialization
  * Jansson, Copyright (c) 2009-2016 Petri Lehtinen <petri@digip.org> licensed under the MIT license.
  *

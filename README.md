@@ -32,7 +32,7 @@ To download the latest development build, see the [Nightly Release](https://gith
 Building CHEM is like building any other vanilla VCV Rack plugin.
 The only difference is that CHEM has proper debug/release builds supported by its makefile.
 A normal `make`, or `make install` builds a release version.
-To build CHEM for debugging with asserts enabled, use `make DEBUG_BUILD=1`.
+To build CHEM for debugging with asserts enabled, use `make DEV_BUILD=1`.
 
 I do not use the Rack SDK.
 I build Rack from source with optimization off to make debugging through Rack easier.
