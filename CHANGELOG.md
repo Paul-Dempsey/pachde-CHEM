@@ -9,5 +9,6 @@
 - Move main Overlay options from the module menu to a new hamburger menu
 - UI contrast improvements in Preset lists and filters
 - Continuous selection (drag) in color pickers
+- Fix restoration of modulation in Macro and Convolution
 
 ## 2.0.1 - First release
