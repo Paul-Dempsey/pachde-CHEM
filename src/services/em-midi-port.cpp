@@ -33,7 +33,6 @@ void EmControlPort::send(IChemHost* chem, ChemId tag, bool force)
     case PortKind::Stream:
         haken->begin_stream(tag, channel_stream);
         haken->stream_data(tag, cc_id, em_low());
-        //haken->end_stream(tag); // HakenMidi.h says optional for poke streams
         break;
 
     case PortKind::StreamIndex:
@@ -56,7 +55,7 @@ void EmControlPort::pull_param_cv(Module* module)
 
 void EmControlPort::set_mod_amount(float amount)
 {
-    assert(kind != PortKind::StreamIndex);
+    if (kind == PortKind::StreamIndex) return;
     assert(in_range(amount, -100.f, 100.f));
     mod_amount = amount;
     mod_value = modulated_value(param_value, cv, mod_amount);
@@ -149,7 +148,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
         mod_target = port->index;
         auto pq = module->getParamQuantity(mod_param);
         if (pq) {
-            pq->setImmediateValue(ports[mod_target].modulation());
+            pq->setImmediateValue(ports[mod_target].modulation_amount());
         }
     } else {
         auto port = get_input_port(e.portId);
@@ -163,7 +162,7 @@ void Modulation::onPortChange(const ::rack::engine::Module::PortChangeEvent &e)
                 mod_target = i;
                 auto pq = module->getParamQuantity(mod_param);
                 if (pq) {
-                    pq->setImmediateValue(port.modulation());
+                    pq->setImmediateValue(port.modulation_amount());
                 }
                 return;
             }
@@ -185,7 +184,7 @@ void Modulation::set_modulation_target(int target)
     mod_target = target;
     auto pq = module->getParamQuantity(mod_param);
     if (pq) {
-        pq->setImmediateValue(port.modulation());
+        pq->setImmediateValue(port.modulation_amount());
     }
 }
 
@@ -245,7 +244,7 @@ void Modulation::sync_send()
             haken->send_stream(client_tag, stream, stream_data);
         }
     } else {
-        for (auto pit = ports.begin();pit != ports.end(); pit++) {
+        for (auto pit = ports.begin(); pit != ports.end(); pit++) {
             pit->pull_param_cv(module);
             pit->send(module->chem_host, client_tag);
         }
@@ -257,7 +256,11 @@ void Modulation::pull_mod_amount()
     if (mod_target >= 0) {
         auto pq = module->getParamQuantity(mod_param);
         if (pq) {
-            ports[mod_target].set_mod_amount(pq->getValue());
+            auto mod = pq->getValue();
+            EmControlPort& port = get_port(mod_target);
+            if (mod != port.mod_amount) {
+                port.set_mod_amount(mod);
+            }
         }
     }
 }
@@ -293,7 +296,7 @@ void Modulation::mod_to_json(json_t *root)
     auto port = ports.begin();
     auto jaru = json_array();
     for (int i = 0; i < count; ++i) {
-        json_array_append_new(jaru, json_real(port->modulation()));
+        json_array_append_new(jaru, json_real(port->modulation_amount()));
         port++;
     }
     json_object_set_new(root, "mod-amount", jaru);

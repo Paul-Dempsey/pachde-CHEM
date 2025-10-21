@@ -114,7 +114,7 @@ struct EmControlPort
     uint8_t em_low() { return em_value >> 7; }
     float parameter() { return param_value; }
     float modulated() { return mod_value; }
-    float modulation() { return mod_amount; }
+    float modulation_amount() { return mod_amount; }
 
     void pull_param_cv(Module* module);
     void set_mod_amount(float amount);

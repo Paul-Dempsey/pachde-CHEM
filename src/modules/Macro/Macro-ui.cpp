@@ -200,7 +200,7 @@ void MacroUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceCo
 void MacroUi::unconnected_ui()
 {
     center_knobs();
-    if (my_module) { my_module->modulation.zero_modulation(); }
+    //if (my_module) { my_module->modulation.zero_modulation(); }
     preset_label->text("");
     preset_label->describe("[no preset]");
     m1_label->text("");

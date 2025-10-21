@@ -143,7 +143,7 @@ void ConvoModule::dataFromJson(json_t* root)
     json_read_string(root, "haken-device", device_claim);
     json_read_bool(root, "glow-knobs", glow_knobs);
 
-    if (running && !device_claim.empty()) {
+    if (!device_claim.empty()) {
         modulation.mod_from_json(root);
     }
     ModuleBroker::get()->try_bind_client(this);
