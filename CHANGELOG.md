@@ -6,6 +6,7 @@
 - #5, Broken stream sends were a Convolution issue, and prob. elsewhere.
 - #5, Add stream index pokes in Modulation class
 - Move all conv data into EM
+- Display current convolution IR on the module
 - Move main Overlay options from the module menu to a new hamburger menu
 - UI contrast improvements in Preset lists and filters
 - Continuous selection (drag) in color pickers
