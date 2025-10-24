@@ -38,7 +38,7 @@ WidgetInfo widget_info[]
     /*26*/{ "IR 4 Right",  CM::P_4_RIGHT,  CM::IN_4_RIGHT,  CM::L_4_RIGHT },
     /*27*/{ "Convolution IR 4", CM::P_4_TYPE, -1, -1 },
 
-    /*28*/{ "Extend", CM::P_EXTEND, -1, CM::L_EXTEND },
+    /*28*/{ "Phase Cancellation", CM::P_PHASE_CANCEL, -1, CM::L_PHASE_CANCEL },
     /*29*/{ "Modulation amount", CM::P_MOD_AMOUNT, -1, -1 }
 };
 int info_index[] {
@@ -87,14 +87,14 @@ ConvoModule::ConvoModule() :
         ++info; // skip type
     }
     dp4(configParam(P_MOD_AMOUNT, -100.f, 100.f, 0.f, param_info(P_MOD_AMOUNT).name, "%"));
-    configSwitch(P_EXTEND, 0.f, 1.f, 0.f, param_info(P_EXTEND).name, {"off", "on"});
+    configSwitch(P_PHASE_CANCEL, 0.f, 1.f, 0.f, param_info(P_PHASE_CANCEL).name, {"off", "on"});
 
     for (int i = 0; i < NUM_PARAMS; ++i) {
         auto wi = widget_info[i];
         if (wi.input >= 0) {
             configInput(wi.input, wi.name);
         }
-        if ((wi.light >= 0) && (CM::L_EXTEND != wi.light)) {
+        if ((wi.light >= 0) && (CM::L_PHASE_CANCEL != wi.light)) {
             std::string name{"Modulation amount on "};
             name.append(wi.name);
             configLight(wi.light, name);
@@ -132,7 +132,7 @@ ConvoModule::ConvoModule() :
         EmccPortConfig::stream_poke(P_2_RIGHT, IN_2_RIGHT, L_2_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR1),
         EmccPortConfig::stream_poke(P_3_RIGHT, IN_3_RIGHT, L_3_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR2),
         EmccPortConfig::stream_poke(P_4_RIGHT, IN_4_RIGHT, L_4_RIGHT, Haken::s_Conv_Poke, Haken::id_c_atR3),
-        EmccPortConfig::stream_index_poke(P_EXTEND, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc)
+        EmccPortConfig::stream_index_poke(P_PHASE_CANCEL, -1, -1, Haken::s_Conv_Poke, Haken::id_c_phc)
     };
     modulation.configure(Params::P_MOD_AMOUNT, Params::NUM_MODS, cfg);
 }
@@ -261,8 +261,8 @@ void ConvoModule::onReset(const ResetEvent &e)
 void ConvoModule::process_params(const ProcessArgs &args)
 {
     modulation.pull_mod_amount();
-    auto v = getParamInt(getParam(Params::P_EXTEND));
-    getLight(Lights::L_EXTEND).setBrightnessSmooth(v, 45.f);
+    auto v = getParamInt(getParam(Params::P_PHASE_CANCEL));
+    getLight(Lights::L_PHASE_CANCEL).setBrightnessSmooth(v, 45.f);
 }
 
 void ConvoModule::process(const ProcessArgs& args)

@@ -34,11 +34,11 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
         P_1_RIGHT,  P_2_RIGHT,  P_3_RIGHT,  P_4_RIGHT,
 
         P_MOD_AMOUNT,
-        P_EXTEND,
+        P_PHASE_CANCEL,
 
         NUM_PARAMS,
-        NUM_KNOBS = P_EXTEND,
-        NUM_MODS = P_EXTEND
+        NUM_KNOBS = P_PHASE_CANCEL,
+        NUM_MODS = P_PHASE_CANCEL
     };
     enum Inputs {
         IN_PRE_MIX,  IN_PRE_INDEX,
@@ -65,7 +65,7 @@ struct ConvoModule : ChemModule, IChemClient, IDoMidi
         L_1_LEFT,   L_2_LEFT,   L_3_LEFT,   L_4_LEFT,
         L_1_RIGHT,  L_2_RIGHT,  L_3_RIGHT,  L_4_RIGHT,
 
-        L_EXTEND,
+        L_PHASE_CANCEL,
 
         NUM_LIGHTS
     };
@@ -125,8 +125,8 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     IChemHost* chem_host{nullptr};
     ConvoModule* my_module{nullptr};
 
-    TextLabel* conv_number_label;
-
+    TextLabel* ir_labels[4]{nullptr};
+    float last_ir[4]{NAN};
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
 

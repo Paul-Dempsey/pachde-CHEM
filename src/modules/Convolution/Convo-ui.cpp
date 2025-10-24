@@ -61,22 +61,22 @@ ConvoUi::ConvoUi(ConvoModule *module) :
         addChild(tracks[p] = createTrackWidget(knobs[p], theme_engine, theme));
     }
     addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
-        Vec(258.f, 28.f), my_module, CM::P_EXTEND, CM::L_EXTEND, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Extend", theme_engine, theme, S::control_label));
+        Vec(258.f, 26.f), my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL, theme_engine, theme)));
+    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", theme_engine, theme, S::control_label));
 
     const float KX = 34.f;
     x = KX;
     const float K_DX = 42.f;
     const float WL_DX = 50.f;
     const float IR_DX = 50.f;
-    const float ROW_DY = 50.f;
+    const float ROW_DY = 51.f;
     const float kdx[] { K_DX, K_DX, WL_DX, K_DX, IR_DX, 0.f};
     const char* labels[] { "Length", "Tuning", "Width", "Left", "Right", "IR" };
     for (int i = 0; i < 6; ++i) {
         addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], theme_engine, theme, S::control_label));
         x += kdx[i];
     }
-
+    auto ir_style = LabelStyle{"dytext", TextAlignment::Center, 12.f, false};
     x = KX;
     y = 104.f;
     int iwi = W_IDX_KR;
@@ -89,6 +89,8 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             }
             x += kdx[j];
         }
+        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", theme_engine, theme, ir_style);
+        addChild(ir_labels[i]);
         x = KX;
         y += ROW_DY;
     }
@@ -221,6 +223,17 @@ void ConvoUi::step()
     bind_host(my_module);
 
     knobs[CM::P_MOD_AMOUNT]->enable(my_module->modulation.has_target());
+
+    for (int p = 0; p < 4; p++) {
+        float v = my_module->getParam(CM::P_1_TYPE+p).getValue();
+        if (v != last_ir[p]) {
+            last_ir[p] = v;
+            auto sq = my_module->getParamQuantity(CM::P_1_TYPE+p);
+            if (sq) {
+                ir_labels[p]->text(sq->getDisplayValueString());
+            }
+        }
+    }
 
     for (int id = 0; id < CM::P_MOD_AMOUNT; ++id) {
         auto wi = param_info(id);
