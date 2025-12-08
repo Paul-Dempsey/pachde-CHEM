@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../plugin.hpp"
-#include "../services/svgtheme.hpp"
-#include "../services/colors.hpp"
+#include "my-plugin.hpp"
+#include "services/svgtheme.hpp"
+#include "services/colors.hpp"
 #include "TipWidget.hpp"
 using namespace svg_theme;
 
@@ -123,7 +123,7 @@ struct ThemeSwitchV2 : app::SvgSwitch, IApplyTheme
     // IApplyTheme
     //
     // For an SvgSwitch, Rack selects the current presentation (this->sw) from one of
-    // a series of backing SVGs ("frames"). A simple invalidation (DirtyEvent) of the widget doesn't force 
+    // a series of backing SVGs ("frames"). A simple invalidation (DirtyEvent) of the widget doesn't force
     // selection of the frame. In order to set the correct frame for the current value of the parameter
     // backing the switch, we send a ChangeEvent and the handler calculates the correct frame for us.
     // If we only dirty, the new theme isn't shown until the value of the switch changes.
@@ -132,7 +132,7 @@ struct ThemeSwitchV2 : app::SvgSwitch, IApplyTheme
     {
         // Check if we're refreshing the widget with a new theme (and thus need to send a change event),
         // or being initialized by the creation helper.
-        bool refresh = frames.size() > 0; 
+        bool refresh = frames.size() > 0;
         if (refresh) {
             frames.clear();
         }

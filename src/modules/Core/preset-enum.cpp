@@ -1,6 +1,6 @@
 #include "preset-enum.hpp"
-#include "../../em/preset-list.hpp"
-#include "../../services/kv-store.hpp"
+#include "em/preset-list.hpp"
+#include "services/kv-store.hpp"
 
 namespace pachde {
 

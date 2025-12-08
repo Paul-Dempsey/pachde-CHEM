@@ -1,6 +1,6 @@
 #pragma once
-#include "../services/text.hpp"
-#include "../services/svgtheme.hpp"
+#include "services/text.hpp"
+#include "services/svgtheme.hpp"
 #include "element-style.hpp"
 using namespace svg_theme;
 

@@ -1,6 +1,6 @@
 #include "preset-list.hpp"
-#include "../plugin.hpp"
-#include "../services/misc.hpp"
+#include "my-plugin.hpp"
+#include "services/misc.hpp"
 #include "em-hardware.h"
 
 using namespace pachde;

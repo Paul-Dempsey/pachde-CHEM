@@ -1,9 +1,9 @@
 #include "Settings.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/hamburger.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "widgets/hamburger.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace pachde;

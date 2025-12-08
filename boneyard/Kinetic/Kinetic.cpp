@@ -1,6 +1,6 @@
 #include "Kinetic.hpp"
-#include "../../services/rack-help.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
 KineticModule::KineticModule(ChemId id, uint8_t cc) :

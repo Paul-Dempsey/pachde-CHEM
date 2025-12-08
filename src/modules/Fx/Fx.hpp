@@ -1,15 +1,15 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/selector-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/selector-widget.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/tip-label-widget.hpp"
+#include "widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -30,7 +30,7 @@ struct FxModule : ChemModule, IChemClient, IDoMidi
         P_MOD_AMOUNT,
 
         // Switches
-        P_DISABLE, 
+        P_DISABLE,
         P_EFFECT,
 
         NUM_PARAMS,
@@ -70,7 +70,7 @@ struct FxModule : ChemModule, IChemClient, IDoMidi
     int last_disable;
     bool glow_knobs;
     bool in_mat_poke;
-    
+
     FxModule();
     ~FxModule() {
         if (chem_host) {
@@ -138,7 +138,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     void createScrews(std::shared_ptr<SvgTheme> theme) override;
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-fx.svg"); }

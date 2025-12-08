@@ -1,14 +1,14 @@
 #pragma once
 #include <stdint.h>
-#include "../chem-id.hpp"
+#include "chem-id.hpp"
 #include "wrap-HakenMidi.hpp"
 #include "midi-message.h"
 #include "em-hardware.h"
 #include "convolution.hpp"
 #include "preset.hpp"
 #include "FixedStringBuffer.hpp"
-#include "../services/crc.hpp"
-#include "../services/midi-log.hpp"
+#include "services/crc.hpp"
+#include "services/midi-log.hpp"
 
 namespace eaganmatrix {
 

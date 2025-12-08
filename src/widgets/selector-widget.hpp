@@ -2,8 +2,8 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/colors.hpp"
-#include "../services/svt_rack.hpp"
+#include "services/colors.hpp"
+#include "services/svt_rack.hpp"
 using namespace svg_theme;
 #include "TipWidget.hpp"
 

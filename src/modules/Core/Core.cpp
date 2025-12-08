@@ -1,8 +1,8 @@
 #include "Core.hpp"
-#include "../../em/PresetId.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../services/kv-store.hpp"
-#include "../../services/rack-help.hpp"
+#include "em/PresetId.hpp"
+#include "services/ModuleBroker.hpp"
+#include "services/kv-store.hpp"
+#include "services/rack-help.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;

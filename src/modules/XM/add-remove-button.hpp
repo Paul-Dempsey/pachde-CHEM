@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../../widgets/widgets.hpp"
+#include "widgets/widgets.hpp"
 
 namespace pachde {
 
@@ -11,7 +11,7 @@ struct PlusMinusButton: DrawButtonCtlBase
     bool plus;
 
     void set_plus(bool p) {
-        plus = p; 
+        plus = p;
         describe(plus ? "Add": "Remove");
     }
 

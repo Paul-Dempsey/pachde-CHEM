@@ -1,6 +1,6 @@
 #include "macro-usage.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../chem-id.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "chem-id.hpp"
 
 namespace pachde {
 

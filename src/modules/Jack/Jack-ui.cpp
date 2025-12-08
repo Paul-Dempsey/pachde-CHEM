@@ -1,8 +1,8 @@
 #include "Jack.hpp"
-#include "../../widgets/uniform-style.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/flip-switch.hpp"
-#include "../../widgets/theme-knob.hpp"
+#include "widgets/uniform-style.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/flip-switch.hpp"
+#include "widgets/theme-knob.hpp"
 
 namespace S = pachde::style;
 using namespace pachde;

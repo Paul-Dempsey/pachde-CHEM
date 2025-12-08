@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/colors.hpp"
-#include "../services/svgtheme.hpp"
+#include "services/colors.hpp"
+#include "services/svgtheme.hpp"
 using namespace svg_theme;
 
 struct PanelBackgroundWidget : Widget, IApplyTheme

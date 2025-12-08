@@ -1,5 +1,5 @@
 #include "text-input.hpp"
-#include "../services/misc.hpp"
+#include "services/misc.hpp"
 
 namespace pachde {
 

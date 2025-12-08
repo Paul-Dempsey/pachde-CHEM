@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/misc.hpp"
+#include "services/misc.hpp"
 
 namespace eaganmatrix {
 

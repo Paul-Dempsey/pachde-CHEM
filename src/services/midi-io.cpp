@@ -1,9 +1,9 @@
 #include <rack.hpp>
 #include "midi-io.hpp"
-#include "../plugin.hpp"
-#include "../services/kv-store.hpp"
-#include "../services/misc.hpp"
-#include "../em/wrap-HakenMidi.hpp"
+#include "my-plugin.hpp"
+#include "services/kv-store.hpp"
+#include "services/misc.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace ::rack;
 
 namespace pachde {

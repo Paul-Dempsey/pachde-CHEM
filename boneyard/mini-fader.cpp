@@ -1,5 +1,5 @@
 #include "mini-fader.hpp"
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 
 namespace pachde {
 
@@ -42,14 +42,14 @@ bool MiniFader::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_
     auto style = theme->getStyle("mf-cap");
     if (style) {
         co = style->strokeWithOpacity();
-        cap_color = isVisibleColor(co) ? fromPacked(co) : nvgRGB(0x40, 0x95, 0xbf); 
+        cap_color = isVisibleColor(co) ? fromPacked(co) : nvgRGB(0x40, 0x95, 0xbf);
         cap_width = style->stroke_width;
     }
 
     style = theme->getStyle("mf-stem");
     if (style) {
         co = style->strokeWithOpacity();
-        stem_color = isVisibleColor(co) ? fromPacked(co) : RampGray(G_55); 
+        stem_color = isVisibleColor(co) ? fromPacked(co) : RampGray(G_55);
         stem_width = style->stroke_width;
     }
 
@@ -94,7 +94,7 @@ void MiniFader::draw(const DrawArgs &args)
     auto pq = getParamQuantity();
     float track = box.size.y - 2 - thumb_height;
     float pos = pq ? rack::math::rescale(pq->getValue(), minimum, maximum, 0.f, track) : 0.f;
-    
+
     float CENTER = box.size.x*.5f;
     Line(vg, CENTER, .75f, CENTER, box.size.y-.75, stem_color, stem_width);
     Line(vg, 1.f, .5f, box.size.x-1.f, .5, cap_color, cap_width);

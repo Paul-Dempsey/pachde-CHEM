@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../../services/colors.hpp"
-#include "../../services/text.hpp"
+#include "services/colors.hpp"
+#include "services/text.hpp"
 using namespace ::rack;
 namespace pachde {
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../chem-core.hpp"
+#include "chem-core.hpp"
 
 namespace pachde {
 

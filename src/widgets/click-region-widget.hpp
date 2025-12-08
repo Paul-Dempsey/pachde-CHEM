@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 #include "layout-help.hpp"
 #include "element-style.hpp"
 

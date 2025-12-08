@@ -1,5 +1,5 @@
 #include "uniform-style.hpp"
-#include "../services/kv-store.hpp"
+#include "services/kv-store.hpp"
 
 namespace pachde {
 namespace style {

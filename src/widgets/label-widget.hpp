@@ -1,7 +1,7 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../services/text.hpp"
-#include "../services/svgtheme.hpp"
+#include "services/text.hpp"
+#include "services/svgtheme.hpp"
 #include "layout-help.hpp"
 using namespace svg_theme;
 
@@ -97,7 +97,7 @@ struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
     bool right() { return _style.right(); }
     bool centered() { return _style.center(); }
     float text_height() { return _style.height; }
-    
+
     void setPos(Vec pos) { box.pos = pos; }
     void setSize(Vec size) { box.size = size; }
     void text(std::string text) { _text = text; }
@@ -111,7 +111,7 @@ struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
     void glowing(bool glow) {
         bright = glow;
     }
-    
+
     // IApplyTheme
     bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
 
@@ -192,7 +192,7 @@ TWidget* createStaticTextLabel(
     math::Vec pos,
     float width,
     std::string text,
-    SvgThemeEngine& engine, 
+    SvgThemeEngine& engine,
     std::shared_ptr<SvgTheme> theme
     )
 {
@@ -214,7 +214,7 @@ TWidget* createLabel(
     math::Vec pos,
     float width,
     std::string text,
-    SvgThemeEngine& engine, 
+    SvgThemeEngine& engine,
     std::shared_ptr<SvgTheme> theme,
     const LabelStyle& style
     )

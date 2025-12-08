@@ -1,11 +1,11 @@
 #include "Preset.hpp"
-#include "../../em/preset-meta.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/click-region-widget.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
-#include "../../widgets/hamburger.hpp"
-#include "../../widgets/spinner.hpp"
+#include "em/preset-meta.hpp"
+#include "services/colors.hpp"
+#include "widgets/click-region-widget.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/uniform-style.hpp"
+#include "widgets/hamburger.hpp"
+#include "widgets/spinner.hpp"
 
 using PM = PresetModule;
 using namespace eaganmatrix;

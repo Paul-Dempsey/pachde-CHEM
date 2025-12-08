@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../../em/midi-message.h"
-#include "../../em/wrap-HakenMidi.hpp"
+#include "em/midi-message.h"
+#include "em/wrap-HakenMidi.hpp"
 
 namespace pachde {
 

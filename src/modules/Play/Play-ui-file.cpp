@@ -1,6 +1,6 @@
 #include "Play.hpp"
 #include <ghc/filesystem.hpp>
-#include "../../services/open-file.hpp"
+#include "services/open-file.hpp"
 
 namespace fs = ghc::filesystem;
 using namespace pachde;

@@ -1,12 +1,12 @@
 #pragma once
 #include <rack.hpp>
 #include "pic.hpp"
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 
 using namespace rack;
 namespace pachde {
 
-// TODO: when rendering a new hue, it's likely much more efficient to 
+// TODO: when rendering a new hue, it's likely much more efficient to
 // use nvgUpdateImage than destroying and creating a new nvgImage.
 
 struct SLWidget : OpaqueWidget

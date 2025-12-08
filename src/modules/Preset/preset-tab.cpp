@@ -1,7 +1,7 @@
 #include "preset-tab.hpp"
-#include "../../services/misc.hpp"
-#include "../../em/em-hardware.h"
-#include "../../em/preset-meta.hpp"
+#include "services/misc.hpp"
+#include "em/em-hardware.h"
+#include "em/preset-meta.hpp"
 
 namespace pachde {
 

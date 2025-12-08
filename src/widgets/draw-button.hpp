@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../services/colors.hpp"
-#include "../services/svt_rack.hpp"
+#include "services/colors.hpp"
+#include "services/svt_rack.hpp"
 #include "TipWidget.hpp"
 using namespace ::rack;
 

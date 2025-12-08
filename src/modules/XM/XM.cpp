@@ -1,7 +1,7 @@
 #include "XM.hpp"
 using namespace pachde;
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
 
 XMModule::XMModule() :
     title_bg(GetPackedStockColor(StockColor::pachde_blue_medium)),

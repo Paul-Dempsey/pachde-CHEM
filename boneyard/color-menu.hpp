@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 #include "element-style.hpp"
 
 namespace pachde {
@@ -26,7 +26,7 @@ struct SwatchesMenuItem : rack::ui::MenuItem
         box.size.x = 4.f + (16 * size.x) + 30.f;
         box.size.y = 4.f + (10 * size.y) + 18.f;
     }
- 
+
     void onHover(const HoverEvent& e) override
     {
         if (e.pos.x < 2.f) return;

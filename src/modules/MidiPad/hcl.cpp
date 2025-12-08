@@ -1,6 +1,6 @@
 #include "hcl.hpp"
-#include "../../chem-id.hpp"
-#include "../../services/misc.hpp"
+#include "chem-id.hpp"
+#include "services/misc.hpp"
 
 namespace pachde {
 /*

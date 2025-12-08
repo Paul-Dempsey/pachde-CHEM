@@ -1,6 +1,6 @@
 #include "Pre.hpp"
-#include "../../services/rack-help.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
 PreModule::PreModule() :

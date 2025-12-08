@@ -1,10 +1,10 @@
 #include "Play.hpp"
 #include <ghc/filesystem.hpp>
-#include "../../services/colors.hpp"
-#include "../../services/open-file.hpp"
-#include "../../em/em-hardware.h"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "services/open-file.hpp"
+#include "em/em-hardware.h"
+#include "widgets/logo-widget.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 namespace fs = ghc::filesystem;

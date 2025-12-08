@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../services/colors.hpp"
-#include "../services/svgtheme.hpp"
+#include "services/colors.hpp"
+#include "services/svgtheme.hpp"
 using namespace ::rack;
 using namespace svg_theme;
 

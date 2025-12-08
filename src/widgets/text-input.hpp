@@ -3,7 +3,7 @@
 using namespace ::rack;
 
 #include "element-style.hpp"
-#include "../services/text.hpp"
+#include "services/text.hpp"
 
 namespace pachde {
 

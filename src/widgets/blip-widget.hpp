@@ -1,7 +1,7 @@
 #pragma once
 #include "TipWidget.hpp"
-#include "../services/svt_rack.hpp"
-#include "../services/colors.hpp"
+#include "services/svt_rack.hpp"
+#include "services/colors.hpp"
 using namespace svg_theme;
 
 namespace pachde {

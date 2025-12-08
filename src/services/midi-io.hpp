@@ -2,10 +2,10 @@
 #pragma once
 #include <rack.hpp>
 #include "midi-log.hpp"
-//#include "../chem-core.hpp"
-#include "../chem-id.hpp"
+//#include "chem-core.hpp"
+#include "chem-id.hpp"
 
-#include "../em/midi-message.h"
+#include "em/midi-message.h"
 using namespace ::rack;
 namespace pachde {
 

@@ -1,5 +1,8 @@
 #pragma once
 //#ifdef LAYOUT_HELP
+#include <rack.hpp>
+using namespace ::rack;
+
 namespace pachde
 {
 
@@ -23,7 +26,7 @@ namespace layout_help {
             enable_children(child, help);
         }
     }
-    
+
 }
 
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "../plugin.hpp"
-
+#include "my-plugin.hpp"
 
 namespace pachde {
 

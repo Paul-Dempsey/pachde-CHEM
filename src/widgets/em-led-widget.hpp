@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../em/wrap-HakenMidi.hpp"
-#include "../services/misc.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/misc.hpp"
 using namespace pachde;
 namespace pachde {
 

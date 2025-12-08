@@ -4,7 +4,6 @@
 #include <rack.hpp>
 #include "svgtheme.hpp"
 
-using namespace rack;
 namespace svg_theme {
 
 // Walks the Widget tree from `widget`, finding widgets
@@ -12,18 +11,18 @@ namespace svg_theme {
 // If modifications to widgets are detected, the DirtyEvent is sent down the
 // tree so that affected widgets will be redrawn.
 //
-bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr<SvgTheme> theme, bool top = true);
+bool ApplyChildrenTheme(::rack::widget::Widget * widget, SvgThemeEngine& themes, std::shared_ptr<SvgTheme> theme, bool top = true);
 
-// Appends a theme menu that offers a "Theme" option submenu with a 
+// Appends a theme menu that offers a "Theme" option submenu with a
 // list of all the themes you've defined.
 // Call from your module widget's appendContextMenu override.
-// Your IThemeHolder::applyTheme(std::string theme) override should update 
+// Your IThemeHolder::applyTheme(std::string theme) override should update
 // the themes of visible widgets, and remember the theme.
 //
-void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable = false, void* context = nullptr);
+void AppendThemeMenu(::rack::ui::Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable = false, void* context = nullptr);
 
 // send Dirty event to widget
-void sendDirty(Widget* widget);
+void sendDirty(::rack::widget::Widget* widget);
 
 // ---------------------------------------------------------------------------
 // Themed Widget creation
@@ -39,7 +38,7 @@ TWidget* Center(TWidget * widget) {
 }
 
 template <class TWidget>
-TWidget* createThemedWidget(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+TWidget* createThemedWidget(::rack::math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {
 	TWidget* o = new TWidget();
 	o->applyTheme(engine, theme);
@@ -47,7 +46,7 @@ TWidget* createThemedWidget(math::Vec pos, SvgThemeEngine& engine, std::shared_p
 	return o;
 }
 
-template <class TPanel = app::SvgPanel>
+template <class TPanel = ::rack::app::SvgPanel>
 TPanel* createThemedPanel(std::string svgPath, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TPanel* panel = new TPanel;
 	panel->setBackground(engine.loadSvg(svgPath, theme));
@@ -55,7 +54,7 @@ TPanel* createThemedPanel(std::string svgPath, SvgThemeEngine& engine, std::shar
 }
 
 template <class TParamWidget>
-TParamWidget* createThemedParam(math::Vec pos, engine::Module* module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TParamWidget* createThemedParam(::rack::math::Vec pos, ::rack::engine::Module* module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TParamWidget* o = new TParamWidget();
 	o->app::ParamWidget::module = module;
 	o->app::ParamWidget::paramId = paramId;
@@ -66,10 +65,10 @@ TParamWidget* createThemedParam(math::Vec pos, engine::Module* module, int param
 }
 
 template <class TPortWidget>
-TPortWidget* createThemedInput(math::Vec pos, engine::Module* module, int inputId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedInput(::rack::math::Vec pos, ::rack::engine::Module* module, int inputId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
 	o->app::PortWidget::module = module;
-	o->app::PortWidget::type = engine::Port::INPUT;
+	o->app::PortWidget::type = ::rack::engine::Port::INPUT;
 	o->app::PortWidget::portId = inputId;
 	o->applyTheme(engine, theme);
 	o->box.pos = pos;
@@ -78,10 +77,10 @@ TPortWidget* createThemedInput(math::Vec pos, engine::Module* module, int inputI
 
 
 template <class TPortWidget>
-TPortWidget* createThemedOutput(math::Vec pos, engine::Module* module, int outputId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedOutput(::rack::math::Vec pos, ::rack::engine::Module* module, int outputId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
 	o->app::PortWidget::module = module;
-	o->app::PortWidget::type = engine::Port::OUTPUT;
+	o->app::PortWidget::type = ::rack::engine::Port::OUTPUT;
 	o->app::PortWidget::portId = outputId;
 	o->applyTheme(engine, theme);
 	o->box.pos = pos;

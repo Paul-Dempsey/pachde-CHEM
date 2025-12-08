@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../em/wrap-HakenMidi.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace Haken;
 
 namespace pachde {
@@ -20,7 +20,7 @@ inline float bipolar_14_to_rack(uint16_t value) {
 
 inline uint8_t unipolar_rack_to_unipolar_7(float value) {
     auto v = clamp(value, 0.0, 10.0);
-    return static_cast<uint8_t>(std::round(rescale(v, 0.f, 10.f, 0.f, 127.f))); 
+    return static_cast<uint8_t>(std::round(rescale(v, 0.f, 10.f, 0.f, 127.f)));
 }
 
 inline uint16_t unipolar_rack_to_unipolar_14(float value) {

@@ -1,8 +1,8 @@
-#include "plugin.hpp"
+#include "my-plugin.hpp"
 
-Plugin *pluginInstance(nullptr);
+::rack::plugin::Plugin *pluginInstance(nullptr);
 
-void init(Plugin *p)
+void init(::rack::plugin::Plugin *p)
 {
 	pluginInstance = p;
 	p->addModel(modelCore);
@@ -21,7 +21,6 @@ void init(Plugin *p)
 	p->addModel(modelOverlay);
 	p->addModel(modelXM);
 	p->addModel(modelMidiPad);
-	//p->addModel(modelProto);
 }
 
 bool isChemModule(Module* candidate)
@@ -29,23 +28,21 @@ bool isChemModule(Module* candidate)
     if (!candidate) return false;
     auto model =  candidate->model;
     return ((model == modelCore)
-        || (model == modelPlay)
+        || (model == modelPreset)
         || (model == modelMacro)
         || (model == modelPre)
         || (model == modelFx)
         || (model == modelPost)
+        || (model == modelPlay)
         || (model == modelConvo)
         || (model == modelJack)
         || (model == modelSustain)
         || (model == modelSostenuto)
         || (model == modelSostenuto2)
         || (model == modelSettings)
-        || (model == modelPreset)
         || (model == modelOverlay)
 		|| (model == modelXM)
 		|| (model == modelMidiPad)
-        //|| (model == modelProto)
-        // add new models here
 	);
 }
 

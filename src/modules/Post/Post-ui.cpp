@@ -1,9 +1,9 @@
 #include "Post.hpp"
-#include "../../services/colors.hpp"
-#include "../../em/em-hardware.h"
-#include "../../widgets/click-region-widget.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "em/em-hardware.h"
+#include "widgets/click-region-widget.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;

@@ -1,9 +1,9 @@
 #pragma once
 #include <rack.hpp>
-#include "../../services/svt_rack.hpp"
-#include "../../widgets/element-style.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../em/preset.hpp"
+#include "services/svt_rack.hpp"
+#include "widgets/element-style.hpp"
+#include "widgets/tip-label-widget.hpp"
+#include "em/preset.hpp"
 
 using namespace ::rack;
 using namespace ::svg_theme;
@@ -47,7 +47,7 @@ class PresetWidget : public OpaqueWidget, public IApplyTheme
     int preset_index;
     PresetId preset_id;
     IPresetAction* agent;
-    
+
     bool hover_grip;
     bool button_down;
     bool live;

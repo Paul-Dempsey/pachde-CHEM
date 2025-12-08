@@ -1,7 +1,7 @@
 #include "Sustain.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;

@@ -1,8 +1,8 @@
 #pragma once
-#include "../../services/haken-midi.hpp"
-#include "../../em/EaganMatrix.hpp"
-#include "../../chem-id.hpp"
-#include "../../chem-core.hpp"
+#include "services/haken-midi.hpp"
+#include "em/EaganMatrix.hpp"
+#include "chem-id.hpp"
+#include "chem-core.hpp"
 
 namespace pachde {
 
@@ -81,10 +81,10 @@ struct OsmosePresetEnumerator: IEnumeratePresets
     virtual ~OsmosePresetEnumerator() {}
     OsmosePresetEnumerator(ChemId source, uint8_t page) :
     page(page), last_page(page) { chem_id = source; }
-    
+
     OsmosePresetEnumerator(ChemId source, uint8_t page, uint8_t last_page) :
     page(page), last_page(last_page) { chem_id = source; }
-    
+
     std::string next_text() override { return format_string("[%d.%d]", page, index); }
     PresetId expected_id() override { return expected; }
     bool next(HakenMidi* haken, EaganMatrix * em) override;

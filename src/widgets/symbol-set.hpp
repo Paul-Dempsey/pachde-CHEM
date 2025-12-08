@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../plugin.hpp"
-#include "../services/svgtheme.hpp"
-#include "../services/colors.hpp"
+#include "my-plugin.hpp"
+#include "services/svgtheme.hpp"
+#include "services/colors.hpp"
 //#include "TipWidget.hpp"
 using namespace svg_theme;
 
@@ -54,7 +54,7 @@ struct SymbolSetWidget : OpaqueWidget, IApplyTheme
         addChild(fb);
 
         sw = new ::rack::widget::SvgWidget;
-        fb->addChild(sw); 
+        fb->addChild(sw);
     }
 
     void set_index(int item) {
@@ -70,7 +70,7 @@ struct SymbolSetWidget : OpaqueWidget, IApplyTheme
     int count() { return source->count(); }
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override {
-        bool refresh = source->count() > 0; 
+        bool refresh = source->count() > 0;
         if (refresh) {
             sw->setSvg(nullptr);
         }
@@ -95,7 +95,7 @@ struct SymbolSetWidget : OpaqueWidget, IApplyTheme
         widget::EventContext cDirty;
         DirtyEvent eDirty;
         eDirty.context = &cDirty;
-        Widget::onDirty(eDirty);        
+        Widget::onDirty(eDirty);
     }
 
     void setSvg(std::shared_ptr<window::Svg> svg) {

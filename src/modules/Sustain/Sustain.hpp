@@ -1,16 +1,16 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/indicator-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/slider-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/themed-widgets.hpp"
-#include "../../widgets/tip-label-widget.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/indicator-widget.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/slider-widget.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/themed-widgets.hpp"
+#include "widgets/tip-label-widget.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -97,7 +97,7 @@ struct SusUi : ChemModuleWidget, IChemClient
 
     void create_ui();
     bool connected();
- 
+
     virtual const char * InputLabel() = 0;
 
     // IChemClient
@@ -106,7 +106,7 @@ struct SusUi : ChemModuleWidget, IChemClient
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // Rack
     void step() override;
     void appendContextMenu(Menu *menu) override;

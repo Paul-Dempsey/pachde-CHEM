@@ -245,7 +245,6 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
     if (!initThemeEngine()) return;
     if (!theme_engine.isLoaded()) return;
     bool follow = module ? getChemModule()->follow_rack : true;
-//    bool sync = module ? getChemModule()->sync_theme : true;
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel<HamburgerTitle>("Themes"));
@@ -266,7 +265,6 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
                 }
                 kv->update(key, KVStore::bool_text(screws));
                 kv->save();
-                //set_screws(APP->scene, screws);
             }
         }));
 

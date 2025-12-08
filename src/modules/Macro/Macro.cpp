@@ -1,6 +1,6 @@
 #include "Macro.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
 using namespace pachde;
 
 MacroModule::MacroModule() :

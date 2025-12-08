@@ -1,6 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "../chem.hpp"
+#include "chem.hpp"
 
 using namespace ::rack;
 

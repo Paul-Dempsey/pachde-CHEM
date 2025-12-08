@@ -2,9 +2,9 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "preset-common.hpp"
-#include "../../em/preset.hpp"
-#include "../../em/preset-sort.hpp"
-#include "../../em/preset-list.hpp"
+#include "em/preset.hpp"
+#include "em/preset-sort.hpp"
+#include "em/preset-list.hpp"
 using namespace eaganmatrix;
 
 namespace pachde {

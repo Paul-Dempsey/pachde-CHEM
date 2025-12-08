@@ -1,14 +1,14 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/knob-track-widget.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/tip-label-widget.hpp"
+#include "widgets/knob-track-widget.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -53,13 +53,13 @@ struct PostModule : ChemModule, IChemClient, IDoMidi
 
     std::string device_claim;
     PostUi* ui() { return reinterpret_cast<PostUi*>(chem_ui); };
-    
+
     Modulation modulation;
     uint8_t cc_lsb;
     bool glow_knobs;
     bool muted;
     rack::dsp::SchmittTrigger mute_trigger;
-    
+
     PostModule();
     ~PostModule() {
         if (chem_host) {
@@ -127,7 +127,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-post.svg"); }
     void setThemeName(const std::string& name, void * context) override;

@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../plugin.hpp"
-#include "../services/svgtheme.hpp"
-#include "../services/colors.hpp"
+#include "my-plugin.hpp"
+#include "services/svgtheme.hpp"
+#include "services/colors.hpp"
 #include "TipWidget.hpp"
 using namespace svg_theme;
 
@@ -20,7 +20,7 @@ struct TButton : SvgButton, IApplyTheme
     std::function<void(bool, bool)> handler;
     TipHolder * tip_holder;
 
-    TButton() 
+    TButton()
     :   key_ctrl(false),
         key_shift(false),
         sticky(false),
@@ -59,7 +59,7 @@ struct TButton : SvgButton, IApplyTheme
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        bool refresh = frames.size() > 0; 
+        bool refresh = frames.size() > 0;
         if (refresh) {
             frames.clear();
             sw->setSvg(nullptr);
@@ -76,7 +76,7 @@ struct TButton : SvgButton, IApplyTheme
         }
         return true;
     }
-    
+
     void onHover(const HoverEvent& e) override {
         e.consume(this);
     }
@@ -187,7 +187,7 @@ struct TParamButton : SvgSwitch, IApplyTheme
 {
     using Base = SvgSwitch;
 
-    TParamButton() 
+    TParamButton()
     {
         this->shadow->hide();
     }
@@ -198,7 +198,7 @@ struct TParamButton : SvgSwitch, IApplyTheme
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        bool refresh = frames.size() > 0; 
+        bool refresh = frames.size() > 0;
         if (refresh) {
             frames.clear();
             sw->setSvg(nullptr);

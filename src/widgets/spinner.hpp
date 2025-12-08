@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/svt_rack.hpp"
-#include "../services/misc.hpp"
+#include "services/svt_rack.hpp"
+#include "services/misc.hpp"
 using namespace svg_theme;
 
 namespace pachde {
@@ -32,7 +32,7 @@ struct Spinner : OpaqueWidget, IApplyTheme
 
         tw = new widget::TransformWidget;
         fb->addChild(tw);
-    
+
         sw = new widget::SvgWidget;
         tw->addChild(sw);
     }
@@ -52,7 +52,7 @@ struct Spinner : OpaqueWidget, IApplyTheme
     void setSvg(std::shared_ptr<window::Svg> svg) {
         if (svg == sw->svg)
             return;
-    
+
         sw->setSvg(svg);
         tw->box.size = sw->box.size;
         fb->box.size = sw->box.size;
@@ -61,7 +61,7 @@ struct Spinner : OpaqueWidget, IApplyTheme
         shadow->box.size = sw->box.size;
         // Move shadow
         shadow->box.pos = math::Vec(sw->box.size.x * .05, sw->box.size.y * 0.15);
-    
+
         fb->setDirty();
     }
     void step() override {

@@ -1,5 +1,5 @@
 #pragma once
-#include "../../chem.hpp"
+#include "chem.hpp"
 #include "macro-usage.hpp"
 #include "macro-data.hpp"
 using namespace eaganmatrix;

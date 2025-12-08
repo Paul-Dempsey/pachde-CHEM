@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
-#include "../../../em/wrap-HakenMidi.hpp"
-#include "../../../services/misc.hpp"
-#include "../../../widgets/hamburger.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/misc.hpp"
+#include "widgets/hamburger.hpp"
 
 using namespace ::rack;
 namespace pachde {
@@ -85,8 +85,8 @@ TPQ* configJackParam(Module * module, int pedal_number, int paramId, const char 
 struct JackMenu : HamburgerUi<ParamWidget> {
 
     MenuItem* createItem(const char * name, int value) {
-        return createCheckMenuItem(name, "", 
-            [=]() { return static_cast<int>(getParamQuantity()->getValue()) == value; }, 
+        return createCheckMenuItem(name, "",
+            [=]() { return static_cast<int>(getParamQuantity()->getValue()) == value; },
             [=](){ getParamQuantity()->setValue(static_cast<float>(value)); });
     }
     void appendContextMenu(Menu* menu) override
@@ -97,7 +97,7 @@ struct JackMenu : HamburgerUi<ParamWidget> {
         menu->addChild(createItem("Sustain",          Haken::ccSus));
         menu->addChild(createItem("Sos 1",            Haken::ccSos));
         menu->addChild(createItem("Sos 2",            Haken::ccSos2));
-        
+
         menu->addChild(createSubmenuItem("Macros", "", [=](Menu* menu){
             menu->addChild(createItem("Macro i",          Haken::ccI));
             menu->addChild(createItem("Macro ii",         Haken::ccII));

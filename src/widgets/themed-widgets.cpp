@@ -1,6 +1,6 @@
 // Copyright (C) Paul Chase Dempsey
 #include "themed-widgets.hpp"
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 
 namespace pachde {
 

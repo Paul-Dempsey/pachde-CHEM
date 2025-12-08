@@ -1,7 +1,7 @@
 #include "Overlay.hpp"
 using namespace pachde;
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
 
 OverlayModule::OverlayModule()
 {

@@ -880,19 +880,19 @@ PackedColor SvgThemeEngine::getStockColor(const char *name)
 // svt_rack
 //
 
-void sendDirty(Widget* widget)
+void sendDirty(::rack::widget::Widget* widget)
 {
-	EventContext cDirty;
-	Widget::DirtyEvent eDirty;
+	::rack::widget::EventContext cDirty;
+	::rack::widget::Widget::DirtyEvent eDirty;
 	eDirty.context = &cDirty;
 	widget->onDirty(eDirty);
 }
 
-bool ApplyChildrenTheme(Widget * widget, SvgThemeEngine& themes, std::shared_ptr<SvgTheme> theme, bool top)
+bool ApplyChildrenTheme(::rack::widget::Widget * widget, SvgThemeEngine& themes, std::shared_ptr<SvgTheme> theme, bool top)
 {
     bool modified = false;
 
-    for (Widget* child : widget->children) {
+    for (auto child : widget->children) {
         if (ApplyChildrenTheme(child, themes, theme, false)) {
             modified = true;
         }
@@ -930,7 +930,7 @@ bool alpha_order(const std::string& a, const std::string& b)
     return false;
 }
 
-void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable, void* context)
+void AppendThemeMenu(::rack::ui::Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, bool disable, void* context)
 {
     auto theme_names = themes.getThemeNames();
     if (theme_names.empty()) return; // no themes
@@ -938,7 +938,7 @@ void AppendThemeMenu(Menu* menu, IThemeHolder* holder, SvgThemeEngine& themes, b
     std::sort(theme_names.begin(), theme_names.end(), alpha_order);
 
     for (auto theme : theme_names) {
-        menu->addChild(createCheckMenuItem(
+        menu->addChild(::rack::createCheckMenuItem(
             theme, "", [=]() { return 0 == theme.compare(holder->getThemeName()); },
             [=]() { holder->setThemeName(theme, context); },
             disable

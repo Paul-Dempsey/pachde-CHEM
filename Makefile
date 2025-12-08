@@ -1,5 +1,7 @@
 RACK_DIR ?= ../..
 
+FLAGS += -Isrc
+
 ifdef DEV_BUILD
 FLAGS += -O0
 FLAGS += -DLAYOUT_HELP
@@ -9,7 +11,7 @@ FLAGS += -DNDEBUG
 endif
 
 # plugin infra
-SOURCES += src/plugin.cpp
+SOURCES += src/my-plugin.cpp
 SOURCES += src/chem.cpp
 
 # EaganMatrix

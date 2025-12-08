@@ -1,12 +1,12 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../../em/midi-message.h"
-#include "../../services/color-help.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/element-style.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/TipWidget.hpp"
+#include "em/midi-message.h"
+#include "services/color-help.hpp"
+#include "services/colors.hpp"
+#include "widgets/element-style.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/TipWidget.hpp"
 using namespace ::svg_theme;
 
 namespace pachde {

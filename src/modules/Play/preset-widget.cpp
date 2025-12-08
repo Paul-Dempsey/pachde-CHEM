@@ -1,7 +1,7 @@
 #include "preset-widget.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/misc.hpp"
-#include "../../widgets/hamburger.hpp"
+#include "services/colors.hpp"
+#include "services/misc.hpp"
+#include "widgets/hamburger.hpp"
 
 namespace pachde {
 
@@ -11,7 +11,7 @@ PresetWidget::PresetWidget()
 :   grip_color(nvgRGBAf(0x9d, 0x91, 0x31, 0.2f)),
     live_color(nvgRGB(0x46, 0x40, 0x60)),
     current_color(nvgRGB(0xf9, 0xa5, 0x4b)),
-    
+
     selected_color(nvgRGB(0x1e, 0x66, 0x2a)),
     selected_text_color(RampGray(G_75)),
     text_color(RampGray(G_65)),
@@ -283,7 +283,7 @@ void PresetWidget::appendContextMenu(ui::Menu* menu)
     }
     menu->addChild(createCheckMenuItem("Toggle current", "",
         [this](){ return is_current(); },
-        [this](){ 
+        [this](){
             set_current(!is_current());
             agent->onSetCurrrent(is_current() ? get_index() : -1);
         },
@@ -329,7 +329,7 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
         }
 
     } else {
- 
+
         auto font = live ? GetPluginFontSemiBold() : GetPluginFontRegular();
         nvgSave(vg);
         auto co_text = selected ? selected_text_color : (live ? live_text_color : text_color);
@@ -338,7 +338,7 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
         nvgText(vg, 2.5f, 3.5f, preset_name.c_str(), nullptr);
         nvgRestore(vg);
 
-        
+
         if (live) {
             nvgBeginPath(vg);
             float cx = box.size.x - .5f;
@@ -349,7 +349,7 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
             nvgFillColor(vg, live_color);
             nvgFill(vg);
         }
-    
+
         if (hover_grip) {
             nvgBeginPath(vg);
             nvgMoveTo(vg, box.size.x - GRIP_WIDTH, 0.f);
@@ -367,29 +367,29 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
                 nvgFill(vg);
             }
         }
-    
+
         if (dragging) {
             if (drop_target && drop_target != this) {
                 float cx = 3.f;
                 float cy = 4.f;
                 Vec pos = drop_target->box.pos.minus(box.pos);;
-    
+
                 nvgFillColor(vg, drag_color);
                 nvgStrokeColor(vg, drag_color);
                 nvgStrokeWidth(vg, 1.5f);
-    
+
                 nvgBeginPath(vg);
                 nvgMoveTo(vg, pos.x - cx,  pos.y - cy);
                 nvgLineTo(vg, pos.x + cx,  pos.y);
                 nvgLineTo(vg, pos.x - cx,  pos.y + cy);
                 nvgClosePath(vg);
                 nvgFill(vg);
-    
+
                 nvgBeginPath(vg);
                 nvgMoveTo(vg, pos.x,              pos.y);
                 nvgLineTo(vg, pos.x + box.size.x, pos.y);
                 nvgStroke(vg);
-    
+
                 nvgBeginPath(vg);
                 nvgMoveTo(vg, pos.x + box.size.x + cx, pos.y + cy);
                 nvgLineTo(vg, pos.x + box.size.x - cx, pos.y);
@@ -398,7 +398,7 @@ void PresetWidget::render(const DrawArgs& args, bool pre_base)
                 nvgFill(vg);
             }
         }
-   
+
     }
 }
 
@@ -423,9 +423,9 @@ void PresetWidget::draw(const DrawArgs& args)
     if (render_here) {
         render(args, true);
     }
- 
+
     Base::draw(args);
- 
+
     if (render_here) {
         render(args, false);
     }

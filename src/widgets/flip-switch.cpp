@@ -1,5 +1,5 @@
 #include "flip-switch.hpp"
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 namespace pachde {
 
 FlipSwitch::FlipSwitch() :

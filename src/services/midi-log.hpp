@@ -1,6 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "../em/midi-message.h"
+#include "em/midi-message.h"
 
 namespace pachde {
 
@@ -14,7 +14,7 @@ struct MidiLog
     double start_time;
     MidiLog();
     ~MidiLog();
-    
+
     void ensure_file();
     void close();
     void logMidi(IO_Direction dir, PackedMidiMessage message);

@@ -1,6 +1,6 @@
 #include "Kinetic.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;
@@ -98,10 +98,10 @@ void KineticUi::appendContextMenu(Menu *menu)
 {
     if (!module) return;
     menu->addChild(new MenuSeparator);
-    menu->addChild(createCheckMenuItem("Glowing knobs", "", 
+    menu->addChild(createCheckMenuItem("Glowing knobs", "",
         [this](){ return my_module->glow_knobs; },
         [this](){
-            my_module->glow_knobs = !my_module->glow_knobs; 
+            my_module->glow_knobs = !my_module->glow_knobs;
             mod_knob->glowing(my_module->glow_knobs);
         }
     ));

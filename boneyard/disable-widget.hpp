@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../plugin.hpp"
-#include "../services/svgtheme.hpp"
-#include "../services/colors.hpp"
+#include "my-plugin.hpp"
+#include "services/svgtheme.hpp"
+#include "services/colors.hpp"
 using namespace svg_theme;
 
 namespace pachde {

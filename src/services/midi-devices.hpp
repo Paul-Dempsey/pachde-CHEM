@@ -3,7 +3,7 @@
 #include <rack.hpp>
 #include <string>
 #include "misc.hpp"
-#include "../chem-id.hpp"
+#include "chem-id.hpp"
 
 namespace pachde {
 

@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
-#include "../../../widgets/theme-button.hpp"
-#include "../../../widgets/bits-widget.hpp"
-#include "../../../widgets/TipWidget.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/bits-widget.hpp"
+#include "widgets/TipWidget.hpp"
 
 using namespace ::rack;
 
@@ -21,7 +21,7 @@ struct StateButton : SvgButton, IApplyTheme
 
     StateButton (
         const char * svg_up,
-        const char * svg_down, 
+        const char * svg_down,
         std::function<void()> on_click
     ) :
         up_svg(svg_up),
@@ -46,15 +46,15 @@ struct StateButton : SvgButton, IApplyTheme
 
     bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
     {
-        bool refresh = frames.size() > 0; 
+        bool refresh = frames.size() > 0;
         if (refresh) {
             frames.clear();
             sw->setSvg(nullptr);
         }
-    
+
         addFrame(engine.loadSvg(asset::plugin(pluginInstance, up_svg), theme));
         addFrame(engine.loadSvg(asset::plugin(pluginInstance, down_svg), theme));
-    
+
         if (refresh) {
             sw->setSvg(frames[0]);
             if (fb) {
@@ -138,7 +138,7 @@ StateButton* makeFilterStateButton(
 struct FilterButton : SvgButton, IApplyTheme
 {
     using Base = SvgButton;
-    
+
     const char * up_svg{nullptr};
     const char * down_svg{nullptr};
     TipHolder * tip_holder{nullptr};
@@ -146,7 +146,7 @@ struct FilterButton : SvgButton, IApplyTheme
     std::function<void(uint64_t item)> change_fn{nullptr};
 
     FilterButton(const char * svg_up, const char * svg_down, std::function<void(uint64_t item)> on_change);
-    
+
     void init (
         const std::string& name, int rows, float item_width,
         const std::vector<std::string>& items,
@@ -166,7 +166,7 @@ struct FilterButton : SvgButton, IApplyTheme
         }
     }
     void close_dialog() { dialog->close(); }
-    
+
     void describe(std::string text)
     {
         if (!tip_holder) {

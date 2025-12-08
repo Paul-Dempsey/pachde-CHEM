@@ -1,5 +1,5 @@
 #include "Jack.hpp"
-#include "../../services/rack-help.hpp"
+#include "services/rack-help.hpp"
 
 using namespace pachde;
 

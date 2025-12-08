@@ -1,6 +1,6 @@
 #include "preset-file-info.hpp"
-#include "../../services/misc.hpp"
-#include "../../plugin.hpp"
+#include "services/misc.hpp"
+#include "my-plugin.hpp"
 
 namespace pachde {
 

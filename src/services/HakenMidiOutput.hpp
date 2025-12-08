@@ -1,7 +1,7 @@
 #pragma once
 #include "midi-io.hpp"
-#include "../em/wrap-HakenMidi.hpp"
-#include "../em/EaganMatrix.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "em/EaganMatrix.hpp"
 
 namespace pachde {
 
@@ -21,7 +21,7 @@ struct HakenMidiOutput : IDoMidi
     {
         output.setChannel(-1);
     }
-    
+
     void enable(bool on = true);
     void queueMessage(PackedMidiMessage msg);
     void dispatch(float sampleTime);

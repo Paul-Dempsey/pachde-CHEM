@@ -1,7 +1,7 @@
 #include "Fx.hpp"
 using namespace pachde;
-#include "../../em/wrap-HakenMidi.hpp"
-#include "../../services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
 
 FxModule::FxModule() :
     modulation(this, ChemId::Fx),

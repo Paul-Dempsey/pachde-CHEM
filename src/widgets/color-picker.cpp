@@ -1,6 +1,6 @@
 #include "color-picker.hpp"
-#include "../services/misc.hpp"
-#include "../services/color-help.hpp"
+#include "services/misc.hpp"
+#include "services/color-help.hpp"
 
 namespace pachde {
 
@@ -29,7 +29,7 @@ void ColorPicker::set_color(PackedColor co)
     hue = Hue1(nvg_color);
     saturation = Saturation(nvg_color);
     lightness = Lightness(nvg_color);
-    
+
     hue_picker->setHue(hue);
     sl_picker->setHue(hue);
     sl_picker->setSaturation(saturation);

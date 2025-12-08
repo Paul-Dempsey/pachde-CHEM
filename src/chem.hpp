@@ -1,6 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "plugin.hpp"
+#include "my-plugin.hpp"
 #include "chem-core.hpp"
 #include "services/colors.hpp"
 #include "widgets/themed-widgets.hpp"

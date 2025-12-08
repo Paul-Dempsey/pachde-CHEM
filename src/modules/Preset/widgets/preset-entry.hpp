@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
-#include "../../../widgets/tip-label-widget.hpp"
-#include "../../../widgets/element-style.hpp"
-#include "../../../em/preset.hpp"
+#include "widgets/tip-label-widget.hpp"
+#include "widgets/element-style.hpp"
+#include "em/preset.hpp"
 
 using namespace eaganmatrix;
 struct PresetUi;
@@ -13,18 +13,18 @@ struct PresetEntry : OpaqueWidget, IApplyTheme
 {
     using Base = OpaqueWidget;
     TipLabel* label{nullptr};
-    std::shared_ptr<PresetInfo> preset{nullptr};
+    PresetUi* ui{nullptr};
     ssize_t preset_index;
+    std::shared_ptr<PresetInfo> preset{nullptr};
     bool live;
     bool current;
     bool hovered;
     std::vector<PresetEntry*>& peers;
-    ElementStyle preset_element{"preset", "hsl(0, 0%, 55%)"};
-    ElementStyle live_element{"preset-live", "hsl(42, 50%, 50%)", "hsl(42, 50%, 50%)", .35f };
+    ElementStyle preset_element {"preset", "hsl(0, 0%, 55%)"};
+    ElementStyle live_element   {"preset-live", "hsl(42, 50%, 50%)", "hsl(42, 50%, 50%)", .35f };
     ElementStyle current_element{"preset-current", "hsl(60, 90%, 50%)", "hsl(60, 90%, 50%)", .25f};
-    ElementStyle hover_element{"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 30%)", .5f};
-    ElementStyle category_style{"preset-cat", "hsl(200, 50%, 50%)"};
-    PresetUi* ui{nullptr};
+    ElementStyle hover_element  {"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 30%)", .5f};
+    ElementStyle category_style {"preset-cat", "hsl(200, 50%, 50%)"};
 
     void set_ui(PresetUi* host) { ui = host; }
 

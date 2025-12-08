@@ -1,8 +1,8 @@
 #include "Play.hpp"
-#include "../../services/colors.hpp"
-#include "../../em/em-hardware.h"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/uniform-style.hpp"
+#include "services/colors.hpp"
+#include "em/em-hardware.h"
+#include "widgets/logo-widget.hpp"
+#include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;

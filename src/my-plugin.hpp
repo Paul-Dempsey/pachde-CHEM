@@ -5,10 +5,7 @@ using namespace ::rack;
 #include "services/svt_rack.hpp"
 #include "widgets/PanelBorder.hpp"
 
-// Declare the Plugin, defined in plugin.cpp
-extern Plugin* pluginInstance;
-
-// Declare each Model, defined in each module source file
+extern ::rack::plugin::Plugin* pluginInstance;
 
 extern Model* modelCore;
 extern Model* modelPlay;
@@ -27,7 +24,6 @@ extern Model* modelPreset;
 extern Model* modelOverlay;
 extern Model* modelXM;
 extern Model* modelMidiPad;
-//extern Model* modelProto;
 
 // Theming
 

@@ -1,9 +1,9 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
-#include "../plugin.hpp"
-#include "../services/midi-devices.hpp"
-#include "../services/svt_rack.hpp"
+#include "my-plugin.hpp"
+#include "services/midi-devices.hpp"
+#include "services/svt_rack.hpp"
 #include "TipWidget.hpp"
 
 using namespace ::rack;

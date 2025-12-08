@@ -1,10 +1,10 @@
 #include "Preset.hpp"
-#include "../../em/preset-meta.hpp"
-#include "../../services/colors.hpp"
-#include "../../widgets/click-region-widget.hpp"
-#include "../../widgets/logo-widget.hpp"
-#include "../../widgets/hamburger.hpp"
-#include "../../widgets/spinner.hpp"
+#include "em/preset-meta.hpp"
+#include "services/colors.hpp"
+#include "widgets/click-region-widget.hpp"
+#include "widgets/logo-widget.hpp"
+#include "widgets/hamburger.hpp"
+#include "widgets/spinner.hpp"
 
 using PM = PresetModule;
 
@@ -220,6 +220,7 @@ PresetUi::PresetUi(PresetModule *module) :
     up_button->applyTheme(theme_engine, theme);
     up_button->setHandler([this](bool c, bool s){
         page_up(c,s);
+        APP->event->setSelectedWidget(this);
     });
     addChild(up_button);
 
@@ -229,6 +230,7 @@ PresetUi::PresetUi(PresetModule *module) :
     down_button->applyTheme(theme_engine, theme);
     down_button->setHandler([this](bool c, bool s){
         page_down(c,s);
+        APP->event->setSelectedWidget(this);
     });
     addChild(down_button);
 
@@ -238,6 +240,7 @@ PresetUi::PresetUi(PresetModule *module) :
     prev->applyTheme(theme_engine, theme);
     prev->setHandler([this](bool c, bool s) {
         previous_preset(c,s);
+        APP->event->setSelectedWidget(this);
     });
     addChild(prev);
 
@@ -247,6 +250,7 @@ PresetUi::PresetUi(PresetModule *module) :
     next->applyTheme(theme_engine, theme);
     next->setHandler([this](bool c, bool s){
         next_preset(c,s);
+        APP->event->setSelectedWidget(this);
     });
     addChild(next);
 

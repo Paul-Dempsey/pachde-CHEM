@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
-#include "../../../services/misc.hpp"
-#include "../../../widgets/hamburger.hpp"
+#include "services/misc.hpp"
+#include "widgets/hamburger.hpp"
 using namespace ::rack;
 namespace pachde {
 
@@ -106,7 +106,7 @@ TPQ* configTuningParam(Module* module, int paramId)
     Param* p = &module->params[paramId];
     p->value = q->getDefaultValue();
 
-    return q;    
+    return q;
 }
 
 struct TuningMenu : HamburgerUi<ParamWidget>
@@ -121,7 +121,7 @@ struct TuningMenu : HamburgerUi<ParamWidget>
 
     MenuItem * createTuningMenuItem(Tuning tuningItem)
     {
-        return createCheckMenuItem(describeTuning(tuningItem), "", 
+        return createCheckMenuItem(describeTuning(tuningItem), "",
             [=](){ return getParamValue() == tuningItem; },
             [=](){ setParamValue(tuningItem); });
     }

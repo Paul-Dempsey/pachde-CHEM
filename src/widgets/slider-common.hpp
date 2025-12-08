@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../services/colors.hpp"
-#include "../services/svt_rack.hpp"
+#include "services/colors.hpp"
+#include "services/svt_rack.hpp"
 #include "element-style.hpp"
 using namespace ::rack;
 using namespace ::svg_theme;
@@ -9,7 +9,7 @@ using namespace ::svg_theme;
 namespace pachde {
 
 enum class Axis { X, Y };
-    
+
 template <typename TSlider>
 TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
 {
@@ -25,21 +25,21 @@ TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int
 
 namespace slider_impl {
 
-inline float coord(Axis axis, const Vec& pos) { 
+inline float coord(Axis axis, const Vec& pos) {
     switch (axis) {
     case Axis::X: return pos.x;
     case Axis::Y: return pos.y;
     default: return pos.y;
     }
 }
-inline float anti_coord(Axis axis, const Vec& pos) { 
+inline float anti_coord(Axis axis, const Vec& pos) {
     switch (axis) {
     case Axis::X: return pos.y;
     case Axis::Y: return pos.x;
     default: return pos.x;
     }
 }
-    
+
 template <typename TSelf, typename TBase>
 void onSelectKey(TSelf* self, const rack::widget::Widget::SelectKeyEvent &e)
 {

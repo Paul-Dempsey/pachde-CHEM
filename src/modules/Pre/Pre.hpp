@@ -1,15 +1,15 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/knob-track-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/selector-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/knob-track-widget.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/selector-widget.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/tip-label-widget.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -54,7 +54,7 @@ struct PreModule : ChemModule, IChemClient, IDoMidi
     std::string device_claim;
     int last_select;
     bool glow_knobs;
-    
+
     PreModule();
     ~PreModule() {
         if (chem_host) {
@@ -70,7 +70,7 @@ struct PreModule : ChemModule, IChemClient, IDoMidi
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
-    
+
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
     std::string client_claim() override { return device_claim; }
@@ -101,7 +101,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     TipLabel* haken_device_label{nullptr};
 
     int comp_type;
-    
+
     SelectorWidget* selector{nullptr};
     TextLabel* effect_label;
     TextLabel* selector_label;
@@ -126,7 +126,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-pre.svg"); }
     void setThemeName(const std::string& name, void * context) override;

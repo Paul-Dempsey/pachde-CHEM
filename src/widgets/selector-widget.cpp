@@ -2,7 +2,7 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "selector-widget.hpp"
-#include "../services/misc.hpp"
+#include "services/misc.hpp"
 
 namespace pachde {
 
@@ -93,7 +93,7 @@ void SelectorWidget::create_tip()
 
 void SelectorWidget::onHover(const HoverEvent& e) {
     Base::onHover(e);
-    
+
     int item = index_of_pos(e.pos);
     if (item != hovered_item) {
         hovered_item = item;
@@ -162,7 +162,7 @@ void SelectorWidget::onButton(const ButtonEvent& e)
             hovered_item = -1;
             createContextMenu();
             e.consume(this);
-        } 
+        }
     }
 }
 
@@ -244,7 +244,7 @@ void SelectorWidget::draw(const DrawArgs& args)
     }
     Line(vg, x, y, x, y + radius + radius, stem_color, stem_width);
 
-    // debug - 
+    // debug -
     // {
     //     auto co = nvgTransRGBAf(RampGray(G_65), .25);
     //     BoxRect(vg, .25,.25, box.size.x-.5, box.size.y-.5, co, .5);

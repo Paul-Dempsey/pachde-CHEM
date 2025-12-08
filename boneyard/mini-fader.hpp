@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/svgtheme.hpp"
+#include "services/svgtheme.hpp"
 using namespace svg_theme;
 
 namespace pachde {

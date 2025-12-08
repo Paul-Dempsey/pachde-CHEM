@@ -1,7 +1,7 @@
 // File is "SettingsModule.cpp" to avoid debugger confusion of same file name in Rack
 #include "Settings.hpp"
-#include "../../services/rack-help.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
 SettingsModule::SettingsModule() :

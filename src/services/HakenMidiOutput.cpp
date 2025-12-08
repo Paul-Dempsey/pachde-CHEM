@@ -1,5 +1,5 @@
 #include "HakenMidiOutput.hpp"
-#include "../em/wrap-HakenMidi.hpp"
+#include "em/wrap-HakenMidi.hpp"
 
 namespace pachde {
 

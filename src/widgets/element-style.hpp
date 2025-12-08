@@ -1,6 +1,6 @@
 #pragma once
-#include "../services/svgtheme.hpp"
-#include "../services/colors.hpp"
+#include "services/svgtheme.hpp"
+#include "services/colors.hpp"
 using namespace ::svg_theme;
 
 namespace pachde {

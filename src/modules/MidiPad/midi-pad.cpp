@@ -1,11 +1,11 @@
 #include "midi-pad.hpp"
-#include "../../services/misc.hpp"
-#include "../../services/colors.hpp"
+#include "services/misc.hpp"
+#include "services/colors.hpp"
 #include "hcl.hpp"
 
 namespace pachde {
 
-// See ../../../doc/hcl.md
+// See doc/hcl.md
 
 const char * default_pad_name[] = {
     "A1", "A2", "A3", "A4",

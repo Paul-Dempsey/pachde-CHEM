@@ -1,7 +1,7 @@
 #include "Overlay.hpp"
-#include "../../services/colors.hpp"
-#include "../../em/em-hardware.h"
-#include "../../widgets/widgets.hpp"
+#include "services/colors.hpp"
+#include "em/em-hardware.h"
+#include "widgets/widgets.hpp"
 
 namespace S = pachde::style;
 using namespace svg_theme;

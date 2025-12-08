@@ -1,8 +1,8 @@
 #include "preset-entry.hpp"
-#include "../../../em/preset-meta.hpp"
-#include "../../../services/misc.hpp"
-#include "../../../chem.hpp"
-#include "../../../widgets/hamburger.hpp"
+#include "em/preset-meta.hpp"
+#include "services/misc.hpp"
+#include "chem.hpp"
+#include "widgets/hamburger.hpp"
 #include "../Preset.hpp"
 
 namespace pachde {

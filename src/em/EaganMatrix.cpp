@@ -1,5 +1,5 @@
 #include "EaganMatrix.hpp"
-#include "../services/misc.hpp"
+#include "services/misc.hpp"
 using namespace pachde;
 
 namespace eaganmatrix {

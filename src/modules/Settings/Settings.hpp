@@ -1,15 +1,15 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/em-led-widget.hpp"
-#include "../../widgets/label-widget.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../widgets/tip-label-widget.hpp"
-#include "../../widgets/slider-h-widget.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/em-led-widget.hpp"
+#include "widgets/label-widget.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "widgets/tip-label-widget.hpp"
+#include "widgets/slider-h-widget.hpp"
 #include "./widgets/tuning.hpp"
 #include "./widgets/x-param.hpp"
 #include "./widgets/y-param.hpp"
@@ -61,7 +61,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
         P_KEEP_MIDI,
         P_KEEP_SURFACE,
         P_AES3,
-        
+
         P_MOD_AMOUNT,
         NUM_PARAMS,
         NUM_EM_VALUES = P_MOD_AMOUNT
@@ -123,7 +123,7 @@ struct SettingsModule : ChemModule, IChemClient, IDoMidi
 
     // IDoMidi
     void do_message(PackedMidiMessage message) override;
-    
+
     // IChemClient
     rack::engine::Module* client_module() override;
     std::string client_claim() override;
@@ -172,20 +172,20 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     TextLabel* round_type_value{nullptr};
     TextLabel* tuning_value{nullptr};
     FillHSlider* round_rate_slider{nullptr};
-    
+
     SettingsUi(SettingsModule *module);
     GlowKnob* mod_knob;
 
     bool connected();
     void createScrews(std::shared_ptr<SvgTheme> theme) override;
-    
+
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
     std::string client_claim() override { return my_module ? my_module->device_claim : ""; }
     void onConnectHost(IChemHost* host) override;
     void onPresetChange() override {}
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
-    
+
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-settings.svg"); }
     void setThemeName(const std::string& name, void * context) override;

@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "../chem-id.hpp"
-#include "../em/EaganMatrix.hpp"
-#include "../em/wrap-HakenMidi.hpp"
+#include "chem-id.hpp"
+#include "em/EaganMatrix.hpp"
+#include "em/wrap-HakenMidi.hpp"
 #include "midi-io.hpp"
 using namespace eaganmatrix;
 

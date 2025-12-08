@@ -1,5 +1,5 @@
 #include "knob-track-widget.hpp"
-#include "../services/misc.hpp"
+#include "services/misc.hpp"
 namespace pachde {
 
 TrackWidget::TrackWidget() :

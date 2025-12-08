@@ -1,11 +1,11 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/em-midi-port.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../services/rack-help.hpp"
-#include "../../widgets/widgets.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "services/colors.hpp"
+#include "services/em-midi-port.hpp"
+#include "services/ModuleBroker.hpp"
+#include "services/rack-help.hpp"
+#include "widgets/widgets.hpp"
 #include "midi-pad.hpp"
 
 using namespace pachde;

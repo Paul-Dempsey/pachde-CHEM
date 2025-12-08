@@ -1,6 +1,5 @@
 #pragma once
-#ifndef SVG_THEME_H
-#define SVG_THEME_H
+#include <rack.hpp>
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -11,7 +10,6 @@
 #include <vector>
 #include <nanosvg.h>
 #include <jansson.h>
-#include <rack.hpp>
 
 namespace svg_theme {
 
@@ -335,7 +333,6 @@ struct IThemeHolder
 };
 
 } // namespace svg_theme
-#endif //SVG_THEME_H
 
 /* Copyright (C) 2023 Paul Chase Dempsey pcdempsey@live.com
  *

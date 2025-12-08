@@ -1,9 +1,9 @@
 #include "midi-log.hpp"
 #include <ghc/filesystem.hpp>
 #include "misc.hpp"
-#include "../plugin.hpp"
-#include "../chem-id.hpp"
-#include "../em/wrap-HakenMidi.hpp"
+#include "my-plugin.hpp"
+#include "chem-id.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace ::rack;
 
 namespace pachde {
@@ -200,7 +200,7 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
             bytes = format_buffer(buffer, 256, "[%08x] ch%-2d %s %d %d\n", m.data, 1+midi_channel(m), StatusName(midi_status(m)), m.bytes.data1, m.bytes.data2);
             break;
     }
-    
+
     if (bytes) {
         char io_glyph = (dir == IO_Direction::In) ? '<' : '>';
         const char * tag = tag_prefix(midi_tag(m));
@@ -233,7 +233,7 @@ void MidiLog::log_message(const char *prefix, const std::string& str)
 {
     log_message(prefix, printable(str));
 }
-    
+
 
 
 }

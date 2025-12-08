@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
 #include "pic.hpp"
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 
 using namespace rack;
 namespace pachde {
@@ -9,7 +9,7 @@ namespace pachde {
 struct HueWidget : OpaqueWidget
 {
     std::function<void(float)> clickHandler;
-    
+
     float hue = 0.f;
     cachePic* ramp = nullptr;
 
@@ -48,7 +48,7 @@ struct HueWidget : OpaqueWidget
         }
         OpaqueWidget::onContextDestroy(e);
     }
-    
+
     void onEnter(const EnterEvent &e) override
     {
         OpaqueWidget::onEnter(e);

@@ -1,8 +1,8 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../services/text.hpp"
-#include "../services/svt_rack.hpp"
+#include "services/text.hpp"
+#include "services/svt_rack.hpp"
 #include "element-style.hpp"
 #include "TipWidget.hpp"
 

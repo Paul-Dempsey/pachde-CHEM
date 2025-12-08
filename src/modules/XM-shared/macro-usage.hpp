@@ -1,9 +1,9 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "../../services/haken-midi.hpp"
-#include "../../services/misc.hpp"
-#include "../../em/midi-message.h"
+#include "services/haken-midi.hpp"
+#include "services/misc.hpp"
+#include "em/midi-message.h"
 
 namespace pachde{
 

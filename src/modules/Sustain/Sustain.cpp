@@ -1,6 +1,6 @@
 #include "Sustain.hpp"
-#include "../../services/rack-help.hpp"
-#include "../../em/wrap-HakenMidi.hpp"
+#include "services/rack-help.hpp"
+#include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
 SusModule::SusModule(ChemId id, uint8_t cc) :

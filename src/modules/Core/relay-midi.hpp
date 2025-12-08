@@ -1,7 +1,7 @@
 #pragma once
 #include <rack.hpp>
-#include "../../em/EaganMatrix.hpp"
-#include "../../em/midi-message.h"
+#include "em/EaganMatrix.hpp"
+#include "em/midi-message.h"
 
 namespace pachde{
 
@@ -24,7 +24,7 @@ struct RelayMidi : IDoMidi
 
     void do_message(PackedMidiMessage message) override {
         // em first, so targets can use the em's handling of complex processing like hi-res values
-        em->onMessage(message); 
+        em->onMessage(message);
 
         for (auto target: targets) {
             target->do_message(message);

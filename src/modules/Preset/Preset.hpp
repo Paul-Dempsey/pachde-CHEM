@@ -1,11 +1,11 @@
 #pragma once
-#include "../../plugin.hpp"
-#include "../../chem.hpp"
-#include "../../chem-core.hpp"
-#include "../../em/EaganMatrix.hpp"
-#include "../../services/colors.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../widgets/widgets.hpp"
+#include "my-plugin.hpp"
+#include "chem.hpp"
+#include "chem-core.hpp"
+#include "em/EaganMatrix.hpp"
+#include "services/colors.hpp"
+#include "services/ModuleBroker.hpp"
+#include "widgets/widgets.hpp"
 #include "preset-common.hpp"
 #include "preset-tab.hpp"
 #include "./widgets/filter-widget.hpp"
@@ -19,14 +19,14 @@ namespace S = pachde::style;
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 
-struct PresetModule : ChemModule, IChemClient, IDoMidi
+struct PresetModule : ChemModule, IChemClient
 {
     enum Params {
         NUM_PARAMS
     };
     enum Inputs {
-        IN_PREV,
-        IN_NEXT,
+        // IN_PREV,
+        // IN_NEXT,
         NUM_INPUTS
     };
     enum Outputs {

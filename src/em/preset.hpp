@@ -2,8 +2,8 @@
 #include <rack.hpp>
 #include "PresetId.hpp"
 #include "preset-meta.hpp"
-#include "../services/misc.hpp"
-#include "../services/crc.hpp"
+#include "services/misc.hpp"
+#include "services/crc.hpp"
 
 using namespace ::rack;
 

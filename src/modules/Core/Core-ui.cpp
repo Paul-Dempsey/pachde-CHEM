@@ -1,11 +1,11 @@
 #include "Core.hpp"
-#include "../../services/ModuleBroker.hpp"
-#include "../../services/kv-store.hpp"
-#include "../../services/open-file.hpp"
-#include "../../widgets/draw-button.hpp"
-#include "../../widgets/theme-button.hpp"
-#include "../../widgets/theme-knob.hpp"
-#include "../../em/preset-meta.hpp"
+#include "services/ModuleBroker.hpp"
+#include "services/kv-store.hpp"
+#include "services/open-file.hpp"
+#include "widgets/draw-button.hpp"
+#include "widgets/theme-button.hpp"
+#include "widgets/theme-knob.hpp"
+#include "em/preset-meta.hpp"
 using EME = IHandleEmEvents::EventMask;
 const char * preset_list_file_dialog_filter = "Preset list (.json):json;Any (*):*";
 constexpr const float LOGO_CENTER{62.f};

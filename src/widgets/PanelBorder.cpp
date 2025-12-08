@@ -1,5 +1,5 @@
 // Copyright (C) Paul Chase Dempsey
-#include "../services/colors.hpp"
+#include "services/colors.hpp"
 #include "PanelBorder.hpp"
 
 namespace pachde {
@@ -59,7 +59,7 @@ bool PartnerPanelBorder::applyTheme(SvgThemeEngine& theme_engine, std::shared_pt
 
 void PartnerPanelBorder::draw(const DrawArgs& args)
 {
-    auto vg = args.vg; 
+    auto vg = args.vg;
     if (left || right) {
         Line(vg, 0.5f, 0.5f, box.size.x - 1.0f, 0.5f, panel_border_color);
         Line(vg, 0.5f, box.size.y - 1.f, box.size.x - 1.0f, box.size.y - 1.f, panel_border_color);
@@ -93,7 +93,7 @@ void PartnerPanelBorder::draw(const DrawArgs& args)
             //     Line(vg, 0.5f, y, 0.5f, y + 1.f, coLink, 1.f);
             //     y += 10.f;
             // }
-            
+
             OpenCircle(vg, 0.f, 6.25, 2.5f, link_color, ring_stroke_width);
             Line(vg, .5f, 6.25f, 4.f, 6.25f, link_color, line_stroke_width);
 
@@ -102,7 +102,7 @@ void PartnerPanelBorder::draw(const DrawArgs& args)
         }
         if (right) {
             OpenCircle(vg, box.size.x, 6.25, 2.5f, link_color, ring_stroke_width);
-            Line(vg, box.size.x - 4.f, 6.25f, box.size.x - .5f, 6.25f, link_color, line_stroke_width); 
+            Line(vg, box.size.x - 4.f, 6.25f, box.size.x - .5f, 6.25f, link_color, line_stroke_width);
 
             // gliss
             // float h = box.size.y *.1f;
