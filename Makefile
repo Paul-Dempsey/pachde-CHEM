@@ -58,6 +58,7 @@ SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/knob-track-widget.cpp
 SOURCES += src/widgets/label-widget.cpp
+SOURCES += src/widgets/menu-widgets.cpp
 SOURCES += src/widgets/panel-border.cpp
 SOURCES += src/widgets/pic.cpp
 SOURCES += src/widgets/selector-widget.cpp

@@ -3,6 +3,7 @@
 #include "em/wrap-HakenMidi.hpp"
 #include "services/misc.hpp"
 #include "widgets/hamburger.hpp"
+#include "widgets/menu-widgets.hpp"
 
 using namespace ::rack;
 namespace pachde {
@@ -84,27 +85,27 @@ TPQ* configJackParam(Module * module, int pedal_number, int paramId, const char 
 
 struct JackMenu : HamburgerUi<ParamWidget> {
 
-    MenuItem* createItem(const char * name, int value) {
-        return createCheckMenuItem(name, "",
-            [=]() { return static_cast<int>(getParamQuantity()->getValue()) == value; },
-            [=](){ getParamQuantity()->setValue(static_cast<float>(value)); });
+    OptionMenuEntry* createItem(const char * name, int value) {
+        return new OptionMenuEntry(
+            static_cast<int>(getParamQuantity()->getValue()) == value,
+            createMenuItem(name, "", [=](){ getParamQuantity()->setValue(static_cast<float>(value)); }));
     }
     void appendContextMenu(Menu* menu) override
     {
         if (!module) return;
         menu->addChild(new MenuSeparator);
 
-        menu->addChild(createItem("Sustain",          Haken::ccSus));
-        menu->addChild(createItem("Sos 1",            Haken::ccSos));
-        menu->addChild(createItem("Sos 2",            Haken::ccSos2));
+        menu->addChild(createItem("Sustain", Haken::ccSus));
+        menu->addChild(createItem("Sos 1",   Haken::ccSos));
+        menu->addChild(createItem("Sos 2",   Haken::ccSos2));
 
         menu->addChild(createSubmenuItem("Macros", "", [=](Menu* menu){
-            menu->addChild(createItem("Macro i",          Haken::ccI));
-            menu->addChild(createItem("Macro ii",         Haken::ccII));
-            menu->addChild(createItem("Macro iii",        Haken::ccIII));
-            menu->addChild(createItem("Macro iv",         Haken::ccIV));
-            menu->addChild(createItem("Macro v",          Haken::ccV));
-            menu->addChild(createItem("Macro vi",         Haken::ccVI));
+            menu->addChild(createItem("Macro i",   Haken::ccI));
+            menu->addChild(createItem("Macro ii",  Haken::ccII));
+            menu->addChild(createItem("Macro iii", Haken::ccIII));
+            menu->addChild(createItem("Macro iv",  Haken::ccIV));
+            menu->addChild(createItem("Macro v",   Haken::ccV));
+            menu->addChild(createItem("Macro vi",  Haken::ccVI));
         }));
 
         menu->addChild(createSubmenuItem("Fx", "", [=](Menu* menu){
@@ -118,28 +119,28 @@ struct JackMenu : HamburgerUi<ParamWidget> {
         }));
 
         menu->addChild(createSubmenuItem("Levels", "", [=](Menu* menu){
-            menu->addChild(createItem("Pre-level",        Haken::ccPre));
-            menu->addChild(createItem("Post-level",       Haken::ccPost));
-            menu->addChild(createItem("Audio in",         Haken::ccAudIn));
+            menu->addChild(createItem("Pre-level",  Haken::ccPre));
+            menu->addChild(createItem("Post-level", Haken::ccPost));
+            menu->addChild(createItem("Audio in",   Haken::ccAudIn));
         }));
 
         menu->addChild(createSubmenuItem("Switches", "", [=](Menu* menu){
-            menu->addChild(createItem("Oct switch",       Haken::ccOctShift));
-            menu->addChild(createItem("Mono switch",      Haken::ccMonoSwitch));
-            menu->addChild(createItem("Advance preset",   Haken::ccAdvance));
+            menu->addChild(createItem("Oct switch",     Haken::ccOctShift));
+            menu->addChild(createItem("Mono switch",    Haken::ccMonoSwitch));
+            menu->addChild(createItem("Advance preset", Haken::ccAdvance));
         }));
         menu->addChild(createSubmenuItem("Misc", "", [=](Menu* menu){
-            menu->addChild(createItem("Round rate",       Haken::ccRoundRate));
-            menu->addChild(createItem("Round initial",    Haken::ccRndIni));
-            menu->addChild(createItem("Oct stretch",      Haken::ccStretch));
-            menu->addChild(createItem("Fine tune",        Haken::ccFineTune));
+            menu->addChild(createItem("Round rate",    Haken::ccRoundRate));
+            menu->addChild(createItem("Round initial", Haken::ccRndIni));
+            menu->addChild(createItem("Oct stretch",   Haken::ccStretch));
+            menu->addChild(createItem("Fine tune",     Haken::ccFineTune));
         }));
         menu->addChild(createSubmenuItem("Extras", "", [=](Menu* menu){
-            menu->addChild(createItem("cc1 (modulation)", Haken::ccMod));
-            menu->addChild(createItem("cc2 (breath)", Haken::ccBreath));
-            menu->addChild(createItem("cc3 (undefined)", Haken::ccUndef));
-            menu->addChild(createItem("cc4 (foot pedal)", Haken::ccFoot));
-            menu->addChild(createItem("cc7 (volume)", Haken::ccVol));
+            menu->addChild(createItem("cc1 (modulation)",  Haken::ccMod));
+            menu->addChild(createItem("cc2 (breath)",      Haken::ccBreath));
+            menu->addChild(createItem("cc3 (undefined)",   Haken::ccUndef));
+            menu->addChild(createItem("cc4 (foot pedal)",  Haken::ccFoot));
+            menu->addChild(createItem("cc7 (volume)",      Haken::ccVol));
             menu->addChild(createItem("cc11 (expression)", Haken::ccExpres));
         }));
 

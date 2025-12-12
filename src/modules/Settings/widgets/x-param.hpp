@@ -1,10 +1,12 @@
 #pragma once
 #include <rack.hpp>
+using namespace ::rack;
 #include "em/wrap-HakenMidi.hpp"
 #include "services/misc.hpp"
 #include "widgets/hamburger.hpp"
+#include "widgets/menu-widgets.hpp"
+using namespace ::widgetry;
 
-using namespace ::rack;
 namespace pachde {
 
 struct BendParamQuantity : ParamQuantity
@@ -50,10 +52,10 @@ TBPQ* configBendParam(Module * module, int paramId, const char * name) {
 
 struct BendMenu : HamburgerUi<ParamWidget> {
 
-    MenuItem* createBendItem(const char * name, int value) {
-        return createCheckMenuItem(name, "",
-            [=]() { return static_cast<int>(getParamQuantity()->getValue()) == value; },
-            [=](){ getParamQuantity()->setValue(static_cast<float>(value)); });
+    OptionMenuEntry* createBendItem(const char * name, int value) {
+        return new OptionMenuEntry(
+            static_cast<int>(getParamQuantity()->getValue()) == value,
+            createMenuItem(name, "", [=](){ getParamQuantity()->setValue(static_cast<float>(value)); }));
     }
     void appendContextMenu(Menu* menu) override
     {

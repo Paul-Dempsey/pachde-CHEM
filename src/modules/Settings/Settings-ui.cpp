@@ -2,6 +2,7 @@
 #include "services/colors.hpp"
 #include "widgets/hamburger.hpp"
 #include "widgets/logo-widget.hpp"
+#include "widgets/menu-widgets.hpp"
 #include "widgets/theme-knob.hpp"
 #include "widgets/uniform-style.hpp"
 
@@ -58,19 +59,19 @@ struct AesMenu : Hamburger
             int current = getParamInt(settings->getParam(SM::P_AES3));
 
             // 48k
-            menu->addChild(createCheckMenuItem(pq->labels[0], "",
-                [=](){ return current == 2; },
-                [=](){ settings->getParam(SM::P_AES3).setValue(2.f); }, false));
+            menu->addChild(new OptionMenuEntry(current == 2,
+                createMenuItem(pq->labels[0], "",
+                    [=](){ settings->getParam(SM::P_AES3).setValue(2.f); })));
 
             // 96k
-            menu->addChild(createCheckMenuItem(pq->labels[1], "",
-                [=](){ return current == 0; },
-                [=](){ settings->getParam(SM::P_AES3).setValue(0.f); }, false));
+            menu->addChild(new OptionMenuEntry(current == 0,
+                createMenuItem(pq->labels[1], "",
+                    [=](){ settings->getParam(SM::P_AES3).setValue(0.f); })));
 
             // Sync
-            menu->addChild(createCheckMenuItem(pq->labels[2], "",
-                [=](){ return current == 1; },
-                [=](){ settings->getParam(SM::P_AES3).setValue(1.f); }, false));
+            menu->addChild(new OptionMenuEntry(current == 1,
+                createMenuItem(pq->labels[2], "",
+                    [=](){ settings->getParam(SM::P_AES3).setValue(1.f); })));
         } else {
             menu->addChild(createMenuLabel("(Unavailable)"));
         }

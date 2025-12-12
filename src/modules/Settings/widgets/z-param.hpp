@@ -3,6 +3,8 @@
 #include "em/wrap-HakenMidi.hpp"
 #include "services/misc.hpp"
 #include "widgets/hamburger.hpp"
+#include "widgets/menu-widgets.hpp"
+using namespace ::widgetry;
 
 using namespace ::rack;
 namespace pachde {
@@ -56,10 +58,10 @@ TPQ* configZParam(Module * module, int paramId, const char * name) {
 
 struct ZMenu : HamburgerUi<ParamWidget> {
 
-    MenuItem* createItem(const char * name, int value) {
-        return createCheckMenuItem(name, "",
-            [=]() { return static_cast<int>(getParamQuantity()->getValue()) == value; },
-            [=](){ getParamQuantity()->setValue(static_cast<float>(value)); });
+    OptionMenuEntry* createItem(const char * name, int value) {
+        return new OptionMenuEntry(
+            static_cast<int>(getParamQuantity()->getValue()) == value,
+            createMenuItem(name, "", [=](){ getParamQuantity()->setValue(static_cast<float>(value)); }));
     }
     void appendContextMenu(Menu* menu) override
     {

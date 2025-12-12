@@ -3,6 +3,7 @@
 #include "services/colors.hpp"
 #include "widgets/click-region-widget.hpp"
 #include "widgets/logo-widget.hpp"
+#include "widgets/menu-widgets.hpp"
 #include "widgets/hamburger.hpp"
 #include "widgets/spinner.hpp"
 
@@ -44,24 +45,20 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
     menu->addChild(createMenuLabel<HamburgerTitle>("Preset Actions"));
 
-    NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
-
     Tab & tab = ui->active_tab();
     PresetOrder order = tab.list.preset_list ? tab.list.preset_list->order : PresetOrder::Alpha;
-    auto item = createMenuItem<ColorDotMenuItem>("Sort alphabetically", "",
-        [this](){ ui->sort_presets(PresetOrder::Alpha); }, false);
-    item->color = (PresetOrder::Alpha == order) ? co_dot : RampGray(G_45);
-    menu->addChild(item);
 
-    item = createMenuItem<ColorDotMenuItem>("Sort by category", "",
-        [this](){ ui->sort_presets(PresetOrder::Category); }, false);
-    item->color = (PresetOrder::Category == order) ? co_dot : RampGray(G_45);
-    menu->addChild(item);
+    auto entry = new OptionMenuEntry(PresetOrder::Alpha == order,
+        createMenuItem("Sort alphabetically", "", [=](){ ui->sort_presets(PresetOrder::Alpha); }));
+    menu->addChild(entry);
 
-    item = createMenuItem<ColorDotMenuItem>("Sort by preset number", "",
-        [this](){ ui->sort_presets(PresetOrder::Natural); }, false);
-    item->color = (PresetOrder::Natural == order) ? co_dot : RampGray(G_45);
-    menu->addChild(item);
+    entry = new OptionMenuEntry(PresetOrder::Category == order,
+        createMenuItem("Sort by category", "", [this](){ ui->sort_presets(PresetOrder::Category); }));
+    menu->addChild(entry);
+
+    entry = new OptionMenuEntry(PresetOrder::Natural == order,
+        createMenuItem("Sort by preset number", "", [this](){ ui->sort_presets(PresetOrder::Natural); }));
+    menu->addChild(entry);
 
     menu->addChild(new MenuSeparator);
 
@@ -81,12 +78,6 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
         !ui->my_module
     ));
 
-    //bool osmose = ui->is_osmose();
-    // menu->addChild(createCheckMenuItem("Use cached User presets", "",
-    //     [this, osmose]() { return osmose || ui->my_module->use_cached_user_presets; },
-    //     [this]() { ui->my_module->use_cached_user_presets = !ui->my_module->use_cached_user_presets; },
-    //     osmose || !ui->my_module
-    // ));
     menu->addChild(createCheckMenuItem("Keep search filters", "",
         [this]() { return ui->my_module->keep_search_filters; },
         [this]() { ui->my_module->keep_search_filters = !ui->my_module->keep_search_filters; },
@@ -97,6 +88,9 @@ void PresetMenu::appendContextMenu(ui::Menu* menu)
 struct SearchMenu : PresetMenu
 {
     void appendContextMenu(ui::Menu* menu) override {
+
+        if (!ui->my_module) return;
+
         menu->addChild(createMenuLabel<HamburgerTitle>("Search Options"));
 
         menu->addChild(createCheckMenuItem("Search preset Name", "",
@@ -107,8 +101,7 @@ struct SearchMenu : PresetMenu
                     ui->my_module->search_meta = true;
                 }
                 ui->on_search_text_enter();
-            },
-            !ui->my_module
+            }
         ));
         menu->addChild(createCheckMenuItem("Search preset Metadata", "",
             [this](){ return ui->my_module->search_meta; },
@@ -137,24 +130,16 @@ struct SearchMenu : PresetMenu
         ));
 
         menu->addChild(new MenuSeparator);
-        NVGcolor co_dot{nvgHSL(200.f/360.f, .5, .5)};
-        auto item = createMenuItem<ColorDotMenuItem>("Search on ENTER", "",
-            [this](){ ui->my_module->search_incremental = false; }, !ui->my_module);
-        if (ui->my_module) {
-            item->color = (!ui->my_module->search_incremental) ? co_dot : RampGray(G_45);
-        } else {
-            item->color = RampGray(G_45);
-        }
-        menu->addChild(item);
 
-        item = createMenuItem<ColorDotMenuItem>("Search as you type", "",
-            [this](){ ui->my_module->search_incremental = true; },  !ui->my_module);
-        if (ui->my_module) {
-            item->color = ui->my_module->search_incremental ? co_dot : RampGray(G_45);
-        } else {
-            item->color =  nvgHSL(360/200, .5, .5);
-        }
-        menu->addChild(item);
+        auto entry = new OptionMenuEntry(!ui->my_module->search_incremental,
+            createMenuItem("Search on ENTER", "",
+                [this](){ ui->my_module->search_incremental = false; }));
+        menu->addChild(entry);
+
+        entry = new OptionMenuEntry(ui->my_module->search_incremental,
+            createMenuItem("Search as you type", "",
+                [this](){ ui->my_module->search_incremental = true; }));
+        menu->addChild(entry);
     }
 };
 
