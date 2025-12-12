@@ -1,8 +1,9 @@
 // Copyright (C) Paul Chase Dempsey
 #include "services/colors.hpp"
-#include "PanelBorder.hpp"
+#include "panel-border.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 void removePanelBorder(SvgPanel* panel)
 {
@@ -23,10 +24,10 @@ void replacePanelBorder(SvgPanel* panel, PanelBorder* border) {
     panel->fb->setDirty();
 }
 
-PartnerPanelBorder* attachPartnerPanelBorder(rack::app::SvgPanel *panel, svg_theme::SvgThemeEngine& engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+PartnerPanelBorder* attachPartnerPanelBorder(rack::app::SvgPanel *panel, std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     auto panelBorder = new PartnerPanelBorder();
-    panelBorder->applyTheme(engine, theme);
+    panelBorder->applyTheme(theme);
     replacePanelBorder(panel, panelBorder);
     return panelBorder;
 }
@@ -41,7 +42,7 @@ void PartnerPanelBorder::setPartners(bool isLeft, bool isRight)
     }
 }
 
-bool PartnerPanelBorder::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
+bool PartnerPanelBorder::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     auto style = theme->getStyle("panel-border");
     if (style) {

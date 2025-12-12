@@ -61,21 +61,21 @@ void HakenMidi::compressor_option(ChemId tag, bool tanh)
 void HakenMidi::keep_pedals(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
-    key_pressure(tag, Haken::ch16, Haken::idPresPed, keep);
+    key_pressure(tag, Haken::ch16, Haken::idPrsvPed, keep);
     //end_stream(tag);
 }
 
 void HakenMidi::keep_surface(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
-    key_pressure(tag, Haken::ch16, Haken::idPresSurf, keep);
+    key_pressure(tag, Haken::ch16, Haken::idPrsvSurf, keep);
     //end_stream(tag);
 }
 
 void HakenMidi::keep_midi(ChemId tag, bool keep)
 {
     begin_stream(tag, Haken::s_Mat_Poke);
-    key_pressure(tag, Haken::ch16, Haken::idPresEnc, keep);
+    key_pressure(tag, Haken::ch16, Haken::idPrsvEnc, keep);
     //end_stream(tag);
 }
 
@@ -103,11 +103,6 @@ void HakenMidi::extended_macro(ChemId tag, uint8_t macro, uint16_t value)
     assert(in_range(macro, U8(7), U8(90)));
     send_message(Tag(MakeCC(Haken::ch1, macro_lsb_cc(macro), value & 0x7f), tag));
     send_message(Tag(MakeCC(Haken::ch1, macro_msb_cc(macro), value >> 7), tag));
-}
-
-void HakenMidi::midi_rate(ChemId tag, HakenMidiRate rate)
-{
-    send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, static_cast<uint8_t>(rate)), tag));
 }
 
 void HakenMidi::editor_present(ChemId tag) {

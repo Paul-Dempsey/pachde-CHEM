@@ -1,12 +1,13 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-namespace pachde {
+
+namespace widgetry {
 
 template<typename TSymbol>
-struct TSymbolWidget: OpaqueWidget
+struct TSymbolWidget: TransparentWidget
 {
-    using Base = OpaqueWidget;
+    using Base = TransparentWidget;
 
     widget::FramebufferWidget* fb{nullptr};
 	widget::SvgWidget* sw{nullptr};
@@ -17,7 +18,7 @@ struct TSymbolWidget: OpaqueWidget
         addChild(fb);
         sw = new widget::SvgWidget;
         fb->addChild(sw);
-        setSvg(Svg::load(asset::plugin(pluginInstance, TSymbol::symbol()))); 
+        setSvg(Svg::load(asset::plugin(pluginInstance, TSymbol::symbol())));
     }
 
     void set_scale(float scale) {
@@ -29,7 +30,7 @@ struct TSymbolWidget: OpaqueWidget
         widget::EventContext cDirty;
         DirtyEvent eDirty;
         eDirty.context = &cDirty;
-        Widget::onDirty(eDirty);        
+        Widget::onDirty(eDirty);
     }
 
     void setSvg(std::shared_ptr<window::Svg> svg) {

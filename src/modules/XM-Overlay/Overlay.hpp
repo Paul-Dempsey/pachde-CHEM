@@ -2,7 +2,6 @@
 #include "my-plugin.hpp"
 #include "chem.hpp"
 #include "services/colors.hpp"
-#include "services/color-help.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
 #include "widgets/widgets.hpp"
@@ -120,7 +119,7 @@ struct OverlayUi : ChemModuleWidget, IChemClient
     void set_bg_color(PackedColor color);
     void set_fg_color(PackedColor color);
     PackedColor get_bg_color() { return my_module ? my_module->bg_color : 0; }
-    PackedColor get_fg_color() { return my_module ? my_module->fg_color : parse_color("hsl(42,60%,50%)"); }
+    PackedColor get_fg_color() { return my_module ? my_module->fg_color : parseColor("hsl(42,.6,.5)", 0xfff0f0f0); }
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -130,7 +129,7 @@ struct OverlayUi : ChemModuleWidget, IChemClient
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-xovr.svg"); }
-    void setThemeName(const std::string& name, void * context) override;
+    //void setThemeName(const std::string& name, void * context) override;
 
     void step() override;
     void appendContextMenu(Menu *menu) override;

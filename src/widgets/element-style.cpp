@@ -1,20 +1,11 @@
 #include "element-style.hpp"
 
-namespace pachde {
-
-static PackedColor parse(const char * color_spec)
-{
-    switch (*color_spec) {
-        case '#': return parseHexColor(color_spec);
-        case 'r': return parseRgbColor(color_spec);
-        case 'h': return parseHslaColor(color_spec);
-        default: return 0;
-    }
-}
+using namespace pachde;
+namespace widgetry {
 
 ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
     key(key),
-    fill_color(parse(color_spec)),
+    fill_color(parseColor(color_spec, colors::NoColor)),
     stroke_color(0),
     dx(dx)
 {
@@ -23,16 +14,16 @@ ElementStyle::ElementStyle(const char* key, const char * color_spec, float dx) :
 ElementStyle::ElementStyle(const char *key, PackedColor co, const char *stroke_spec, float dx) :
     key(key),
     fill_color(co),
-    stroke_color(parse(stroke_spec)),
+    stroke_color(parseColor(stroke_spec, colors::NoColor)),
     dx(dx)
 {
 }
 
 
-ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *stroke_spec, float dx) : 
+ElementStyle::ElementStyle(const char *key, const char *color_spec, const char *stroke_spec, float dx) :
     key(key),
-    fill_color(parse(color_spec)),
-    stroke_color(parse(stroke_spec)),
+    fill_color(parseColor(color_spec, colors::NoColor)),
+    stroke_color(parseColor(stroke_spec, colors::NoColor)),
     dx(dx)
 {
 }

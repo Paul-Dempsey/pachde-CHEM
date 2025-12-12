@@ -1,20 +1,20 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "my-plugin.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
-#include "TipWidget.hpp"
+#include "tip-widget.hpp"
 using namespace svg_theme;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 // send a change notification to widget
 void notifyChange(Widget* widget);
 
 template <typename TLight>
-void applyLightTheme( TLight* light, const std::string& theme_name, const std::string& theme_key = "led")
+void applyLightTheme( TLight* light, std::shared_ptr<SvgTheme> theme, const std::string& theme_key = "led")
 {
-    auto theme = theme_engine.getTheme(theme_name);
     if (theme) {
         auto style = theme->getStyle(theme_key);
         if (style) {
@@ -29,28 +29,32 @@ void applyLightTheme( TLight* light, const std::string& theme_name, const std::s
 }
 
 // A Themed screw, based on the standard Rack screw.
-struct ThemeScrew : app::SvgScrew, IApplyTheme
+struct ThemeScrew : app::SvgScrew
 {
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/Screw.svg"), theme));
-        return true;
+    void loadSvg(ILoadSvg* loader) {
+        setSvg(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/Screw.svg")));
+    }
+
+    void apply_theme(std::shared_ptr<SvgTheme> theme) {
+        applySvgTheme(sw->svg, theme);
+        fb->dirty = true;
     }
 };
 
 // A themed Port
-struct ThemePort : app::SvgPort, IApplyTheme
+struct ThemePort : app::SvgPort
 {
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/Port.svg"), theme));
-        return true;
+    void loadSvg(ILoadSvg* loader) {
+        setSvg(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/Port.svg")));
+    }
+
+    void apply_theme(std::shared_ptr<SvgTheme> theme) {
+        applySvgTheme(sw->svg, theme);
+        fb->dirty = true;
     }
 };
 
-struct ThemeColorPort : app::SvgPort,  IApplyTheme
+struct ThemeColorPort : app::SvgPort,  IThemed
 {
     NVGcolor ring;
     const char* key;
@@ -68,10 +72,16 @@ struct ThemeColorPort : app::SvgPort,  IApplyTheme
 
     void draw(const DrawArgs& args) override;
 
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    void loadSvg(ILoadSvg* loader) {
+        setSvg(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/ColorPort.svg")));
+    }
+
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
-        setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/ColorPort.svg"), theme));
+        // assume the cached Svgs are updated together
+        //applySvgTheme(sw->svg, theme);
+        fb->dirty = true;
+
         auto style = theme->getStyle(key);
         if (style) {
             if (style->isApplyStroke()) {
@@ -88,64 +98,125 @@ struct ThemeColorPort : app::SvgPort,  IApplyTheme
 };
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorInput(math::Vec pos, engine::Module* module, int inputId, const char * key, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorInput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int inputId, const char * key, const NVGcolor& color, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
+    o->loadSvg(loader);
 	o->box.pos = pos;
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::INPUT;
 	o->app::PortWidget::portId = inputId;
-	o->applyTheme(engine, theme);
+	o->applyTheme(theme);
     o->ringColor(key, color);
 	return o;
 }
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorOutput(math::Vec pos, engine::Module* module, int outputId, const char*  key, const NVGcolor& color, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorOutput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int outputId, const char*  key, const NVGcolor& color, std::shared_ptr<SvgTheme> theme) {
 	TPortWidget* o = new TPortWidget();
 	o->box.pos = pos;
+    o->loadSvg(loader);
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::OUTPUT;
 	o->app::PortWidget::portId = outputId;
-	o->applyTheme(engine, theme);
+	o->applyTheme(theme);
     o->ringColor(key, color);
 	return o;
 }
 
+// TODO: any steteful SVG-based widgets need to be sent onChange() to how the correct updates state after a theme change
+// Need to recurse widgets do this for any known stateful widgets
 
 // themed vertical 2-value switch
-struct ThemeSwitchV2 : app::SvgSwitch, IApplyTheme
+struct ThemeSwitchV2 : app::SvgSwitch
 {
     ThemeSwitchV2()
     {
         shadow->opacity = 0.f; // hide the default shadow, like the Rack vertical switches do
     }
 
-    // IApplyTheme
-    //
+    void loadSvg(ILoadSvg* loader) {
+        if (frames.size() > 0) {
+            frames.clear();
+        }
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/vswitch2-0.svg")));
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/vswitch2-1.svg")));
+        fb->dirty = true;
+    }
+
     // For an SvgSwitch, Rack selects the current presentation (this->sw) from one of
     // a series of backing SVGs ("frames"). A simple invalidation (DirtyEvent) of the widget doesn't force
     // selection of the frame. In order to set the correct frame for the current value of the parameter
-    // backing the switch, we send a ChangeEvent and the handler calculates the correct frame for us.
+    // backing the switch, it is required to send a ChangeEvent and the handler calculates the correct frame for us.
     // If we only dirty, the new theme isn't shown until the value of the switch changes.
-    //
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        // Check if we're refreshing the widget with a new theme (and thus need to send a change event),
-        // or being initialized by the creation helper.
-        bool refresh = frames.size() > 0;
-        if (refresh) {
-            frames.clear();
-        }
-
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/vswitch2-0.svg"), theme));
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/vswitch2-1.svg"), theme));
-
-        if (refresh) {
-            // send change event to ensure the switch ui is set to the correct frame
-            notifyChange(this);
-        }
-        return refresh;
-    }
 };
+
+template <class TWidget>
+TWidget* createThemedWidget(::rack::math::Vec pos, ILoadSvg* loader) {
+	TWidget* o = new TWidget();
+	o->loadSvg(loader);
+	o->box.pos = pos;
+	return o;
+}
+
+template <class TWidget>
+TWidget* createThemedWidget(::rack::math::Vec pos, std::shared_ptr<SvgTheme> theme) {
+	TWidget* o = new TWidget();
+	o->applyTheme(theme);
+	o->box.pos = pos;
+	return o;
+}
+
+template <class TPanel = ::rack::app::SvgPanel>
+TPanel* createThemedPanel(std::string svgPath, ILoadSvg* loader) {
+	TPanel* panel = new TPanel;
+	panel->setBackground(loader->loadSvg(svgPath));
+	return panel;
+}
+
+template <class TParamWidget>
+TParamWidget* createThemedParam(::rack::math::Vec pos, ILoadSvg* loader, ::rack::engine::Module* module, int paramId) {
+	TParamWidget* o = new TParamWidget();
+    o->loadSvg(loader);
+	o->app::ParamWidget::module = module;
+	o->app::ParamWidget::paramId = paramId;
+	o->initParamQuantity();
+	o->box.pos = pos;
+	return o;
+}
+
+template <class TParamWidget>
+TParamWidget* createThemedParam(::rack::math::Vec pos, std::shared_ptr<SvgTheme> theme, ::rack::engine::Module* module, int paramId) {
+	TParamWidget* o = new TParamWidget();
+    o->applyTheme(theme);
+	o->app::ParamWidget::module = module;
+	o->app::ParamWidget::paramId = paramId;
+	o->initParamQuantity();
+	o->box.pos = pos;
+	return o;
+}
+
+template <class TPortWidget>
+TPortWidget* createThemedInput(::rack::math::Vec pos, ILoadSvg* loader, ::rack::engine::Module* module, int inputId) {
+	TPortWidget* o = new TPortWidget();
+    o->loadSvg(loader);
+	o->app::PortWidget::module = module;
+	o->app::PortWidget::type = ::rack::engine::Port::INPUT;
+	o->app::PortWidget::portId = inputId;
+	o->box.pos = pos;
+	return o;
+}
+
+
+template <class TPortWidget>
+TPortWidget* createThemedOutput(::rack::math::Vec pos, ILoadSvg* loader, ::rack::engine::Module* module, int outputId) {
+	TPortWidget* o = new TPortWidget();
+    o->loadSvg(loader);
+	o->app::PortWidget::module = module;
+	o->app::PortWidget::type = ::rack::engine::Port::OUTPUT;
+	o->app::PortWidget::portId = outputId;
+	o->box.pos = pos;
+	return o;
+}
+
 
 }

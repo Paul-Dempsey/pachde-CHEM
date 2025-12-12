@@ -1,11 +1,12 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "my-plugin.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
 using namespace svg_theme;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 struct GlowKnob : rack::RoundKnob {
     using Base = rack::RoundKnob;
@@ -77,18 +78,22 @@ struct GlowKnob : rack::RoundKnob {
 };
 
 template<typename TSvg>
-struct TKnob : GlowKnob, IApplyTheme
+struct TKnob : GlowKnob, IThemed
 {
     using Base = GlowKnob;
 
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    void loadSvg(ILoadSvg* loader) {
+        bg->setSvg(loader->loadSvg(asset::plugin(pluginInstance, TSvg::bg())));
+        setSvg(loader->loadSvg(asset::plugin(pluginInstance, TSvg::knob())));
+    }
+
+    // IThemed
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         wire = (theme->name == "Wire");
-        bg->setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::bg()), theme));
-        setSvg(engine.loadSvg(asset::plugin(pluginInstance, TSvg::knob()), theme));
-        auto screen = theme->getFillColor("k-disabled", true);
-        if (isVisibleColor(screen)) {
+
+        PackedColor screen{colors::NoColor};
+        if (theme->getFillColor(screen, "k-disabled", true)) {
             disabled_screen = fromPacked(screen);
         } else {
             disabled_screen = nvgRGBAf(.4, .4, .4, .6f);
@@ -96,8 +101,7 @@ struct TKnob : GlowKnob, IApplyTheme
         return true;
     }
 
-    void drawLayer(const DrawArgs& args, int layer) override
-    {
+    void drawLayer(const DrawArgs& args, int layer) override {
         if (layer != 1) return;
         if (rack::settings::rackBrightness > .95f) return;
         if (!module) return;
@@ -169,10 +173,11 @@ using GreenTrimPot = TKnob<GreenTrimPotSvg>;
 using GrayTrimPot = TKnob<GrayTrimPotSvg>;
 
 template <typename TKnob>
-TKnob* createChemKnob(Vec pos, Module * module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+TKnob* createChemKnob(Vec pos, ILoadSvg* loader, Module * module, int paramId, std::shared_ptr<SvgTheme> theme)
 {
 	auto o = createParam<TKnob>(pos, module, paramId);
-    o->applyTheme(engine, theme);
+    o->loadSvg(loader);
+    o->applyTheme(theme);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
     return o;
 }

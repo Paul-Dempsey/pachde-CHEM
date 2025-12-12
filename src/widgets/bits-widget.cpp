@@ -1,6 +1,6 @@
 #include "bits-widget.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 constexpr const float ROW_HEIGHT = 10.5f;
 constexpr const float MARGIN_DX = 3.5f;
@@ -13,7 +13,6 @@ BitsWidget::BitsWidget(
     int rows,
     float item_width,
     const std::vector<std::string>& items,
-    SvgThemeEngine& theme_engine,
     std::shared_ptr<svg_theme::SvgTheme> theme,
     std::function<void(uint64_t state)> on_change
 ) :
@@ -28,7 +27,7 @@ BitsWidget::BitsWidget(
     float x, y;
 
     LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
-    addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, theme_engine, theme, title_style));
+    addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, theme, title_style));
 
     auto r = exit_box_rect();
     addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) { close(); }, "option-exit"));
@@ -37,9 +36,9 @@ BitsWidget::BitsWidget(
 
     y = MARGIN_DY + title->box.size.y + MARGIN_DY;
 
-    TextLabel* none_label = createLabel<TextLabel>(Vec(box.size.x*.5f, y), 32.f, "[ any ]", theme_engine, theme, style);
+    TextLabel* none_label = createLabel<TextLabel>(Vec(box.size.x*.5f, y), 32.f, "[ any ]", theme, style);
     addChild(none_label);
-    addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) { 
+    addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) {
         state = 0;
         if (change_fn) change_fn(state);
     }, "choice-hover"));
@@ -51,7 +50,7 @@ BitsWidget::BitsWidget(
     float top = y;
     for (size_t i = 0; i < items.size(); ++i, item_it++) {
 
-        auto label = createLabel<TextLabel>(Vec(x,y+1), label_width, *item_it, theme_engine, theme, style);
+        auto label = createLabel<TextLabel>(Vec(x,y+1), label_width, *item_it, theme, style);
         labels.push_back(label);
         addChild(label);
 
@@ -68,10 +67,10 @@ BitsWidget::BitsWidget(
         }
     }
     box.size.y = top + (rows * ROW_HEIGHT) + MARGIN_DY;
-    ApplyChildrenTheme(this, theme_engine, theme);
+    applyChildrenTheme(this, theme);
 }
 
-bool BitsWidget::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool BitsWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     envelope.apply_theme(theme);
     control_frame.apply_theme(theme);
@@ -145,10 +144,10 @@ void BitsWidget::select_item(int id, int mods)
             state |= bit;
         }
         break;
-    case RACK_MOD_CTRL: 
+    case RACK_MOD_CTRL:
         state = bit;
         break;
-    default: 
+    default:
         return;
     }
     if (change_fn) change_fn(state);
@@ -200,9 +199,9 @@ void BitsWidget::draw(const DrawArgs& args)
     auto p = nvgBoxGradient(vg, 12, 12, box.size.x-30.f, box.size.y-24.f, 12.f, 50.f, nvgRGB(0,0,0), nvgRGBAf(0,0,0,0));
     nvgFillPaint(vg, p);
     nvgFill(vg);
-   
+
     auto co_border = envelope.nvg_stroke_color();
-    
+
     nvgBeginPath(vg);
     nvgMoveTo(vg, box.size.x, box.size.y * .5f - 3.5f);
     nvgLineTo(vg, box.size.x + 3.5f, box.size.y*.5f);
@@ -212,14 +211,14 @@ void BitsWidget::draw(const DrawArgs& args)
     nvgFill(vg);
 
     nvgResetScissor(vg);
-    
+
     FillRect(vg, 0.f, 0.f, box.size.x, box.size.y, envelope.nvg_color());
 
     float y = title->box.pos.y + title->box.size.y + MARGIN_DY*.5;
     Line(vg, 0, y, box.size.x, y, control_frame.nvg_stroke_color(), .5f);
 
     FittedBoxRect(vg, 0.f, 0.f, box.size.x, box.size.y, co_border, Fit::Inside, envelope.width());
-   
+
 
     auto r = exit_box_rect();
     BoxRect(vg, RECT_ARGS(r), control_frame.nvg_stroke_color(), .5f);

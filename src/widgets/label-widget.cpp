@@ -1,7 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #include "label-widget.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 BasicTextLabel::BasicTextLabel() :
     _color(RampGray(G_90)),
@@ -10,14 +11,16 @@ BasicTextLabel::BasicTextLabel() :
     layout_hint_color = Overlay(GetStockColor(StockColor::Yellow), .5f);
 }
 
-// IApplyTheme
-bool BasicTextLabel::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
+// IThemed
+bool BasicTextLabel::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     if (0 == *_style.key || !theme) return false;
-    _color = fromPacked(theme_engine.getFillColor(theme->name, _style.key, true));
-    if (!isColorVisible(_color)) {
-        _color = RampGray(G_65);
+    auto style = theme->getStyle(_style.key);
+    PackedColor co = colors::NoColor;
+    if (style) {
+        co = style->fill_color();
     }
+    _color = packed_color::isVisible(co) ? fromPacked(co) : RampGray(G_65);
     return true;
 }
 

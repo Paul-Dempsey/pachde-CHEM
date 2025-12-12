@@ -1,6 +1,7 @@
 #include "MidiPad.hpp"
 using namespace pachde;
 #include "em/wrap-HakenMidi.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 
 MidiPadModule::MidiPadModule()
@@ -43,8 +44,8 @@ void MidiPadModule::dataFromJson(json_t* root)
 json_t* MidiPadModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    json_object_set_new(root, "title", json_string(title.c_str()));
+    set_json(root, "haken-device", device_claim);
+    set_json(root, "title", title);
 
     auto jar = json_array();
     for (int i = 0; i < 16; ++i) {

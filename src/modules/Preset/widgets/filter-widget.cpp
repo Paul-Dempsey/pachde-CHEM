@@ -6,8 +6,7 @@ namespace pachde {
 
 StateButton* makeFilterStateButton(
     Vec pos,
-    SvgThemeEngine &engine,
-    std::shared_ptr<SvgTheme> theme,
+    ILoadSvg* loader,
     std::function<void()> on_click
 )
 {
@@ -17,7 +16,7 @@ StateButton* makeFilterStateButton(
         on_click
     );
     sb->box.pos = pos;
-    sb->applyTheme(engine, theme);
+    sb->loadSvg(loader);
     return sb;
 }
 
@@ -31,18 +30,18 @@ FilterButton* makeFilter (
     const std::string&name,
     const char * up_svg,
     const char * down_svg,
-    SvgThemeEngine &engine,
+    ILoadSvg* loader,
     std::shared_ptr<SvgTheme> theme,
     std::function<void(uint64_t item)> on_change
     )
 {
     FilterButton* o = new FilterButton(up_svg, down_svg, on_change);
     o->box.pos = pos;
-    o->init(name, rows, item_width, items, engine, theme);
+    o->init(name, rows, item_width, items, loader, theme);
     return o;
 }
 
-FilterButton* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Classic",
@@ -67,11 +66,11 @@ FilterButton* makeCatFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<Svg
         "Category",
         "res/widgets/category-button.svg",
         "res/widgets/category-button-down.svg",
-        engine, theme, on_change
+        loader, theme, on_change
     );
 }
 
-FilterButton* makeTypeFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Atonal",
@@ -91,16 +90,16 @@ FilterButton* makeTypeFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<Sv
     };
     return makeFilter(
         pos,
-        5, 50.f, 
+        5, 50.f,
         info,
         "Type",
         "res/widgets/type-button.svg",
         "res/widgets/type-button-down.svg",
-        engine, theme, on_change
+        loader, theme, on_change
     );
 }
 
-FilterButton* makeCharacterFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Acoustic",
@@ -149,13 +148,13 @@ FilterButton* makeCharacterFilter(Vec pos, SvgThemeEngine &engine, std::shared_p
         50.f,
         info,
         "Character",
-        "res/widgets/character-button.svg", 
+        "res/widgets/character-button.svg",
         "res/widgets/character-button-down.svg",
-        engine, theme, on_change
+        loader, theme, on_change
     );
 }
 
-FilterButton* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Additive",
@@ -185,11 +184,11 @@ FilterButton* makeMatrixFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<
         "Matrix",
         "res/widgets/matrix-button.svg",
         "res/widgets/matrix-button-down.svg",
-        engine, theme, on_change
+        loader, theme, on_change
     );
 }
 
-FilterButton* makeSettingFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Channel 1",
@@ -209,7 +208,7 @@ FilterButton* makeSettingFilter(Vec pos, SvgThemeEngine &engine, std::shared_ptr
         "Setting",
         "res/widgets/gear-button.svg",
         "res/widgets/gear-button-down.svg",
-        engine,
+        loader,
         theme,
         on_change
     );
@@ -225,14 +224,14 @@ FilterButton::FilterButton(const char *svg_up, const char *svg_down, std::functi
     this->shadow->hide();
 }
 
-void FilterButton::init(const std::string &name, int rows, float item_width, const std::vector<std::string> &items, SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+void FilterButton::init(const std::string &name, int rows, float item_width, const std::vector<std::string> &items, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     if (item_width <= 0.f) item_width = 42;
-    applyTheme(engine, theme);
+    loadSvg(loader);
 
     const float DIALOG_SEP = 3.5f;
 
-    dialog = new BitsWidget(name, rows, item_width, items, engine, theme,
+    dialog = new BitsWidget(name, rows, item_width, items, theme,
         [=](uint64_t state) {
             describe(dialog->make_summary());
             if (change_fn) {
@@ -247,28 +246,13 @@ void FilterButton::init(const std::string &name, int rows, float item_width, con
     dialog->setVisible(false);
 }
 
-bool FilterButton::applyTheme(SvgThemeEngine &engine, std::shared_ptr<SvgTheme> theme)
+void FilterButton::loadSvg(ILoadSvg* loader)
 {
-    bool refresh = frames.size() > 0; 
-    if (refresh) {
-        frames.clear();
-        sw->setSvg(nullptr);
-    }
-
-    addFrame(engine.loadSvg(asset::plugin(pluginInstance, up_svg), theme));
-    addFrame(engine.loadSvg(asset::plugin(pluginInstance, down_svg), theme));
-
-    if (refresh) {
-        sw->setSvg(frames[0]);
-        if (fb) {
-            fb->setDirty();
-        }
-    }
-    if (dialog && !dialog->isVisible()) {
-        // dialog is not a child widget when not shown
-        ApplyChildrenTheme(dialog, engine, theme);
-    }
-    return true;
+    frames.clear();
+    addFrame(loader->loadSvg(asset::plugin(pluginInstance, up_svg)));
+    addFrame(loader->loadSvg(asset::plugin(pluginInstance, down_svg)));
+    sw->setSvg(frames[0]);
+    fb->dirty = true;
 }
 
 

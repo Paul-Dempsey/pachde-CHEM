@@ -26,16 +26,16 @@ constexpr const float CORE_LINK_LEFT = 12.f;
 constexpr const float CORE_LINK_TEXT = 28.f;
 constexpr const float CORE_LINK_TEXT_DY = 13.f;
 
-extern pachde::LabelStyle warning_label; // "warning" 9px left
-extern pachde::LabelStyle haken_label;   // "dytext" 10px left
-extern pachde::LabelStyle in_port_label; // "in-label" 12px center
-extern pachde::LabelStyle control_label; // "ctl-label" 14px center
-extern pachde::LabelStyle control_label_left;  // "ctl-label" 14px left
-extern pachde::LabelStyle small_control_label; // "label" 10px center
-extern pachde::LabelStyle med_control_label;   // "label" 12px center
+extern widgetry::LabelStyle warning_label; // "warning" 9px left
+extern widgetry::LabelStyle haken_label;   // "dytext" 10px left
+extern widgetry::LabelStyle in_port_label; // "in-label" 12px center
+extern widgetry::LabelStyle control_label; // "ctl-label" 14px center
+extern widgetry::LabelStyle control_label_left;  // "ctl-label" 14px left
+extern widgetry::LabelStyle small_control_label; // "label" 10px center
+extern widgetry::LabelStyle med_control_label;   // "label" 12px center
 
-extern pachde::LabelStyle heading_label; // "ctl-label" 16px center bold
-extern pachde::LabelStyle pedal_label;   // "ped-assign" 9px left
+extern widgetry::LabelStyle heading_label; // "ctl-label" 16px center bold
+extern widgetry::LabelStyle pedal_label;   // "ped-assign" 9px left
 
 extern const char * const NotConnected;
 extern const char * const InputColorKey;

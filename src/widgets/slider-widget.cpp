@@ -1,7 +1,8 @@
 #include "slider-widget.hpp"
 using namespace ::rack;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 using namespace slider_impl;
 
 BasicSlider::BasicSlider() :
@@ -33,7 +34,7 @@ void BasicSlider::onLeave(const LeaveEvent& e) {
     slider_impl::onLeave<BasicSlider, Base>(this, e);
 }
 
-bool BasicSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTheme> theme)
+bool BasicSlider::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     wire = theme->name == "Wire";
     stem.apply_theme(theme);
@@ -66,7 +67,7 @@ void BasicSlider::draw_thumb(const DrawArgs &args)
     float pos = box.size.y - thumb_cy - thumb_pos();
     if (wire) {
         BoxRect(vg, center - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_stroke_color(), thumb.dx);
-        if (Alpha(thumb.fill_color) < 1.0) {
+        if (packed_color::alpha(thumb.fill_color) < 1.0) {
             FillRect(vg, center - thumb_cx, pos - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_color());
         }
     } else {

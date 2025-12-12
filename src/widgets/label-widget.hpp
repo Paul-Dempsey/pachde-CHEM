@@ -1,11 +1,11 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "services/text.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "layout-help.hpp"
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
 enum class TextAlignment { Left, Center, Right };
 enum class VAlignment { Top, Middle, Bottom };
@@ -81,7 +81,7 @@ struct LabelStyle
     bool center() { return align == TextAlignment::Center; }
 };
 
-struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
+struct BasicTextLabel: Widget, IThemed, ILayoutHelp
 {
     using Base = Widget;
 
@@ -112,15 +112,15 @@ struct BasicTextLabel: Widget, IApplyTheme, ILayoutHelp
         bright = glow;
     }
 
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    // IThemed
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void render(const DrawArgs& args);
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
 };
 
-struct TextLabel: Widget, IApplyTheme, ILayoutHelp
+struct TextLabel: Widget, IThemed, ILayoutHelp
 {
     using Base = Widget;
 
@@ -174,9 +174,9 @@ struct TextLabel: Widget, IApplyTheme, ILayoutHelp
         _label->glowing(glow);
         dirty();
     }
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
-        return _label->applyTheme(theme_engine, theme);
+        return _label->applyTheme(theme);
     }
     void draw(const DrawArgs& args) override
     {
@@ -192,7 +192,6 @@ TWidget* createStaticTextLabel(
     math::Vec pos,
     float width,
     std::string text,
-    SvgThemeEngine& engine,
     std::shared_ptr<SvgTheme> theme
     )
 {
@@ -205,7 +204,7 @@ TWidget* createStaticTextLabel(
         w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
-    w->applyTheme(engine, theme);
+    w->applyTheme(theme);
     return w;
 }
 
@@ -214,7 +213,6 @@ TWidget* createLabel(
     math::Vec pos,
     float width,
     std::string text,
-    SvgThemeEngine& engine,
     std::shared_ptr<SvgTheme> theme,
     const LabelStyle& style
     )
@@ -229,7 +227,7 @@ TWidget* createLabel(
         w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
-    w->applyTheme(engine, theme);
+    w->applyTheme(theme);
     return w;
 }
 

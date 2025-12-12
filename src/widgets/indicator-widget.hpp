@@ -1,10 +1,11 @@
 #pragma once
 #include "services/text.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "element-style.hpp"
+#include "tip-widget.hpp"
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
 struct DotWidget : TransparentWidget {
     NVGcolor color;
@@ -55,7 +56,7 @@ inline IndicatorWidget * createIndicatorCentered(float x, float y, const NVGcolo
     return w;
 }
 
-struct StateIndicatorWidget : IndicatorWidget, IApplyTheme
+struct StateIndicatorWidget : IndicatorWidget, IThemed
 {
     ElementStyle option_on{"state-on", "hsl(216,50%,50%)", "hsl(216,50%,50%)", 1};
     ElementStyle option_off{"state-off", "#00000000", "#808080", .35f};
@@ -71,7 +72,7 @@ struct StateIndicatorWidget : IndicatorWidget, IApplyTheme
 
     bool wire{false};
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         wire = (0 == theme->name.compare("Wire"));
         option_on.apply_theme(theme);

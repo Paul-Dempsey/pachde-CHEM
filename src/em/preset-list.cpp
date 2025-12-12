@@ -1,6 +1,7 @@
 #include "preset-list.hpp"
 #include "my-plugin.hpp"
 #include "services/misc.hpp"
+#include "services/json-help.hpp"
 #include "em-hardware.h"
 
 using namespace pachde;

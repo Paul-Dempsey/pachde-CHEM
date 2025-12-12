@@ -2,12 +2,12 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "em/midi-message.h"
-#include "services/color-help.hpp"
 #include "services/colors.hpp"
 #include "widgets/element-style.hpp"
 #include "widgets/label-widget.hpp"
-#include "widgets/TipWidget.hpp"
+#include "widgets/tip-widget.hpp"
 using namespace ::svg_theme;
+using namespace ::widgetry;
 
 namespace pachde {
 
@@ -50,7 +50,7 @@ struct MidiPad
     void from_json(json_t* root);
 };
 
-struct PadWidget : TipWidget, IApplyTheme
+struct PadWidget : TipWidget, IThemed
 {
     using Base = TipWidget;
 
@@ -75,7 +75,7 @@ struct PadWidget : TipWidget, IApplyTheme
         int identifier,
         std::shared_ptr<MidiPad> the_pad,
         Module* module,
-        SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
+        std::shared_ptr<SvgTheme> theme,
         std::function<void(int)> callback);
 
     void set_pad(std::shared_ptr<MidiPad> the_pad);
@@ -84,7 +84,7 @@ struct PadWidget : TipWidget, IApplyTheme
     void onHover(const HoverEvent& e) override;
     void onLeave(const LeaveEvent& e) override;
     void onButton(const ButtonEvent& e) override;
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void step() override;
     void draw(const DrawArgs& args) override;
 

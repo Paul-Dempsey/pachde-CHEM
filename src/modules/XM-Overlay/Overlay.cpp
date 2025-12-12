@@ -1,6 +1,7 @@
 #include "Overlay.hpp"
 using namespace pachde;
 #include "em/wrap-HakenMidi.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 
 OverlayModule::OverlayModule()
@@ -160,8 +161,8 @@ void OverlayModule::dataFromJson(json_t* root)
         overlay_preset->fromJson(j);
     }
     title = get_json_string(root, "overlay-title");
-    bg_color = parse_color(get_json_string(root, "background-color"));
-    fg_color = parse_color(get_json_string(root, "foreground-color"));
+    bg_color = parseColor(get_json_cstring(root, "background-color"), 0);
+    fg_color = parseColor(get_json_cstring(root, "foreground-color"), 0xffe6e6e6);
 
     ModuleBroker::get()->try_bind_client(this);
 }
@@ -173,9 +174,9 @@ json_t* OverlayModule::dataToJson()
     if (overlay_preset) {
         json_object_set_new(root, "overlay-preset", overlay_preset->toJson(true, true, true));
     }
-    json_object_set_new(root, "overlay-title", json_string(title.c_str()));
-    json_object_set_new(root, "background-color", json_string(hex_string(bg_color).c_str()));
-    json_object_set_new(root, "foreground-color", json_string(hex_string(fg_color).c_str()));
+    set_json(root, "overlay-title", title);
+    set_json(root, "background-color", hex_string(bg_color));
+    set_json(root, "foreground-color", hex_string(fg_color));
 
     return root;
 }
@@ -189,7 +190,7 @@ void OverlayModule::onReset(const ResetEvent &e)
 
     title = DEFAULT_TITLE;
     bg_color = 0;
-    fg_color = parse_color("hsl(42,60%,50%)");
+    fg_color = parseColor("hsl(42, .6, .5)", 0xfff0f0f0);
     macro_usage.clear();
     in_macro_request = false;
     expect_preset_change = false;

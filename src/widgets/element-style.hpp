@@ -1,9 +1,9 @@
 #pragma once
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
 using namespace ::svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
 struct ElementStyle
 {
@@ -19,8 +19,8 @@ struct ElementStyle
     ElementStyle(const char* key, PackedColor co, const char * stroke_spec, float dx = 1.f);
     ElementStyle(const char* key, const char * color_spec, const char * stroke_spec, float dx = 1.f);
 
-    NVGcolor nvg_color() { return fromPacked(fill_color); }
-    NVGcolor nvg_stroke_color() { return fromPacked(stroke_color); }
+    NVGcolor nvg_color() { return pachde::fromPacked(fill_color); }
+    NVGcolor nvg_stroke_color() { return pachde::fromPacked(stroke_color); }
     float width() { return dx; }
 
     void apply_theme(std::shared_ptr<SvgTheme> theme);

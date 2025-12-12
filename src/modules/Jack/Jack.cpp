@@ -1,4 +1,5 @@
 #include "Jack.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 
 using namespace pachde;
@@ -37,17 +38,16 @@ JackModule::JackModule()
 void JackModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
-    json_read_bool(root, "glow-knobs", glow_knobs);
-
+    glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
+    device_claim = get_json_string(root, "haken-device");
     ModuleBroker::get()->try_bind_client(this);
 }
 
 json_t* JackModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
+    set_json(root, "haken-device", device_claim);
+    set_json(root, "glow-knobs", glow_knobs);
     return root;
 }
 
@@ -118,7 +118,7 @@ void JackModule::process_params(const ProcessArgs &args)
     last_assign_2 = update_send(stream_data, P_ASSIGN_JACK_2, Haken::idPedal2,    last_assign_2);
     last_shift    = update_send(stream_data, P_SHIFT,         Haken::idJackShift, last_shift);
     last_action   = update_send(stream_data, P_SHIFT_ACTION,  Haken::idSwTogInst, last_action);
-    last_keep     = update_send(stream_data, P_KEEP,          Haken::idPresPed,   last_keep);
+    last_keep     = update_send(stream_data, P_KEEP,          Haken::idPrsvPed,   last_keep);
 
     auto haken = chem_host->host_haken();
     if (!stream_data.empty()) {

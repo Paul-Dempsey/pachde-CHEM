@@ -4,7 +4,6 @@ using namespace ::rack;
 #include "em/wrap-HakenMidi.hpp"
 #include "services/colors.hpp"
 #include "services/misc.hpp"
-#include "services/svt_rack.hpp"
 
 namespace pachde {
 

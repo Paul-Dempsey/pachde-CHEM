@@ -1,12 +1,12 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 using namespace svg_theme;
 
 namespace pachde {
 
-struct MiniFader: ParamWidget, IApplyTheme
+struct MiniFader: ParamWidget, IThemed
 {
     using Base = ParamWidget;
 
@@ -27,8 +27,8 @@ struct MiniFader: ParamWidget, IApplyTheme
     // ParamWidget
     void initParamQuantity() override;
 
-    // IApplyTheme
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    // IThemed
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     // Widget
     //void onHover(const HoverEvent& e) override;

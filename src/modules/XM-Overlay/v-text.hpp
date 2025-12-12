@@ -7,7 +7,7 @@ namespace pachde {
 
 struct VerticalLabel: OpaqueWidget {
     std::string text{"hello"};
-    PackedColor color{PackRGB(uint32_t(240), uint32_t(240), uint32_t(240))};
+    PackedColor color{0xfff0f0f0};
     bool bold{true};
     float height{28.f};
 

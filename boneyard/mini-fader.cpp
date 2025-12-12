@@ -36,59 +36,32 @@ void MiniFader::initParamQuantity()
     }
 }
 
-bool MiniFader::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool MiniFader::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     PackedColor co;
     auto style = theme->getStyle("mf-cap");
     if (style) {
         co = style->strokeWithOpacity();
-        cap_color = isVisibleColor(co) ? fromPacked(co) : nvgRGB(0x40, 0x95, 0xbf);
+        cap_color = packed_color::isVisible(co) ? fromPacked(co) : nvgRGB(0x40, 0x95, 0xbf);
         cap_width = style->stroke_width;
     }
 
     style = theme->getStyle("mf-stem");
     if (style) {
         co = style->strokeWithOpacity();
-        stem_color = isVisibleColor(co) ? fromPacked(co) : RampGray(G_55);
+        stem_color = packed_color::isVisible(co) ? fromPacked(co) : RampGray(G_55);
         stem_width = style->stroke_width;
     }
 
     style = theme->getStyle(thumb_key);
     if (style) {
         co = style->fillWithOpacity();
-        thumb_color = isVisibleColor(co) ? fromPacked(co) : nvgRGB(0xc9, 0x1d, 0xc7);
+        thumb_color = packed_color::isVisible(co) ? fromPacked(co) : nvgRGB(0xc9, 0x1d, 0xc7);
     }
     return false;
 }
 
-// void MiniFader::onHover(const HoverEvent &e)
-// {
-//     Base::onHover(e);
-// }
-
-void MiniFader::onDragStart(const DragStartEvent &e)
-{
-    Base::onDragStart(e);
-}
-
-void MiniFader::onDragMove(const DragMoveEvent &e)
-{
-    Base::onDragMove(e);
-}
-
-void MiniFader::onDragEnd(const DragEndEvent &e)
-{
-    Base::onDragEnd(e);
-}
-
-void MiniFader::onButton(const ButtonEvent &e)
-{
-    //auto mods = (e.mods & RACK_MOD_MASK);
-    Base::onButton(e);
-}
-
-void MiniFader::draw(const DrawArgs &args)
-{
+void MiniFader::draw(const DrawArgs &args) {
     auto vg = args.vg;
 
     auto pq = getParamQuantity();
@@ -103,10 +76,9 @@ void MiniFader::draw(const DrawArgs &args)
     FillRect(vg, 2.f, box.size.y-1.f - pos - thumb_height, box.size.x - 4.f, thumb_height, thumb_color);
 }
 
-MiniFader * createMiniFaderCentered(Vec pos, Module *module, int param_id, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
-{
+MiniFader * createMiniFaderCentered(Vec pos, Module *module, int param_id, std::shared_ptr<SvgTheme> theme) {
     auto o = createParamCentered<MiniFader>(pos, module, param_id);
-    o->applyTheme(engine, theme);
+    o->applyTheme(theme);
     return o;
 }
 

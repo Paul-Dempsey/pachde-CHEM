@@ -4,7 +4,7 @@ using namespace ::rack;
 #include "em/wrap-HakenMidi.hpp"
 #include "services/misc.hpp"
 using namespace pachde;
-namespace pachde {
+namespace widgetry {
 
 struct OctaveShiftLeds {
     uint8_t shift{60};

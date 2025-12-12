@@ -15,7 +15,7 @@ PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers, std::shared_ptr<SvgTh
     peers(peers)
 {
     LabelStyle grid_style{"preset"};
-    addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", theme_engine, theme, grid_style));
+    addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", theme, grid_style));
 }
 
 PresetEntry* PresetEntry::create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host, std::shared_ptr<SvgTheme> theme) {
@@ -58,14 +58,14 @@ void PresetEntry::clear_preset()
     notifyChange(this);
 }
 
-bool PresetEntry::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTheme> theme)
+bool PresetEntry::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     preset_element.apply_theme(theme);
     live_element.apply_theme(theme);
     current_element.apply_theme(theme);
     hover_element.apply_theme(theme);
     category_style.apply_theme(theme);
-    label->applyTheme(theme_engine, theme);
+    label->applyTheme(theme);
     return true;
 }
 

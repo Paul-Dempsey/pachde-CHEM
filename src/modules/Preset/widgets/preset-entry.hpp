@@ -5,11 +5,12 @@
 #include "em/preset.hpp"
 
 using namespace eaganmatrix;
+using namespace widgetry;
 struct PresetUi;
 
 namespace pachde {
 
-struct PresetEntry : OpaqueWidget, IApplyTheme
+struct PresetEntry : OpaqueWidget, IThemed
 {
     using Base = OpaqueWidget;
     TipLabel* label{nullptr};
@@ -38,7 +39,7 @@ struct PresetEntry : OpaqueWidget, IApplyTheme
     PresetId preset_id() const { return preset ? preset->id : PresetId(); }
     void send_preset();
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void appendContextMenu(ui::Menu* menu);
     void createContextMenu()
     {

@@ -1,6 +1,6 @@
 #include "Play.hpp"
 #include <ghc/filesystem.hpp>
-
+#include "services/json-help.hpp"
 namespace fs = ghc::filesystem;
 using namespace pachde;
 
@@ -24,10 +24,10 @@ void PlayModule::update_mru(std::string path)
 void PlayModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
-    json_read_string(root, "playlist-folder", playlist_folder);
-    json_read_string(root, "playlist-file", playlist_file);
-    json_read_bool(root, "track-live", track_live);
+    device_claim = get_json_string(root, "haken-device");
+    playlist_folder = get_json_string(root, "playlist-folder");
+    playlist_file = get_json_string(root, "playlist-file");
+    track_live = get_json_bool(root, "track-live", true);
 
     playlist_mru.clear();
     auto jar = json_object_get(root, "history");
@@ -48,9 +48,9 @@ void PlayModule::dataFromJson(json_t* root)
 json_t* PlayModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    json_object_set_new(root, "track-live", json_boolean(track_live));
-    json_object_set_new(root, "playlist-folder", json_string(playlist_folder.c_str()));
+    set_json(root, "haken-device", device_claim);
+    set_json(root, "track-live", track_live);
+    set_json(root, "playlist-folder", playlist_folder);
     if (!playlist_folder.empty()) {
         auto kv = get_plugin_kv_store();
         if (kv && kv->load()) {
@@ -60,7 +60,7 @@ json_t* PlayModule::dataToJson()
             }
         }
     }
-    json_object_set_new(root, "playlist-file", json_string(playlist_file.c_str()));
+    set_json(root, "playlist-file", playlist_file);
 
     auto jaru = json_array();
     int count = 0;

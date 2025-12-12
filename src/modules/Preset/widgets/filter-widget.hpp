@@ -1,16 +1,17 @@
 #pragma once
 #include <rack.hpp>
+using namespace ::rack;
 #include "widgets/theme-button.hpp"
 #include "widgets/bits-widget.hpp"
-#include "widgets/TipWidget.hpp"
-
-using namespace ::rack;
+#include "widgets/tip-widget.hpp"
+using namespace widgetry;
 
 namespace pachde {
 
-struct StateButton : SvgButton, IApplyTheme
+struct StateButton : SvgButton
 {
     using Base = SvgButton;
+
     const char * up_svg{nullptr};
     const char * down_svg{nullptr};
     TipHolder * tip_holder{nullptr};
@@ -44,25 +45,17 @@ struct StateButton : SvgButton, IApplyTheme
         tip_holder->setText(text);
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    void loadSvg(ILoadSvg* loader)
     {
-        bool refresh = frames.size() > 0;
-        if (refresh) {
-            frames.clear();
-            sw->setSvg(nullptr);
+        frames.clear();
+
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, up_svg)));
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, down_svg)));
+
+        sw->setSvg(frames[0]);
+        if (fb) {
+            fb->setDirty();
         }
-
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, up_svg), theme));
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, down_svg), theme));
-
-        if (refresh) {
-            sw->setSvg(frames[0]);
-            if (fb) {
-                fb->setDirty();
-            }
-        }
-
-        return true;
     }
 
     void onHover(const HoverEvent& e) override {
@@ -130,12 +123,11 @@ struct StateButton : SvgButton, IApplyTheme
 
 StateButton* makeFilterStateButton(
     Vec pos,
-    SvgThemeEngine &engine,
-    std::shared_ptr<SvgTheme> theme,
+    ILoadSvg* loader,
     std::function<void()> on_click
 );
 
-struct FilterButton : SvgButton, IApplyTheme
+struct FilterButton : SvgButton
 {
     using Base = SvgButton;
 
@@ -150,7 +142,8 @@ struct FilterButton : SvgButton, IApplyTheme
     void init (
         const std::string& name, int rows, float item_width,
         const std::vector<std::string>& items,
-        SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme);
+        ILoadSvg* loader,
+        std::shared_ptr<svg_theme::SvgTheme> theme);
 
     uint64_t get_state() { return dialog->get_state(); }
     void set_state(uint64_t state) {
@@ -175,7 +168,7 @@ struct FilterButton : SvgButton, IApplyTheme
         tip_holder->setText(text);
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    void loadSvg(ILoadSvg* loader);
 
     void onHover(const HoverEvent& e) override {
         e.consume(this);
@@ -220,10 +213,10 @@ struct FilterButton : SvgButton, IApplyTheme
     void step() override;
 };
 
-FilterButton* makeCatFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeTypeFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeCharacterFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeMatrixFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeSettingFilter(Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 
 }

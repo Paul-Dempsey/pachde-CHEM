@@ -1,13 +1,13 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
-struct FlipSwitch: ::rack::app::Switch, IApplyTheme
+struct FlipSwitch: ::rack::app::Switch, IThemed
 {
     using Base = ::rack::app::Switch;
 
@@ -19,7 +19,7 @@ struct FlipSwitch: ::rack::app::Switch, IApplyTheme
 
     FlipSwitch();
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
     //TODO: ctrl+click for reverse
     void onDragStart(const DragStartEvent& e) override;
 	void onDragEnd(const DragEndEvent& e) override;

@@ -2,15 +2,14 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "services/text.hpp"
-#include "services/svt_rack.hpp"
 #include "element-style.hpp"
-#include "TipWidget.hpp"
+#include "tip-widget.hpp"
 
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
-struct TabHeader: OpaqueWidget, IApplyTheme
+struct TabHeader: OpaqueWidget, IThemed
 {
     using Base = OpaqueWidget;
     const float cell = 12.f;
@@ -41,7 +40,7 @@ struct TabHeader: OpaqueWidget, IApplyTheme
     std::function<void(int item)> on_item_change{nullptr};
     void set_on_item_change(std::function<void(int item)> handler) { on_item_change = handler; }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void ensure_tip_holder() { if (!tip_holder) tip_holder = new TipHolder(); }
     void set_tip_text(std::string text) { ensure_tip_holder(); tip_holder->setText(text); }

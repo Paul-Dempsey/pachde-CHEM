@@ -1,10 +1,10 @@
 #include "tab-header.hpp"
-
-namespace pachde {
+using namespace pachde;
+namespace widgetry {
 
 static const char * _digits = "123456789";
 
-bool TabHeader::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+bool TabHeader::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     item_style.apply_theme(theme);
     current_style.apply_theme(theme);
@@ -26,7 +26,7 @@ int TabHeader::index_of_pos(Vec pos)
 
 void TabHeader::onHover(const HoverEvent& e) {
     Base::onHover(e);
-    
+
     int item = index_of_pos(e.pos);
     if (item != hovered_item) {
         hovered_item = item;
@@ -85,7 +85,7 @@ void TabHeader::onButton(const ButtonEvent& e)
             hovered_item = -1;
             //createContextMenu();
             e.consume(this);
-        } 
+        }
     }
 }
 void TabHeader::draw(const DrawArgs& args)

@@ -1,8 +1,9 @@
 #include "slider-h-widget.hpp"
 using namespace ::rack;
 using namespace ::svg_theme;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 using namespace slider_impl;
 
 BasicHSlider::BasicHSlider() :
@@ -93,7 +94,7 @@ float BasicHSlider::mod_pos()
     return rescale(mod_value, pq->getMinValue(), pq->getMaxValue(), 0.f, range);
 }
 
-bool BasicHSlider::applyTheme(SvgThemeEngine &theme_engine, std::shared_ptr<SvgTheme> theme)
+bool BasicHSlider::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     wire = theme->name == "Wire";
     stem.apply_theme(theme);
@@ -125,7 +126,7 @@ void BasicHSlider::draw_thumb(const DrawArgs &args)
     float pos = thumb_pos() + thumb_cx;
     if (wire) {
         BoxRect(vg, pos - thumb_cx, CENTER - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_stroke_color(), thumb.dx);
-        if (Alpha(thumb.fill_color) < 1.0) {
+        if (packed_color::alpha(thumb.fill_color) < 1.0) {
             FillRect(vg, pos - thumb_cx, CENTER - thumb_cy, thumb_size.x, thumb_size.y, thumb.nvg_color());
         }
     } else {

@@ -4,10 +4,11 @@ using namespace ::rack;
 #include "services/colors.hpp"
 #include "layout-help.hpp"
 #include "element-style.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
-struct ClickRegion : Widget, ILayoutHelp, IApplyTheme
+struct ClickRegion : Widget, ILayoutHelp, IThemed
 {
     using Base = Widget;
     int identifier;
@@ -33,7 +34,7 @@ struct ClickRegion : Widget, ILayoutHelp, IApplyTheme
         hover_style.key = key;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override
     {
         if (hoverable) {
             hover_style.apply_theme(theme);

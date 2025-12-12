@@ -23,10 +23,6 @@ struct PlayMenu : Hamburger
 
     void setUi(PlayUi* w) { ui = w; }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override {
-        return Base::applyTheme(engine, theme);
-    }
-
     void appendContextMenu(ui::Menu* menu) override
     {
         menu->addChild(createMenuLabel<HamburgerTitle>("Playlist Actions"));
@@ -113,20 +109,19 @@ PlayUi::PlayUi(PlayModule *module) :
     my_module(module)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
     if (S::show_screws()) {
-        addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
-        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), theme_engine, theme));
-        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+        addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), &module_svgs));
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), &module_svgs));
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), &module_svgs));
     }
 
     float y = PRESETS_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
-        auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme_engine, theme);
+        auto pw = createPresetWidget(this, &presets, PRESETS_LEFT, y, theme);
         if (!module) {
             pw->set_text(in_range(i, 4, 14) ? "..." : format_string("[preset #%d]", 1 + i));
         }
@@ -135,30 +130,30 @@ PlayUi::PlayUi(PlayModule *module) :
         y += 20;
     }
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
 
     addChild(warning_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme_engine, theme, S::warning_label));
+        Vec(28.f, box.size.y - 22.f), box.size.x, "", theme, S::warning_label));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
     LabelStyle style{"dytext", TextAlignment::Left, 14.f};
     addChild(playlist_label = createLabel<TipLabel>(
-        Vec(ONEU, 16), 148.f, "My Favorites", theme_engine, theme, style));
+        Vec(ONEU, 16), 148.f, "My Favorites", theme, style));
     playlist_label->glowing(true);
 
     addChild(blip = createBlipCentered(7.5f, 24.f, "Playlist unsaved when lit"));
     blip->set_radius(2.5f);
     blip->set_rim_color(nvgTransRGBAf(RampGray(G_65), .4f));
-    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
+    blip->set_light_color(ColorFromTheme(theme, "warning", nvgRGB(0xe7, 0xe7, 0x45)));
     blip->set_brightness(0.f);
 
     style.height = 9.f;
     style.align = TextAlignment::Center;
     addChild(page_label = createLabel<TextLabel>(
-        Vec(RIGHT_MARGIN_CENTER, 35.f),  35.f, "1 of 1", theme_engine, theme, style));
+        Vec(RIGHT_MARGIN_CENTER, 35.f),  35.f, "1 of 1", theme, style));
 
-    auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), theme_engine, theme, "Add to playlist");
+    auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), &module_svgs, "Add to playlist");
     heart->setHandler([this](bool c, bool s){
         add_live();
     });
@@ -168,10 +163,10 @@ PlayUi::PlayUi(PlayModule *module) :
     style.height = 14.f;
     style.bold = true;
     addChild(live_preset_label = createLabel<TipLabel>(
-        Vec(87, 340.f), 150.f, "[current device preset]", theme_engine, theme, style));
+        Vec(87, 340.f), 150.f, "[current device preset]", theme, style));
     live_preset_label->glowing(true);
 
-    play_menu = createThemedWidget<PlayMenu>(Vec(RIGHT_MARGIN_CENTER, 148.f), theme_engine, theme);
+    play_menu = createThemedWidget<PlayMenu>(Vec(RIGHT_MARGIN_CENTER, 148.f), theme);
     play_menu->setUi(this);
     play_menu->describe("Play actions menu");
     addChild(Center(play_menu));
@@ -181,7 +176,7 @@ PlayUi::PlayUi(PlayModule *module) :
     up_button->setHandler([this](bool c, bool s){
         page_up(c, s);
     });
-    up_button->applyTheme(theme_engine, theme);
+    up_button->applyTheme(theme);
     addChild(up_button);
 
     down_button = createWidgetCentered<DownButton>(Vec(RIGHT_MARGIN_CENTER, 67.f));
@@ -189,23 +184,23 @@ PlayUi::PlayUi(PlayModule *module) :
     down_button->setHandler([this](bool c, bool s){
         page_down(c, s);
     });
-    down_button->applyTheme(theme_engine, theme);
+    down_button->applyTheme(theme);
     addChild(down_button);
 
     auto prev = createWidgetCentered<PrevButton>(Vec(RIGHT_MARGIN_CENTER - 9.5f, 98.f));
     prev->describe("Select previous preset");
     prev->setHandler([this](bool c, bool s){ prev_preset(); });
-    prev->applyTheme(theme_engine, theme);
+    prev->applyTheme(theme);
     addChild(prev);
 
     auto next = createWidgetCentered<NextButton>(Vec(RIGHT_MARGIN_CENTER + 9.f, 98.f));
     next->describe("Select next preset");
     next->setHandler([this](bool c, bool s){ next_preset(); });
-    next->applyTheme(theme_engine, theme);
+    next->applyTheme(theme);
     addChild(next);
 
-    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_PREV, S::InputColorKey, PORT_CORN, theme_engine, theme)));
-    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), my_module, PlayModule::IN_PRESET_NEXT, S::InputColorKey, PORT_CORN, theme_engine, theme)));
+    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER - 9.f, RACK_GRID_HEIGHT - 26.f), &module_svgs, my_module, PlayModule::IN_PRESET_PREV, S::InputColorKey, PORT_CORN, theme)));
+    addChild(Center(createThemedColorInput(Vec(RIGHT_MARGIN_CENTER + 9.f, RACK_GRID_HEIGHT - 26.f), &module_svgs, my_module, PlayModule::IN_PRESET_NEXT, S::InputColorKey, PORT_CORN, theme)));
 
     if (!module && S::show_browser_logo()) {
         auto logo = new WatermarkLogo(1.25f);
@@ -215,13 +210,15 @@ PlayUi::PlayUi(PlayModule *module) :
 
     // Footer
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), &module_svgs, "Core link");
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }
     addChild(link_button);
+
+    module_svgs.changeTheme(theme);
 
     if (my_module) {
         my_module->set_chem_ui(this);
@@ -235,12 +232,14 @@ PlayUi::PlayUi(PlayModule *module) :
         update_up_down();
     }
     set_modified(false);
+
 }
 
 void PlayUi::setThemeName(const std::string& name, void * context)
 {
-    blip->set_light_color(ColorFromTheme(getThemeName(), "warning", nvgRGB(0xe7, 0xe7, 0x45)));
     Base::setThemeName(name, context);
+    auto theme = getSvgTheme();
+    blip->set_light_color(ColorFromTheme(theme, "warning", nvgRGB(0xe7, 0xe7, 0x45)));
 }
 
 void PlayUi::appendContextMenu(Menu *menu)

@@ -1,4 +1,5 @@
 #include "Pre.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 #include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
@@ -50,9 +51,8 @@ bool PreModule::connected() {
 void PreModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
-    json_read_bool(root, "glow-knobs", glow_knobs);
-
+    glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
+    device_claim = get_json_string(root, "haken-device");
     if (!device_claim.empty()) {
         modulation.mod_from_json(root);
     }
@@ -62,11 +62,11 @@ void PreModule::dataFromJson(json_t *root)
 json_t* PreModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    set_json(root, "haken-device", device_claim);
     if (!device_claim.empty()) {
         modulation.mod_to_json(root);
     }
-    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
+    set_json(root, "glow-knobs", glow_knobs);
     return root;
 }
 

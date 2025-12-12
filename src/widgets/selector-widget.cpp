@@ -3,8 +3,9 @@
 using namespace ::rack;
 #include "selector-widget.hpp"
 #include "services/misc.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 SelectorWidget::SelectorWidget() :
     bright(false),
@@ -41,7 +42,7 @@ void SelectorWidget::initParamQuantity()
     }
 }
 
-bool SelectorWidget::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool SelectorWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     wire = ("Wire" == theme->name);
     auto style = theme->getStyle("selector");
@@ -49,14 +50,16 @@ bool SelectorWidget::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::sh
         head_color = fromPacked(style->fillWithOpacity());
         stem_color = fromPacked(style->strokeWithOpacity());
         stem_width = style->stroke_width;
-        auto pco = theme->getFillColor("selector-sel", true);
-        if (isVisibleColor(pco)) {
+
+        PackedColor pco;
+
+        if (theme->getFillColor(pco, "selector-sel", true)) {
             active_color = fromPacked(pco);
         } else {
             active_color = stem_color;
         }
-        pco = theme->getFillColor("selector-item", true);
-        if (isVisibleColor(pco)) {
+
+        if (theme->getFillColor(pco, "selector-item", true)) {
             inactive_color = fromPacked(pco);
         } else {
             inactive_color = RampGray(G_50);

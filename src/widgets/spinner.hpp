@@ -1,14 +1,15 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "services/svt_rack.hpp"
 #include "services/misc.hpp"
+#include "services/svg-theme.hpp"
+
 using namespace svg_theme;
 
 namespace pachde {
 
 template <typename TSvg>
-struct Spinner : OpaqueWidget, IApplyTheme
+struct Spinner : OpaqueWidget
 {
     using Base = OpaqueWidget;
     FramebufferWidget* fb{nullptr};
@@ -42,10 +43,8 @@ struct Spinner : OpaqueWidget, IApplyTheme
         theta = angle_step;
     }
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, TSvg::image()), theme));
-        return true;
+    void loadSvg(ILoadSvg* loader) {
+        setSvg(loader->loadSvg(asset::plugin(pluginInstance, TSvg::image())));
     }
 
     // identical to SvgKnob::setSvg (but we don't want to be a paramWidget)
@@ -94,10 +93,10 @@ struct ChemSpinSvg {
 using ChemSpinner = Spinner<ChemSpinSvg>;
 
 template <typename Tparent>
-void startSpinner(Tparent* parent, Vec pos) {
+void startSpinner(Tparent* parent, Vec pos, ILoadSvg* loader) {
     auto spinner = new ChemSpinner();
     spinner->box.pos = pos;
-    spinner->applyTheme(theme_engine, theme_engine.getTheme(parent->getThemeName()));
+    spinner->loadSvg(loader);
     Center(spinner);
     parent->addChild(spinner);
 }

@@ -1,8 +1,8 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
-#include <rack.hpp>
-using namespace ::rack;
-namespace pachde {
+#include "widgetry.hpp"
+
+namespace widgetry {
 
 struct TipHolder
 {
@@ -39,9 +39,9 @@ struct TipHolder
     }
 };
 
-struct TipWidget : Widget
+struct TipWidget : ::rack::widget::Widget
 {
-    using Base = Widget;
+    using Base = ::rack::widget::Widget;
     TipHolder* tip_holder;
 
     TipWidget() : tip_holder(nullptr) {}
@@ -49,18 +49,16 @@ struct TipWidget : Widget
         if (tip_holder) delete tip_holder;
         tip_holder = nullptr;
     }
-    
+
     bool hasText() { return tip_holder && !tip_holder->tip_text.empty(); }
 
-    void ensureTipHolder()
-    {
+    void ensureTipHolder() {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
     }
 
-    void describe(std::string text)
-    {
+    void describe(std::string text) {
         ensureTipHolder();
         tip_holder->setText(text);
     }
@@ -94,8 +92,7 @@ struct TipWidget : Widget
         destroyTip();
     }
 
-    void onDragEnd(const DragEndEvent& e) override
-    {
+    void onDragEnd(const DragEndEvent& e) override {
         Base::onDragEnd(e);
         destroyTip();
     }

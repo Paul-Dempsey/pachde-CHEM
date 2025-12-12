@@ -1,6 +1,7 @@
 #include "midi-pad.hpp"
 #include "services/misc.hpp"
 #include "services/colors.hpp"
+#include "services/json-help.hpp"
 #include "hcl.hpp"
 
 namespace pachde {
@@ -41,11 +42,11 @@ bool MidiPad::compile()
 json_t * MidiPad::to_json()
 {
     json_t * root = json_object();
-    json_object_set_new(root, "pad", json_integer(id));
-    json_object_set_new(root, "name", json_string(name.c_str()));
-    json_object_set_new(root, "midi", json_string(def.c_str()));
-    json_object_set_new(root, "color", json_string(hex_string(color).c_str()));
-    json_object_set_new(root, "text-color", json_string(hex_string(text_color).c_str()));
+    set_json_int(root, "pad", id);
+    set_json(root, "name", name.c_str());
+    set_json(root, "midi", def.c_str());
+    set_json(root, "color", hex_string(color).c_str());
+    set_json(root, "text-color", hex_string(text_color).c_str());
     return root;
 }
 
@@ -54,14 +55,8 @@ void MidiPad::from_json(json_t* root)
     id = get_json_int(root, "pad", -1);
     def = get_json_string(root, "midi");
     name = get_json_string(root, "name");
-    color = parse_color(get_json_string(root, "color"), RARE_COLOR);
-    if (color == RARE_COLOR) {
-        color = 0xff8c8c8c;
-    }
-    text_color = parse_color(get_json_string(root, "text-color"), RARE_COLOR);
-    if (text_color == RARE_COLOR) {
-        text_color = 0xff000000;
-    }
+    color = parseColor(get_json_cstring(root, "color"), 0xff8c8c8c);
+    text_color = parseColor(get_json_cstring(root, "text-color"), 0xff000000);
 
     //compile();
 }
@@ -91,14 +86,14 @@ void PadWidget::init(
     int identifier,
     std::shared_ptr<MidiPad> the_pad,
     Module* module,
-    SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme,
+    std::shared_ptr<SvgTheme> theme,
     std::function<void(int)> callback)
 {
     id = identifier;
     on_click = callback;
     addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
-    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", engine, theme, LabelStyle{"", TextAlignment::Center, 12.f}));
-    applyTheme(engine, theme);
+    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", theme, LabelStyle{"", TextAlignment::Center, 12.f}));
+    applyTheme(theme);
     set_pad(the_pad);
 }
 
@@ -128,7 +123,7 @@ void PadWidget::on_pad_change(bool name, bool description)
             describe(desc);
         }
     } else {
-        label->color(fromPacked(OPAQUE_BLACK));
+        label->color(fromPacked(colors::Black));
         label->text("");
         describe("(undefined)");
     }
@@ -161,7 +156,7 @@ void PadWidget::onButton(const ButtonEvent &e)
     Base::onButton(e);
 }
 
-bool PadWidget::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+bool PadWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     wire = (0 == theme->name.compare("Wire"));
     pad_style.apply_theme(theme);

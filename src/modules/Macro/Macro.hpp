@@ -146,7 +146,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-macro.svg"); }
-    void setThemeName(const std::string& name, void * context) override;
+    //void setThemeName(const std::string& name, void * context) override;
 
     void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;

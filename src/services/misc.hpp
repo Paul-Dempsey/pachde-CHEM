@@ -34,66 +34,10 @@ std::string TempName(const std::string& suffix);
 
 template <typename T>
 inline bool in_range(T value, T minimum, T maximum) { return minimum <= value && value <= maximum; }
+inline bool in_rangef(float value, float minimum, float maximum){ return (minimum <= value) && (value <= maximum); }
 
 template <typename T>
 inline bool in_range_limit(T value, T minimum, T limit) { return minimum <= value && value < limit; }
-
-bool get_json_bool(const json_t* root, const char* key, bool default_value);
-float get_json_float(const json_t* root, const char* key, float default_value);
-int get_json_int(const json_t* root, const char* key, int default_value);
-int64_t get_json_int64(const json_t* root, const char* key, int64_t default_value);
-std::string get_json_string(const json_t* root, const char* key, const std::string& default_value);
-std::string get_json_string(const json_t* root, const char* key);
-
-inline void json_read_string(json_t* root, const char* name, std::string& var) {
-    if (json_t* j = json_object_get(root, name)) {
-        var = json_string_value(j);
-    }
-}
-
-inline void json_read_bool(json_t* root, const char* name, bool& var) {
-    if (json_t* j = json_object_get(root, name)) {
-        var = json_boolean_value(j);
-    }
-}
-
-inline void json_read_float(json_t* root, const char * name, float& var){
-    if (json_t* j = json_object_get(root, name)) {
-        var = json_real_value(j);
-    }
-}
-
-
-
-// enum Expansion {
-//     None  = 0x00,
-//     Left  = 0x01,
-//     Right = 0x10,
-//     Both  = 0x11
-// };
-// struct ExpanderPresence {
-//     Expansion exp;
-//     //Expansion operator() () const { return exp; }
-//     ExpanderPresence() : exp(Expansion::None) {}
-//     ExpanderPresence(Expansion e) : exp(e) {}
-//     bool operator == (const ExpanderPresence& rhs) { return exp == rhs.exp; }
-//     bool operator == (const Expansion& rhs) { return exp == rhs; }
-//     static ExpanderPresence fromRackSide(int rackSide) {
-//         return ExpanderPresence(rackSide == 0 ? Expansion::Left : rackSide == 1 ? Expansion:: Right : Expansion::None);
-//     }
-//     void add(Expansion expansion) { exp = static_cast<Expansion>(exp | expansion); }
-//     void remove(Expansion expansion) { exp = static_cast<Expansion>(exp & ~expansion); }
-//     void addRight() { add(Expansion::Right); }
-//     void addLeft() { add(Expansion::Left); }
-//     void removeRight() { remove(Expansion::Right); }
-//     void removeLeft() { remove(Expansion::Left); }
-//     void clear() { exp = Expansion::None; }
-//     bool right() const { return exp & Expansion::Right; }
-//     bool left() const { return exp & Expansion::Left; }
-//     bool both() const { return exp == Expansion::Both; }
-//     bool empty() const { return exp == Expansion::None; }
-//     bool any() { return !empty(); }
-// };
 
 class WallTimer
 {

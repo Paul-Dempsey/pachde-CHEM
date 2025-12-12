@@ -1,14 +1,14 @@
 #include "Core.hpp"
 #include "em/PresetId.hpp"
-#include "services/ModuleBroker.hpp"
+#include "services/json-help.hpp"
 #include "services/kv-store.hpp"
+#include "services/ModuleBroker.hpp"
 #include "services/rack-help.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
 
-CoreModule::CoreModule() : modulation(this, ChemId::Core)
-{
+CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     ticker.set_interval(1.0f);
     module_id = ChemId::Core;
 
@@ -86,8 +86,7 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core)
     load_pfis(pfis_filename(), user_preset_file_infos);
 }
 
-CoreModule::~CoreModule()
-{
+CoreModule::~CoreModule() {
     midi_relay.unregister_target(this);
     controller1_midi_in.clear();
     controller2_midi_in.clear();
@@ -110,8 +109,7 @@ CoreModule::~CoreModule()
     save_pfis(pfis_filename(), user_preset_file_infos);
 }
 
-void CoreModule::enable_logging(bool enable)
-{
+void CoreModule::enable_logging(bool enable) {
     if (enable){
         midi_log = new MidiLog();
         LOG_MSG("Core", format_string("Starting CHEM Core [%p] %s", this, string::formatTimeISO(system::getUnixTime()).c_str()));
@@ -136,8 +134,7 @@ void CoreModule::enable_logging(bool enable)
     }
 }
 
-std::string CoreModule::device_name(ChemDevice which)
-{
+std::string CoreModule::device_name(ChemDevice which) {
     switch (which)
     {
     case ChemDevice::Haken: return haken_device.device_name();
@@ -148,8 +145,7 @@ std::string CoreModule::device_name(ChemDevice which)
 }
 
 
-PresetId CoreModule::prev_next_id(ssize_t increment)
-{
+PresetId CoreModule::prev_next_id(ssize_t increment) {
     ssize_t index{-1};
     PresetId id;
     if (em.preset.id.valid() && em.preset.id.key()) {
@@ -192,8 +188,7 @@ PresetId CoreModule::prev_next_id(ssize_t increment)
     return id;
 }
 
-void CoreModule::next_preset()
-{
+void CoreModule::next_preset() {
     load_lists();
     if (em.is_osmose()) {
         PresetId id = prev_next_id(1);
@@ -205,8 +200,7 @@ void CoreModule::next_preset()
     }
 }
 
-void CoreModule::prev_preset()
-{
+void CoreModule::prev_preset() {
     load_lists();
     if (em.is_osmose()) {
         PresetId id = prev_next_id(-1);
@@ -218,8 +212,7 @@ void CoreModule::prev_preset()
     }
 }
 
-void CoreModule::clear_presets(eaganmatrix::PresetTab which)
-{
+void CoreModule::clear_presets(eaganmatrix::PresetTab which) {
     valid_tab(which);
     auto list = which == PresetTab::User ? user_presets : system_presets;
     std::string path = list->filename;
@@ -240,8 +233,7 @@ void CoreModule::clear_presets(eaganmatrix::PresetTab which)
     notify_preset_list_changed(which);
 }
 
-PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load)
-{
+PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load) {
     valid_tab(which);
     if (!busy_load && host_busy()) return PresetResult::NotReady;
     if (!haken_device.connection || !haken_device.connection->identified()) return PresetResult::NotReady;
@@ -268,8 +260,7 @@ PresetResult CoreModule::load_preset_file(PresetTab which, bool busy_load)
     return result;
 }
 
-PresetResult CoreModule::load_quick_user_presets()
-{
+PresetResult CoreModule::load_quick_user_presets() {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
 
@@ -284,8 +275,7 @@ PresetResult CoreModule::load_quick_user_presets()
     return PresetResult::Ok;
 }
 
-PresetResult CoreModule::load_quick_system_presets()
-{
+PresetResult CoreModule::load_quick_system_presets() {
     if (em.is_osmose()) return PresetResult::NotApplicableOsmose;
     if (host_busy()) return PresetResult::NotReady;
     if (chem_ui && !ui()->showing_busy()) {
@@ -296,8 +286,7 @@ PresetResult CoreModule::load_quick_system_presets()
     return PresetResult::Ok;
 }
 
-PresetResult CoreModule::load_full_user_presets()
-{
+PresetResult CoreModule::load_full_user_presets() {
     if (host_busy()) return PresetResult::NotReady;
     stash_user_preset_file = user_presets->filename;
     user_presets->clear();
@@ -322,8 +311,7 @@ PresetResult CoreModule::load_full_user_presets()
     return PresetResult::Ok;
 }
 
-PresetResult CoreModule::scan_osmose_presets(uint8_t page)
-{
+PresetResult CoreModule::scan_osmose_presets(uint8_t page) {
     if (!em.is_osmose()) return PresetResult::NotApplicableEm;
     if (host_busy()) return PresetResult::NotReady;
     if (chem_ui && !ui()->showing_busy()) {
@@ -338,15 +326,13 @@ PresetResult CoreModule::scan_osmose_presets(uint8_t page)
     return PresetResult::Ok;
 }
 
-void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which)
-{
+void CoreModule::notify_preset_list_changed(eaganmatrix::PresetTab which) {
     for (auto client: preset_list_clients) {
         client->on_list_changed(which);
     }
 }
 
-void CoreModule::update_user_preset_file_infos()
-{
+void CoreModule::update_user_preset_file_infos() {
     if (!haken_device.connection) return;
     auto hardware = em.get_hardware();
     if (!hardware) return;
@@ -369,39 +355,34 @@ void CoreModule::update_user_preset_file_infos()
     }
 }
 
-void CoreModule::register_preset_list_client(IPresetListClient *client)
-{
+void CoreModule::register_preset_list_client(IPresetListClient *client) {
     if (preset_list_clients.cend() == std::find(preset_list_clients.cbegin(), preset_list_clients.cend(), client)) {
         preset_list_clients.push_back(client);
     }
 }
 
-void CoreModule::unregister_preset_list_client(IPresetListClient *client)
-{
+void CoreModule::unregister_preset_list_client(IPresetListClient *client) {
     auto cit = std::find(preset_list_clients.begin(), preset_list_clients.end(), client);
     if (cit != preset_list_clients.end()) {
         preset_list_clients.erase(cit);
     }
 }
 
-std::shared_ptr<PresetList> CoreModule::host_user_presets()
-{
+std::shared_ptr<PresetList> CoreModule::host_user_presets() {
     if (user_presets && user_presets->empty()) {
         load_preset_file(PresetTab::User);
     }
     return user_presets;
 }
 
-std::shared_ptr<PresetList> CoreModule::host_system_presets()
-{
+std::shared_ptr<PresetList> CoreModule::host_system_presets() {
     if (system_presets && system_presets->empty()) {
         load_preset_file(PresetTab::System);
     }
     return system_presets;
 }
 
-PresetResult CoreModule::load_full_system_presets()
-{
+PresetResult CoreModule::load_full_system_presets() {
     if (host_busy()) return PresetResult::NotReady;
     system_presets->clear();
 
@@ -426,8 +407,7 @@ PresetResult CoreModule::load_full_system_presets()
     return PresetResult::Ok;
 }
 
-PresetResult CoreModule::end_scan()
-{
+PresetResult CoreModule::end_scan() {
     if (!gathering) return PresetResult::NotApplicable;
     auto gather = gathering;
     gathering = GatherFlags::None;
@@ -464,8 +444,7 @@ PresetResult CoreModule::end_scan()
     return PresetResult::Ok;
 }
 
-void CoreModule::load_lists()
-{
+void CoreModule::load_lists() {
     if (host_busy()) return;
     if (!em.get_hardware()) return;
     if (system_presets->empty()) {
@@ -480,8 +459,7 @@ void CoreModule::load_lists()
     }
 }
 
-void CoreModule::reset_tasks()
-{
+void CoreModule::reset_tasks() {
     recurring_tasks.reset();
     startup_tasks.reset();
     for (size_t i = 0; i < sizeof(start_states)/sizeof(start_states[0]); ++i) {
@@ -489,8 +467,7 @@ void CoreModule::reset_tasks()
     }
 }
 
-void CoreModule::reboot()
-{
+void CoreModule::reboot() {
     if (in_reboot) return;
 
     in_reboot = true;
@@ -508,8 +485,7 @@ void CoreModule::reboot()
 }
 
 // IHandleEmEvents
-void CoreModule::onEditorReply(uint8_t reply)
-{
+void CoreModule::onEditorReply(uint8_t reply) {
     if (!startup_tasks.completed()) {
         startup_tasks.heartbeat_received();
     } else {
@@ -517,20 +493,17 @@ void CoreModule::onEditorReply(uint8_t reply)
     }
 }
 
-void CoreModule::onTaskMessage(uint8_t code)
-{
-    if (Haken::helloWorld == code) {
+void CoreModule::onTaskMessage(uint8_t code) {
+    if (Haken::tenSecsOld == code) {
         reset_tasks();
     }
 }
 
-void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
-{
+void CoreModule::onHardwareChanged(uint8_t hardware, uint16_t firmware_version) {
     init_osmose();
 }
 
-void CoreModule::onPresetBegin()
-{
+void CoreModule::onPresetBegin() {
     if (gathering && full_build) {
         if (PresetListBuildCoordinator::Phase::PendBegin == full_build->phase) {
             full_build->preset_started();
@@ -538,8 +511,7 @@ void CoreModule::onPresetBegin()
     }
 }
 
-void CoreModule::onPresetChanged()
-{
+void CoreModule::onPresetChanged() {
     LOG_MSG("Core", format_string("--- Received Preset Changed: %s", em.preset.summary().c_str()));
     in_preset_request = false;
 
@@ -609,14 +581,12 @@ void CoreModule::onPresetChanged()
     }
 }
 
-void CoreModule::onUserBegin()
-{
+void CoreModule::onUserBegin() {
     is_busy = true;
     if (chem_ui) ui()->show_busy(is_busy);
 }
 
-void CoreModule::onUserComplete()
-{
+void CoreModule::onUserComplete() {
     is_busy = false;
     if (chem_ui) {
         ui()->show_busy(false);
@@ -635,14 +605,12 @@ void CoreModule::onUserComplete()
     }
 }
 
-void CoreModule::onSystemBegin()
-{
+void CoreModule::onSystemBegin() {
     is_busy = true;
     if (chem_ui) ui()->show_busy(true);
 }
 
-void CoreModule::onSystemComplete()
-{
+void CoreModule::onSystemComplete() {
     is_busy = false;
     if (chem_ui) {
         ui()->show_busy(false);
@@ -656,20 +624,17 @@ void CoreModule::onSystemComplete()
     }
 }
 
-void CoreModule::onMahlingBegin()
-{
+void CoreModule::onMahlingBegin() {
     is_busy = true;
     if (chem_ui) ui()->show_busy(is_busy);
 }
 
-void CoreModule::onMahlingComplete()
-{
+void CoreModule::onMahlingComplete() {
     is_busy = false;
     if (chem_ui) ui()->show_busy(is_busy);
 }
 
-void CoreModule::request_preset(ChemId tag, PresetId id)
-{
+void CoreModule::request_preset(ChemId tag, PresetId id) {
     if (host_busy()) return;
     in_preset_request = true;
     em.set_osmose_id(id);
@@ -677,22 +642,19 @@ void CoreModule::request_preset(ChemId tag, PresetId id)
 }
 
 // IChemHost
-void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
+void CoreModule::notify_connection_changed(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) {
     for (auto client : chem_clients) {
         client->onConnectionChange(device, connection);
     }
 }
 
-void CoreModule::notify_preset_changed()
-{
+void CoreModule::notify_preset_changed() {
     for (auto client : chem_clients) {
         client->onPresetChange();
     }
 }
 
-void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
-{
+void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source) {
     input->ring.clear();
     if (source->connection) {
         input->setDriverId(source->connection->driver_id);
@@ -702,8 +664,7 @@ void HandleMidiDeviceChange(MidiInput* input, const MidiDeviceHolder* source)
     }
 }
 
-void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
-{
+void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source) {
     switch (source->role()) {
     case ChemDevice::Haken: {
         em.ready = false;
@@ -764,16 +725,14 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source)
     }
 }
 
-void CoreModule::onRemove(const RemoveEvent &e)
-{
+void CoreModule::onRemove(const RemoveEvent &e) {
     for (auto client : chem_clients) {
         client->onConnectHost(nullptr);
     }
     chem_clients.clear();
 }
 
-void CoreModule::onReset(const ResetEvent &e)
-{
+void CoreModule::onReset(const ResetEvent &e) {
     LOG_MSG("Core", "onReset");
     haken_device.clear();
     controller1.clear();
@@ -781,8 +740,7 @@ void CoreModule::onReset(const ResetEvent &e)
     reboot();
 }
 
-void CoreModule::onRandomize(const RandomizeEvent &e)
-{
+void CoreModule::onRandomize(const RandomizeEvent &e) {
     if (host_busy()) return;
     if (!user_presets && !system_presets) return;
     if (user_presets->empty() && system_presets->empty()) return;
@@ -795,18 +753,16 @@ void CoreModule::onRandomize(const RandomizeEvent &e)
     request_preset(ChemId::Core, list->presets[index]->id);
 }
 
-void CoreModule::dataFromJson(json_t *root)
-{
+void CoreModule::dataFromJson(json_t *root) {
     ChemModule::dataFromJson(root);
     haken_device.set_claim(get_json_string(root, "haken-device"));
     controller1.set_claim(get_json_string(root, "controller-1"));
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
-    json_read_bool(root, "glow-knobs", glow_knobs);
+    glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
 }
 
-json_t* CoreModule::dataToJson()
-{
+json_t* CoreModule::dataToJson() {
     json_t* root = ChemModule::dataToJson();
     json_object_set_new(root, "haken-device", json_string(haken_device.get_claim().c_str()));
     json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
@@ -816,8 +772,7 @@ json_t* CoreModule::dataToJson()
     return root;
 }
 
-void CoreModule::update_from_em()
-{
+void CoreModule::update_from_em() {
     if (disconnected) return;
     if (chem_host && chem_host->host_preset()) {
         auto em = chem_host->host_matrix();
@@ -832,8 +787,7 @@ void CoreModule::update_from_em()
     }
 }
 
-void CoreModule::connect_midi(bool on)
-{
+void CoreModule::connect_midi(bool on) {
     if (disconnected == !on) return;
     disconnected = !on;
     if (disconnected) {
@@ -851,8 +805,7 @@ void CoreModule::connect_midi(bool on)
     }
 }
 
-void CoreModule::init_osmose()
-{
+void CoreModule::init_osmose() {
     bool osmose = em.is_osmose() ? true : is_osmose_name(haken_device.get_claim());
     haken_midi.osmose_target = osmose;
 
@@ -866,8 +819,7 @@ void CoreModule::init_osmose()
     }
 }
 
-void CoreModule::do_message(PackedMidiMessage message)
-{
+void CoreModule::do_message(PackedMidiMessage message) {
     if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Core) == midi_tag(message)) return;
     if (host_busy()) return;
@@ -890,8 +842,7 @@ void CoreModule::do_message(PackedMidiMessage message)
     }
 }
 
-void CoreModule::register_chem_client(IChemClient* client)
-{
+void CoreModule::register_chem_client(IChemClient* client) {
     if (chem_clients.cend() == std::find(chem_clients.cbegin(), chem_clients.cend(), client)) {
         chem_clients.push_back(client);
         client->onConnectHost(this);
@@ -902,8 +853,7 @@ void CoreModule::register_chem_client(IChemClient* client)
     }
 }
 
-void CoreModule::unregister_chem_client(IChemClient* client)
-{
+void CoreModule::unregister_chem_client(IChemClient* client) {
     auto item = std::find(chem_clients.cbegin(), chem_clients.cend(), client);
     if (item != chem_clients.cend())
     {
@@ -915,8 +865,7 @@ void CoreModule::unregister_chem_client(IChemClient* client)
     }
 }
 
-bool CoreModule::host_has_client_model(IChemClient* target)
-{
+bool CoreModule::host_has_client_model(IChemClient* target) {
     auto target_model = target->client_module()->getModel();
     for (auto client : chem_clients) {
         auto client_model = client->client_module()->getModel();
@@ -927,13 +876,11 @@ bool CoreModule::host_has_client_model(IChemClient* target)
     return false;
 }
 
-bool CoreModule::host_has_client(IChemClient* client)
-{
+bool CoreModule::host_has_client(IChemClient* client) {
     return chem_clients.cend() != std::find(chem_clients.cbegin(), chem_clients.cend(), client);
 }
 
-std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice device)
-{
+std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice device) {
     switch (device)
     {
     case ChemDevice::Haken: return haken_device.connection; break;
@@ -946,8 +893,7 @@ std::shared_ptr<MidiDeviceConnection> CoreModule::host_connection(ChemDevice dev
 constexpr const uint64_t PROCESS_LIGHT_INTERVAL = 48;
 constexpr const uint64_t PROCESS_PARAM_INTERVAL = 47;
 
-void CoreModule::processLights(const ProcessArgs &args)
-{
+void CoreModule::processLights(const ProcessArgs &args) {
     getLight(L_READY).setBrightnessSmooth(host_busy() ? 0.f : 1.0f, args.sampleTime * 20);
 
     octave.set_shift(em.get_octave_shift());
@@ -965,8 +911,7 @@ void CoreModule::processLights(const ProcessArgs &args)
     getLight(L_C2_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C2_CHANNEL_MAP).getValue(), 45.f);
 }
 
-void CoreModule::process_params(const ProcessArgs &args)
-{
+void CoreModule::process_params(const ProcessArgs &args) {
     if (is_controller_1_connected()) {
         controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));
         controller1_midi_in.set_music_pass(getParamInt(getParam(P_C1_MUSIC_FILTER)));
@@ -994,8 +939,7 @@ void CoreModule::process_params(const ProcessArgs &args)
     }
 }
 
-void CoreModule::process_gather(const ProcessArgs &args)
-{
+void CoreModule::process_gather(const ProcessArgs &args) {
     if (!gathering) return;
 
     if (stop_scan) {
@@ -1037,8 +981,7 @@ void CoreModule::process_gather(const ProcessArgs &args)
     }
 }
 
-void CoreModule::process(const ProcessArgs &args)
-{
+void CoreModule::process(const ProcessArgs &args) {
     //DO NOT ChemModule::process(args);
 
     if (0 == ((args.frame + id) % PROCESS_LIGHT_INTERVAL)) {

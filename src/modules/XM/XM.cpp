@@ -1,6 +1,7 @@
 #include "XM.hpp"
 using namespace pachde;
 #include "em/wrap-HakenMidi.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 
 XMModule::XMModule() :
@@ -65,14 +66,9 @@ void XMModule::dataFromJson(json_t* root)
     device_claim = get_json_string(root, "haken-device");
     glow_knobs = get_json_bool(root, "glow-knobs", false);
     title = get_json_string(root, "module-title");
-    title_bg = parse_color(get_json_string(root, "title-bg"), RARE_COLOR);
-    if (title_bg == RARE_COLOR) {
-        title_bg = GetPackedStockColor(StockColor::pachde_blue_dark);
-    }
-    title_fg = parse_color(get_json_string(root, "title-fg"), RARE_COLOR);
-    if (title_fg == RARE_COLOR) {
-        title_fg = GetPackedStockColor(StockColor::Gray_75p);
-    }
+    title_bg = parseColor(get_json_cstring(root, "title-bg"), GetPackedStockColor(StockColor::pachde_blue_dark));
+    title_fg = parseColor(get_json_cstring(root, "title-fg"), GetPackedStockColor(StockColor::Gray_75p));
+
     my_macros.clear();
     my_macros.from_json(root, getId());
     for (auto macro: my_macros.data) {
@@ -80,18 +76,18 @@ void XMModule::dataFromJson(json_t* root)
     }
     update_param_info();
     if (chem_ui) {
-        ui()->update_main_ui(theme_engine.getTheme(getThemeName()));
+        ui()->update_main_ui(ui()->getSvgTheme());
     }
 }
 
 json_t* XMModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
-    json_object_set_new(root, "module-title", json_string(title.c_str()));
-    json_object_set_new(root, "title-bg", json_string(hex_string(title_bg).c_str()));
-    json_object_set_new(root, "title-fg", json_string(hex_string(title_fg).c_str()));
+    set_json(root, "haken-device", device_claim);
+    set_json(root, "glow-knobs", glow_knobs);
+    set_json(root, "module-title", title);
+    set_json(root, "title-bg", hex_string(title_bg));
+    set_json(root, "title-fg", hex_string(title_fg));
     my_macros.to_json(root);
     return root;
 }
@@ -136,7 +132,7 @@ void XMModule::onReset(const ResetEvent &e)
     my_macros.clear();
     update_param_info();
     if (chem_ui) {
-        ui()->update_main_ui(theme_engine.getTheme(ui()->getThemeName()));
+        ui()->update_main_ui(ui()->getSvgTheme());
     }
 }
 

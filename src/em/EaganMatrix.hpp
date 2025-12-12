@@ -9,6 +9,7 @@
 #include "FixedStringBuffer.hpp"
 #include "services/crc.hpp"
 #include "services/midi-log.hpp"
+#include "services/misc.hpp"
 
 namespace eaganmatrix {
 
@@ -196,8 +197,8 @@ struct EaganMatrix
     bool is_extend_polyphony() { return mat[Haken::idOkExpPoly]; }
     bool is_increase_computation_rate() { return mat[Haken::idOkIncComp]; }
     uint8_t get_bend_range() { return mat[Haken::idBendRange]; }
-    uint8_t get_y_assign() { return mat[Haken::idFrontBack]; }
-    uint8_t get_z_assign() { return mat[Haken::idPressure]; }
+    uint8_t get_y_assign() { return mat[Haken::idYencode]; }
+    uint8_t get_z_assign() { return mat[Haken::idZencode]; }
     uint8_t get_mono_func() { return mat[Haken::idMonoFunc]; }
     uint8_t get_mono_interval() { return mat[Haken::idMonoInt]; }
     uint8_t get_note_priority() { return mat[Haken::idPrio]; }
@@ -239,10 +240,10 @@ struct EaganMatrix
     uint8_t get_bank_A_type() { return mat[Haken::idBankA]; }
     uint8_t get_bank_B_type() { return mat[Haken::idBankB]; }
     uint8_t get_bank_C_type() { return mat[Haken::idBankC]; }
-	uint8_t get_A1_col_mode() { return mat[Haken::idColModeA1]; }
-	uint8_t get_B1_col_mode() { return mat[Haken::idColModeB1]; }
-	uint8_t get_A2_col_mode() { return mat[Haken::idColModeA2]; }
-	uint8_t get_B2_col_mode() { return mat[Haken::idColModeB2]; }
+	uint8_t get_A1_col_mode() { return mat[Haken::idBankAcm1]; }
+	uint8_t get_B1_col_mode() { return mat[Haken::idBankBcm1]; }
+	uint8_t get_A2_col_mode() { return mat[Haken::idBankAcm2]; }
+	uint8_t get_B2_col_mode() { return mat[Haken::idBankBcm2]; }
 	uint8_t get_bank_param_A() { return mat[Haken::idBankParamA]; }
 	uint8_t get_bank_param_B() { return mat[Haken::idBankParamB]; }
     bool is_disable_anti_alias_delay() { return mat[Haken::idAliasDelay]; }
@@ -260,9 +261,9 @@ struct EaganMatrix
     uint8_t get_row_2_type(){ return mat[Haken::idRowTyp2]; }
     uint8_t get_action() { return mat[Haken::idAction]; }
     uint8_t get_aes3() { return mat[Haken::idAes3]; }
-    bool is_keep_surface_processing() { return mat[Haken::idPresSurf]; }
-    bool is_keep_pedals() { return mat[Haken::idPresPed]; }
-    bool is_keep_midi_encoding() { return mat[Haken::idPresEnc]; }
+    bool is_keep_surface_processing() { return mat[Haken::idPrsvSurf]; }
+    bool is_keep_pedals() { return mat[Haken::idPrsvPed]; }
+    bool is_keep_midi_encoding() { return mat[Haken::idPrsvEnc]; }
     bool is_big_popup_font() { return mat[Haken::idBigFontPop]; }
     uint8_t get_from_analysis_slot() { return mat[Haken::idFromAnlys]; }
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }

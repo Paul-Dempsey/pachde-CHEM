@@ -28,10 +28,9 @@ JackUi::JackUi(JackModule *module) :
     last_p2(-1)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
 
     symbols.add_source("res/symbols/pedal-none.svg");
@@ -42,7 +41,7 @@ JackUi::JackUi(JackModule *module) :
     symbols.add_source("res/symbols/pedal-cv.svg");
     symbols.add_source("res/symbols/pedal-pot.svg");
     symbols.add_source("res/symbols/pedal-other.svg");
-    symbols.applyTheme(theme_engine, theme);
+    symbols.loadSvg(&module_svgs);
 
     float x, y;
 
@@ -54,16 +53,16 @@ JackUi::JackUi(JackModule *module) :
 
     x = CENTER;
     y = 34.f;
-    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_1, theme_engine, theme)));
+    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), theme, my_module, JackModule::P_ASSIGN_JACK_1)));
     y += 8.f;
-    addChild(assign_1_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
+    addChild(assign_1_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme, assign_style));
 
     y += KNOBS_DY;
-    addChild(createChemKnob<TrimPot>(Vec(12.f,y), my_module, JackModule::P_MIN_JACK_1, theme_engine, theme));
-    addChild(createChemKnob<TrimPot>(Vec(32.f,y), my_module, JackModule::P_MAX_JACK_1, theme_engine, theme));
+    addChild(createChemKnob<TrimPot>(Vec(12.f,y), &module_svgs, my_module, JackModule::P_MIN_JACK_1, theme));
+    addChild(createChemKnob<TrimPot>(Vec(32.f,y), &module_svgs, my_module, JackModule::P_MAX_JACK_1, theme));
     y += LABEL_DY;
-    addChild(createLabel<TextLabel>(Vec(12, y), 20.f, "min", theme_engine, theme, knob_label_style));
-    addChild(createLabel<TextLabel>(Vec(32, y), 20.f, "max", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(12, y), 20.f, "min", theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(32, y), 20.f, "max", theme, knob_label_style));
 
     y += PEDAL_DY;
     pedal_image_1 = new SymbolSetWidget(&symbols);
@@ -72,16 +71,16 @@ JackUi::JackUi(JackModule *module) :
     addChild(Center(pedal_image_1));
 
     y = 130.f;
-    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), my_module, JackModule::P_ASSIGN_JACK_2, theme_engine, theme)));
+    addChild(Center(createThemedParam<JackMenu>(Vec(x, y), theme, my_module, JackModule::P_ASSIGN_JACK_2)));
     y += 8.f;
-    addChild(assign_2_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme_engine, theme, assign_style));
+    addChild(assign_2_label = createLabel<TextLabel>(Vec(x, y), box.size.x, "", theme, assign_style));
 
     y += KNOBS_DY;
-    addChild(createChemKnob<TrimPot>(Vec(12.f, y), my_module, JackModule::P_MIN_JACK_2, theme_engine, theme));
-    addChild(createChemKnob<TrimPot>(Vec(32.f, y), my_module, JackModule::P_MAX_JACK_2, theme_engine, theme));
+    addChild(createChemKnob<TrimPot>(Vec(12.f, y), &module_svgs, my_module, JackModule::P_MIN_JACK_2, theme));
+    addChild(createChemKnob<TrimPot>(Vec(32.f, y), &module_svgs, my_module, JackModule::P_MAX_JACK_2, theme));
     y += LABEL_DY;
-    addChild(createLabel<TextLabel>(Vec(12, y), 15.f, "min", theme_engine, theme, knob_label_style));
-    addChild(createLabel<TextLabel>(Vec(32, y), 15.f, "max", theme_engine, theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(12, y), 15.f, "min", theme, knob_label_style));
+    addChild(createLabel<TextLabel>(Vec(32, y), 15.f, "max", theme, knob_label_style));
 
     y += PEDAL_DY;
     if (module) {
@@ -96,16 +95,16 @@ JackUi::JackUi(JackModule *module) :
     }
 
     y = 212.f;
-    addChild(Center(createThemedParam<ShiftMenu>(Vec(x, y), my_module, JackModule::P_SHIFT, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Shift", theme_engine, theme, S::med_control_label));
+    addChild(Center(createThemedParam<ShiftMenu>(Vec(x, y), theme, my_module, JackModule::P_SHIFT)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Shift", theme, S::med_control_label));
 
     y += 27.f;
-    addChild(Center(createThemedParam<HamParam>(Vec(x,y), my_module, JackModule::P_SHIFT_ACTION, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Action", theme_engine, theme, S::med_control_label));
+    addChild(Center(createThemedParam<HamParam>(Vec(x,y), theme, my_module, JackModule::P_SHIFT_ACTION)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Action", theme, S::med_control_label));
 
     y += 27.f;
-    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), my_module, JackModule::P_KEEP, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Keep", theme_engine, theme, S::med_control_label));
+    addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, JackModule::P_KEEP)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 6.f), 40.f, "Keep", theme, S::med_control_label));
 
     // outputs
     auto co_port = PORT_ORANGE;
@@ -115,14 +114,14 @@ JackUi::JackUi(JackModule *module) :
     addChild(level_1 = createWidgetCentered<LevelWidget>(Vec(CENTER - 14.25f, y - 5.f)));
     addChild(level_2 = createWidgetCentered<LevelWidget>(Vec(CENTER + 14.25f, y - 5.f + S::PORT_DY)));
 
-    addChild(Center(createThemedColorOutput(Vec(x , y), my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", theme_engine, theme, S::in_port_label));
+    addChild(Center(createThemedColorOutput(Vec(x , y), &module_svgs, my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", theme, S::in_port_label));
 
     y += S::PORT_DY;
-    addChild(Center(createThemedColorOutput(Vec(x, y), my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", theme_engine, theme, S::in_port_label));
+    addChild(Center(createThemedColorOutput(Vec(x, y), &module_svgs, my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", theme, S::in_port_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(30.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
 
@@ -132,6 +131,8 @@ JackUi::JackUi(JackModule *module) :
         });
     }
     addChild(link_button);
+
+    module_svgs.changeTheme(theme);
 
     // init
     sync_labels();
@@ -144,11 +145,6 @@ JackUi::JackUi(JackModule *module) :
     }
 }
 
-
-void JackUi::setThemeName(const std::string& name, void * context)
-{
-    Base::setThemeName(name, context);
-}
 
 void JackUi::onConnectHost(IChemHost* host)
 {

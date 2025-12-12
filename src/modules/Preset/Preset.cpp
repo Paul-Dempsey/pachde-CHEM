@@ -1,4 +1,5 @@
 #include "Preset.hpp"
+#include "services/json-help.hpp"
 
 PresetModule::PresetModule()
 {
@@ -8,13 +9,13 @@ PresetModule::PresetModule()
 void PresetModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
-    json_read_bool(root, "track-live", track_live);
-    json_read_bool(root,"keep-search", keep_search_filters);
-    json_read_bool(root, "search-name", search_name);
-    json_read_bool(root, "search-text", search_meta);
-    json_read_bool(root, "search-anchored", search_anchor);
-    json_read_bool(root, "search-incremental", search_incremental);
+    device_claim = get_json_string(root, "haken-device");
+    track_live = get_json_bool(root, "track-live", track_live);
+    keep_search_filters = get_json_bool(root,"keep-search", keep_search_filters);
+    search_name = get_json_bool(root, "search-name", search_name);
+    search_meta = get_json_bool(root, "search-text", search_meta);
+    search_anchor = get_json_bool(root, "search-anchored", search_anchor);
+    search_incremental = get_json_bool(root, "search-incremental", search_incremental);
     active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
 
     if (keep_search_filters) {

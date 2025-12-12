@@ -5,6 +5,7 @@ FLAGS += -Isrc
 ifdef DEV_BUILD
 FLAGS += -O0
 FLAGS += -DLAYOUT_HELP
+FLAGS += -DDEV_BUILD
 else
 FLAGS += -O3
 FLAGS += -DNDEBUG
@@ -27,10 +28,10 @@ SOURCES += src/em/preset-sort.cpp
 
 # services
 SOURCES += src/services/colors.cpp
-SOURCES += src/services/color-help.cpp
 SOURCES += src/services/em-midi-port.cpp
 SOURCES += src/services/haken-midi.cpp
 SOURCES += src/services/HakenMidiOutput.cpp
+SOURCES += src/services/json-help.cpp
 SOURCES += src/services/kv-store.cpp
 SOURCES += src/services/midi-devices.cpp
 SOURCES += src/services/midi-io.cpp
@@ -40,19 +41,24 @@ SOURCES += src/services/MidiDeviceHolder.cpp
 SOURCES += src/services/misc.cpp
 SOURCES += src/services/ModuleBroker.cpp
 SOURCES += src/services/open-file.cpp
+SOURCES += src/services/packed-color.cpp
 SOURCES += src/services/rack-help.cpp
-SOURCES += src/services/svgtheme.cpp
+SOURCES += src/services/svg-query.cpp
+SOURCES += src/services/svg-theme.cpp
+SOURCES += src/services/svg-theme-load.cpp
 SOURCES += src/services/text.cpp
+SOURCES += src/services/theme.cpp
 
 # widgets
 SOURCES += src/widgets/blip-widget.cpp
 SOURCES += src/widgets/bits-widget.cpp
 SOURCES += src/widgets/color-picker.cpp
+SOURCES += src/widgets/color-widgets.cpp
 SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/knob-track-widget.cpp
 SOURCES += src/widgets/label-widget.cpp
-SOURCES += src/widgets/PanelBorder.cpp
+SOURCES += src/widgets/panel-border.cpp
 SOURCES += src/widgets/pic.cpp
 SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/slider-widget.cpp
@@ -61,6 +67,7 @@ SOURCES += src/widgets/tab-header.cpp
 SOURCES += src/widgets/text-input.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
+SOURCES += src/widgets/widgetry.cpp
 
 # modules
 SOURCES += src/modules/Core/Core.cpp

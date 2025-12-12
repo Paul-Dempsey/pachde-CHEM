@@ -70,7 +70,6 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     HakenMidiOutput haken_midi_out;
     HakenMidi haken_midi;
-    HakenMidiRate midi_rate{HakenMidiRate::Full};
     RelayMidi midi_relay;
     MidiLog* midi_log{nullptr};
 
@@ -341,7 +340,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-core.svg"); }
-    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+    void createScrews() override;
 
     // IChemClient
     IChemHost* chem_host;

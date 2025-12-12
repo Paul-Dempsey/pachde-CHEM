@@ -2,10 +2,13 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "services/colors.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 using namespace svg_theme;
+using namespace pachde;
 
-struct PanelBackgroundWidget : Widget, IApplyTheme
+namespace widgetry {
+
+struct PanelBackgroundWidget : Widget, IThemed
 {
     bool track_parent_size{false};
 
@@ -25,7 +28,7 @@ struct PanelBackgroundWidget : Widget, IApplyTheme
         e.unconsume();
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         auto style = theme->getStyle("g-panel");
         if (style) {
@@ -67,3 +70,4 @@ struct PanelBackgroundWidget : Widget, IApplyTheme
     }
 };
 
+}

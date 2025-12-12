@@ -4,38 +4,40 @@
 #include "widgets/layout-help.hpp"
 #include "widgets/uniform-style.hpp"
 #include "services/kv-store.hpp"
+#include "services/json-help.hpp"
+using namespace widgetry;
 
-void ChemModule::setThemeName(const std::string &name, void *)
-{
-    theme_name = name;
+void ChemModule::setThemeName(const std::string &name, void *) {
+    theme_setting = name;
+    actual_theme = theme::get_actual_theme(theme_setting);
 }
 
-std::string ChemModule::getThemeName()
-{
-    if (follow_rack) {
-        return ::rack::settings::preferDarkPanels ? "Dark": "Light";
+std::string ChemModule::getThemeName() {
+    return theme_setting;
+}
+
+std::string ChemModule::get_actual_theme_name() {
+    if (actual_theme.empty()) {
+        actual_theme = theme::get_actual_theme(theme_setting);
     }
-    if (theme_name.empty()) return DEFAULT_THEME;
-    return theme_name;
+    return actual_theme;
 }
 
 void ChemModule::dataFromJson(json_t* root)
 {
-    json_t* j = json_object_get(root, "theme");
-    if (j) {
-        theme_name = json_string_value(j);
+    auto j = json_object_get(root, "follow-rack-theme"); // backwards compat
+    if (j && json_boolean_value(j)) {
+        theme_setting = theme::theme_name::Ui;
+    } else {
+        theme_setting = get_json_string(root, "theme", theme::theme_name::PreferDark);
     }
-    j = json_object_get(root, "follow-rack-theme");
-    if (j) {
-        follow_rack = json_boolean_value(j);
-    }
+    actual_theme = theme::get_actual_theme(theme_setting);
 }
 
 json_t* ChemModule::dataToJson()
 {
     json_t* root = json_object();
-    json_object_set_new(root, "theme", json_string(theme_name.c_str()));
-    json_object_set_new(root, "follow-rack-theme", json_boolean(follow_rack));
+    set_json(root, "theme", theme_setting);
     return root;
 }
 
@@ -76,8 +78,7 @@ void add_screws()
             assert(chem);
             auto ui = chem->chem_ui;
             if (ui) {
-                auto theme = theme_engine.getTheme(ui->getThemeName());
-                ui->createScrews(theme);
+                ui->createScrews();
             }
         }
     }
@@ -122,19 +123,17 @@ void ChemModuleWidget::setThemeName(const std::string& name, void *context)
 {
     if (!module) return;
 
-    auto panel = dynamic_cast<rack::app::SvgPanel*>(getPanel());
-    if (!panel) return;
+    // auto panel = dynamic_cast<rack::app::SvgPanel*>(getPanel());
+    // if (!panel) return;
 
     getChemModule()->setThemeName(name, context);
-
-    auto svg_theme = theme_engine.getTheme(name);
-
-    std::shared_ptr<Svg> newSvg = panel->svg;
-    if (theme_engine.applyTheme(svg_theme, panelFilename(), newSvg)) {
-        panel->setBackground(newSvg);
-    }
-
-    svg_theme::ApplyChildrenTheme(this, theme_engine, svg_theme);
+    auto svg_theme = getSvgTheme();
+    module_svgs.changeTheme(svg_theme);
+    // std::shared_ptr<Svg> newSvg = module_svgs.loadSvg(panelFilename());
+    // if (applySvgTheme(newSvg, svg_theme)) {
+    //     panel->setBackground(newSvg);
+    // }
+    svg_theme::applyChildrenTheme(this, svg_theme);
     sendDirty(this);
 
     if (context == this) {
@@ -143,16 +142,33 @@ void ChemModuleWidget::setThemeName(const std::string& name, void *context)
     }
 }
 
+std::string ChemModuleWidget::getThemeName() {
+    return module
+        ? getChemModule()->getThemeName()
+        : theme::get_default_theme();
+}
+
+std::string ChemModuleWidget::getActualThemeName() {
+    return module
+        ? getChemModule()->get_actual_theme_name()
+        : get_default_theme();
+}
+
+std::shared_ptr<SvgTheme> ChemModuleWidget::getSvgTheme() {
+    return getThemeCache().getTheme(getActualThemeName());
+}
+
 void ChemModuleWidget::step()
 {
     ModuleWidget::step();
     setPartnerPanelBorder<ChemModuleWidget>(this);
     if (module) {
         auto chem = getChemModule();
-        if (chem->follow_rack) {
-            auto needed = ::rack::settings::preferDarkPanels ? "Dark" : "Light";
-            if (needed != chem->theme_name) {
-                setThemeName(needed, nullptr);
+        auto theme = getThemeName();
+        if (theme::is_special_theme(theme)) {
+            auto actual = theme::get_actual_theme(theme);
+            if (actual != chem->get_actual_theme_name()) {
+                setThemeName(theme, nullptr);
             }
         }
     }
@@ -165,7 +181,7 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
     case GLFW_KEY_F5: {
         if (e.action == GLFW_RELEASE && (0 == mods)) {
             e.consume(this);
-            reloadThemes();
+            reloadThemeCache();
             setThemeName(getThemeName(), nullptr);
         }
     } break;
@@ -242,13 +258,11 @@ void ChemModuleWidget::draw(const DrawArgs& args)
 void ChemModuleWidget::appendContextMenu(Menu *menu)
 {
     if (!module) return;
-    if (!initThemeEngine()) return;
-    if (!theme_engine.isLoaded()) return;
-    bool follow = module ? getChemModule()->follow_rack : true;
+    initThemeCache();
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel<HamburgerTitle>("Themes"));
-    AppendThemeMenu(menu, this, theme_engine, follow, this);
+//TODO    AppendThemeMenu(menu, this, theme_engine, follow, this);
 
     menu->addChild(new MenuSeparator);
     bool screws = style::show_screws();
@@ -268,17 +282,10 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
             }
         }));
 
-    menu->addChild(createCheckMenuItem("Follow Rack theme", "",
-        [=](){ return follow; },
-        [=](){
-            auto chem = getChemModule();
-            chem->follow_rack = !follow;
-            this->setThemeName(getThemeName(), nullptr);
-        }));
 
-    menu->addChild(createMenuItem("Hot-reload themes", "F5", [this]() {
-        reloadThemes();
-        this->setThemeName(getThemeName(), this);
+    menu->addChild(createMenuItem("Hot-reload themes", "F5", [=]() {
+        reloadThemeCache();
+        setThemeName(getThemeName(), this);
     }));
 
 #ifdef LAYOUT_HELP
@@ -301,20 +308,26 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 // utils
 //
 
-NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback)
+NVGcolor ColorFromTheme(std::shared_ptr<SvgTheme> theme, const char * color_name, const NVGcolor& fallback)
 {
     assert(color_name);
-    if (theme.empty()) return fallback;
-    auto co = fromPacked(theme_engine.getFillColor(theme, color_name, true));
-    return isColorVisible(co) ? co : fallback;
+    if (!theme) return fallback;
+    PackedColor co{colors::NoColor};
+    if (theme->getFillColor(co, color_name, true)) {
+        return fromPacked(co);
+    }
+    return fallback;
 }
 
-NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback)
+NVGcolor ColorFromTheme(std::shared_ptr<SvgTheme> theme, const char * color_name, StockColor fallback)
 {
     assert(color_name);
-    if (theme.empty()) return GetStockColor(fallback);
-    auto co = fromPacked(theme_engine.getFillColor(theme, color_name, true));
-    return isColorVisible(co) ? co : GetStockColor(fallback);
+    if (!theme) return GetStockColor(fallback);
+    PackedColor co{colors::NoColor};
+    if (theme->getFillColor(co, color_name, true)) {
+        return fromPacked(co);
+    }
+    return GetStockColor(fallback);
 }
 
 namespace pachde {

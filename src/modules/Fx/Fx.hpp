@@ -140,7 +140,7 @@ struct FxUi : ChemModuleWidget, IChemClient
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
     // ChemModuleWidget
-    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+    void createScrews() override;
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-fx.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 

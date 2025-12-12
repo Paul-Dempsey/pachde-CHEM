@@ -1,28 +1,25 @@
 #include <rack.hpp>
+using namespace ::rack;
 #include "ModuleBroker.hpp"
 #include "midi-devices.hpp"
 #include "widgets/hamburger.hpp"
-using namespace ::rack;
+using namespace ::widgetry;
+
 namespace pachde {
 
 std::shared_ptr<ModuleBroker> the_module_broker_instance = std::make_shared<ModuleBroker>();
 
-std::shared_ptr<ModuleBroker> ModuleBroker::get()
-{
+std::shared_ptr<ModuleBroker> ModuleBroker::get() {
     return the_module_broker_instance;
 }
 
-ModuleBroker::ModuleBroker()
-{
+ModuleBroker::ModuleBroker() {
     hosts.reserve(4);
 }
 
-ModuleBroker::~ModuleBroker()
-{
-}
+ModuleBroker::~ModuleBroker() {}
 
-void ModuleBroker::register_host(IChemHost* host)
-{
+void ModuleBroker::register_host(IChemHost* host) {
     if (hosts.cend() == std::find(hosts.cbegin(), hosts.cend(), host)) {
         hosts.push_back(host);
     } else {
@@ -30,28 +27,24 @@ void ModuleBroker::register_host(IChemHost* host)
     }
 }
 
-void ModuleBroker::unregister_host(IChemHost* host)
-{
+void ModuleBroker::unregister_host(IChemHost* host) {
     auto item = std::find(hosts.cbegin(), hosts.cend(), host);
     if (item != hosts.cend()) {
         hosts.erase(item);
     }
 }
 
-bool ModuleBroker::is_primary(IChemHost* host)
-{
+bool ModuleBroker::is_primary(IChemHost* host) {
     if (hosts.empty()) return false;
     return (host == *hosts.cbegin());
 }
 
-IChemHost* ModuleBroker::get_primary()
-{
+IChemHost* ModuleBroker::get_primary() {
     if (hosts.empty()) return nullptr;
     return *hosts.begin();
 }
 
-bool ModuleBroker::try_bind_client(IChemClient* client)
-{
+bool ModuleBroker::try_bind_client(IChemClient* client) {
     if (hosts.empty()) return false;
     for (auto host : hosts) {
         if (!host->host_has_client_model(client)) {
@@ -64,8 +57,7 @@ bool ModuleBroker::try_bind_client(IChemClient* client)
     return false;
 }
 
-IChemHost* ModuleBroker::get_host(const std::string& claim)
-{
+IChemHost* ModuleBroker::get_host(const std::string& claim) {
     for (auto host : hosts) {
         if (host->host_claim() == claim) {
             return host;
@@ -74,8 +66,7 @@ IChemHost* ModuleBroker::get_host(const std::string& claim)
     return nullptr;
 }
 
-void ModuleBroker::addHostPickerMenu(ui::Menu* menu, IChemClient* client)
-{
+void ModuleBroker::addHostPickerMenu(ui::Menu* menu, IChemClient* client) {
     menu->addChild(createMenuLabel<HamburgerTitle>("Link to Core Module"));
     if (hosts.empty()) {
         menu->addChild(createMenuLabel("[no Core modules available]"));

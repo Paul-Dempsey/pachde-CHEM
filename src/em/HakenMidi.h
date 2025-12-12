@@ -9,29 +9,32 @@
 // 
 //  Line#	  Topic											  Midi Channels
 //	  32	Overview		
-//	  54	Status Bytes    Definitions for Continuum		(all)
-//   156	SSL_ch1_ch2     List of all cc on ch1/ch2       (ch1/ch2)
-//	 181	SSL_ch16        List of all cc on ch16		    (ch16)
-//   211    SSL_streams		List of all stream names		(ch16)
-//   220    SSL_Form_Poke	List of all id in s_Form_Poke	(ch16)
-//   240    SSL_Mat_Poke	List of all id in s_Mat_Poke	(ch16)
-//   263	SSL_ccTask		List of values for ccTask		(ch16)
-//	 291	Preset Select   Preset Load and Store			(ch2/ch16)
-//	 398	Note cc         For Encoding Surface Activity	(ch2..ch16)
-//	 427	Macro cc        Macros i..vi and 14' m7..m90	(ch1 and ch2)
-//	 470	Global cc       Absolute ch1 and Relative ch2	(ch1 and ch2)
-//	 513	Setup cc        General Configuration			(ch16)
-//	 931	ccStream        Select a stream					(ch16 "sData" follow)
-//	1006	s_Form_Poke     Formula Configuration stream	(ch16 "sData" pairs: id,value)
-//	1211	s_Mat_Poke      Matrix  Configuration stream	(ch16 "sData" pairs: id,value)
-//	1496	s_Kinet_Poke    Kinetic Properties stream		(ch16 "sData" pairs: id,value)
-//	1551	s_BiqSin_Poke   BiqSin  Properties stream		(ch16 "sData" pairs: id,value)
-//	1610	s_Conv_Poke     Convolution Config stream 		(ch16 "sData" pairs: id,value)
-//	1654	Thick Continuum config strip locations
+//	  61	Status Bytes    Definitions for Continuum		(all)
+//   169	SSL_ch1_ch2     List of all cc on ch1/ch2       (ch1/ch2)
+//	 194	SSL_ch16        List of all cc on ch16		    (ch16)
+//   224    SSL_streams		List of all stream names		(ch16)
+//   233    SSL_Form_Poke	List of all id in s_Form_Poke	(ch16)
+//   253    SSL_Mat_Poke	List of all id in s_Mat_Poke	(ch16)
+//   277	SSL_ccTask		List of values for ccTask		(ch16)
+//	 305	Preset Select   Preset Load and Store			(ch2/ch16)
+//	 416	Note cc         For Encoding Surface Activity	(ch2..ch16)
+//	 445	Macro cc        Macros i..vi and 14' m7..m90	(ch1 and ch2)
+//	 488	Global cc       Absolute ch1 and Relative ch2	(ch1 and ch2)
+//	 531	Setup cc        General Configuration			(ch16)
+//	 970	ccStream        Select a stream					(ch16 "sData" follow)
+//	1049	s_Form_Poke     Formula Configuration stream	(ch16 "sData" pairs: id,value)
+//	1255	s_Mat_Poke      Matrix  Configuration stream	(ch16 "sData" pairs: id,value)
+//	1569	s_Kinet_Poke    Kinetic Properties stream		(ch16 "sData" pairs: id,value)
+//	1624	s_BiqSin_Poke   BiqSin  Properties stream		(ch16 "sData" pairs: id,value)
+//	1687	s_Conv_Poke     Convolution Config stream 		(ch16 "sData" pairs: id,value)
+//	1731	Thick Continuum config strip locations
 
 
 // Overview of Haken Audio Midi Protocol:
 //		Channel 2-16 for MPE notes (see "Note cc" section below for more information)
+//							0xBn is "ccStat" + channel - 1
+//							0xEn is "pitchWheel" + channel - 1
+//							0xDn is "chanPres" + channel - 1
 //			Bn 86 ff		(1) *optional* low 7' for subsequent Z, Y, or X
 //			En xx xx		(2) X 14' bend offset from keyOn nn (optionally preceded by cc86 for 21')
 //			Dn zz			(3) Z 7' (when Z changes are slow this is preceded by cc86 for 14')
@@ -39,20 +42,24 @@
 //			8n nn 127		(5) start note at pitch of nn + immediately preceding X bend
 //			9n nn 127		(6) end of note (not sent until end of sustain/sostenuto if active)
 //		Channel 1 for Absolute 7-bit Control (general use) and 14-bit Macros (for EaganMatrix Overlays)
+//							0xB0 is "ccStat1"
 //			B0 cc# value	(1) Absolute 7' controllers and 7' macros
 //							(2)  m7-m48 14' controllers (lsb in preceding "FracPed" cc86)
 //							(3) m49-m90 14' controllers (lsb in preceding "FracPedEx" cc97)
 //		Channel 2 for Relative 7-bit Control (general use) and Bank/Preset Select
+//							0xB1 is "ccStat2"
 //			B1 cc# value	(1) Relative 7' controllers and 7' macros
 //							(2) Select preset: B1 32 bank, B1 00 presetHi, C1 presetLow
-//		Channel 16 for Configuration (0xBF and 0xAF Midi status bytes, AF for id# & value or value pair)
+//		Channel 16 for Configuration
+//							0xBF is "ccStat16"
+//							0xAF is "sData" (ch 16 polyphonic aftertouch repurposed for "stream data")
 //			BF cc# value	Configuration cc# descriptions below
 //			AF id# value	Configuration id# meaning determined by preceding cc56 "stream_poke" select
 //			AF val1 val2	Pairs of values in stream, meaning determined by preceding cc56 "stream" select
 
 
 enum {
-	// Midi "status byte" definitions.(8)
+	// Midi "status byte" definitions.
 	keyOn 			= 0x90,		// default: Continuum uses constant 127 for keyOn velocity
 	keyOff 			= 0x80,
 		nnPerOctave		= 12,
@@ -75,28 +82,32 @@ enum {
 		nnMidMini		= 66,	// (nnLowMini+nnHighMin)/2
 		koSusSos		= 1,	// internal keyOff value for sustain/sostenuto pedal up		10.10 [CCon23]
 		koSteal			= 127, 	// internal keyOff value for voice steal					10.10 [CCon23]
-	polyKeyPres 	= 0xa0,		// polyphonic key pressure (2 data bytes) meaning depends on channel
+	polyKeyPres 	= 0xA0,		// polyphonic key pressure (2 data bytes) meaning depends on channel;
+								// channel 1 uses standard Midi definition, repurposed on other channels.
 								// Channel bits = 0000 rx:    MPE ch1 Z, used by rechannelMidiKeyboard()
-								// Channel bits = 10XY rx:    X is msb of 1st download 8' byte, Y of 2nd
-		sData			= 0xaf,	// Channel bits = 1111 rx&tx: two sData 7' bytes in Stream	10.33
+		dData00			= 0xA8,	// Channel bits = 10XY rx:    two memory download bytes 0xxxxxxx 0yyyyyyy
+		dData01			= 0xA9,	// Channel bits = 10XY rx:    two memory download bytes 1xxxxxxx 0yyyyyyy
+		dData10			= 0xAA,	// Channel bits = 10XY rx:    two memory download bytes 0xxxxxxx 1yyyyyyy
+		dData11			= 0xAB,	// Channel bits = 10XY rx:    two memory download bytes 1xxxxxxx 1yyyyyyy
+		sData			= 0xAF,	// Channel bits = 1111 rx&tx: two sData 7' bytes in Stream	10.33
 								//   - sData is preceded by ccStream to select a stream	 	 6.16 [NAMM]
 								//	 - always an even number of sData bytes in a stream		10.34 [Bday]
 								//   - "poke" streams encode id# & value
 								//   - other streams sData are pairs of values (e.g. two ascii characters)
-	ccStat 			= 0xb0,		// control change "status byte"; controllers defined below
+	ccStat 			= 0xB0,		// control change "status byte"; controllers defined below
 		max14		   = 0x3f80,// 1.0 value for 14' 0..1 controllers (max high 7', zero low 7': 127<<7)
 		#define inv_max14  0.00006151574 // 1/max14 = 1/(127<<7); ccFracXYZ/ccFracIM48/ccFracM49M90 = low7'
 		zero14		   = 0x2000,// 0.0 value for 14' -1..1 controllers
 		#define inv_zero14 0.00012207031 // 1/zero14 = 1/(64<<7); ccFracXYZ/ccFracIM48/ccFracM49M90 = low7'
-	progChg 		= 0xc0,		// program change (1 data byte follows) has two distinct uses:
+	progChg 		= 0xC0,		// program change (1 data byte follows) has two distinct uses:
 								// (1) Continuum preset select sequence ccBankH ccBankL progChg:
 								//	   ccBankH on ch2 or ch16 is category (see below),
 								//	   ccBankL is high 7 bits of preset within category (can omit if 0),
 								//	   progChg on ch2 or ch16 to read (use ccStore instead to write).
-								// (2) On preset load, can transmit a user-selected progChg on ch1.
-	chanPres 		= 0xd0,		// channel pressure (1 data byte); used by MPE Z encode
-								//   - our MPE+ uses chanPres for Z with ccFracXYZ supplying optional lsb
-	pitchWheel 		= 0xe0,		// pitch wheel (pitch bend) 14 bits follow for normal Midi,
+								// (2) On preset load, transmit a user-selected 3rd-party progChg on ch1.
+	chanPres 		= 0xD0,		// channel pressure (1 data byte); used by MPE Z encode
+								//   - our MPE+ uses chanPres for Z via ccFracXYZ supplying optional lsb
+	pitchWheel 		= 0xE0,		// pitch wheel (pitch bend) 14 bits follow for normal Midi,
 								// we sometimes send additional 7 bits with preceding ccFracXYZ
 		bendMax		= 0x3fff,	// max for encoding 14-bit normal Midi PitchWheel
 		extBendMax 	= 0x1fffff,	// max for encoding 21-bit extended Midi PitchWheel using ccFracXYZ
@@ -105,32 +116,32 @@ enum {
 		extBendOffset=0x100000,	// offset for encoding 21-bit extended PitchWheel (using ccFracXYZ)
 		#define inv_extBendOffset .000000953674316
 
-	// System Messages.
-	sysMes 			= 0xf0,		// system messages   
-	SysEx 			= 0xf0,		// sysex for old Preset files: now use sData  				 5.40 [BPK]
-	MidiTimingCode	= 0xf1,		// Midi Time Code quarter-frame message (together with Time Code SysEx)
-	SongPosPtr 		= 0xf2,		// 2 bytes of data follow
-	SongSelect 		= 0xf3,		// 1 byte of data follows
-	//				= 0xf4,		//
-	//				= 0xf5,		//
-	TuneRequest	 	= 0xf6,		// no data follows
-	SysExEnd 		= 0xf7,		// end system exclusive; see also s_StreamEnd 				 5.40 [BPK]
-	TimingCk 		= 0xf8,		// Midi Clock: message 1 of 4 (real time, 24 per quarter note, no data)
-	MidiTick		= 0xf9,		// 10 ms clock (rarely used, not part of Midi Clock)
-	StartSeq 		= 0xfa,		// Midi Clock: message 2 of 4 (Midi Time Code is different, uses SysEx)
-	ContinueSeq 	= 0xfb,		// Midi Clock: message 3 of 4 
-	StopSeq 		= 0xfc,		// Midi Clock: message 4 of 4 
-	//				= 0xfd,		// [undefined]
-	actSense 		= 0xfe,		// active sensing (Continuum no longer transmits, as of 8.11)
-	ResetAllReceivers = 0xff,
+	// Midi System Messages.
+	sysMes 			= 0xF0,		// system messages
+	SysEx 			= 0xF0,		// sysex for old Preset files: now use sData  				 5.40 [BPK]
+	MidiTimingCode	= 0xF1,		// Midi Time Code quarter-frame message (together with Time Code SysEx)
+	SongPosPtr 		= 0xF2,		// 2 bytes of data follow
+	SongSelect 		= 0xF3,		// 1 byte of data follows
+	//				= 0xF4,		//
+	//				= 0xF5,		//
+	TuneRequest	 	= 0xF6,		// no data follows
+	SysExEnd 		= 0xF7,		// end system exclusive; see also s_StreamEnd 				 5.40 [BPK]
+	TimingCk 		= 0xF8,		// Midi Clock: message 1 of 4 (real time, 24 per quarter note, no data)
+	MidiTick		= 0xF9,		// 10 ms clock (rarely used, not part of Midi Clock)
+	StartSeq 		= 0xFA,		// Midi Clock: message 2 of 4 (Midi Time Code is different, uses SysEx)
+	ContinueSeq 	= 0xFB,		// Midi Clock: message 3 of 4
+	StopSeq 		= 0xFC,		// Midi Clock: message 4 of 4
+	//				= 0xFD,		// [undefined]
+	actSense 		= 0xFE,		// active sensing (Continuum no longer transmits, as of 8.11)
+	ResetAllReceivers = 0xFF,
 
 	// Masks.
-	realTimeMask 	= 0xf8,		// real-time Midi bytes have these bits set
+	realTimeMask 	= 0xF8,		// real-time Midi bytes have these bits set
 	statFlag 		= 0x80,		// top bit of status nybble indicating a status byte   
-	statMask 		= 0xf0,		// status nybble   
-	chanMask 		= 0x0f,		// channel nybble  
+	statMask 		= 0xF0,		// status nybble
+	chanMask 		= 0x0F,		// channel nybble
 
-	// System controllers.
+	// Midi System controllers.
 	ccSoundOff		= 120,		// All Sound Off (stops all notes on channel)
 	ccDefault	 	= 121,		// All Controllers Default Value channel mode message
 	ccLocal			= 122,		// local control on/off
@@ -141,16 +152,18 @@ enum {
 	ctPolyOn		= 127,		// poly on (mono off); redefined by MPE
 	ccMpe			= 127,		// ... taken over by MPE: data is polyphony, or 0 to end MPE
 
-	// Channel number.
-	mpeMastChan		= 0,		// channel 1 is MPE's default "master" channel
-	ch1				= 0,		// channel 1 tx/rx absolute peds, ch1Note, utility			 8.67
-		ccStat1=ccStat+ch1,		// NB: Continuum echoes absolute ch1 for relative rx'ed on ch2
-		progChg1=progChg+ch1,	// tx only: user-selected value to external synth
-	mpeFirstChan	= 1,		// channel 2 is MPE's first channel for notes (mpeMastChan+1)
-	ch2				= 1,		// channel 2 rx preset select, macros, globals (see below)	 9.94
-		ccStat2=ccStat+ch2,		// rx only: relative position, echo absolute on ch1			 8.67
-	ch16	 		= 15,		// channel 16 cc (tx and rx): general Continuum setup
-		ccStat16=ccStat+ch16,
+	// Channel numbers.
+	mpeMastChan		= 0,		//      channel 1 is MPE's default "master" channel
+	ch1				= 0,		//      channel 1 tx/rx absolute peds, ch1Note				 8.67
+		ccStat1=ccStat+ch1,		// 0xB0 NB: Continuum echoes absolute ch1 for relative rx'ed on ch2
+		progChg1=progChg+ch1,	// 0xC0 tx only: user-selected value to external synth
+	mpeFirstChan	= 1,		//      channel 2 is MPE's first channel for notes (mpeMastChan+1)
+	ch2				= 1,		//      channel 2 rx preset select, macros, globals (see below)
+		ccStat2=ccStat+ch2,		// 0xB1 rx only: relative position, echo absolute on ch1	 8.67
+		progChg2=progChg+ch2,	// 0xC1 preset load LSB; follows "ccBankH" and "ccBankL".	 9.94
+	ch16	 		= 15,		//      channel 16 cc (tx and rx): Continuum/EaganMatrix config
+		ccStat16=ccStat+ch16,	// 0xBF Continuum/EaganMatrix config
+		progChg16=progChg+ch16,	// 0xCF preset load LSB; "progChg2" alias (same function)	 9.70
 
 
 // -------------------------------------- List of all cc on ch1/ch2 ---------------------------------------
@@ -167,7 +180,7 @@ enum {
 			 /* ch1/ch2 cc64  */   "Sus Stretch Sos HpLevel LineLevel Sos2 Actuatn "					  \
 			 /* ch1/ch2 cc71  */     "(71) (72) (73) "													  \
 			 /* ch1/ch2 cc74  */   "ccY "																  \
-			 /* ch1/ch2 cc75  */     "(75) (76) (77) (78) (79) (80) (81) LpDetect "						  \
+			 /* ch1/ch2 cc75  */     "(75) min1 max1 min2 max2 (80) (81) LpDetect "						  \
 			 /* ch1/ch2 cc83  */   "EqTilt EqFrq EqMix FracPed Frac MSpL MSpH ThrDrv AtkCut "			  \
 			 /* ch1/ch2 cc92  */   "RatMkp CoThMix (94) Reci5 Reci6 FracPedEx NrpnL NrpnH RpnL RpnH "	  \
 			 /* ch1/ch2 cc102 */     "m31/m73 m32/m74 m33/m75 m34/m76 m35/m77 m36/m78 m37/m79 m38/m80 "   \
@@ -191,12 +204,12 @@ enum {
 			   /* ch 16 cc33  */     "(33) FormSel FormCopy MacrUses PedTyp "							  \
 			   /* ch 16 cc38  */   "[DataL] "															  \
 			   /* ch 16 cc39  */     "(39) Row Col MatDecLo MatDecHi MatVal MatOp Neighbor ModMatInd "    \
-			   /* ch 16 cc48  */     "ModMatVal (49) (50) Grid (52) (53) (54) (55) "					  \
-			   /* ch 16 cc56  */     "Stream AnlysName (58) MiniMicro_LB (60) (61) (62) (63) "			  \
+			   /* ch 16 cc48  */     "ModMatVal (49) (50) Grid (52) (53) CreaArch CreaArchFin "			  \
+			   /* ch 16 cc56  */     "Stream AnlysSlot (58) MiniMicro_LB (60) (61) (62) (63) "			  \
 			   /* ch 16 cc64  */   "[64] [65] [66] [HpLevel] [LineLevel] [Sos2] [Actuatn] "				  \
 			   /* ch 16 cc71  */     "PolyTrad PolyDsp PolyCvc "										  \
 			   /* ch 16 cc74  */   "ccY "																  \
-			   /* ch 16 cc75  */     "Test Min1 Max1 Min2 Max2 QBias (81) LpDetect "					  \
+			   /* ch 16 cc75  */     "Test Min1 Max1 Min2 Max2 NHyst (81) LpDetect "					  \
 			   /* ch 16 cc83  */   "[EqTilt] [EqFrq] [EqMix] [FracPed] Frac [MSpL] [MSpH] [ThrDrv] "	  \
 			   /* ch 16 cc91  */   "[AtkCut] [RatMkp] [CoThMix] (94) [Reci5] [Reci6] [FracPedEx] "		  \
 			   /* ch 16 cc98  */   "NrpnL NrpnH RpnL RpnH "												  \
@@ -214,7 +227,7 @@ enum {
 			 /*  streams  0- 8 */  "Name ConText Graph GraphO1 GraphO2 GraphT0 GraphT1 Log UpdF2 "		  \
 			 /*  streams  9-17 */  "DemoAst Float Kinetic BiqSin Sys Conv Thumbnail MacroH MacroL "		  \
 			 /*  streams 18-23 */  "MacrUses Form_Poke Mat_Poke Graph_Poke GraphO1_Poke GraphO2_Poke "	  \
-			 /*  streams 24-27 */  "Kinet_Poke BiqSin_Poke Conv_Poke AnlysName"
+			 /*  streams 24-27 */  "Kinet_Poke BiqSin_Poke Conv_Poke AnlysName UtilMinMax UtilData "
 
 
 // ------------------------------------ List of all id in s_Form_Poke ------------------------------------
@@ -242,18 +255,19 @@ enum {
 	#define SSL_Mat_Poke	       /* see s_Mat_Poke section below for definitions of these id */		  \
 			/* stream 20 id 0   */ "(0) SplitMode NoteMode ReciCol1 ReciCol2 OkIncComp "				  \
 			/* stream 20 id 6   */ "Prio SwTogInst (8) Reverse RoundMode OkExpPoly Action "				  \
-			/* stream 20 id 13  */ "Aes3 BigFontPop RecircDisab CompOpt (17) (18) (19) (20) "			  \
-			/* stream 20 id 21  */ "(21) (22) (23) (24) (25) (26) (27) (28) (29) (30) (31) "		      \
-			/* stream 20 id 32  */ "(32) (33) (34) Program Routing (37) (38) Poly BendRange "			  \
-			/* stream 20 id 41  */ "FrontBack Pressure (43) MiddleC SplitPoint MonoFunc (47) "			  \
+			/* stream 20 id 13  */ "Aes3 BigFontPop RecircDisab CompOpt MinY MaxY MinZ MaxZ "			  \
+			/* stream 20 id 21  */ "OutEnc1 OutEnc2 OutMin1 OutMax1 OutMin2 OutMax2 "					  \
+			/* stream 20 id 27  */ "MastCol1 MastCol2 MastCol3 MastCol4 MastCol5 MastCol6 (33) (34) "     \
+			/* stream 20 id 35  */ "Program Routing (37) (38) Poly BendRange "							  \
+			/* stream 20 id 41  */ "Yencode Zlegacy Zencode MiddleC SplitPoint MonoFunc (47) "			  \
 			/* stream 20 id 48  */ "MonoInterv (49) (50) (51) Pedal1 Pedal2 JackShift (55) "		      \
-			/* stream 20 id 56  */ "PreservSurf PreservPed PreservEncod ConfigToMidi TArea (61) "		  \
+			/* stream 20 id 56  */ "PreservSurf PreservPed PreservEncod ConfigToMidi TArea MiniI2C "	  \
 			/* stream 20 id 62  */ "ReciType CvcCfg SSetA SSetB (66) (67) (68) (69) BqExtA BqExtB "		  \
 			/* stream 20 id 72  */ "OscFilTyp1 OscFilTyp2 OscFilTyp3 OscFilTyp4 OscFilTyp5 "		      \
 			/* stream 20 id 77  */ "OscFilOpt1 OscFilOpt2 OscFilOpt3 OscFilOpt4 OscFilOpt5 "		      \
 			/* stream 20 id 82  */ "FilExtrm1 FilExtrm2 FilExtrm3 FilExtrm4 FilExtrm5 "					  \
-			/* stream 20 id 87  */ "(87) (88) (89) (90) BankA BankB BankC ColModeB1 ColModeA1 "			  \
-			/* stream 20 id 96  */ "ColModeB2 ColModeA2 BankParamB BankParamA "							  \
+			/* stream 20 id 87  */ "(87) (88) (89) (90) BankA BankB BankC BankBcm1 BankAcm1 "			  \
+			/* stream 20 id 96  */ "BankBcm2 BankAcm2 BankParamB BankParamA "							  \
 			/* stream 20 id 100 */ "SgTyp1 SgTyp2 SgTyp3 SgTyp4 SgTyp5 TimeSel RowTyp1 RowTyp2 "	      \
 			/* stream 20 id 108 */ "AliasDelay (109) (110) (111) (112) (113) (114) (115) (116) "	      \
 			/* stream 20 id 117 */ "(117) (118) (119) (120) (121) (122) (123) (124) "					  \
@@ -264,29 +278,28 @@ enum {
 // Space-separated list of data values for ccTask.
 	#define SSL_ccTask 			   /* see ccTask below for definitions of these values */				  \
 			/* ccTask value 0   */ "downloadOkBoot downloadFail downloadOkChained doneCopy "              \
-			/* ccTask value 4   */ "downloadOkData archiveOk archiveFail value7available curGloToFlash "  \
-			/* ccTask value 9   */ "reduceGain reducePoly inFactCalib eraseMessage noSync cvcPower "	  \
-			/* ccTask value 15  */ "dspMismatch configToMidi startFirmware startData burnUserArea "		  \
-			/* ccTask value 20  */ "endDataDownload midiLoopbackDetected txtToMidi helloWorld begSync "   \
-			/* ccTask value 25  */ "endSync doneSync syncFail doUpdate2 createLed testBegin testErr "	  \
-			/* ccTask value 32  */ "userToMidi PresetRequiresManualUpdate resetCalib refineCalib "		  \
-			/* ccTask value 36  */ "midiTxFullRate midiTxOneThirdRate midiTx5PercentRate sysToMidi "	  \
-			/* ccTask value 40  */ "endSysNames factCalib doUpdateFile1 burnUser489 dspReboot surfAlign " \
-			/* ccTask value 46  */ "addTrim delTrim resetTrim beginSysNames anlysToMidi storeFactSetup "  \
-			/* ccTask value 52  */ "decPreset incPreset beginUserNames endUserNames clearTopo "			  \
-			/* ccTask value 57  */ "preEraseUpdF1 preEraseUpdF2 preEraseUpdF3 remakeSRMahl doneFactProg " \
-			/* ccTask value 62  */ "failFactProg usbTxNoAck MidiRxOver MidiTxOver MidiRxSyntax "		  \
-			/* ccTask value 67  */ "MidiRxBitErr sensComm nan dspSeq burnUserMiniMicro MidiLog0	MidiLog1 "\
-			/* ccTask value 74  */ "MidiLog2 MidiLog3 burnRecov489 burnRecov364 burnRecovMiniMicro "      \
-			/* ccTask value 79  */ "loadsToMidi pitchGrid1 pitchGrid2 pitchGrid3 pitchGrid4 pitchGrid5 "  \
-			/* ccTask value 85  */ "pitchGrid6 pitchGrid7 pitchGrid8 numDecMat numIncMat mendDisco "	  \
+			/* ccTask value 4   */ "downloadOkData archiveOk archiveFail EmptyUPreset0 curGloToFlash "    \
+			/* ccTask value 9   */ "reduceGain reducePoly inFactCalib eraseMessage aesSyncFail matToLog " \
+			/* ccTask value 15  */ "ceeMismatch configToMidi startFirmware startData 19nop "	          \
+			/* ccTask value 20  */ "endDataDownload midiLoopback contTxtToMidi tenSecsOld begTxDsp "      \
+			/* ccTask value 25  */ "endTxDsp doneTxDsp txDspFail doUpdF2 createLed testBegin testErr "    \
+			/* ccTask value 32  */ "userToMidi manualUpdate doResetCalib doRefineCalib "		          \
+			/* ccTask value 36  */ "36nop 37nop 38nop sysToMidi "	                                      \
+			/* ccTask value 40  */ "endSysNames doFactCalib doUpdate1 burnUser489 rebootUpdF1 "	          \
+			/* ccTask value 45  */ "surfAlign addTrim delTrim resetTrim beginSysNames anlysToMidi "		  \
+			/* ccTask value 51  */ "storeFactSetup decPreset incPreset beginUserNames endUserNames "	  \
+			/* ccTask value 56  */ "clearTopo preEraseUpdF1 preEraseUpdF2 preEraseUpdF3 remakeSRMahl "    \
+			/* ccTask value 61  */ "doneFactProg failFactProg usbTxNoAck rxOver txOver rxSynErr "		  \
+			/* ccTask value 67  */ "rxBitErr sensComm nanErr ceeSeq burnUserMini doMidiLog0	doMidiLog1 "  \
+			/* ccTask value 74  */ "doMidiLog2 doMidiLog3 burnRecovery489 77nop burnRecovMini "           \
+			/* ccTask value 79  */ "loadsToMidi defFirstTuning defGrid2 defGrid3 defGrid4 defGrid5 "      \
+			/* ccTask value 85  */ "defGrid6 defGrid7 defLastTuning numDecMat numIncMat mendDisco "	      \
 			/* ccTask value 91  */ "rebootRecov stageUp stageDown stageDok1 stageDok2 stageDok3 "		  \
 			/* ccTask value 97  */ "stageDfail1 stageDfail2 stageDfail3 rebootFinaliz gridToFlash "		  \
-			/* ccTask value 102 */ "mendDiv startUpdF2 doneSRMahl pullConv pullSSet DemoUset1 DemoUset2 " \
-			/* ccTask value 109 */ "DemoUset3 DemoUset4 DemoUset5 DemoUset6 DemoUset7 DemoUset8 "		  \
-			/* ccTask value 115 */ "EmptyUset1 EmptyUset2 EmptyUset3 EmptyUset4 EmptyUset5 EmptyUset6 "	  \
-			/* ccTask value 121 */ "EmptyUset7 EmptyUset8 burnUser593 burnRecov593 (125) (126) "		  \
-			/* ccTask value 127 */ "rebootUser "
+			/* ccTask value 102 */ "mendDivided startUpdF2 doneSRMahl pullConv pullSSet "                 \
+			/* ccTask value 107 */ "Demo1 Demo2 Demo3 Demo4 Demo5 Demo6 Demo7 Demo8 "	                  \
+			/* ccTask value 115 */ "Empty1 Empty2 Empty3 Empty4 Empty5 Empty6 Empty7 Empty8 "             \
+			/* ccTask value 123 */ "burnUser593 burnRecov593 dnTrim upTrim rebootUser "
 
 
 // ---------------------------------------- Preset Load and Store ----------------------------------------
@@ -369,21 +382,25 @@ enum {
 								// 
 		catEdBuf 		= 126, 	// Category# for Midi tx and rx, not used internally: Preset Edit Buffer
 								// 	NB: Internally, catUser with userPreset0 is used instead
-								//  NB: For Editor highlighting, source preset slot encoded as follows:
+								//  NB: Tx to Editor for highlighted preset slot encoded as follows:
 								// 		0 no source preset slot ("from disk" or similar state)
 								// 		1..128 User Preset Slot 0..127 is source preset
 								// 		129+ System Preset Slot 0+ is source preset
+								//  NB: Rx from Editor only catEdBuf with slot 0 is meaningful;
+								//      it means preset opened from disk, not stored in local presets.
+								//      For userPreset1..UserPreset128 Editor uses catUser;
+								//		for system presets Editor uses catSSlot.
 								// 
 		catSSlot 		= 127,	// Category# for tx/rx, not used internally: System Preset Slot "sysSlot"
 								// 
 	ccBankL			= 32,		// optional preset# MSB; follows ccBankH
 								// Aliased (same function) on ch2 and ch16.					 9.95
-	progChg2  = progChg+ch2,	// ch2:  preset load LSB; follows ccBankH and ccBankL.		 9.94
+//  progChg2  (defined above)	// ch2:  preset load LSB; follows ccBankH and ccBankL.		 9.94
 								//		 NB: Preset numbers start from 1 for internal catpre,
 								// 		     offset 1 from progChg2/progChg16/ccStore Midi encoding.
 								//		 NB: rx for ccBankH = any valid category,
 								//			 Continuum tx *only* ccBankH = catSSlot/catEdBuf/catUser
-	progChg16 = progChg+ch16,	// ch16: preset load LSB; progChg2 alias (same function)	 9.70 [COVID19]
+//  progChg16 (defined above)	// ch16: preset load LSB; progChg2 alias (same function)	 9.70 [COVID19]
 	ccStore			= 112,		// ch16: store flash; ccBankH = catEdBuf/catUser/catSSlot	10.33
 								//       NB: ccStore with catEdBuf or catUser may be done at any time,
 								//           but catSSlot only in sequence as part of Update File 2.
@@ -398,16 +415,16 @@ enum {
 
 // -------------------------------------- Note cc: All MPE Channels --------------------------------------
 // See MPE+ web page for more discussion of Continuum's note encoding.
-// (1) Do not use Key Velocity ï¿½MPE Strike Valueï¿½; instead use a sequence of values that preserve 
+// (1) Do not use Key Velocity “MPE Strike Value”; instead use a sequence of values that preserve 
 //     details of the attack trajectory. MPE+ always has Midi Key Velocity at 127.
 // (2) Notes may start at any pitch; the initial pitch of an MPE+ note is Midi Note Number
 //     plus preceding bend. Encourage performers to learn to play without "rounding";
 //     do not dumb down the Continuum to starting notes at one-of-12 pitches like a keyboard.
-// (3) Temporal resolution in Z updates is paramount in attacks, value resolution in sustains.
+// (3) Use best temporal Z resolution in attacks, use best value Z resolution in sustains.
 //     Use MPE+ glitch-free 14-bit Y and Z updates (see "ccFracXYZ" below), except in attack
 //     use as many 7-bit Z updates as possible (skip "ccFracXYZ" for Y and Z during attack).
 // (4) 21-bit X (Bend) is available but rarely necessary, even in long sustains.
-// (5) The Continuum extends notes during sustain and sostenuto, 
+// (5) The Continuum extends notes for sustain pedal and sostenuto pedals,
 //     delaying keyOff until end sustain or sostenuto pedal is released.
 // Notes are encoded with keyOn, keyOff, chanPres, pitchWheel, and certain ccStat (see "Overview").
 // The following are cc ("ccStat") that may be used to encode notes.
@@ -427,7 +444,7 @@ enum {
 
 // ------------------------------------- Macros i..vi and 14' m7..m90 -------------------------------------
 	// Continuum MPE+ 14' macros incorporate preceding cc86 (ccFracIM48) or cc97 (ccFracM49M90) for low 7'.
-	// Avoids Midi 14' glitch because cc86 and cc97 values are not used until subsequent macro cc arrives.
+	// Avoids Midi 14' glitch because cc86 and cc97 values not applied until subsequent macro cc arrives.
 	// 
 	// i..vi    are  0..1 (see "max14"  0x3F80) and are *optionally* 14' preceded by cc86 ccFracIM48,
 	// m7..m48  are -1..1 (see "zero14" 0x2000) and are   *always*   14' preceded by cc86 ccFracIM48,
@@ -465,7 +482,7 @@ enum {
 	ccM73=102,ccM74=103,ccM75=104,ccM76=105,ccM77=106,ccM78=107,ccM79=108,ccM80=109,ccM81=110,
 	ccM82=111,ccM83=112,ccM84=113,ccM85=114,ccM86=115,ccM87=116,ccM88=117,ccM89=118,ccM90=119,
 	// The following definitions are internally used for indexing into arrays of macro values.
-	idI=0,idIV=3,idM7=6,idM31=30,idM48=47,idM90=89,idMex=42,
+	idI=0,idIV=3,idV=4,idVI=5,idM7=6,idM31=30,idM48=47,idM90=89,idMex=42,
 
 
 // ------------------------------ Global cc: Absolute ch1 or Relative ch2  ------------------------------
@@ -493,8 +510,8 @@ enum {
 	ccSus			= 64,		// sustain pedal; down = b0 40 7f; up = b0 40 00  
 	ccStretch		= 65,		// 0..127 = normal..twice stretched intervals				10.34 [Suprbth]
 	ccSos			= 66,		// sostenuto pedal, used as first sostenuto on Continuum
-	ccHpLevel		= 67,		// headphone level (for OS) 								 8.12 [COVID19]
-	ccLineLevel		= 68,		// line level  	  (for OS)									 8.12 [COVID19]
+	ccHpLevel		= 67,		// headphone level (for Osmose) 							 8.12 [COVID19]
+	ccLineLevel		= 68,		// line level  	  (for Osmose)								 8.12 [COVID19]
 	ccSos2			= 69,		// hold2 pedal, used as second sostenuto					 1.67
 	ccMin1			= 76,		// minimum data value for pedal 1							 4.15 
 	ccMax1			= 77,		// max data value for pedal 1			
@@ -512,14 +529,7 @@ enum {
 
 
 // ---------------------------------------- General Setup cc: ch16 ----------------------------------------
-	ccDataH			= 6,		// data entry  tx: display, log, MPE bend range				 7.39 [Fruita]
-		// The following at ccDataH definitions for tx utility display; ccDataL has sensor data.
-		hiSensNo		= 0x00,	// tx utility display: 2/0,5/ msbs of sensor number
-		loSensNo_norm	= 0x20,	// tx utility display: 2/1,5/ lsbs of sens# using normalized display
-		loSensNo_dual	= 0x40,	// tx utility display: 2/2,5/ lsbs of sens# using dual-rail display
-		newScanHalf 	= 0x7e,	// tx utility display: start of new scan for half-size fingerboard
-		newScanFull		= 0x7f,	// rx utility display: start of new scan for full-size or slim70
-		newLogDump  	= 0x7d,	// log dump: start of log dump over traditional Midi		
+	ccDataH			= 6,		// data entry  tx: MPE bend range, MPE+ params				 7.39 [Fruita]
 	ccFormSel		= 34,		// select a formula for Editor display and/or modification
 	ccFormCopy		= 35,		// formula to copy into currently selected; 0 primary to secondary
 	    cpyA = 1 /*matA*/, cpyW = 45 /*matW*/, cpyX, cpyXnn, cpyY, cpyZ, cpy0p1,
@@ -536,12 +546,25 @@ enum {
 		  	  	  	  	  	  	// 8x: only in i2c because 1/4" jacks have no ring pullup
 		  _isCV_		  = 5,	// retired: Mini limited CV input 							10.43
 		  isPot			  = 6,	// Slim Continuum pot (continuous-valued)
-	ccDataL 		= 38, 		// log dumps, utility disp, cvc verify, custom tuning		 6.19 re-add
-								// For sensor utility display:
-								// 	 Dual Rail ccDataL has three bytes (min, max, cur) per sensor.
-								// 	 Normalized Sensor ccDataL has one byte per sensor.
-		maxGridEntries 	= 128,	// tuning grid: fills one flash page						 6.19 [GulfSP]
-		ccsPerGridPoint = 6,	// tuning grid: number of ccDataL messages per grid point
+	ccDataL 		= 38, 		// data entry  rx: custom tunings							 6.19 re-add
+		maxGridEntries 	= 128,	// tuning grid: max 128 grid points (one flash page)		 6.19 [GulfSP]
+		ccsPerGridPoint = 6,	// tuning grid: number of ccDataL messages per tuning grid point
+								// For downloading a tuning grid:
+								//   After defFirstTuning..defLastTuning, send sets of 6 ccDataL bytes:
+								//   3 bytes of "from" value
+								//   3 bytes of "to" value
+								//	 The 3 bytes together are a 21-bit fixed-point note number:
+								//			7 bits of notenumber, binary point, 14 fractional
+								//			nnnnnnn.HHHHHHHLLLLLLL
+								//   The tuning grid points must be ordered in increasing "from" value.
+								//   The tuning grid data must be 0 terminated (last 6 bytes all 0),
+								//   then send gridToFlash so tuning is stored for ccGrid.
+								//   Notice: Only 2 tuning points (at low and high extremes) are needed
+								//           to double width of octaves across entire instrument;
+								//           more points are needed only if "rounding" is the goal.
+								//			 For "rounding", the "from" and "to" are often the same;
+								//           each grid point acts as an "attractor point" for rounding
+								//			 but the tuning grid does not change surface's note spacing.
 	ccRow			= 40,		// select row in matrix
 		rNoise			=  0,	// noise samples source row
 		rOscFil1		=  1,	// 1st oscillator/filter's output row
@@ -564,12 +587,12 @@ enum {
 	ccCol			= 41,		// select column in matrix
 		cSL				=  0,	// Master Section left input
 		cSR				=  1,	// Master Section right input
-		cCnvI1			=  2,	// 1st convolution index
-		cCnvM1			=  3,	// 1st convolution mix
-		cReciR1			=  4,	// recirculator first column
-		cReciR2			=  5,	// recirculator second column
-		cCnvI2			=  6,	// 2nd convolution index
-		cCnvM2			=  7,	// 2nd convolution mix
+		cMast1			=  2,	// 1st of 6 assignable Master columns						10.60
+		cMast2			=  3,	// 2nd of 6 assignable Master columns						10.60
+		cMast3			=  4,	// 3rd of 6 assignable Master columns						10.60
+		cMast4			=  5,	// 4th of 6 assignable Master columns						10.60
+		cMast5			=  6,	// 5th of 6 assignable Master columns						10.60
+		cMast6			=  7,	// 6th of 6 assignable Master columns						10.60
 		cSM				=  8,	// Master / Dry mix
 		cL				=  9,	// Dry left 
 		cR				= 10,	// Dry Right
@@ -624,8 +647,8 @@ enum {
 		cSgF5			= 59,	// 5th Shape Generator Frequency
 		cSgT5			= 60,	// 5th Shape Generator Trigger
 	     nCols,					// number of columns in matrix [61]
+		 nAMastCols 	= 6,	// number of assignable Master columns
 		 nCnv			= 2,	// number of convolutions (both in Master) 					 5.41 [BPK]
-		 oCnv			= 4,	// number of matrix columns offset between convolutions
 	     nOFil			= 5,	// number of oscillators/filters
 		 oFilt			= 3,	// number of matrix columns per filter
 		 nBank			= 3,	// number of multipurpose banks
@@ -661,6 +684,9 @@ enum {
 		matDisBit 		= 64, 	// bit set if matrix point disabled 						 8.10
 	ccMatOp			= 45,		// matrix operation
 		// 				= 100..105 avail
+		matClrBankA		= 103,	// rx: clear all items in BankA's matrix columns			10.59
+		matClrBankB		= 104,	// rx: clear all items in BankB's matrix columns			10.59
+		matClrBankC		= 105,	// rx: clear all items in BankC's matrix columns			10.59
 		colFloat		= 106,	// rx: Show column value (via s_Float)						 8.61 [DanielB]
 		noFloat			= 107,	// rx: Hide debug value (no s_Float)						 8.10
 		formFloat		= 108,	// rx: Show formula value (s_Float)							 8.10
@@ -697,22 +723,19 @@ enum {
 		lastUserTuning 	= 87,
 		userTuningGrids = lastUserTuning - firstUserTuning + 1,
 	ccAnlysSlot		= 57,		// specify analysis slot number, follows s_AnlysName		10.41
-	ccMini_LB		= 59,		// two purposes: menu-diving options for Mini, and loopback detect:
-								// only sent, never received								 9.08 [COVID19]
-								// for loopback detect see also companion mechanism ccLoopDetect
-		bDim			= 0x07,	// Mini/Micro dim = -6,-12,-18,-24dB
-		bPedExt			= 0x08,	// set to use Mini/Micro ext jack for pedal1 or i2c			 8.59
-			pedX=0,i2cX,		// bPedExt field values: jack is for pedal1 or i2c			 8.68
-		bAvail			= 0x10,	// bit available											10.43
-		bBrD			= 0x60,	// Mini/Micro display brightness
+	ccLB			= 59,		// loopback detect: only sent, never received;				 9.08 [COVID19]
+								// one of two loopback detect mechanisms, see also ccLoopDetect
+	ccLoopDetect	= 82,		// random pattern for loopback detect (ch16 *and* ch1);		 8.62 [RoanMtn]
+								// one of two loopback detect mechanisms, see also ccMini_LB
+	ccCreaArch		= 54,		// creating user preset group (data = user preset #0..127)	10.56
+								// (see related cfCreateArch16..cfCreateArch1)
+	ccCreaArchFin	= 55,		// last in user preset group (data = user preset #0..127)	10.56
 	ccActuation		= 70,		// sensor scanning modifications							 8.55
 	ccPolyTrad		= 71,		// Continuum out: total _TRAD polyphony						 6.00
 	ccPolyDsp		= 72,		// Continuum out: total _DSP polyphony						 6.00
 	ccPolyCvc		= 73,		// Continuum out: total _CVC polyphony						 6.00
 	ccTest			= 75,		// for stress test of Midi to/from Editor; data 64..127		 5.64 
-	ccQBias			= 80,		// obsolete (saved but no longer does anything)				10.07
-	ccLoopDetect	= 82,		// random pattern for loopback detect   also on *ch1*		 8.62 [RoanMtn]
-								// see also companion mechanism ccMini_LB
+	ccNHyst			= 80,		// note on/off hysteresis, 64 is default value				10.61
 	ccNrpnL  		= 98,		// low 7' nrpn select										 9.08 [NAMM]
 	ccNrpnH  		= 99,		// high 7' nrpn select										 9.08 [NAMM]
 	ccRpnL			= 100,		// low 7' rpn select										 7.38 [Fruita]
@@ -741,7 +764,7 @@ enum {
 		downloadOkData	= 4,	// tx: center msg "Data download completed."
 		archiveOk		= 5,	// tx: erase message bar; at end of Preset Group
 		archiveFail		= 6,	// tx: msg bar red "Failed"; File2 and User Preset Groups retry
-		//				= 7,	//     retired Killamix query								10.10
+		EmptyUPreset0	= 7,	// rx: Empty to UserPreset0 (edit buffer)					10.60
 		curGloToFlash	= 8,	// rx: write global/calib/Map/current to flash				 5.12
 								//     Special case if Archive Retrieve: end of Retrieve
 		reduceGain		= 9,	// tx: center msg "Reduce Gain"
@@ -749,21 +772,37 @@ enum {
 		inFactCalib		= 11,	// tx: center msg "Factory Calibration In Progress"			 6.38
 		eraseMessage	= 12,	// tx: erase message bar
 		aesSyncFail		= 13,	// tx: center msg "AES3 Sync Failure"  						 5.40
-		cvcPower		= 14,	// tx: center msg "Turn On or Disconnect CVC"  1x dsp only	 5.40
+		matToLog		= 14,	// rx: Cameron Fuller's compiled matrix code to log			10.59
 		ceeMismatch		= 15,	// tx: firmware version mismatch between MultiDsps			 5.60
 		configToMidi	= 16,	// rx: current config to Midi								 5.21
 		startFirmware 	= 17,	// rx: begin firmware download
 		startData		= 18,	// rx: begin synthesis data download
-		burnUser364 	= 19,	// rx: done with firmware 1x3x download, burn flash (if crc ok)
-		endDataDownload = 20,	// rx: end data firmware/data download
+		//  After startData, two download memory bytes are encoded per dData00/01/10/11 message.
+		//	To download an Additive Analysis, send 16 header bytes then 512 frames (256 bytes/frame):
+		//		4 bytes	- value 1..40 to load data for additive slot 0..39
+		//		4 bytes - hex date (nybbles 00yymmdd, 0x00250702 = 2 July 2025)
+		//		4 bytes - number of bytes of data including header (N+16 = 512*256+16 = 131088)
+		//		4 bytes - crc of data not including header, computed as follows:
+		//				  Uint crc = 0xAA5555AA;
+		//				  for (int i = 0; i < N/4; i++)
+		//				  	 { crc ^= word[i]; crc = (crc << 1) | ((crc >> 31) & 1); }
+		//		N bytes - 512 frames x 256 bytes per frame = 131072 data bytes
+		//				  each frame: 64 16' log-frequency values; first 16' of analysis special nnRef
+		//								  float nn = value * 0.002746582 - 43.234424;
+		//							  64 7' log-amplitude values
+		//								  float amp = (expf( v * 0.08122942468 ) - 1.0) / 0x10000;
+		//								  special values >= 0x80 are 7' phase value (zero amplitude)
+		//							  64 7' log-noisiness values, same units as log-amplitude
+		//			 	= 19,	//     retired burn364 1x firmware
+		endDataDownload = 20,	// rx: end data data download
 		midiLoopback	= 21,	// tx: Midi-loopback-detected error message
 		contTxtToMidi	= 22,	// rx: preset's control text to Midi						10.36
-		helloWorld		= 23,	// tx: sent once ~10 seconds after powerup					10.40
-		begTxDsp		= 24,	// internal: begin config send    (tx dsp1, rx dsp2,dsp3)	 5.60
-		endTxDsp		= 25,	// internal: end   config send    (tx dsp1, rx dsp2,dsp3)	 5.60
-		doneTxDsp		= 26,	// internal: end   config receive (tx dsp2,dsp3, rx dsp1) 
-		txDspFail		= 27,	// tx: config send txDsp fail, log in Max window
-		doUpdF2			= 28,	// tx: did UpdateFile1 reboot, "Do Update File 2"
+		tenSecsOld		= 23,	// tx: sent once ~10 seconds after powerup					10.40
+		begTxDsp		= 24,	// inter-DSP begin preset send  (tx dsp1, rx dsp2,dsp3)		 5.60
+		endTxDsp		= 25,	// inter-DSP end preset send    (tx dsp1, rx dsp2,dsp3)		 5.60
+		doneTxDsp		= 26,	// inter-DSP end preset receive (tx dsp2,dsp3, rx dsp1)
+		txDspFail		= 27,	// tx: inter-DSP preset setup fail, log in Max window
+		doUpdF2			= 28,	// tx: center msg (did UpdateFile1 reboot) "Do Update File 2"
 								// NB: This is also used by Osmose.
 		createLed		= 29,	// rx: turn on yellow LED for archive create
 		testBegin		= 30,	// rx: begin Midi stress test
@@ -773,23 +812,23 @@ enum {
 		manualUpdate	= 33,	// tx: old preset requires manual update 					 6.20
 		doResetCalib	= 34,	// rx: replace at-rest sensor levels						 6.38
 		doRefineCalib	= 35,	// rx: incorporate new at-rest								 6.38
-		midiTxFull		= 36,	// rx: use full midi transmission rate						 6.41
-		midiTxThird		= 37,	// rx: use one-third midi transmission rate 				 6.41 7.57 8.55
-		midiTxTweenth	= 38,	// rx: use one-twentieth midi transmission rate 			 6.41 7.57 7.59
+		//				= 36,	//     retired full midi transmission rate
+		//				= 37,	//     retired one-third midi transmission rate
+		//				= 38,	//     retired one-twentieth midi transmission rate
 		sysToMidi		= 39,	// rx: request sysPreset names to Midi, then current config	 6.19
 		endSysNames		= 40,	// tx: end list of system presets				  			 9.70
 		doFactCalib		= 41,	// rx: do factory calibration
-		doUpdate1		= 42,	// tx: booted up in recovery mode, "Do Update File 1"
+		doUpdate1		= 42,	// tx: center msg (booted up in recovery) "Do Update File 1"
 								// NB: This is also used by Osmose to detect Recovery Mode.
 		burnUser489 	= 43,	// rx: done firm 2x6x download, write flash (if crc ok)
 		rebootUpdF1		= 44,	// rx: reboot after UpdateFile1 (if all ok)					 7.56
 		surfAlign		= 45,	// rx: toggle slim's Surface Alignment mode 				 9.08
-		addTrim			= 46,	// rx: add currently-playing finger to Pitch Trim array		 7.57
+		addTrim			= 46,	// rx: add playing finger position to Pitch Trim array		 7.57
 		delTrim			= 47,	// rx: remove Pitch Trim point nearest to finger			 7.57
 		resetTrim		= 48,	// rx: remove all Pitch Trim data  							 7.57
 		beginSysNames	= 49,	// tx: begin list of system presets 			 			 9.70
 		anlysToMidi		= 50,	// rx: request analysis names (subset of userToMidi)		10.43
-		storeFactSetup	= 51,	// rx: copy calib/global/userPre to factory setup backup
+		storeFactSetup	= 51,	// rx: store factory setup state (including SN)
 		decPreset		= 52,	// rx: go to prev sysPreset									 8.59 [SuprBth]
 		incPreset		= 53,	// rx: go to next sysPreset									 8.59 [SuprBth]
 		beginUserNames	= 54,	// tx: begin list of analysis and uPreset names				 7.78 10.41
@@ -814,8 +853,8 @@ enum {
 		doMidiLog1		= 73,	// rx: dsp1 scrolling ascii log via Midi					 7.40 8.81
 		doMidiLog2		= 74,	// rx: dsp2 scrolling ascii log via Midi 					 7.40 8.81
 		doMidiLog3		= 75,	// rx: dsp3 scrolling ascii log via Midi 					 7.40 8.81
-		burnRecovery489 = 76,	// rx: done recovery firm 1x3x download, write flash
-		burnRecovery364 = 77,	// rx: done recovery firm 2x6x download, write flash
+		burnRecovery489 = 76,	// rx: done recovery firm 2x6x download, write flash
+		//				= 77,	//     retired recovery firm 1x3x 
 		burnRecoveryMini= 78,	// rx: done recovery firm Mini/Micro download, write flash	10.42
 		loadsToMidi 	= 79,	// rx: do "configToMidi" for future preset loads			10.10
 		defFirstTuning	= 80,	// rx: begin first user tuning grid; ccDataL data follows 
@@ -825,10 +864,10 @@ enum {
 		numIncMat		= 89,	// rx: increment numeric matrix point						 9.70
 		mendDisco		= 90,	// rx: mend discontinuity at note (Sensor Map)				 9.74
 		rebootRecov		= 91,	// rx: reboot in Recovery Mode, no delay					 9.81
-		stageUp			= 92,	// rx: upload monolithic update								 9.82
-		stageDown		= 93,	// rx: download monolithic update							 9.82
-		stageDownOk1	= 94, stageDownOk2, stageDownOk3,		// tx: at end of StageDown
-		stageDownFail1	= 97, stageDownFail2, stageDownFail3,	// tx: at end of StageDown
+		stageUp			= 92,	// rx: upload monolithic update	       (Osmose-specific)	 9.82
+		stageDown		= 93,	// rx: download monolithic update      (Osmose-specific)	 9.82
+		stageDownOk1	= 94, stageDownOk2, stageDownOk3,		// tx: (Osmose-specific) end of StageDown
+		stageDownFail1	= 97, stageDownFail2, stageDownFail3,	// tx: (Osmose-specific) end of StageDown
 		rebootFinaliz	= 100,	// rx: reboot in 10s, led matrix "finalize"					 9.82
 		gridToFlash 	= 101,	// rx: save tuning grids to flash
 		mendDivided		= 102,	// rx: mend divided note (add to Sensor Map)				 9.74
@@ -844,22 +883,23 @@ enum {
 		Empty8			= 122,	// rx: Empty to last set-of-16 user presets.				 9.70 [COVID19]
 		burnUser593 	= 123,	// rx: done firmware 8x download, write flash (if crc ok)
 		burnRecovery593 = 124,	// rx: done recovery firm 8x download, write flash
-		//				= 125,	//
-		//				= 126,	//
+		dnTrim			= 125,	// rx: decrease pitch trim value nearest to finger by 1		10.53 [Paris]
+		upTrim			= 126,	// rx: increase pitch trim value  nearest to fingerby 1		10.53 [Paris]
 		rebootUser		= 127,	// rx: reboot in User (normal) Mode, no delay				10.33
 	ccDInfo			= 110,		// for Continuum Editor: additional info for download
 		// NB: ccTask not stored within an "archive" (preset in .mid file); but some ccDInfo are.
-		profileEnd		= 0,	// tx: erase Editor's Message Bar, Editor puts up Save dialog
+		//				= 0,	// tx: Editor puts up Save Profile dialog [no longer used]
 		percentFirst	= 1,	// tx: left msg "1%"  in Editor's Message Bar
 		percentLast		= 99,	// tx: left msg "99%" in Editor's Message Bar
-		cfCreateArch0	= 100,	// rx: start archive *creation* (preset to archive)		 5.12
+		cfCreateArch0	= 100,	// rx: start archive *creation* (preset to archive)			 5.12
 								//     value 100 selects edit buffer (userPreset0) as source
-		cfCreateArch1	= 101,	// rx: start archive *creation* (preset to archive)
-								//     value 101..116 select within current set-of-16 user presets
-		cfCreateArch16	= 116,	// rx: start archive *creation* (preset to archive)	
+		cfCreateArch1	= 101,	// rx: cfCreateArch16..1 select within current set-of-16 user presets;
+								//     cfCreateArch1 is last preset in Save User Preset Group;
+								//	   "ccCreaArchFin" is more general version of cfCreateArch1
+		cfCreateArch16	= 116,	// rx: "ccCreaArch" is more general cfCreateArch16..cfCreateArch2
 		inProgress		= 118,	// tx: center msg "Download in progress. Please wait."
 		archiveNop		= 119,	// rx: no-op, used as padding in midi files
-		edRecordArchive	= 120,	// tx: sent to Editor when cfCreateArchive is received;
+		edRecordArchive	= 120,	// tx: replied to Editor when ccCreaArch/cfCreateArchive is received;
 								//     Editor starts recording (which excludes edRecordArchive)
 		cfRetrieveArch  = 121,	// tx: sent to Editor along with edRecordArchive -- 
 								// rx: played back from Editor at start of *retrieval* from archive;
@@ -872,7 +912,7 @@ enum {
 								// rx: archive retrieval:  Continuum does nothing with this
 		finalizing		= 125,	// tx: left msg "finalizing flash"
 		//				= 126,	// tx: left msg "initializing" [no longer used, except in old archives]
-		profileStart	= 127,	// tx: center msg "Profile is being generated. Please wait."
+		//				= 127,	// tx: center msg "Profile. Please wait." [no longer used]
 	ccEdState		= 111,		// Continuum state info (to Editor) 						 3.47
 		sLedBits		= 0x0f,	// select led color bits
 		  ledOff		  = 0,	// led color
@@ -895,32 +935,27 @@ enum {
 		  aesInput176p4	  = 6,	// aes input 176.4 kHz
 		  aesInput192	  = 7,	// aes input 192.0 kHz
 		  #define StdRate 44100,48000,88200,96000,176400,192000
-	ccRxSNBN 		= 113,		// Continuum rx: response to ccTxSNBN						 3.26
+	ccRxSNBN 		= 113,		// rx: Response to ccTxSNBN									 3.26
 								// for private use only; sets poly, multi-split, and Midi special encoding:
 								// high channel number hack, assume bend 96, default y z cc
-	cc_txUsg_rxDis  = 114, 		// Tx: Processing usage; Rx: Utility sensor-display mode
-								// Tx: 32*dsp# + 4%units (0-25)								 9.08 [COVID19]
-		drawAttacks 	= 1, 	// rx sensor utility display mode: "Start of Notes"
-		drawNormalized	= 2,	// rx sensor utility display mode: "Continuous"
-		drawDualRaw		= 3,	// rx sensor utility display mode: "Raw Sensors"
-		drawDualZoomRaw	= 10,	// rx sensor utility display mode: "Zoom Raw Sensors"
-		drawDualZoomNxt = 9,	// rx sensor utility display mode: "Zoom Next Start"
-		drawDualNorm	= 4,	// rx sensor utility display mode: "Normalized Sensors"
-		drawDualSumDiff	= 7, 	// rx sensor utility display mode: "Difference and Sum"
-		drawDualBarZ	= 8,	// rx sensor utility display mode: "Intermediate and Final"
-		drawDualHist	= 5, 	// rx sensor utility display mode: "Midi History Z,-Y"
-		drawDualHist14	= 6, 	// rx sensor utility display mode: "Midi History Zhi,Zlo"
-	ccLogDump 		= 115, 		// begin or continue continuum log dump
-		ordBits			= 0x03,	// 0 starts, 1..3 role.ord request for next block of data in log
-		//				= 0x7c,	// available (nonzero to avoid initiating log dump)
-	ccEditor 		= 116,		// Continuum input: Continuum Editor is out there 			 3.33
-	ccEditorReply	= 118,		// Respond to ccEditor LightAct,doubleSR,3/ProcPow,SNBN,edCvcMatrix
+	cc_txUsg_rxDis  = 114, 		// tx: Processing usage; value is 32*dsp# + 4%units (0-25)	 9.08 [COVID19]
+								// rx: Haken Audio internal utility sensor data mode, values below
+		utTrigger		= 1,	// rx: utility asking for sensor scan data (tx s_UtilData)	10.59 [BahiaH]
+		utRaw			= 2,	// rx: set utTrigger data mode "Raw Sensors"			(tx s_UtilMinMax)
+		utZoomRaw		= 3,	// rx: set utTrigger data mode "Zoom Raw Sensors"		(tx s_UtilMinMax) 
+		utSumDiff		= 5, 	// rx: set utTrigger data mode "Difference and Sum"		(null s_UtilMinMax)
+		utNorm			= 4,	// rx: set utTrigger data mode "Normalized Sensors"		(null s_UtilMinMax)
+		utBarZ			= 6,	// rx: set utTrigger data mode "Intermediate and Final" (null s_UtilMinMax)
+		utTrigger2		= 127,	// rx: utility asking for secondary data   (tx s_UtilData)	10.59
+	//				= 115		// retired log dump											10.56 [BahiaH]
+	ccEditor 		= 116,		// rx: Continuum Editor is out there 						 3.33
+	ccEditorReply	= 118,		// tx: Respond to ccEditor 1/,1/doubleSR,3/ProcPow,1/SNBN,1/edCvcMatrix
 		edsCvcMatrix	= 0,	// bit 0: cvc determined by EaganMatrix						 5.20 7.44
 		edsSNBN			= 1,	// bit 1: SNBN private bit for one special customer
 		edsProcPow		= 2,	// bits 2-4: 3-bit procPowMult: 1..6=1x..6x, 7=8x			 7.82
 		  edmProcPow	= 0x1c,	// bits 2-4 mask
 		edsDoubleSR		= 5,	// bit 5: doubleSR active									 8.24
-		//edsLightAction= 6,	// bit 6: available
+		edsHWlog		= 6,	// bit 6: Hardware Log turned on for one of the dsp			10.61
 	ccArchCnt		= 119,		// count of controller messages in archive definition
 	//ccSoundOff	= 120,		// ccSoundOff is special, cannot use for data communications
 	//				= 121		   
@@ -952,8 +987,8 @@ enum {
 		s_GraphT1		= 6,	// Up to 16 Pitch Trim Y=1 Points			    (max  48 sData)
 								// Each s_GraphT0/s_GraphT1 Trim point is three sData:
 								//   nn  note number, multiple of 6, increasing order, 0 terminates
-								//   lo  least significant 7' of cents offset
-								//   hi  most  significant 7' of cents offset; 14' offset 0x2000
+								//   lo  least significant 7' of cents offset; zero cents = 299
+								//   hi  most  significant 7' of cents offset; extrapolated = 0x2000
 		s_Log			= 7,	// Hardware Log line of ascii text (to Editor)
 								//   zero-pad if odd number of ascii characters
 		s_UpdF2			= 8,	// Rx before Update File 2; #sysPresets			(2  sData)
@@ -968,11 +1003,11 @@ enum {
 		s_Sys			= 13,	// Tx System Info:								(20 sData)
 								//   2 sData: Count of System Presets
 								//   4 sData: SysPresets Sum Check
-								//   1 sData: % slots
-								//   1 sData: % SysPre data
-								//   4 sData: 28' Synthesis Data Sum Check, dsp1
-								//   4 sData: 28' Synthesis Data Sum Check, dsp2
-								//   4 sData: 28' Synthesis Data Sum Check, dsp3
+								//   1 sData: % SysPresets Slots
+								//   1 sData: % SysPresets Memory
+								//   4 sData: 28' Synthesis Data Sum Check, flash1
+								//   4 sData: 28' Synthesis Data Sum Check, flash2 (if 6x system)
+								//   4 sData: 28' Synthesis Data Sum Check, flash3 (if 6x system)
 		s_Conv			= 14,	// Convolution Parameters						(max 30 sData)
 								// >> see s_Conv_Poke section below for stream's sData ordering
 		s_Thumb			= 15,	// Tx Thumbnails:								(sets of 4 sData)
@@ -1004,6 +1039,10 @@ enum {
 								// >> see s_Conv_Poke section below for id assignments
 		s_AnlysName		= 27,	// Ascii name of Additive Analysis 				(max  32 sData)
 								//   zero-pad if odd number of ascii characters				10.41
+		s_UtilMinMax	= 28,	// Utility: min and max sensor values			(max 512 sData)
+								// tx for Haken Audio internal use							10.59 [BahiaH]
+		s_UtilData		= 29,	// Utility: sensor values						(max 256 sData)
+								// tx for Haken Audio internal use							10.59 [BahiaH]
 		s_StreamEnd		= 127,	// Marks end of sData stream (not required with stream_Poke)
 
 
@@ -1150,6 +1189,7 @@ enum {
 		aMax			= 11,	// result is never less than ancillary value
 		aCross			= 12,	// crossing detect: below ancillary value to above = +1,
 								// 				    above ancillary value to below = -1
+								//					(add AncOp2 aMax 0 to ignore negative crossings)
 	idAncVal		= 57,		// selects first ancillary value					 		 5.11 10.31
 	idAncVal2		= 101,		// selects second ancillary value							 9.73 10.31
 		a0p0			=   0,	// ancillary value is 0.0
@@ -1180,10 +1220,10 @@ enum {
 	idAncNN			= 10,		// false = normal, true = do conversion from kHz to nn
 	idAncLimit		= 9,		// false = normal, true = engage matrix column limiter
 	// Interpolation, Persistence, Reluctance   
-	idInterp		= 48,		// interpolation value 0..100 								 4.37 [20Anniv]
+	idInterp		= 48,		// interpolation value 0..127 								 4.37 [20Anniv]
 		interpDef		= 40,	// default interpolation
-	idPersist		= 63,		// formula persistence 0..100 								 4.36 [Sylvnia]
-	idReluct		= 96,		// formula reluctance 0..100 								10.22
+	idPersist		= 63,		// formula persistence 0..127 								10.56
+	idReluct		= 96,		// formula reluctance 0..127 								10.22
 	// Blend.					   
 	idBlend			= 39,		// blend control for primary/secondary formula values		 6.10 10.22
 		// idBlend values:		   (NB: psForm and psMacro use value of idBlMacForm)
@@ -1218,7 +1258,8 @@ enum {
 	// Polyphony
 	idPoly		 	= 39,		// base polyphony (lowest common denominator 2x dsp), values 1..8
 								// See also idOkExpPoly										10.32
-		maxMpePoly		= 15,	// max poly for MPE: not notes on mpeMastChan 				10.34 [Bday]
+		maxMpePoly		= 15,	// max poly for MPE: not notes on mpeMastChan (ch1) 		10.34 [Bday]
+		maxNonMpePoly	= 14,	// max poly arbitrary Yencode and Zencode: no notes ch 1&16	10.57
 		maxMidiPoly		= 16,	// number of Midi channels limits number of voices
 		emVoices		= 8, 	// max EaganMatrix voices per dsp (see "DSP489 emVoices=4.jpg")
 		maxPoly8x		= 16, 	// 8x systems have two dsp (C1 and C2), 8 voices each		10.10
@@ -1234,17 +1275,24 @@ enum {
 								// values > 96 select MPE+ ch1's bend range					 8.60
 		#define				ch1Bend(b) MAX(1,(b)-maxBendRange+1)
 		#define				inv_maxBendRange 0.0104166667
-	idFrontBack 	= 41, 		// select controller number for front-back position
+	idYencode 		= 41, 		// select cc number for Y position
 		xmitNoY			= 0,	// do not transmit y info
 		xmitNoShelf		= 127,	// avoid shelf on y, use defaultYcc
 		defaultYcc = ccBrightness,
-	idPressure		= 42, 		// select controller for finger pressure; 127 to use channel pressure
+	idMinY			= 17,		// for non-MPE: start of Y range to transmit over Midi		10.57
+	idMaxY			= 18,		// for non-MPE: end of Y range to transmit over Midi		10.57
+	idZencode		= 43, 		// select cc for Z, or 125+ to use channel pressure			10.57
         xmitNoZ		 	= 0,	// do not transmit z info									 5.40
-		useChanPr		= 69,	// use channel pressure to encode Z (but do not use MPE)	 7.56
-		useMPEplus		= 70,	// MPE+: our 14-bit MPE, externally remap channels to n+1	 7.44
+		useChanPr		= 125,	// use channel pressure to encode Z (do not enforce Y MPE)	 7.56
+		useMPEplus		= 126,	// MPE+: our 14-bit MPE, idMinY/Z = 0, idMaxY/Z = 127,		 7.44
 								// chanPres, cc74 (Ymsb), cc87 (ccFracXYZ)					 8.59 [Paris]
 								// MPE+ on ch1 channelized to DSP, see psCh1Note.			 8.60
-		useMPE		 	= 127,	// MPE: channel pressure for Z, externally remap channels to n+1 [7.44]
+		useMPE		 	= 127,	// MPE: channel pressure for Z, like MPE+ w/o 14-bit 	 	 7.44
+	idMinZ			= 19,		// for non-MPE: start of Z range to transmit over Midi		10.57
+	idMaxZ			= 20,		// for non-MPE: end of Z range to transmit over Midi		10.57
+	idZlegacy		= 42, 		// idZlegacy *only* legal values = 0,1,2,3,4,7,11,69,70,127
+		legChanPr		= 69,	// idLZlegacy value; please use idZencode instead
+		legMPEplus		= 70,	// idLZlegacy value; please use idZencode instead
 	// Mono function and voice assignment
 	idMonoFunc		= 46,		// mono function (fingers combine to make single pitch)		 1.82
 		MonoPortZ		= 0,	// pressure-based pitch		Mini substitutes MonoLegatoT	 8.65
@@ -1312,7 +1360,7 @@ enum {
 		bMidiInCvc		= 0x20,	// bit routes Midi In to CVC
 		defaultRoute    = 63,	// default is to set all routing bits
 	idProgram 		= 35,		// User program# tx to third party on ch1 at preset load 	 6.12
-	// Pedals
+	// Pedals - Internal and Input
 	idPedal1 		= 52,		// select cc number for pedal jack 1; Mini/Micro: 0 means i2c instead
 	idPedal2 		= 53,		// select cc number for pedal jack 2
 	idJackShift		= 54,		// amount to shift when pedal jack is ccOctShift ch1,ch16
@@ -1321,6 +1369,13 @@ enum {
 		octPedSw		= 0,	// switch
 		octPedTog		= 1,	// toggle
 		octPedInst		= 2,	// instant
+	// Pedals - ch1 Output
+	idOutEnc1		= 21,		// pedal 1 cc for ch1 pedal output, 0 = off					10.59
+	idOutEnc2		= 22,		// pedal 2 cc for ch1 pedal output, 0 = off
+	idOutMin1		= 23,		// start of pedal 1 range to transmit on ch1				10.59
+	idOutMax1		= 24,		// end of pedal 1 range to transmit on ch1
+	idOutMin2 		= 25,		// start of pedal 2 range to transmit on ch1				10.59
+	idOutMax2		= 26,		// end of pedal 2 range to transmit in ch1
 	// Master Section
 	idNoRecirc		= 15,		// true to disable recirculator 							 5.01 5.12
 	idReciType		= 62,		// recirculator type										 7.36
@@ -1332,11 +1387,24 @@ enum {
 		R_digEchoHPF	= 5,	// high pass digital echo									 7.36
 		R_longRev		= 6,	// long reverb												 10.12 10.20
 		R_mask			= 0x7,	// this must be > R_lastone, for switch optimization
-	idReciCol1		= 3,		// recirc columns function select (see below)				 8.62 [DanielB]
-	idReciCol2		= 4,		// (Note: rDials is reciParams+1, includes rMix at end)
-		rDial1=0,rDial2,rDial3,rDial4,rDial5,rDial6, rMix,    rDials,
+	idMastCol1		= 27,		// 1st of 6 assignable Master columns; values below			10.60
+	idMastCol2		= 28,		// 2nd of 6 assignable Master columns; values below
+	idMastCol3		= 29,		// 3rd of 6 assignable Master columns; values below
+	idMastCol4		= 30,		// 4th of 6 assignable Master columns; values below
+	idMastCol5		= 31,		// 5th of 6 assignable Master columns; values below
+	idMastCol6		= 32,		// 6th of 6 assignable Master columns; values below			10.60
+		mReci1=0,mReci2,mReci3,mReci4,mReci5,mReci6,		// column adds into recirculator parameter
+		mReciMix=6,											// column adds into recirculator mix
+		mPre=7,   											// column adds into pre level
+		mThrDrv=8,mAtkCut,mRatMkp,mCoThMix,					// column adds into compress/tanh parameter
+		mPost=12, 											// column adds into post level
+		mEqTilt=13,mEqFreq,mEqMix,							// column adds into eq parameter
+		mConvI1=16,mConvM1,mConvI2,mConvM2,		aMastCCs,	// column adds into conv parameter
 	idCompOpt		= 16,		// 0=compressor, 1=masterTanh								10.35
 		masComp=0,masTanh,
+	// Obsolete
+	idReciCol1		= 3,		// obsolete - use idMastCol3								 8.62 [DanielB]
+	idReciCol2		= 4,		// obsolete - use idMastCol4								10.60
 	// Oscillators/Filters 
 	idOscFilTyp1	= 72,		// oscillator/filter type, see values below
 	idOscFilTyp2	= 73,
@@ -1408,23 +1476,24 @@ enum {
 		MDelay		= 2,		// for                     idBankC
 		FDelay		= 3,		// for                     idBankC
 		#define			IsGran(a) IN(SineSpray, a, HarMan)
-	idColModeA1		= 95,		// 1st of two column mode selects (bankA)        see cm1_xxx below
-	idColModeB1		= 94,		// 1st of two column mode selects (bankB/C)      see cm1_xxx below
-		// idColModeA1/idColModeB1 values by bank type
-		cm1_g2Amp=0,cm1_g2Band=1,cm1_g2Tim,	// BiqGraph: graph2 does Amp or BW or Time		10.48
+	idBankAcm1		= 95,		// 1st of two column mode selects (bankA)        see cm1_xxx below
+	idBankBcm1		= 94,		// 1st of two column mode selects (bankB/C)      see cm1_xxx below
+		// idBankAcm1/idBankBcm1 values by bank type
+		cm1_g2Amp=0,cm1_g2Band=1,			// BiqGraph: graph2 does Amp or BW				10.53
 		cm1_aSF=0,cm1_aQF=1,				// Additive: select sF or qF
 		cm1_mmSB=0,cm1_mmQB=1,				// ModMan:   select sB or qB
 		cm1_wbOD=0,cm1_wbEO=1,				// WaveBank: select offset duty cycle or even/odd
 		cm1_bbDBP=0,cm1_bbDBO=1,			// BiqBank:  select dB/partial or dB/octave
-	idColModeA2		= 97,		// 2nd of two column mode selects (bankA)        see cm2_xxx below
-	idColModeB2		= 96,		// 2nd of two column mode selects (bankB/C)      see cm2_xxx below
-		// idColModeA2/idColModeB2 values by bank type
+	idBankAcm2		= 97,		// 2nd of two column mode selects (bankA)        see cm2_xxx below
+	idBankBcm2		= 96,		// 2nd of two column mode selects (bankB/C)      see cm2_xxx below
+		// idBankAcm2/idBankBcm2 values by bank type
 		cm2_g1Amp=0,cm2_g1Frq=1,			// BiqGraph: graph1 does Amp or Freq
 		cm2_aIP=0,cm2_aDF,cm2_aPA,cm2_aN,	// Additive: I' or dF or pA or N
 		cm2_mmSF=0,cm2_mmQF=1,cm2_mmSA=2,	// ModMan:   sF or qF or sA
 		cm2_bbFull=0,cm2_bbHead=1,			// BiqBank:  modes full scale or leave headroom
-	idBankParamA	= 99,		// deflate (biq) or wave (WaveBank) for bankA
-	idBankParamB	= 98,		// deflate (biq) or wave (WaveBank) for bankB/C
+	idBankParamA	= 99,		// deflate/iit (biq) or wave (WaveBank) for bankA
+	idBankParamB	= 98,		// deflate/iit (biq) or wave (WaveBank) for bankB/C
+		bq_iit			= 8,	// biq: 0..7 = deflate values for RBJ biquads; 8 = IIT		10.53
 		wave_saw		= 0,	// waveBank: sawtooth
 		wave_square		= 1,	// waveBank: square
 		wave_triangle	= 2,	// waveBank: triangle			
@@ -1485,9 +1554,10 @@ enum {
 		AEShouse		= 1,	// use aes3 house clock (aesrx clock) for xmit, if aesrx available
 		AES48k 			= 2,	// aestx at 48k clock rate, internally clocked
 		AES108k			= 3,	// this can't be user-configured; for multi-dsp only  		 5.55
-	idPresSurf		= 56,		// true = preserve surface processing (round, split, mono, etc)
-	idPresPed		= 57,		// true = preserve Pedal assignments (Ped1/2,jackShift,min,max)
-	idPresEnc		= 58,		// true = preserve encoding (Bend, Ycc, Zcc, routing) 		 6.16 10.33
+	idMiniI2C		= 61,		// true = Mini Ped/Ext jack for i2c; false = for pedal		10.61
+	idPrsvSurf		= 56,		// true = preserve surface processing (round, split, mono, etc)
+	idPrsvPed		= 57,		// true = preserve Pedal assignments (Ped1/2,jackShift,min,max)
+	idPrsvEnc		= 58,		// true = preserve encoding (Bend, Ycc, Zcc, routing, cvc) 	 6.16 10.33
 	idBigFontPop	= 14,		// true for large popup menu font in Editor					 7.21 10.33
 	// Copy additive analyses from one location to another.
 	idFromAnlys		= 126,		// source additive analysis slot#
@@ -1556,8 +1626,10 @@ enum {
 	// These id assignments correspond to the sData ordering in s_BiqSin.
 	// For more information, see ccStream and s_BiqSin_Poke definitions above.
 	id_q_NOP		=  0,		// data not used; id means "unused column" for id_q_SelN and id_q2_SelN
-	id_q_sF			=  1,		// BankA property: mode/partial freq linear spread from fundamental
-	id_q_qF			=  2,		// BankA property: mode/partial freq nonlin spread from fundamental
+	id_q_sF			=  1,		// BankA property: mode/partial freq linear spread from fundamental,
+								//				or matrix column <0 for String Inharmonicity Coefficient
+	id_q_qF			=  2,		// BankA property: mode/partial freq nonlin spread from fundamental,
+								//				or matrix column <0 for String Excitation Position
 	id_q_B			=  3,		// BankA property: mode/partial bandw
 	id_q_R			=  4,		// BankA property: mode/partial amps even/odd ratio
 	id_q_C			=  5,		// BankA property: center of focus
@@ -1583,8 +1655,10 @@ enum {
 	id_q_Sel8		= 23,		// BankA property: variable column 8 selection id_q_NOP..id_q_A3
 	  bBankBytes		= 24,	// # sData for each bank; 48 sData total
 	id_q2_NOP		= 24,		// data value not used
-	id_q2_sF		= 25,		// BankB property: mode/partial freq linear spread from fundamental
-	id_q2_qF		= 26,		// BankB property: mode/partial freq nonlin spread from fundamental
+	id_q2_sF		= 25,		// BankB property: mode/partial freq linear spread from fundamental,
+								//				or matrix column <0 for String Inharmonicity Coefficient
+	id_q2_qF		= 26,		// BankB property: mode/partial freq nonlin spread from fundamental,
+								//				or matrix column <0 for String Excitation Position
 	id_q2_B			= 27,		// BankB property: mode/partial bandw
 	id_q2_R			= 28,		// BankB property: mode/partial amps even/odd ratio
 	id_q2_C			= 29,		// BankB property: center of focus
@@ -1679,9 +1753,6 @@ enum {
 	optFourOct = 5,				// octave pedal does four octaves (instead of normal 1 octave)
 	optReverse = 6,				// reverse pitches
 	optNoRecirc = 7,			// avoid recirculator										 4.40
-	optTxThird = 8,				// one-third Midi transmit rate								 6.41 7.57
-	optTxTweenth = 9,			// one-twentieth Midi transmit rate							 7.59
-	optDemoAssort = 10,			// demo presets												 7.00
 
 	optResetAll = 127,			// reset all saved presets as well as current configuration
 

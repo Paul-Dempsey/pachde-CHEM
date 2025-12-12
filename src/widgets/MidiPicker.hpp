@@ -1,15 +1,16 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
+using namespace ::rack;
 #include "my-plugin.hpp"
 #include "services/midi-devices.hpp"
-#include "services/svt_rack.hpp"
-#include "TipWidget.hpp"
+#include "services/svg-theme.hpp"
+using namespace svg_theme;
+#include "tip-widget.hpp"
 
-using namespace ::rack;
-namespace pachde {
+namespace widgetry {
 
-struct MidiPicker : TipWidget, IApplyTheme
+struct MidiPicker : TipWidget
 {
     MidiPicker & operator=(const MidiPicker &) = delete;
     MidiPicker(const MidiPicker&) = delete;
@@ -29,15 +30,12 @@ struct MidiPicker : TipWidget, IApplyTheme
         fb->addChild(sw);
     }
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        sw->setSvg(theme_engine.loadSvg(asset::plugin(pluginInstance, "res/widgets/midi-button.svg"), theme));
+    void loadSvg(ILoadSvg* loader) {
+        sw->setSvg(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/midi-button.svg")));
         box.size = sw->box.size;
         fb->box.size = sw->box.size;
         fb->setDirty(true);
-        return true;
     }
-
 
     void setDeviceHolder(MidiDeviceHolder * holder, MidiDeviceHolder* main_holder) {
         assert(holder);

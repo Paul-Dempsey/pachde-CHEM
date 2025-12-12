@@ -195,7 +195,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
-    void createScrews(std::shared_ptr<SvgTheme> theme) override;
+    void createScrews() override;
 
     // IPresetListClient
     void on_list_changed(eaganmatrix::PresetTab which) override;

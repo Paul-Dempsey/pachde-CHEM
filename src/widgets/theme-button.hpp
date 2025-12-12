@@ -1,15 +1,15 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "my-plugin.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
-#include "TipWidget.hpp"
+#include "tip-widget.hpp"
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
 template<typename TSvg>
-struct TButton : SvgButton, IApplyTheme
+struct TButton : SvgButton
 {
     using Base = SvgButton;
 
@@ -31,50 +31,33 @@ struct TButton : SvgButton, IApplyTheme
         this->shadow->hide();
     }
 
-    virtual ~TButton()
-    {
+    virtual ~TButton()     {
         if (tip_holder) {
             delete tip_holder;
             tip_holder = nullptr;
         }
     }
 
-    void describe(std::string text)
-    {
+    void describe(std::string text)     {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
         tip_holder->setText(text);
     }
 
-    void setHandler(std::function<void(bool,bool)> callback)
-    {
+    void setHandler(std::function<void(bool,bool)> callback) {
         handler = callback;
     }
 
-    void set_sticky(bool is_sticky)
-    {
+    void set_sticky(bool is_sticky) {
         sticky = is_sticky;
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        bool refresh = frames.size() > 0;
-        if (refresh) {
-            frames.clear();
-            sw->setSvg(nullptr);
-        }
-
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
-
-        if (refresh) {
-            sw->setSvg(frames[0]);
-            if (fb) {
-                fb->setDirty();
-            }
-        }
-        return true;
+    void loadSvg(ILoadSvg* loader) {
+        frames.clear();
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, TSvg::up())));
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, TSvg::down())));
+        fb->dirty = true;
     }
 
     void onHover(const HoverEvent& e) override {
@@ -156,9 +139,9 @@ struct TButton : SvgButton, IApplyTheme
 };
 
 template <typename TButton>
-TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+TButton * createThemedButton(math::Vec pos, ILoadSvg* loader, const char * tip = nullptr) {
     TButton * o  = new(TButton);
-    o->applyTheme(engine, theme);
+    o->loadSvg(loader);
 	o->box.pos = pos;
     if (tip) {
         o->describe(tip);
@@ -167,9 +150,9 @@ TButton * createThemedButton(math::Vec pos, SvgThemeEngine& engine, std::shared_
 }
 
 template <typename TButton, typename TLight>
-TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lightId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme, const char * tip = nullptr) {
+TButton * createThemedLightButton(math::Vec pos, ILoadSvg* loader, engine::Module* module, int lightId, const char * tip = nullptr) {
     TButton * o  = new(TButton);
-    o->applyTheme(engine, theme);
+    o->loadSvg(loader);
 	o->box.pos = pos;
 
     if (tip) {
@@ -183,50 +166,33 @@ TButton * createThemedLightButton(math::Vec pos, engine::Module* module, int lig
 }
 
 template<typename TSvg>
-struct TParamButton : SvgSwitch, IApplyTheme
+struct TParamButton : SvgSwitch
 {
     using Base = SvgSwitch;
 
-    TParamButton()
-    {
+    TParamButton() {
         this->shadow->hide();
     }
 
-    void step() override {
-        Base::step();
-    }
-
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        bool refresh = frames.size() > 0;
-        if (refresh) {
-            frames.clear();
-            sw->setSvg(nullptr);
-        }
-
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::up()), theme));
-        addFrame(engine.loadSvg(asset::plugin(pluginInstance, TSvg::down()), theme));
-
-        if (refresh) {
-            sw->setSvg(frames[0]);
-            if (fb) {
-                fb->setDirty();
-            }
-        }
-        return true;
+    void loadSvg(ILoadSvg* loader) {
+        frames.clear();
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, TSvg::up())));
+        addFrame(loader->loadSvg(asset::plugin(pluginInstance, TSvg::down())));
+        sw->setSvg(frames[0]);
+        fb->dirty = true;
     }
 };
 
 template <typename TPButton>
-TPButton * createThemedParamButton(math::Vec pos, engine::Module*module, int paramId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
+TPButton * createThemedParamButton(math::Vec pos, ILoadSvg* loader, rack::engine::Module*module, int paramId) {
     TPButton * o  = createParam<TPButton>(pos, module, paramId);
-    o->applyTheme(engine, theme);
+    o->loadSvg(loader);
     return o;
 }
 
 template <typename TPButton, typename TLight>
-TPButton * createThemedParamLightButton(math::Vec pos, engine::Module* module, int paramId, int lightId, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) {
-    TPButton * o = createThemedParamButton<TPButton>(pos, module, paramId, theme_engine, theme);
+TPButton * createThemedParamLightButton(math::Vec pos, ILoadSvg* loader, rack::engine::Module* module, int paramId, int lightId) {
+    TPButton * o = createThemedParamButton<TPButton>(pos, loader, module, paramId);
 
     auto light = createLight<TLight>(Vec(0,0), module, lightId);
     light->box.pos = o->box.size.div(2).minus(light->box.size.div(2));

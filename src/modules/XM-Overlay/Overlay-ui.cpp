@@ -64,10 +64,9 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     my_module(module)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
 
     bool browsing = !module;
@@ -93,12 +92,12 @@ OverlayUi::OverlayUi(OverlayModule *module) :
         title_widget->set_text_color(0xffe6e6e6);
     }
 
-    auto menu = Center(createThemedWidget<OverlayMenu>(Vec(15.f, 24.f), theme_engine, theme));
+    auto menu = Center(createThemedWidget<OverlayMenu>(Vec(15.f, 24.f), theme));
     menu->setUi(this);
     menu->describe("Overlay menu");
     addChild(menu);
 
-    auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(15.f, 36.f), theme_engine, theme, "Select overlay preset"));
+    auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(15.f, 36.f), &module_svgs, "Select overlay preset"));
     if (my_module) {
         set_preset_button->setHandler([=](bool c, bool f) {
             if (!chem_host) return;
@@ -112,7 +111,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     addChild(set_preset_button);
 
     // footer
-    link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-15.f), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-15.f), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
 
@@ -130,16 +129,13 @@ OverlayUi::OverlayUi(OverlayModule *module) :
         addChild(Center(logo));
     }
 
+    module_svgs.changeTheme(theme);
+
     // init
     if (my_module) {
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
-}
-
-void OverlayUi::setThemeName(const std::string& name, void * context)
-{
-    Base::setThemeName(name, context);
 }
 
 void OverlayUi::onConnectHost(IChemHost* host)

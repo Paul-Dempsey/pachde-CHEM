@@ -1,4 +1,5 @@
 #include "Sustain.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 #include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
@@ -27,8 +28,8 @@ void SusModule::init()
 void SusModule::dataFromJson(json_t* root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
-    json_read_bool(root, "glow-knobs", glow_knobs);
+    device_claim = get_json_string(root, "haken-device");
+    glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
     getParam(P_MOD_AMOUNT).setValue(get_json_float(root, "mod-amount", 0.f));
     ModuleBroker::get()->try_bind_client(this);
 }
@@ -36,9 +37,9 @@ void SusModule::dataFromJson(json_t* root)
 json_t* SusModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
-    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
-    json_object_set_new(root, "mod-amount", json_real(getParam(P_MOD_AMOUNT).getValue()));
+    set_json(root, "haken-device", device_claim);
+    set_json(root, "glow-knobs", glow_knobs);
+    set_json(root, "mod-amount", getParam(P_MOD_AMOUNT).getValue());
     return root;
 }
 

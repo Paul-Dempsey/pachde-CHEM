@@ -177,7 +177,6 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     GlowKnob* mod_knob;
 
     bool connected();
-    void createScrews(std::shared_ptr<SvgTheme> theme) override;
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -188,7 +187,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-settings.svg"); }
-    void setThemeName(const std::string& name, void * context) override;
+    void createScrews() override;
+    //void setThemeName(const std::string& name, void * context) override;
 
     void sync_labels();
     void step() override;

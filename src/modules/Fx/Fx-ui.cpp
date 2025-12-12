@@ -17,13 +17,12 @@ FxUi::FxUi(FxModule *module) :
     my_module(module)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
     if (S::show_screws()) {
-        createScrews(theme);
+        createScrews();
     }
     float x, y;
     bool browsing = !module;
@@ -31,8 +30,8 @@ FxUi::FxUi(FxModule *module) :
     const float PANEL_WIDTH = 135.f;
     const float CENTER = PANEL_WIDTH*.5f;
 
-    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 28.f), my_module, FxModule::P_EFFECT, theme_engine, theme));
-    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme_engine, theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(selector = createThemedParam<SelectorWidget>(Vec(3.5f, 28.f), theme, my_module, FxModule::P_EFFECT));
+    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", theme, LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
 
     // knobs with labels
     const float DY_KNOB = 62.f;
@@ -43,24 +42,24 @@ FxUi::FxUi(FxModule *module) :
 
     x = KNOB_AXIS + KNOB_DX;
     y = 60.f;
-    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), my_module, FxModule::P_MIX, theme_engine, theme));
-    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme_engine, theme));
+    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, y), &module_svgs, my_module, FxModule::P_MIX, theme));
+    addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX], theme));
     addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, y-9.f), my_module, FxModule::L_MIX));
-    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme->name);
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme);
 
     x = KNOB_AXIS - KNOB_DX;
     y -= 8.f;
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
-        Vec(x, y), my_module, FxModule::P_DISABLE, FxModule::L_DISABLE, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", theme_engine, theme, S::control_label));
+        Vec(x, y), &module_svgs, my_module, FxModule::P_DISABLE, FxModule::L_DISABLE)));
+    addChild(createLabel<TextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", theme, S::control_label));
 
     y = KNOB_TOP;
     x = KNOB_AXIS - KNOB_DX;
     for (int i = 0; i < K_MIX; ++i) {
-        addChild(knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), my_module, i, theme_engine, theme));
-        addChild(tracks[i] = createTrackWidget(knobs[i], theme_engine, theme));
+        addChild(knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, i, theme));
+        addChild(tracks[i] = createTrackWidget(knobs[i], theme));
 
-        r_labels[i] = createLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme_engine, theme, S::control_label);
+        r_labels[i] = createLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), theme, S::control_label);
         addChild(r_labels[i]);
 
         if (i & 1) {
@@ -77,18 +76,18 @@ FxUi::FxUi(FxModule *module) :
     const float label_width = 20.f;
     y = S::PORT_TOP;
     x = PORT_LEFT;
-    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), module, FxModule::P_MOD_AMOUNT, theme_engine, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, FxModule::P_MOD_AMOUNT, theme));
 
     x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, "MIX", theme_engine, theme, S::in_port_label));
+    addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, FxModule::IN_MIX, S::InputColorKey, co_port, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, "MIX", theme, S::in_port_label));
     if (my_module){ addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, FxModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     for (int i = 0; i <= K_R6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, format_string("R%d", 1+i), theme_engine, theme, S::in_port_label));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port, theme)));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, format_string("R%d", 1+i), theme, S::in_port_label));
         if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
 
@@ -103,9 +102,9 @@ FxUi::FxUi(FxModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
@@ -119,6 +118,8 @@ FxUi::FxUi(FxModule *module) :
     if (browsing && S::show_browser_logo()) {
         addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 150.f)));
     }
+
+    module_svgs.changeTheme(theme);
 
     // init
     if (!my_module || my_module->glow_knobs) {
@@ -147,17 +148,17 @@ void FxUi::center_knobs()
     }
 }
 
-void FxUi::createScrews(std::shared_ptr<SvgTheme> theme)
+void FxUi::createScrews()
 {
-    addChild(createThemedWidget<ThemeScrew>(Vec(2*RACK_GRID_WIDTH, 0), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, 0), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(2*RACK_GRID_WIDTH, 0), &module_svgs));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, 0), &module_svgs));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2*RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), &module_svgs));
 }
 
 void FxUi::setThemeName(const std::string& name, void * context)
 {
-    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, name);
     Base::setThemeName(name, context);
+    applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, getSvgTheme());
 }
 
 void FxUi::onConnectHost(IChemHost* host)

@@ -3,7 +3,7 @@
 #include "label-widget.hpp"
 #include "draw-button.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 struct TextButton : FrameButton
 {
@@ -17,15 +17,14 @@ struct TextButton : FrameButton
     void set_text(std::string t) { text = t; }
     void set_style(LabelStyle style) { label_style = style; }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
-    {
-        Base::applyTheme(theme_engine, theme);
-        color = theme_engine.getFillColor(theme->name, label_style.key, true);
-        if (!isVisibleColor(color)) {
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override {
+        Base::applyTheme(theme);
+
+        if (!theme->getFillColor(color, label_style.key, true)) {
             color = GetPackedStockColor(StockColor::Gray_65p);
         }
-        bg = theme_engine.getFillColor(theme->name, "tbtn-face", true);
-        return true;
+        theme->getFillColor(bg, "tbtn-face", true);
+        return false;
     }
 
     void draw(const DrawArgs& args) override
@@ -34,7 +33,7 @@ struct TextButton : FrameButton
         auto font = label_style.bold ? GetPluginFontSemiBold() : GetPluginFontRegular();
         if (!FontOk(font)) return;
 
-        if (isVisibleColor(bg)) {
+        if (packed_color::isVisible(bg)) {
             FillRect(vg, 0, 0, box.size.x, box.size.y, fromPacked(bg));
         }
 

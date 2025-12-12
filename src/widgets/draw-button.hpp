@@ -1,11 +1,13 @@
 #pragma once
 #include <rack.hpp>
-#include "services/colors.hpp"
-#include "services/svt_rack.hpp"
-#include "TipWidget.hpp"
 using namespace ::rack;
+#include "services/colors.hpp"
+#include "tip-widget.hpp"
+#include "services/svg-theme.hpp"
+using namespace svg_theme;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 constexpr const float HALO_FADE = .65f;
 
@@ -31,7 +33,7 @@ enum ColorIndex {
     Disabled
 };
 
-struct DrawButtonBase: OpaqueWidget, IApplyTheme
+struct DrawButtonBase: OpaqueWidget, IThemed
 {
     using Base = OpaqueWidget;
 
@@ -59,8 +61,7 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         addColor("ctl-disabled", ColorKind::Stroke, RampGray(Ramp::G_50));
     }
 
-    virtual ~DrawButtonBase()
-    {
+    virtual ~DrawButtonBase() {
         if (tip_holder) {
             delete tip_holder;
             tip_holder = nullptr;
@@ -71,16 +72,14 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         this->enabled = enabled;
     }
 
-    void describe(std::string text)
-    {
+    void describe(std::string text) {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
         tip_holder->setText(text);
     }
 
-    void setHandler(std::function<void(bool,bool)> callback)
-    {
+    void setHandler(std::function<void(bool,bool)> callback) {
         handler = callback;
     }
 
@@ -120,15 +119,13 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         destroyTip();
     }
 
-    void onDragEnd(const DragEndEvent& e) override
-    {
+    void onDragEnd(const DragEndEvent& e) override {
         Base::onDragEnd(e);
         destroyTip();
         button_down = false;
     }
 
-    void onHoverKey(const HoverKeyEvent& e) override
-    {
+    void onHoverKey(const HoverKeyEvent& e) override {
         Base::onHoverKey(e);
         key_ctrl = e.mods & RACK_MOD_CTRL;
         key_shift = e.mods & GLFW_MOD_SHIFT;
@@ -146,8 +143,7 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         }
     }
 
-    void onAction(const ActionEvent& e) override
-    {
+    void onAction(const ActionEvent& e) override {
         destroyTip();
         if (enabled && handler) {
             handler(key_ctrl, key_shift);
@@ -156,13 +152,11 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         }
     }
 
-    void addColor(const char * theme_key, ColorKind kind, NVGcolor default_color)
-    {
+    void addColor(const char * theme_key, ColorKind kind, NVGcolor default_color) {
         color_styles.push_back(ColorStyle{theme_key, default_color, kind});
     }
 
-    NVGcolor get_color(const char * name)
-    {
+    NVGcolor get_color(const char * name) {
         for (auto style : color_styles) {
             if (0 == strcmp(style.key, name)) {
                 return style.color;
@@ -171,19 +165,18 @@ struct DrawButtonBase: OpaqueWidget, IApplyTheme
         return no_light;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
+    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
         if (color_styles.empty()) return false;
         for (ColorStyle& style : color_styles) {
-            PackedColor pcolor = NoColor;
+            PackedColor pcolor = colors::NoColor;
             switch (style.kind) {
-            case ColorKind::Fill: pcolor = theme->getFillColor(style.key, true); break;
-            case ColorKind::Stroke: pcolor = theme->getStrokeColor(style.key, true); break;
+            case ColorKind::Fill: theme->getFillColor(pcolor, style.key, true); break;
+            case ColorKind::Stroke: theme->getStroke(pcolor, style.key, true, nullptr); break;
             default:
                 assert(false);
                 break;
             }
-            style.color = isVisibleColor(pcolor) ? fromPacked(pcolor) : style.default_color;
+            style.color = packed_color::isVisible(pcolor) ? fromPacked(pcolor) : style.default_color;
         }
         return true;
     }
@@ -194,39 +187,24 @@ struct DrawButtonCtlBase: DrawButtonBase
 {
     using Base = DrawButtonBase;
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
-
-    NVGcolor glyph_color_for_state(bool enabled, bool down)
-    {
+    NVGcolor glyph_color_for_state(bool enabled, bool down) {
         if (!enabled) return color_styles[ColorIndex::Disabled].color;
         auto co = color_styles[ColorIndex::Glyph].color;
         if (down) return nvgTransRGBAf(co, .5f);
         return co;
     }
 
-    // DrawButtonCtlBase()
-    // {
-    // }
 };
 
 struct UpButton: DrawButtonCtlBase
 {
     using Base = DrawButtonCtlBase;
 
-    UpButton()
-    {
+    UpButton() {
         box.size = Vec{15.f, 15.f};
     }
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
 
-    void draw(const DrawArgs& args) override
-    {
+    void draw(const DrawArgs& args) override {
         Base::draw(args);
         auto vg = args.vg;
 
@@ -250,19 +228,13 @@ struct UpButton: DrawButtonCtlBase
 struct DownButton: DrawButtonCtlBase
 {
     using Base = DrawButtonCtlBase;
-    DownButton()
-    {
+
+    DownButton() {
         box.size.x = 15.f;
         box.size.y = 15.f;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
-
-    void draw(const DrawArgs& args) override
-    {
+    void draw(const DrawArgs& args) override {
         Base::draw(args);
         auto vg = args.vg;
 
@@ -286,19 +258,12 @@ struct PrevButton: DrawButtonCtlBase
 {
     using Base = DrawButtonCtlBase;
 
-    PrevButton()
-    {
+    PrevButton() {
         box.size.x = 15.f;
         box.size.y = 15.f;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
-
-    void draw(const DrawArgs& args) override
-    {
+    void draw(const DrawArgs& args) override {
         Base::draw(args);
         auto vg = args.vg;
 
@@ -315,19 +280,13 @@ struct PrevButton: DrawButtonCtlBase
 struct NextButton: DrawButtonCtlBase
 {
     using Base = DrawButtonCtlBase;
-    NextButton()
-    {
+
+    NextButton() {
         box.size.x = 15.f;
         box.size.y = 15.f;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
-
-    void draw(const DrawArgs& args) override
-    {
+    void draw(const DrawArgs& args) override {
         Base::draw(args);
         auto vg = args.vg;
 
@@ -345,19 +304,13 @@ struct NextButton: DrawButtonCtlBase
 struct FrameButton: DrawButtonCtlBase
 {
     using Base = DrawButtonCtlBase;
-    FrameButton()
-    {
+
+    FrameButton() {
         box.size.x = 12.f;
         box.size.y = 12.f;
     }
 
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
-        return Base::applyTheme(theme_engine, theme);
-    }
-
-    void draw(const DrawArgs& args) override
-    {
+    void draw(const DrawArgs& args) override {
         Base::draw(args);
         auto vg = args.vg;
 

@@ -156,7 +156,7 @@ struct PadEdit : OpaqueWidget
         using namespace pad_edit_constants;
         initializing = true;
         ui = mw;
-        auto theme = theme_engine.getTheme(ui->getThemeName());
+        auto theme = ui->getSvgTheme();
         LabelStyle mini_label_style{"ctl-label", TextAlignment::Center, 10.f, true};
         LabelStyle section_label_style{"ctl-label-hi", TextAlignment::Center, 14.f, true};
         {
@@ -171,7 +171,7 @@ struct PadEdit : OpaqueWidget
         addChild(close);
 
         y = 22.f;
-        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, theme_engine, theme, ui->my_module ? ui->my_module->title : "",
+        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, theme, ui->my_module ? ui->my_module->title : "",
             [=](std::string text){ on_title_text_changed(text); },
             nullptr,
             "Module title");
@@ -179,13 +179,13 @@ struct PadEdit : OpaqueWidget
         addChild(title_field);
 
         y = SECTION_TOP;
-        addChild(coordinate = createLabel(Vec(CENTER,y), 40, "", theme_engine, theme, section_label_style));
+        addChild(coordinate = createLabel(Vec(CENTER,y), 40, "", theme, section_label_style));
 
         y += 18;
 
-        addChild(createLabel(Vec(3.5, y), 28, "Name", theme_engine, theme, ::pachde::style::control_label_left));
+        addChild(createLabel(Vec(3.5, y), 28, "Name", theme, ::pachde::style::control_label_left));
 
-        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, theme_engine, theme, "",
+        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, theme, "",
             [=](std::string text){ on_name_text_changed(text); },
             nullptr,
             "Pad name");
@@ -196,7 +196,7 @@ struct PadEdit : OpaqueWidget
 
         // compile / test / clear buttons
 
-        name_palette = Center(createThemedButton<Palette1Button>(Vec(CENTER - PALETTE_DX,y), theme_engine, theme, "Text color"));
+        name_palette = Center(createThemedButton<Palette1Button>(Vec(CENTER - PALETTE_DX,y), &ui->module_svgs, "Text color"));
         name_palette->setHandler([=](bool,bool) {
             ui::Menu* menu = createMenu();
             auto picker = new ColorPickerMenu();
@@ -208,7 +208,7 @@ struct PadEdit : OpaqueWidget
         });
         addChild(name_palette);
 
-        pad_palette = Center(createThemedButton<Palette2Button>(Vec(CENTER + PALETTE_DX,y), theme_engine, theme, "Pad color"));
+        pad_palette = Center(createThemedButton<Palette2Button>(Vec(CENTER + PALETTE_DX,y), &ui->module_svgs, "Pad color"));
         pad_palette->setHandler([=](bool,bool) {
             ui::Menu* menu = createMenu();
             auto picker = new ColorPickerMenu();
@@ -221,15 +221,11 @@ struct PadEdit : OpaqueWidget
         addChild(pad_palette);
 
         y += 6.5f;
-        addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", theme_engine, theme, mini_label_style));
-        addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "pad", theme_engine, theme, mini_label_style));
+        addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", theme, mini_label_style));
+        addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "pad", theme, mini_label_style));
 
         y += 16.f;
-        //midi_field = createThemedTextInput(7.5, y, 105.f, 12.f, theme_engine, theme, pad->def,
-        //    [=](std::string text){ on_midi_text_changed(text); },
-        //    nullptr,
-        //    "Pad Midi");
-        //midi_field->text_height = 10.f;
+
         midi_field = createWidget<MultiTextInput>(Vec(3.5, y));
         midi_field->box.size = Vec(113, 132);
         midi_field->set_on_change( [=](std::string text){
@@ -243,26 +239,26 @@ struct PadEdit : OpaqueWidget
 
         y += 146;
         float x = CENTER - 28.f;
-        auto btn = Center(createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme, "Clear"));
+        auto btn = Center(createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Clear"));
         btn->latched = false;
         btn->setHandler([=](bool,bool) { clear_pad(); });
         addChild(btn);
-        addChild(createLabel(Vec(x,y + 8.f),25, "clear", theme_engine, theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),25, "clear", theme, mini_label_style));
 
         x = CENTER;
-        btn = createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme, "Compile definition to MIDI");
+        btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Compile definition to MIDI");
         btn->setHandler([=](bool,bool){ commit(true); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),34, "compile", theme_engine, theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),34, "compile", theme, mini_label_style));
 
         x = CENTER + 28.f;
-        btn = createThemedButton<SquareButton>(Vec(x,y), theme_engine, theme, "Send MIDI (test)");
+        btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Send MIDI (test)");
         btn->setHandler([=](bool,bool){ send_pad(); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),25, "send", theme_engine, theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),25, "send", theme, mini_label_style));
 
         y += 24.f;
-        addChild(status = createLabel<TipLabel>(Vec(3.5, y), WIDTH - 7, "", theme_engine, theme, S::warning_label));
+        addChild(status = createLabel<TipLabel>(Vec(3.5, y), WIDTH - 7, "", theme, S::warning_label));
 
         // tab order
         title_field->nextField = name_field;
@@ -290,33 +286,32 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     my_module(module)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
+    auto theme = getSvgTheme();
 
     {
-        auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-        panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+        auto panel = createThemedPanel(panelFilename(), &module_svgs);
+        panelBorder = attachPartnerPanelBorder(panel, theme);
         setPanel(panel);
     }
 
     {
         auto flyout_background = createWidget<PanelBackgroundWidget>(Vec(0,0));
         flyout_background->track();
-        flyout_background->applyTheme(theme_engine, theme);
+        flyout_background->applyTheme(theme);
         addChildBottom(flyout_background);
     }
     if (S::show_screws()) {
-        addChild(createThemedWidget<ThemeScrew>(Vec(0, 0), theme_engine, theme));
-        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, 0), theme_engine, theme));
+        addChild(createThemedWidget<ThemeScrew>(Vec(0, 0), &module_svgs));
+        addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, 0), &module_svgs));
     }
-    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", theme_engine, theme, LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
+    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", theme, LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
 
     float x = 15.f;
     float y = 60.f;
     for (int i = 0; i < 16; ++i) {
         auto w = createWidget<PadWidget>(Vec(x,y));
         w->init(i, my_module ? my_module->pad_defs[i] : nullptr, my_module,
-            theme_engine, theme,
+            theme,
             [=](int id) { on_click_pad(id); });
         pad_ui[i] = w;
         addChild(w);
@@ -328,7 +323,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         }
     }
 
-    edit_button = Center(createThemedButton<EditButton>(Vec(box.size.x*.5, EDIT_CY), theme_engine, theme, "Edit (F2)"));
+    edit_button = Center(createThemedButton<EditButton>(Vec(box.size.x*.5, EDIT_CY), &module_svgs, "Edit (F2)"));
     edit_button->set_sticky(true);
     if (my_module) {
         edit_button->setHandler([=](bool c, bool s){ edit_mode(!my_module->editing); });
@@ -347,7 +342,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     x = INPUT_ROW_CX;
     y = INPUT_TOP_CY;
     for (int i = 0; i < 16; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, i, S::InputColorKey, co_port, theme_engine, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port, theme)));
         if (3 == i % 4) {
             x = INPUT_ROW_CX;
             y += INPUT_DY;
@@ -358,9 +353,9 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
 
     // footer
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
@@ -373,6 +368,8 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         logo->box.pos = Vec(box.size.x*.5f, 232.f);
         addChild(Center(logo));
     }
+
+    module_svgs.changeTheme(theme);
 
     if (my_module) {
         my_module->set_chem_ui(this);
@@ -531,11 +528,6 @@ void MidiPadUi::set_pad_text_color(PackedColor color)
     if (-1 == edit_pad) return;
     my_module->set_pad_text_color(edit_pad, color);
     pad_ui[edit_pad]->on_pad_change(false, false);
-}
-
-void MidiPadUi::setThemeName(const std::string& name, void * context)
-{
-    Base::setThemeName(name, context);
 }
 
 void MidiPadUi::onConnectHost(IChemHost* host)

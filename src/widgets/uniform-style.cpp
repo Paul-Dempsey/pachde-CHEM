@@ -1,6 +1,6 @@
 #include "uniform-style.hpp"
 #include "services/kv-store.hpp"
-
+using namespace widgetry;
 namespace pachde {
 namespace style {
 

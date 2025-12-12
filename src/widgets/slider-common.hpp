@@ -1,17 +1,17 @@
 #pragma once
 #include <rack.hpp>
-#include "services/colors.hpp"
-#include "services/svt_rack.hpp"
-#include "element-style.hpp"
 using namespace ::rack;
+#include "services/colors.hpp"
+#include "services/svg-theme.hpp"
 using namespace ::svg_theme;
+#include "element-style.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 enum class Axis { X, Y };
 
 template <typename TSlider>
-TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id,std::shared_ptr<SvgTheme> theme)
 {
     TSlider* o = createParam<TSlider>(pos, module, param_id);
     if (TSlider::axis == Axis::Y) {
@@ -19,7 +19,7 @@ TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int
     } else {
         o->box.size.x = length;
     }
-    o->applyTheme(engine, theme);
+    o->applyTheme(theme);
     return o;
 }
 

@@ -928,7 +928,7 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e)
 
 void PlayUi::onHoverScroll(const HoverScrollEvent &e)
 {
-    if (in_range(e.pos.x, PRESETS_LEFT, PRESETS_LEFT + 150.f) && in_range(e.pos.y, PRESETS_TOP, 340.f)) {
+    if (in_rangef(e.pos.x, PRESETS_LEFT, PRESETS_LEFT + 150.f) && in_rangef(e.pos.y, PRESETS_TOP, 340.f)) {
         int delta = 5 * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
         auto mods = APP->window->getMods();
         if (mods & GLFW_MOD_CONTROL) {

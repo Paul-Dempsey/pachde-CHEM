@@ -1,13 +1,15 @@
 #pragma once
 #include <rack.hpp>
-#include "services/svt_rack.hpp"
-#include "widgets/element-style.hpp"
-#include "widgets/tip-label-widget.hpp"
 #include "em/preset.hpp"
+#include "widgets/element-style.hpp"
+#include "widgets/themed-widgets.hpp"
+#include "widgets/tip-label-widget.hpp"
 
 using namespace ::rack;
 using namespace ::svg_theme;
 using namespace ::eaganmatrix;
+using namespace ::widgetry;
+
 namespace pachde {
 
 constexpr const float GRIP_WIDTH = 10.f;
@@ -26,7 +28,7 @@ struct IPresetAction {
     virtual Widget* widget() = 0;
 };
 
-class PresetWidget : public OpaqueWidget, public IApplyTheme
+class PresetWidget : public OpaqueWidget, public IThemed
 {
     using Base = OpaqueWidget;
 
@@ -88,7 +90,7 @@ public:
     }
     void set_agent(IPresetAction* client) { agent = client; }
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void appendContextMenu(ui::Menu* menu);
     void createContextMenu()
@@ -125,9 +127,9 @@ public:
     void draw(const DrawArgs& args) override;
 };
 
-inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetInfo>>* presets, float x, float y, SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
+inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetInfo>>* presets, float x, float y, std::shared_ptr<SvgTheme> theme)
 {
-    auto o = createThemedWidget<PresetWidget>(Vec(x,y), engine, theme);
+    auto o = createThemedWidget<PresetWidget>(Vec(x,y), theme);
     o->set_agent(agent);
     o->set_preset_list(presets);
     return o;

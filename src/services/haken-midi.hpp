@@ -8,12 +8,6 @@ using namespace eaganmatrix;
 
 namespace pachde {
 
-enum class HakenMidiRate : uint8_t {
-    Full = Haken::midiTxFull,
-    Third = Haken::midiTxThird,
-    Twentieth = Haken::midiTxTweenth
-};
-
 struct HakenMidi
 {
     MidiLog* log{nullptr};
@@ -48,7 +42,6 @@ struct HakenMidi
     void request_updates(ChemId tag);
     void request_user(ChemId tag);
     void request_system(ChemId tag);
-    void midi_rate(ChemId tag, HakenMidiRate rate);
     void remake_mahling(ChemId tag);
     void previous_system_preset(ChemId tag);
     void next_system_preset(ChemId tag);

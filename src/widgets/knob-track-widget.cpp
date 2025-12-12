@@ -1,6 +1,8 @@
 #include "knob-track-widget.hpp"
 #include "services/misc.hpp"
-namespace pachde {
+using namespace pachde;
+
+namespace widgetry {
 
 TrackWidget::TrackWidget() :
     value(0.f),
@@ -29,7 +31,7 @@ void TrackWidget::set_min_max_value(float min, float max) {
     max_value = max;
 }
 
-bool TrackWidget::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
+bool TrackWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     auto style = theme->getStyle(track_key);
     if (style) {

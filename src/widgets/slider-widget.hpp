@@ -1,9 +1,9 @@
 #pragma once
 #include "slider-common.hpp"
 
-namespace pachde {
-    
-struct BasicSlider : Knob, IApplyTheme
+namespace widgetry {
+
+struct BasicSlider : Knob, IThemed
 {
     using Base = Knob;
     static const Axis axis{Axis::Y};
@@ -16,7 +16,7 @@ struct BasicSlider : Knob, IApplyTheme
     float mod_value{NAN};
     float shrinky = 2.f;
     float increment = 10.f / 127.f;
-    
+
     BasicSlider();
 
     void onEnter(const EnterEvent& e) override;
@@ -29,7 +29,7 @@ struct BasicSlider : Knob, IApplyTheme
     void unmodulate() { mod_value = NAN; }
     void set_modulation(float mod) { mod_value = mod; }
     float thumb_pos();
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void draw_stem(const DrawArgs& args);
     void draw_thumb(const DrawArgs& args);
     void draw_mod(const DrawArgs& args);
@@ -44,10 +44,10 @@ struct FillSlider : BasicSlider
 
     FillSlider() : fill("slide-fill", "hsl(32,90%,60%)", "hsl(32,90%,60%)", 3.5f) {}
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         fill.apply_theme(theme);
-        return Base::applyTheme(engine, theme);
+        return Base::applyTheme(theme);
     }
     void draw_fill(const DrawArgs& args);
     void draw(const DrawArgs& args) override;

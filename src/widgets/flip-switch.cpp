@@ -1,6 +1,8 @@
 #include "flip-switch.hpp"
 #include "services/colors.hpp"
-namespace pachde {
+using namespace pachde;
+
+namespace widgetry {
 
 FlipSwitch::FlipSwitch() :
     pressed(false)
@@ -9,7 +11,7 @@ FlipSwitch::FlipSwitch() :
     box.size.y = 12.f;
 }
 
-bool FlipSwitch::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool FlipSwitch::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     auto style = theme->getStyle("fswhi");
     if (style)     {

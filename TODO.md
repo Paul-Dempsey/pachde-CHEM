@@ -2,6 +2,15 @@
 
 ## General
 
+- MIDI-friendly control for navigating presets
+  - How to simulate endless encoder on controllers without endless encoders (like NK2)?
+- Integrated MIDI mapping across CHEM features for MIDI controllers.
+
+- 10.61 HakenMidi
+  - New Pedal assignments
+  - New ccs for Y and Z
+  - check for other new/deprecated features
+
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
 
 ## Core
@@ -10,7 +19,7 @@
 
 ## After release
 
-- Update svg_theme project to sync with all the improvements from CHEM.
+- Update svg_theme project to sync with all the improvements from CHEM/pachde1.
 
 ## Ideas
 
@@ -22,7 +31,4 @@
 - Blinking or highlighted link button when not connected
 - Setting files (surface, rounding, polyphony) (Rack presets sufficient?)
 - Preset-associated settings (re settings files) i.e. Customize sys preset - parameters per-module
-- color picker
-  - choose text syntax
-  - 100% transparent option
-  - transparency slider
+- Something for pitch tables?

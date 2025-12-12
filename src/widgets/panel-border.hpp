@@ -3,14 +3,14 @@
 #include <rack.hpp>
 using namespace ::rack;
 
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 using namespace svg_theme;
 
 bool isPeerModule(::rack::engine::Module* me, ::rack::engine::Module* candidate);
 
-namespace pachde {
+namespace widgetry {
 
-struct PartnerPanelBorder : ::rack::app::PanelBorder, IApplyTheme
+struct PartnerPanelBorder : ::rack::app::PanelBorder, IThemed
 {
     bool left{false};
     bool right{false};
@@ -25,7 +25,7 @@ struct PartnerPanelBorder : ::rack::app::PanelBorder, IApplyTheme
     }
     void setPartners(bool isLeft, bool isRight);
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void draw(const DrawArgs& args) override;
 };
@@ -33,7 +33,7 @@ struct PartnerPanelBorder : ::rack::app::PanelBorder, IApplyTheme
 void removePanelBorder(::rack::app::SvgPanel* panel);
 void replacePanelBorder(::rack::app::SvgPanel* panel, ::rack::app::PanelBorder* border);
 
-PartnerPanelBorder* attachPartnerPanelBorder(::rack::app::SvgPanel *panel, svg_theme::SvgThemeEngine& engine, std::shared_ptr<svg_theme::SvgTheme> theme);
+PartnerPanelBorder* attachPartnerPanelBorder(::rack::app::SvgPanel *panel, std::shared_ptr<svg_theme::SvgTheme> theme);
 
 template<class TModuleWidget>
 void setPartnerPanelBorder(TModuleWidget* me)

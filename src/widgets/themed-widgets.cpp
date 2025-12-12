@@ -2,7 +2,7 @@
 #include "themed-widgets.hpp"
 #include "services/colors.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 void notifyChange(Widget* widget)
 {
@@ -19,6 +19,6 @@ void ThemeColorPort::draw(const DrawArgs& args)
     if (pachde::isColorTransparent(ring)) {
         return;
     }
-    OpenCircle(args.vg, 8, 8, 4.0f, ring, ring_width);
+    pachde::OpenCircle(args.vg, 8, 8, 4.0f, ring, ring_width);
 }
 }

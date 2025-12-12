@@ -23,21 +23,20 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     my_module(module)
 {
     setModule(module);
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
     if (style::show_screws()) {
-        createScrews(theme);
+        createScrews();
     }
     float x, y;
     bool browsing = !module;
     LabelStyle heading_style{"ctl-label-hi", TextAlignment::Left, 14.f, true};
 
     y = 32.f;
-    addChild(createLabel<TextLabel>(Vec(7.5f, y), 25.f, "Pre", theme_engine, theme,  heading_style));
-    addChild(createLabel<TextLabel>(Vec(204.f, y), 25.f, "Post", theme_engine, theme, heading_style));
+    addChild(createLabel<TextLabel>(Vec(7.5f, y), 25.f, "Pre",  theme,  heading_style));
+    addChild(createLabel<TextLabel>(Vec(204.f, y), 25.f, "Post",  theme, heading_style));
 
     // knobs
 
@@ -54,15 +53,15 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     };
     for (int p = 0; p < 4; ++p) {
         if (p & 1) {
-            addChild(knobs[p] = createChemKnob<BasicKnob>(Vec(pcx[p], y), my_module, p, theme_engine, theme));
+            addChild(knobs[p] = createChemKnob<BasicKnob>(Vec(pcx[p], y), &module_svgs, my_module, p, theme));
         } else {
-            addChild(knobs[p] = createChemKnob<BlueKnob>(Vec(pcx[p], y), my_module, p, theme_engine, theme));
+            addChild(knobs[p] = createChemKnob<BlueKnob>(Vec(pcx[p], y), &module_svgs, my_module, p, theme));
         }
-        addChild(tracks[p] = createTrackWidget(knobs[p], theme_engine, theme));
+        addChild(tracks[p] = createTrackWidget(knobs[p], theme));
     }
     addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
-        Vec(258.f, 26.f), my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", theme_engine, theme, S::control_label));
+        Vec(258.f, 26.f), &module_svgs, my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL)));
+    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", theme, S::control_label));
 
     const float KX = 34.f;
     x = KX;
@@ -73,7 +72,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float kdx[] { K_DX, K_DX, WL_DX, K_DX, IR_DX, 0.f};
     const char* labels[] { "Length", "Tuning", "Width", "Left", "Right", "IR" };
     for (int i = 0; i < 6; ++i) {
-        addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], theme_engine, theme, S::control_label));
+        addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], theme, S::control_label));
         x += kdx[i];
     }
     auto ir_style = LabelStyle{"dytext", TextAlignment::Center, 12.f, false};
@@ -83,19 +82,19 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 6; ++j) {
             auto wi = widget_info[iwi++];
-            addChild(knobs[wi.param] = createChemKnob<BasicKnob>(Vec(x, y), my_module, wi.param, theme_engine, theme));
+            addChild(knobs[wi.param] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, wi.param, theme));
             if (wi.input >= 0) {
-                addChild(tracks[wi.input] = createTrackWidget(knobs[wi.param], theme_engine, theme));
+                addChild(tracks[wi.input] = createTrackWidget(knobs[wi.param], theme));
             }
             x += kdx[j];
         }
-        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", theme_engine, theme, ir_style);
+        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", theme, ir_style);
         addChild(ir_labels[i]);
         x = KX;
         y += ROW_DY;
     }
 
-    addChild(knobs[CM::P_MOD_AMOUNT] = createChemKnob<TrimPot>(Vec(210.f, S::PORT_TOP), my_module, CM::P_MOD_AMOUNT, theme_engine, theme));
+    addChild(knobs[CM::P_MOD_AMOUNT] = createChemKnob<TrimPot>(Vec(210.f, S::PORT_TOP), &module_svgs, my_module, CM::P_MOD_AMOUNT, theme));
 
     // inputs
     auto co_port = PORT_CORN;
@@ -117,7 +116,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             while (wi.input < 0) {
                 wi = widget_info[iwi++];
             }
-            addChild(Center(createThemedColorInput(Vec(x, y), my_module, wi.input, S::InputColorKey, co_port, theme_engine, theme)));
+            addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port, theme)));
             addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - PORT_MOD_DX, y - PORT_MOD_DY), my_module, wi.light));
             if (my_module) {
                 addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
@@ -138,9 +137,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const char * port_name[] {"MIX", "IDX"};
     for (int i = 0; i < 4; ++i, ++iwi) {
         auto wi = widget_info[iwi];
-        addChild(Center(createThemedColorInput(Vec(x, y), my_module, wi.input, S::InputColorKey, co_port, theme_engine, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port, theme)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, wi.light));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, port_name[i & 1], theme_engine, theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, port_name[i & 1], theme, S::in_port_label));
         if (my_module) {
             addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }
@@ -155,9 +154,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme_engine, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
         link_button->setHandler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
@@ -170,6 +169,8 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     if (browsing && S::show_browser_logo()) {
         addChild(createWidgetCentered<OpaqueLogo>(Vec(CENTER, 136)));
     }
+
+    module_svgs.changeTheme(theme);
 
     // init
 
@@ -192,17 +193,12 @@ void ConvoUi::glowing_knobs(bool glow) {
     }
 }
 
-void ConvoUi::createScrews(std::shared_ptr<SvgTheme> theme)
+void ConvoUi::createScrews()
 {
-    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), theme_engine, theme));
+    addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, 0), &module_svgs));
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0), &module_svgs));
     //addChild(createThemedWidget<ThemeScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), theme_engine, theme));
-}
-
-void ConvoUi::setThemeName(const std::string &name, void *context)
-{
-    Base::setThemeName(name, context);
+    addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH), &module_svgs));
 }
 
 void ConvoUi::onConnectHost(IChemHost* host)

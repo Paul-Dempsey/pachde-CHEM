@@ -4,7 +4,7 @@
 #include "services/colors.hpp"
 
 using namespace ::rack;
-namespace pachde {
+namespace widgetry {
 
 Pic* Pic::CreateRaw(int width, int height) {
     auto p = new Pic();

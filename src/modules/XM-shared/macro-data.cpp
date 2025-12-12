@@ -1,4 +1,5 @@
 #include "macro-data.hpp"
+#include "services/json-help.hpp"
 
 namespace pachde {
 

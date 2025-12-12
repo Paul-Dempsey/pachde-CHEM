@@ -1,10 +1,10 @@
 #pragma once
-#include "TipWidget.hpp"
-#include "services/svt_rack.hpp"
+#include "tip-widget.hpp"
 #include "services/colors.hpp"
 using namespace svg_theme;
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 struct Blip: TipWidget
 {

@@ -1,9 +1,11 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
+using namespace ::rack;
 #include "services/misc.hpp"
 #include "widgets/hamburger.hpp"
-using namespace ::rack;
+using namespace ::widgetry;
+
 namespace pachde {
 
 enum Tuning : uint8_t {

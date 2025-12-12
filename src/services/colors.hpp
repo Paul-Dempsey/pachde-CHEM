@@ -1,6 +1,8 @@
-// Copyright (C) Paul Chase Dempsey
 #pragma once
 #include <rack.hpp>
+using namespace ::rack;
+#include "packed-color.hpp"
+using namespace packed_color;
 
 namespace pachde {
 
@@ -44,11 +46,7 @@ enum Ramp {
     G_85, G_90, G_95, G_100,
     G_WHITE = G_100
 };
-extern const NVGcolor GrayRamp[];
-inline const NVGcolor& RampGray(Ramp g)
-{
-    return GrayRamp[rack::math::clamp(g, G_BLACK, G_WHITE)];
-}
+NVGcolor RampGray(Ramp g);
 
 #define COLOR_BRAND    nvgRGB(0x45,0x7a,0xa6)  // #457aa6
 #define COLOR_BRAND_MD nvgRGB(0x4e,0x8b,0xbf)  // #4e8dbf
@@ -92,7 +90,7 @@ extern const NVGcolor gray_light;
 extern const NVGcolor no_light;
 
 #define IS_SAME_COLOR(p,q) (((p).r == (q).r) && ((p).g == (q).g) && ((p).b == (q).b) && ((p).a == (q).a))
-inline NVGcolor Overlay(NVGcolor color, float trans = 0.2f) { return nvgTransRGBAf(color, trans); }
+inline NVGcolor Overlay(const NVGcolor &color, float transparency = 0.2f) { return nvgTransRGBAf(color, transparency); }
 inline NVGcolor Gray(float L) {
     NVGcolor color;
     color.r = color.b = color.g = L;
@@ -107,42 +105,17 @@ inline NVGcolor nvgHSLAf(float h, float s, float l, float a)
     return color;
 }
 
-
-// 8-bit (0-255) abgr packed into a uint32_t.
-typedef uint32_t PackedColor;
-
-inline bool isVisibleColor(PackedColor co) { return 0 != (co & 0xff000000); }
-
-inline PackedColor PackRGBA(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
-    return r | (g << 8u) | (b << 16u) | (a << 24u);
-}
-
-inline PackedColor PackRGB(uint32_t r, uint32_t g, uint32_t b) {
-    return PackRGBA(r, g, b, 255u);
-}
-
-inline uint32_t Red(PackedColor co) { return co & 0xff; }
-inline uint32_t Green(PackedColor co) { return (co >> 8) & 0xff; }
-inline uint32_t Blue(PackedColor co) { return (co >> 16u) & 0xff; }
-inline uint32_t Alpha(PackedColor co) { return (co >> 24u) & 0xff; }
-
 inline NVGcolor fromPacked(PackedColor co)
 {
     return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
 }
 
-inline NVGcolor fromPackedOrDefault(PackedColor co, const NVGcolor& fallback)
-{
-    if (!isVisibleColor(co)) return fallback;
-    return nvgRGBA(co & 0xff, (co >> 8) & 0xff, (co >> 16) & 0xff, (co >> 24) & 0xff);
-}
-
-inline PackedColor toPacked(NVGcolor co) {
-    return PackRGBA(
-        static_cast<uint32_t>(co.r * 255.f),
-        static_cast<uint32_t>(co.g * 255.f),
-        static_cast<uint32_t>(co.b * 255.f),
-        static_cast<uint32_t>(co.a * 255.f));
+inline PackedColor toPacked(const NVGcolor& co) {
+    return packRgba(
+        static_cast<uint32_t>(co.r * 255),
+        static_cast<uint32_t>(co.g * 255),
+        static_cast<uint32_t>(co.b * 255),
+        static_cast<uint32_t>(co.a * 255));
 }
 
 struct NamedColor {
@@ -343,7 +316,7 @@ constexpr const float PI = 3.14159265358979323846;
 constexpr const float TWO_PI = 2.0f * PI;
 constexpr const float SQRT3 = 1.732050807568877f;
 
-// stb linearizes on load so we don't have to gamma-correct
+// stb linearizes on load so we don't have to gamma/correct
 inline float LuminanceLinear(const NVGcolor& color) {
     return 0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b;
 }
@@ -378,32 +351,35 @@ inline float Hue(const NVGcolor& color) {
 inline bool isColorTransparent(const NVGcolor& color) { return color.a < 0.001f; }
 inline bool isColorVisible(const NVGcolor& color) { return color.a > 0.001f; }
 
-void FillRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color);
+inline NVGcolor RandomColor() { return nvgRGBAf(random::uniform(), random::uniform(), random::uniform(), random::uniform()); }
+inline NVGcolor RandomOpaqueColor() { return nvgRGBAf(random::uniform(), random::uniform(), random::uniform(), 1.0f); }
+void FillRect(NVGcontext *vg, float x, float y, float width, float height, NVGcolor color);
 void GradientRect(NVGcontext * vg, float x, float y, float width, float height, const NVGcolor& top, const NVGcolor& bottom, float y1, float y2);
-void RoundRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color, float radius);
-enum class Fit { Inside, Outside };
+void RoundRect(NVGcontext *vg, float x, float y, float width, float height, NVGcolor color, float radius);
+enum class Fit { Inside, Outside, None };
 void FittedBoxRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color, Fit fit, float strokeWidth = 1.0);
-void BoxRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color, float strokeWidth = 1.0);
-void RoundBoxRect(NVGcontext *vg, float x, float y, float width, float height, const NVGcolor& color, float radius, float strokeWidth = 1.0);
-void Line(NVGcontext * vg, float x1, float y1, float x2, float y2, const NVGcolor& color, float strokeWidth = 1.0);
-void CircleGradient(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& top, const NVGcolor& bottom);
-void Circle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& fill);
-void OpenCircle(NVGcontext * vg, float cx, float cy, float r, const NVGcolor& stroke, float stroke_width = 1.f);
+void BoxRect(NVGcontext *vg, float x, float y, float width, float height, NVGcolor color, float strokeWidth = 1.0);
+void RoundBoxRect(NVGcontext *vg, float x, float y, float width, float height, NVGcolor color, float radius, float strokeWidth = 1.0);
+void Line(NVGcontext * vg, float x1, float y1, float x2, float y2, NVGcolor color, float strokeWidth = 1.0);
+void CircleGradient(NVGcontext * vg, float cx, float cy, float r, NVGcolor top, NVGcolor bottom);
+void Circle(NVGcontext * vg, float cx, float cy, float r, NVGcolor fill);
+void OpenCircle(NVGcontext * vg, float cx, float cy, float r, NVGcolor stroke, float stroke_width = 1.f);
 void Dot(NVGcontext*vg, float x, float y, const NVGcolor& co, bool filled = true, float radius = 2.25f, float stroke_width = .5f);
 void CircularHalo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor);
 void Halo(NVGcontext* vg, float cx, float cy, float inner_radius, float halo_radius, const NVGcolor& haloColor, float fade = 1.0f);
 void KnobTrack(NVGcontext* vg, float cx, float cy, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 void TrackGliss(NVGcontext* vg, float cx, float cy, float xg, float yg, float minAngle, float maxAngle, float track_radius, float track_width, const NVGcolor& color);
 
-#ifdef IMPLEMENT_COLOR_MENU
 template <class TMenuItem = rack::ui::MenuEntry>
 rack::ui::MenuEntry* createColorMenuItem(
     PackedColor previewColor,
-    std::string text, std::string rightText,
+    std::string text,
+    std::string rightText,
     std::function<bool()> checked,
     std::function<void()> action,
     bool disabled = false,
-    bool alwaysConsume = false)
+    bool alwaysConsume = false
+    )
 {
     struct ColorItem : rack::ui::MenuEntry {
         NVGcolor preview;
@@ -433,6 +409,6 @@ rack::ui::MenuEntry* createColorMenuItem(
 
 	return item;
 }
-#endif
+
 
 }

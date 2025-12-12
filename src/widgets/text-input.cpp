@@ -1,14 +1,15 @@
 #include "text-input.hpp"
 #include "services/misc.hpp"
+using namespace pachde;
 
-namespace pachde {
+namespace widgetry {
 
 TextInput::TextInput()
 {
     multiline = false;
 }
 
-bool TextInput::applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme)
+bool TextInput::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     bg_style.apply_theme(theme);
     text_style.apply_theme(theme);

@@ -1,5 +1,6 @@
 // File is "SettingsModule.cpp" to avoid debugger confusion of same file name in Rack
 #include "Settings.hpp"
+#include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 #include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
@@ -137,14 +138,14 @@ void SettingsModule::zero_modulation()
 void SettingsModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
-    json_read_string(root, "haken-device", device_claim);
+    device_claim = get_json_string(root, "haken-device");
     ModuleBroker::get()->try_bind_client(this);
 }
 
 json_t* SettingsModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(device_claim.c_str()));
+    set_json(root, "haken-device", device_claim);
     return root;
 }
 
@@ -303,14 +304,14 @@ void SettingsModule::do_message(PackedMidiMessage message)
                 } break;
             case Haken::idPoly:      param_index = P_BASE_POLYPHONY; break;
             case Haken::idBendRange: param_index = P_X; break;
-            case Haken::idFrontBack: param_index = P_Y; break;
-            case Haken::idPressure:  param_index = P_Z; break;
+            case Haken::idYencode:   param_index = P_Y; break;
+            case Haken::idZencode:   param_index = P_Z; break;
             case Haken::idMiddleC:   param_index = P_MIDDLE_C; break;
             case Haken::idTArea:     param_index = P_TOUCH_AREA; break;
             case Haken::idMonoFunc:  param_index = P_MONO_MODE; break;
             case Haken::idMonoInt:   param_index = P_MONO_INTERVAL; break;
-            case Haken::idPresEnc:   param_index = P_KEEP_MIDI; break;
-            case Haken::idPresSurf:  param_index = P_KEEP_SURFACE; break;
+            case Haken::idPrsvEnc:   param_index = P_KEEP_MIDI; break;
+            case Haken::idPrsvSurf:  param_index = P_KEEP_SURFACE; break;
             case Haken::idAes3:      param_index = P_AES3; break;
             default: break;
             }
@@ -439,8 +440,8 @@ void SettingsModule::process(const ProcessArgs &args)
         build_update(stream_data, P_TOUCH_AREA, Haken::idTArea);
         build_update(stream_data, P_MIDDLE_C, Haken::idMiddleC);
         build_update(stream_data, P_X, Haken::idBendRange);
-        build_update(stream_data, P_Y, Haken::idFrontBack);
-        build_update(stream_data, P_Z, Haken::idPressure);
+        build_update(stream_data, P_Y, Haken::idYencode);
+        build_update(stream_data, P_Z, Haken::idZencode);
         build_update(stream_data, P_NOTE_PROCESSING, Haken::idNoteMode);
         build_update(stream_data, P_NOTE_PRIORITY, Haken::idPrio);
         build_update(stream_data, P_ROUND_TYPE, Haken::idRoundMode);
@@ -449,8 +450,8 @@ void SettingsModule::process(const ProcessArgs &args)
         build_update(stream_data, P_DOUBLE_COMPUTATION, Haken::idOkIncComp);
         build_update(stream_data, P_MONO_MODE, Haken::idMonoFunc);
         build_update(stream_data, P_MONO_INTERVAL, Haken::idMonoInt);
-        build_update(stream_data, P_KEEP_MIDI, Haken::idPresEnc);
-        build_update(stream_data, P_KEEP_SURFACE, Haken::idPresSurf);
+        build_update(stream_data, P_KEEP_MIDI, Haken::idPrsvEnc);
+        build_update(stream_data, P_KEEP_SURFACE, Haken::idPrsvSurf);
         build_update(stream_data, P_AES3, Haken::idAes3);
 
         haken->send_stream(ChemId::Settings, Haken::s_Mat_Poke, stream_data);

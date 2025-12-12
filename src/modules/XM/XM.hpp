@@ -2,7 +2,6 @@
 #include "my-plugin.hpp"
 #include "chem.hpp"
 #include "services/colors.hpp"
-#include "services/color-help.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
 #include "services/rack-help.hpp"

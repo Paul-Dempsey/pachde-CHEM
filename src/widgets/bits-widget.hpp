@@ -4,9 +4,9 @@ using namespace ::rack;
 #include "click-region-widget.hpp"
 #include "label-widget.hpp"
 
-namespace pachde {
+namespace widgetry {
 
-struct BitsWidget : OpaqueWidget, IApplyTheme
+struct BitsWidget : OpaqueWidget, IThemed
 {
     using Base = OpaqueWidget;
 
@@ -31,11 +31,10 @@ struct BitsWidget : OpaqueWidget, IApplyTheme
         int rows,
         float item_width,
         const std::vector<std::string>& items,
-        SvgThemeEngine& theme_engine,
         std::shared_ptr<svg_theme::SvgTheme> theme,
         std::function<void(uint64_t state)> on_change
     );
-    bool applyTheme(svg_theme::SvgThemeEngine& theme_engine, std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
     uint64_t get_state() { return state; }
     void set_state(uint64_t the_state) { state = the_state; }
     std::string make_summary();

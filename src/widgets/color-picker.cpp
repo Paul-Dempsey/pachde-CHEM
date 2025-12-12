@@ -1,8 +1,8 @@
 #include "color-picker.hpp"
-#include "services/misc.hpp"
-#include "services/color-help.hpp"
+#include "services/text.hpp"
+#include "services/packed-color.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 void ColorPicker::set_text_color()
 {
@@ -13,10 +13,10 @@ void ColorPicker::set_text_color()
         text_input->text = hex_string(color);
         break;
     case ColorSyntax::RGB:
-        text_input->text = format_string("rgb(%d,%d,%d)", Red(color), Green(color), Blue(color));
+        text_input->text = rgba_string(color);
         break;
     case ColorSyntax::HSL:
-        text_input->text = hsl_string(hue, saturation, lightness, nvg_color.a);
+        text_input->text = hsla_string(hue, saturation, lightness, nvg_color.a);
         break;
     }
 }
@@ -24,25 +24,33 @@ void ColorPicker::set_text_color()
 void ColorPicker::set_color(PackedColor co)
 {
     color = co;
-    sample->color = co;
     nvg_color = fromPacked(co);
-    hue = Hue1(nvg_color);
-    saturation = Saturation(nvg_color);
-    lightness = Lightness(nvg_color);
 
-    hue_picker->setHue(hue);
-    sl_picker->setHue(hue);
-    sl_picker->setSaturation(saturation);
-    sl_picker->setLightness(lightness);
-    set_text_color();
+    hue = Hue1(nvg_color);
+    saturation = Saturation1(nvg_color);
+    lightness = Lightness(nvg_color);
+    alpha = nvg_color.a;
+
+    if (solid) solid->color = color;
+    if (sample) sample->color = color;
+    if (hue_picker) hue_picker->setHue(hue);
+    if (alpha_picker) alpha_picker->setOpacity(alpha);
+    if (sl_picker) {
+        sl_picker->setHue(hue);
+        sl_picker->setSaturation(saturation);
+        sl_picker->setLightness(lightness);
+    }
+    if (text_input) set_text_color();
     if (on_new_color) on_new_color(color);
 }
 
-void ColorPicker::refresh_from_hsl() {
-    nvg_color = nvgHSL(hue, saturation, lightness);
+void ColorPicker::refresh_from_hsla() {
+    nvg_color = nvgHSLAf(hue, saturation, lightness, alpha);
     color = toPacked(nvg_color);
     sample->color = color;
+    solid->color = color;
     hue_picker->setHue(hue);
+    alpha_picker->setOpacity(alpha);
     sl_picker->setHue(hue);
     sl_picker->setSaturation(saturation);
     sl_picker->setLightness(lightness);
@@ -53,12 +61,22 @@ void ColorPicker::refresh_from_hsl() {
 ColorPicker::ColorPicker()
 {
     box.size = get_size();
+    set_color(toPacked(nvgHSLAf(40.f/360.f, .85f, .5f, 1.f)));
+
+    alpha_picker = new AlphaWidget();
+    alpha_picker->box.pos = Vec(0.f, 0.f);
+    alpha_picker->box.size = Vec(15.f, 224);
+    alpha_picker->set_handler([=](float opacity) {
+        set_alpha(opacity);
+    });
+    alpha_picker->setOpacity(get_alpha());
+    addChild(alpha_picker);
 
     hue_picker = new HueWidget();
     hue_picker->hue = get_hue();
-    hue_picker->box.pos = Vec(0,0);
+    hue_picker->box.pos = Vec(18.5f,0.f);
     hue_picker->box.size = Vec(15.f, 224);
-    hue_picker->onClick([=](float hue) {
+    hue_picker->set_handler([=](float hue) {
         set_hue(hue);
     });
     addChild(hue_picker);
@@ -66,34 +84,61 @@ ColorPicker::ColorPicker()
     sl_picker = new SLWidget(get_hue());
     sl_picker->setSaturation(get_saturation());
     sl_picker->setLightness(get_lightness());
-    sl_picker->box.pos = Vec(18.5f, 0);
+    sl_picker->box.pos = Vec(37.f, 0);
     sl_picker->box.size = Vec(136.f, 224.f);
-    sl_picker->onClick([=](float sat, float light) {
-        set_saturation(sat);
-        set_lightness(light);
+    sl_picker->set_handler([=](float sat, float light) {
+        saturation = sat;
+        lightness = light;
+        refresh_from_hsla();
     });
     addChild(sl_picker);
 
-    sample = createWidget<Swatch>(Vec(0, 227.5f));
-    sample->box.size = Vec(149.f, 14.f);
+    solid = createWidget<SolidSwatch>(Vec(0, 227.5f));
+    solid->box.size = Vec(36.f, 14);
+    addChild(solid);
+
+    sample = createWidget<Swatch>(Vec(36.f, 227.5));
+    sample->box.size = Vec(box.size.x - 36.f, 14.f);
     addChild(sample);
 
-    text_input = createWidget<TextInput>(Vec(0, 244.f));
-    text_input->box.size = sample->box.size;
+    text_input = createWidget<TextInput>(Vec(3.5f, 244.f));
+    text_input->box.size = Vec(142.5f, 14.f);
     text_input->text_height = 14.f;
     text_input->set_on_change([=](std::string text) {
         syntax = ColorSyntax::Unknown;
-        if (isValidHexColor(text)) syntax = ColorSyntax::Hex;
-        else if (is_hsl(text)) syntax = ColorSyntax::HSL;
-        else if (is_rgb(text)) syntax = ColorSyntax::RGB;
-        if (syntax != ColorSyntax::Unknown) {
-            auto co = parse_color(text, RARE_COLOR);
-            if (co != RARE_COLOR) {
-                set_color(co);
-            }
-        }
+        PackedColor co;
+        if (parseColor(co, colors::NoColor, text.c_str(), nullptr)) {
+            if (is_hsl_prefix(text.c_str())) syntax = ColorSyntax::HSL;
+            else if (is_rgb_prefix(text.c_str())) syntax = ColorSyntax::RGB;
+            else syntax = ColorSyntax::Hex;
+            syntax_selector->syntax = syntax;
+            set_color(co);
+        };
     });
     addChild(text_input);
+
+    syntax_selector = createWidget<SyntaxSelector>(Vec(153.f, 244.f));
+    syntax_selector->set_handler([=](ColorSyntax syntax) {
+        this->syntax = syntax;
+        set_text_color();
+    });
+    addChild(syntax_selector);
+    set_color(color);
+}
+
+ColorPickerMenu::ColorPickerMenu() {
+    auto picker_size = ColorPicker::get_size();
+    box.size = picker_size.plus(Vec(8.f, 8.f));
+    picker = createWidgetCentered<ColorPicker>(box.getCenter());
+    addChild(picker);
+}
+
+void ColorPickerMenu::draw(const DrawArgs& args)
+{
+    auto vg = args.vg;
+    FillRect(vg, 0, 0, box.size.x, box.size.y, nvgRGB(0x18, 0x18, 0x18));
+    FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, RampGray(G_65), Fit::Inside, 1.5f);
+    OpaqueWidget::draw(args);
 }
 
 }

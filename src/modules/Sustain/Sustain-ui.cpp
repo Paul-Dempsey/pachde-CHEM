@@ -28,29 +28,28 @@ SusUi::SusUi(SusModule *module) :
 
 void SusUi::create_ui()
 {
-    initThemeEngine();
-    auto theme = theme_engine.getTheme(getThemeName());
-    auto panel = createThemedPanel(panelFilename(), theme_engine, theme);
-    panelBorder = attachPartnerPanelBorder(panel, theme_engine, theme);
+    auto theme = getSvgTheme();
+    auto panel = createThemedPanel(panelFilename(), &module_svgs);
+    panelBorder = attachPartnerPanelBorder(panel, theme);
     setPanel(panel);
     float x, y;
     x = CENTER;
     const float MIDDLE = 160.f;
     y = MIDDLE - 64.f - 4.f;
-    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MAX, theme_engine, theme)));
-    addChild(slider = Center(createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme_engine, theme)));
+    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_MAX)));
+    addChild(slider = Center(createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme)));
     y = MIDDLE + 64.f + 4.f;
-    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), my_module, SM::P_MIN, theme_engine, theme)));
+    addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_MIN)));
 
     auto co_port = PORT_CORN;
     y = S::PORT_TOP;
-    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), module, SM::P_MOD_AMOUNT, theme_engine, theme));
+    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, SM::P_MOD_AMOUNT,theme));
 
     y += S::PORT_DY;
-    addChild(Center(createThemedColorInput(Vec(x , y), my_module, SM::IN_MOD, S::InputColorKey, co_port, theme_engine, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme_engine, theme, S::in_port_label));
+    addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_MOD, S::InputColorKey, co_port, theme)));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme, S::in_port_label));
 
-    link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), theme_engine, theme, "Core link");
+    link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));
     link->setFill(false);
 
@@ -66,6 +65,8 @@ void SusUi::create_ui()
         logo->box.pos = Vec(CENTER, 60);
         addChild(Center(logo));
     }
+
+    module_svgs.changeTheme(theme);
 
     // init
 

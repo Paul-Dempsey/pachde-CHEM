@@ -1,8 +1,8 @@
 #pragma once
 #include "label-widget.hpp"
-#include "TipWidget.hpp"
+#include "tip-widget.hpp"
 
-namespace pachde {
+namespace widgetry {
 
 struct TipLabel : TextLabel
 {

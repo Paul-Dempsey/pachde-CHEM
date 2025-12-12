@@ -37,18 +37,24 @@ PresetWidget::PresetWidget()
     box.size.y = 20.f;
 }
 
-bool PresetWidget::applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme)
-{
+// assume theme has the style
+PackedColor unchecked_fill_color(std::shared_ptr<SvgTheme> theme, const char * key) {
+    PackedColor co{colors::NoColor};
+    theme->getFillColor(co, key, true);
+    return co;
+}
+
+bool PresetWidget::applyTheme(std::shared_ptr<SvgTheme> theme) {
     wire_style = theme->name == "Wire";
-    grip_color =          fromPacked(theme->getFillColor("preset-grip", true));
-    live_color =          fromPacked(theme->getFillColor("preset-live", true));
-    current_color =       fromPacked(theme->getFillColor("preset-current", true));
-    live_text_color =     fromPacked(theme->getFillColor("preset-livetext", true));
-    selected_color =      fromPacked(theme->getFillColor("preset-selected", true));
-    selected_text_color = fromPacked(theme->getFillColor("preset-seltext", true));
-    text_color =          fromPacked(theme->getFillColor("preset", true));
-    drag_color =          fromPacked(theme->getFillColor("preset-drag", true));
-    drag_current_color =  fromPacked(theme->getFillColor("preset-dragcur", true));
+    grip_color =          fromPacked(unchecked_fill_color(theme, "preset-grip"));
+    live_color =          fromPacked(unchecked_fill_color(theme, "preset-live"));
+    current_color =       fromPacked(unchecked_fill_color(theme, "preset-current"));
+    live_text_color =     fromPacked(unchecked_fill_color(theme, "preset-livetext"));
+    selected_color =      fromPacked(unchecked_fill_color(theme, "preset-selected"));
+    selected_text_color = fromPacked(unchecked_fill_color(theme, "preset-seltext"));
+    text_color =          fromPacked(unchecked_fill_color(theme, "preset"));
+    drag_color =          fromPacked(unchecked_fill_color(theme, "preset-drag"));
+    drag_current_color =  fromPacked(unchecked_fill_color(theme, "preset-dragcur"));
     hover_element.apply_theme(theme);
     return true;
 }

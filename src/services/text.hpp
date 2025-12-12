@@ -20,6 +20,10 @@ inline bool FontOk(std::shared_ptr<window::Font> font) {
     return font && font->handle >= 0;
 }
 
+std::string rgba_string(PackedColor color);
+
+std::string hsla_string(float hue, float saturation, float lightness, float alpha);
+
 void SetTextStyle(NVGcontext *vg, std::shared_ptr<window::Font> font, NVGcolor color = RampGray(G_20), float height = 16);
 
 // Center text horizontally on the given point

@@ -1,9 +1,7 @@
 #pragma once
 #include <rack.hpp>
 using namespace ::rack;
-#include "services/svgtheme.hpp"
-#include "services/svt_rack.hpp"
-#include "widgets/PanelBorder.hpp"
+#include "services/svg-theme.hpp"
 
 extern ::rack::plugin::Plugin* pluginInstance;
 
@@ -27,9 +25,11 @@ extern Model* modelMidiPad;
 
 // Theming
 
-extern svg_theme::SvgThemeEngine theme_engine;
-bool initThemeEngine();
-bool reloadThemes();
+void initThemeCache();
+void reloadThemeCache();
+::svg_theme::ThemeCache& getThemeCache();
+::svg_theme::RackSvgCache* getRackSvgs();
+::svg_theme::SvgNoCache* getSvgNoCache();
 
 bool isChemModule(Module* candidate);
 bool isPeerModule(Module* me, Module* candidate);

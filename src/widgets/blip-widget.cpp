@@ -1,8 +1,8 @@
 #include "blip-widget.hpp"
+using namespace pachde;
+namespace widgetry {
 
-namespace pachde {
-
-Blip::Blip() 
+Blip::Blip()
 :   hole(no_light),
     rim(RampGray(G_50)),
     light(GetStockColor(StockColor::Blue)),

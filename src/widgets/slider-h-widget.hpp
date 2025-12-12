@@ -4,9 +4,9 @@
 using namespace ::rack;
 using namespace ::svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
-struct BasicHSlider: ParamWidget, IApplyTheme
+struct BasicHSlider: ParamWidget, IThemed
 {
     using Base = ParamWidget;
 
@@ -31,7 +31,7 @@ struct BasicHSlider: ParamWidget, IApplyTheme
     float thumb_pos();
     float mod_pos();
 
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void onEnter(const EnterEvent& e) override;
     void onLeave(const LeaveEvent& e) override;
@@ -59,10 +59,10 @@ struct FillHSlider: BasicHSlider
 
     FillHSlider() : fill("hslide-fill", "#f9a54b", 2.5f) {}
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         fill.apply_theme(theme);
-        return Base::applyTheme(engine, theme);
+        return Base::applyTheme(theme);
     }
     void draw_fill(const DrawArgs& args);
     void draw(const DrawArgs& args) override;

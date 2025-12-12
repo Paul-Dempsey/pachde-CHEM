@@ -1,7 +1,7 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "my-plugin.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
 using namespace svg_theme;
 
@@ -9,7 +9,7 @@ namespace pachde {
 
 constexpr const PackedColor DEFAULT_DISABLED_SCREEEN{0x80303030};
 
-struct DisableWidget : TipWidget, IApplyTheme
+struct DisableWidget : TipWidget, IThemed
 {
     Widget* target{nullptr};
     NVGcolor screen{fromPacked(DEFAULT_DISABLED_SCREEEN)};

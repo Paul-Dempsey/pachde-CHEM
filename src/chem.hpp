@@ -3,22 +3,28 @@
 #include "my-plugin.hpp"
 #include "chem-core.hpp"
 #include "services/colors.hpp"
+#include "services/theme.hpp"
+#include "services/svg-theme.hpp"
 #include "widgets/themed-widgets.hpp"
+#include "widgets/panel-border.hpp"
 
 using namespace rack;
 using namespace svg_theme;
 using namespace pachde;
+using namespace widgetry;
+using namespace theme;
 
 #define DEFAULT_THEME "Dark"
 struct ChemModuleWidget;
 
 struct ChemModule : Module, IThemeHolder
 {
-    std::string theme_name;
-    bool follow_rack{false};
+    private: std::string actual_theme;
+    public:
+    std::string theme_setting;
+    bool seek_host{false};
     IChemHost* chem_host{nullptr};
     ChemModuleWidget* chem_ui{nullptr};
-    bool seek_host{false};
 
     virtual IChemHost* get_host() { return chem_host; };
 
@@ -27,6 +33,7 @@ struct ChemModule : Module, IThemeHolder
 
     void setThemeName(const std::string& name, void *) override;
     std::string getThemeName() override;
+    std::string get_actual_theme_name();
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
@@ -50,22 +57,20 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
     bool hints{false};
 #endif
 
-    virtual std::string panelFilename() = 0;
-
+    SvgCache module_svgs;
     PartnerPanelBorder * panelBorder {nullptr};
 
+    virtual std::string panelFilename() = 0;
     ChemModule* getChemModule() { return static_cast<ChemModule*>(module); }
 
     // IThemeHolder used by the context menu helper
-    std::string getThemeName() override
-    {
-        return module ? getChemModule()->getThemeName() : ::rack::settings::preferDarkPanels ? "Dark": "Light";
-    }
-
-    virtual void createScrews(std::shared_ptr<SvgTheme> theme) {}
-    void set_extender_theme(LeftRight which, const std::string& name);
-
     void setThemeName(const std::string& name, void *context) override;
+    std::string getThemeName() override;
+    std::string getActualThemeName();
+    std::shared_ptr<SvgTheme> getSvgTheme();
+
+    virtual void createScrews() {}
+    void set_extender_theme(LeftRight which, const std::string& name);
 
     void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;
@@ -77,13 +82,14 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
     void appendContextMenu(Menu *menu) override;
 };
 
-NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, const NVGcolor& fallback);
-NVGcolor ColorFromTheme(const std::string& theme, const char * color_name, StockColor fallback);
+NVGcolor ColorFromTheme(std::shared_ptr<SvgTheme> theme, const char * color_name, StockColor fallback);
+NVGcolor ColorFromTheme(std::shared_ptr<SvgTheme> theme, const char * color_name, const NVGcolor& fallback);
 
 // helpers/Impls
 namespace pachde {
 bool host_connected(IChemHost* chem_host);
 }
+
 // bind_host use from ModuleWidget::step()
 template<typename TClientModule>
 void bind_host(TClientModule* client_module)

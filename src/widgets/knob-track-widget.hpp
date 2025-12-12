@@ -1,11 +1,11 @@
 #pragma once
 #include <rack.hpp>
 #include "services/colors.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 using namespace ::rack;
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
 namespace track_constant {
     static constexpr const float default_radius{18.f};
@@ -18,7 +18,7 @@ namespace track_constant {
     static const char * default_inactive_track_key {"k-track-na"};
 }
 
-struct TrackWidget : TransparentWidget, IApplyTheme
+struct TrackWidget : TransparentWidget, IThemed
 {
     using Base = TransparentWidget;
 
@@ -43,7 +43,7 @@ struct TrackWidget : TransparentWidget, IApplyTheme
     void set_active(bool enable);
     void set_value(float value);
     void set_min_max_value(float min, float max);
-    bool applyTheme(SvgThemeEngine& theme_engine, std::shared_ptr<SvgTheme> theme) override;
+    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
 };
@@ -56,7 +56,6 @@ struct TrackIndicator : TrackWidget {
 template <typename TTrack = TrackWidget>
 TTrack * createTrackWidget(
     Knob * knob,
-    SvgThemeEngine &engine,
     std::shared_ptr<SvgTheme> theme,
     const char * track_theme_key = track_constant::default_track_key,
     const char * inactive_theme_key = track_constant::default_inactive_track_key
@@ -65,7 +64,7 @@ TTrack * createTrackWidget(
     auto o = new TTrack();
     if (track_theme_key) o->track_key = track_theme_key;
     if (inactive_theme_key) o->inactive_key = inactive_theme_key;
-    o->applyTheme(engine, theme);
+    o->applyTheme(theme);
 
     o->min_angle = knob->minAngle;
     o->max_angle = knob->maxAngle;
@@ -80,7 +79,6 @@ TTrack * createTrackWidget(
     float knob_radius,
     float min_angle,
     float max_angle,
-    SvgThemeEngine &engine,
     std::shared_ptr<SvgTheme> theme,
     const char * track_theme_key = track_constant::default_track_key,
     const char * inactive_theme_key = track_constant::default_inactive_track_key
@@ -89,7 +87,7 @@ TTrack * createTrackWidget(
     auto o = new TTrack();
     if (track_theme_key) o->track_key = track_theme_key;
     if (inactive_theme_key) o->inactive_key = inactive_theme_key;
-    o->applyTheme(engine, theme);
+    o->applyTheme(theme);
     o->box.pos = pos;
     o->box.size = Vec{knob_radius + 2.f, knob_radius + 2.f};
     o->min_angle = min_angle;

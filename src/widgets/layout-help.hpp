@@ -1,9 +1,9 @@
 #pragma once
-//#ifdef LAYOUT_HELP
 #include <rack.hpp>
 using namespace ::rack;
+using namespace pachde;
 
-namespace pachde
+namespace widgetry
 {
 
 struct ILayoutHelp {
@@ -18,7 +18,6 @@ struct ILayoutHelp {
 };
 
 namespace layout_help {
-
     inline void enable_children(Widget* widget, bool help) {
         for (auto child: widget->children) {
             auto lh = dynamic_cast<ILayoutHelp*>(child);
@@ -26,8 +25,6 @@ namespace layout_help {
             enable_children(child, help);
         }
     }
-
 }
 
 }
-//#endif

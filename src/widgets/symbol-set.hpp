@@ -1,14 +1,14 @@
 // Copyright (C) Paul Chase Dempsey
 #pragma once
 #include "my-plugin.hpp"
-#include "services/svgtheme.hpp"
+#include "services/svg-theme.hpp"
 #include "services/colors.hpp"
-//#include "TipWidget.hpp"
+//#include "tip-widget.hpp"
 using namespace svg_theme;
 
-namespace pachde {
+namespace widgetry {
 
-struct SymbolProvider: IApplyTheme
+struct SymbolProvider
 {
     std::vector<std::shared_ptr<window::Svg>> frames;
     std::vector<std::string> sources;
@@ -26,22 +26,21 @@ struct SymbolProvider: IApplyTheme
         sources.push_back(source);
     }
 
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override {
+    void loadSvg(ILoadSvg* loader) {
         frames.clear();
         for (auto it = sources.cbegin(); it != sources.cend(); it++) {
-            auto svg = engine.loadSvg(asset::plugin(pluginInstance, *it), theme);
-            frames.push_back(svg);
+            frames.push_back(loader->loadSvg(asset::plugin(pluginInstance, *it)));
         }
-        return true;
     }
+
 };
 
-struct SymbolSetWidget : OpaqueWidget, IApplyTheme
+struct SymbolSetWidget : OpaqueWidget
 {
     using Base = OpaqueWidget;
     ::rack::widget::FramebufferWidget* fb;
 	::rack::widget::SvgWidget* sw;
-    SymbolProvider* source;
+    SymbolProvider* source{nullptr};
 
     int index;
     float scale;
@@ -68,23 +67,6 @@ struct SymbolSetWidget : OpaqueWidget, IApplyTheme
     }
 
     int count() { return source->count(); }
-
-    bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override {
-        bool refresh = source->count() > 0;
-        if (refresh) {
-            sw->setSvg(nullptr);
-        }
-
-        source->applyTheme(engine, theme);
-
-        if (refresh) {
-            sw->setSvg(source->item(index));
-            if (fb) {
-                fb->setDirty();
-            }
-        }
-        return true;
-    }
 
     void set_scale(float scale) {
         if (scale == this->scale)

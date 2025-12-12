@@ -313,9 +313,9 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
     if (fetch && (0 == tab.count()) && !start_delay.running() && host_available()) {
         load_presets(tab_id);
     }
-    auto theme = theme_engine.getTheme(getThemeName());
-    user_label->applyTheme(theme_engine, theme);
-    system_label->applyTheme(theme_engine, theme);
+    auto theme = getSvgTheme();
+    user_label->applyTheme(theme);
+    system_label->applyTheme(theme);
 
     scroll_to(tab.scroll_top);
     //update_help();
