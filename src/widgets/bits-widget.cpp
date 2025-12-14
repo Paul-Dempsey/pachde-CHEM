@@ -13,7 +13,6 @@ BitsWidget::BitsWidget(
     int rows,
     float item_width,
     const std::vector<std::string>& items,
-    std::shared_ptr<svg_theme::SvgTheme> theme,
     std::function<void(uint64_t state)> on_change
 ) :
     name(name),
@@ -27,7 +26,7 @@ BitsWidget::BitsWidget(
     float x, y;
 
     LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
-    addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, theme, title_style));
+    addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, title_style));
 
     auto r = exit_box_rect();
     addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) { close(); }, "option-exit"));
@@ -36,7 +35,7 @@ BitsWidget::BitsWidget(
 
     y = MARGIN_DY + title->box.size.y + MARGIN_DY;
 
-    TextLabel* none_label = createLabel<TextLabel>(Vec(box.size.x*.5f, y), 32.f, "[ any ]", theme, style);
+    TextLabel* none_label = createLabel<TextLabel>(Vec(box.size.x*.5f, y), 32.f, "[ any ]", style);
     addChild(none_label);
     addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) {
         state = 0;
@@ -50,7 +49,7 @@ BitsWidget::BitsWidget(
     float top = y;
     for (size_t i = 0; i < items.size(); ++i, item_it++) {
 
-        auto label = createLabel<TextLabel>(Vec(x,y+1), label_width, *item_it, theme, style);
+        auto label = createLabel<TextLabel>(Vec(x,y+1), label_width, *item_it, style);
         labels.push_back(label);
         addChild(label);
 
@@ -67,16 +66,14 @@ BitsWidget::BitsWidget(
         }
     }
     box.size.y = top + (rows * ROW_HEIGHT) + MARGIN_DY;
-    applyChildrenTheme(this, theme);
 }
 
-bool BitsWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
+void BitsWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     envelope.apply_theme(theme);
     control_frame.apply_theme(theme);
     control_glyph.apply_theme(theme);
     check_style.apply_theme(theme);
-    return true;
 }
 
 std::string BitsWidget::make_summary()

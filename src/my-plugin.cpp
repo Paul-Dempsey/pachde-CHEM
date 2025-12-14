@@ -76,17 +76,17 @@ void reloadThemeCache() {
     initThemeCache();
 }
 
-void initThemeCache() {
-    const char * theme_files[] = {
+static const char * theme_files[] = {
         "res/themes/Light.vgt",
         "res/themes/Dark.vgt",
-        "res/themes/Gray.vgt",
         "res/themes/High.vgt",
+        "res/themes/Gray.vgt",
         "res/themes/Ice.vgt",
         "res/themes/Katy.vgt",
         "res/themes/Mellow.vgt",
         "res/themes/Wire.vgt"
     };
+void initThemeCache() {
     if (!theme_cache.themes.empty()) return;
 #ifdef DEV_BUILD
             ErrorContext err;

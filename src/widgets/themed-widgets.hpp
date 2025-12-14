@@ -13,7 +13,7 @@ namespace widgetry {
 void notifyChange(Widget* widget);
 
 template <typename TLight>
-void applyLightTheme( TLight* light, std::shared_ptr<SvgTheme> theme, const std::string& theme_key = "led")
+void applyLightTheme(TLight* light, std::shared_ptr<SvgTheme> theme, const char * theme_key = "led")
 {
     if (theme) {
         auto style = theme->getStyle(theme_key);
@@ -76,7 +76,7 @@ struct ThemeColorPort : app::SvgPort,  IThemed
         setSvg(loader->loadSvg(asset::plugin(pluginInstance, "res/widgets/ColorPort.svg")));
     }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         // assume the cached Svgs are updated together
         //applySvgTheme(sw->svg, theme);
@@ -93,32 +93,29 @@ struct ThemeColorPort : app::SvgPort,  IThemed
                 ring_width = style->stroke_width;
             }
         }
-        return true;
     }
 };
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorInput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int inputId, const char * key, const NVGcolor& color, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorInput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int inputId, const char * key, const NVGcolor& color) {
 	TPortWidget* o = new TPortWidget();
     o->loadSvg(loader);
 	o->box.pos = pos;
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::INPUT;
 	o->app::PortWidget::portId = inputId;
-	o->applyTheme(theme);
     o->ringColor(key, color);
 	return o;
 }
 
 template <class TPortWidget = ThemeColorPort>
-TPortWidget* createThemedColorOutput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int outputId, const char*  key, const NVGcolor& color, std::shared_ptr<SvgTheme> theme) {
+TPortWidget* createThemedColorOutput(math::Vec pos, ILoadSvg* loader, engine::Module* module, int outputId, const char*  key, const NVGcolor& color) {
 	TPortWidget* o = new TPortWidget();
 	o->box.pos = pos;
     o->loadSvg(loader);
 	o->app::PortWidget::module = module;
 	o->app::PortWidget::type = engine::Port::OUTPUT;
 	o->app::PortWidget::portId = outputId;
-	o->applyTheme(theme);
     o->ringColor(key, color);
 	return o;
 }
@@ -158,14 +155,6 @@ TWidget* createThemedWidget(::rack::math::Vec pos, ILoadSvg* loader) {
 	return o;
 }
 
-template <class TWidget>
-TWidget* createThemedWidget(::rack::math::Vec pos, std::shared_ptr<SvgTheme> theme) {
-	TWidget* o = new TWidget();
-	o->applyTheme(theme);
-	o->box.pos = pos;
-	return o;
-}
-
 template <class TPanel = ::rack::app::SvgPanel>
 TPanel* createThemedPanel(std::string svgPath, ILoadSvg* loader) {
 	TPanel* panel = new TPanel;
@@ -177,17 +166,6 @@ template <class TParamWidget>
 TParamWidget* createThemedParam(::rack::math::Vec pos, ILoadSvg* loader, ::rack::engine::Module* module, int paramId) {
 	TParamWidget* o = new TParamWidget();
     o->loadSvg(loader);
-	o->app::ParamWidget::module = module;
-	o->app::ParamWidget::paramId = paramId;
-	o->initParamQuantity();
-	o->box.pos = pos;
-	return o;
-}
-
-template <class TParamWidget>
-TParamWidget* createThemedParam(::rack::math::Vec pos, std::shared_ptr<SvgTheme> theme, ::rack::engine::Module* module, int paramId) {
-	TParamWidget* o = new TParamWidget();
-    o->applyTheme(theme);
 	o->app::ParamWidget::module = module;
 	o->app::ParamWidget::paramId = paramId;
 	o->initParamQuantity();

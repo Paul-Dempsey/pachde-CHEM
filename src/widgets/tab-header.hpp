@@ -40,7 +40,7 @@ struct TabHeader: OpaqueWidget, IThemed
     std::function<void(int item)> on_item_change{nullptr};
     void set_on_item_change(std::function<void(int item)> handler) { on_item_change = handler; }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void ensure_tip_holder() { if (!tip_holder) tip_holder = new TipHolder(); }
     void set_tip_text(std::string text) { ensure_tip_holder(); tip_holder->setText(text); }

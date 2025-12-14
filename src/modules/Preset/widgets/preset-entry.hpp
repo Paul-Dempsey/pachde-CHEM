@@ -29,8 +29,8 @@ struct PresetEntry : OpaqueWidget, IThemed
 
     void set_ui(PresetUi* host) { ui = host; }
 
-    PresetEntry(std::vector<PresetEntry*>& peers, std::shared_ptr<SvgTheme> theme);
-    static PresetEntry* create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host, std::shared_ptr<SvgTheme> theme);
+    PresetEntry(std::vector<PresetEntry*>& peers);
+    static PresetEntry* create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host);
 
     void set_preset(int index, bool is_current, bool is_live, std::shared_ptr<PresetInfo> preset);
     void set_current(ssize_t index);
@@ -39,7 +39,7 @@ struct PresetEntry : OpaqueWidget, IThemed
     PresetId preset_id() const { return preset ? preset->id : PresetId(); }
     void send_preset();
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void appendContextMenu(ui::Menu* menu);
     void createContextMenu()
     {

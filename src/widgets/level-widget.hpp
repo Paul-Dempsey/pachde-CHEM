@@ -15,10 +15,9 @@ struct LevelWidget: TransparentWidget, IThemed
         box.size = Vec(1.5f, 26.f);
     }
 
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
         wire = 0 == theme->name.compare("Wire");
         style.apply_theme(theme);
-        return true;
     }
 
     void drawLayer(const DrawArgs& args, int layer) override {

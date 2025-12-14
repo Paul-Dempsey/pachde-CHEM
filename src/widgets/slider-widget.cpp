@@ -34,13 +34,12 @@ void BasicSlider::onLeave(const LeaveEvent& e) {
     slider_impl::onLeave<BasicSlider, Base>(this, e);
 }
 
-bool BasicSlider::applyTheme(std::shared_ptr<SvgTheme> theme)
+void BasicSlider::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     wire = theme->name == "Wire";
     stem.apply_theme(theme);
     thumb.apply_theme(theme);
     mod.apply_theme(theme);
-    return true;
 }
 
 void BasicSlider::draw_stem(const DrawArgs &args)

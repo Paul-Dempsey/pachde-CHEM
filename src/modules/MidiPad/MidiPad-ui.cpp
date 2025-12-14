@@ -171,7 +171,7 @@ struct PadEdit : OpaqueWidget
         addChild(close);
 
         y = 22.f;
-        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, theme, ui->my_module ? ui->my_module->title : "",
+        title_field = createThemedTextInput(15.f, y, 90.f, 14.f, ui->my_module ? ui->my_module->title : "",
             [=](std::string text){ on_title_text_changed(text); },
             nullptr,
             "Module title");
@@ -179,13 +179,13 @@ struct PadEdit : OpaqueWidget
         addChild(title_field);
 
         y = SECTION_TOP;
-        addChild(coordinate = createLabel(Vec(CENTER,y), 40, "", theme, section_label_style));
+        addChild(coordinate = createLabel(Vec(CENTER,y), 40, "", section_label_style));
 
         y += 18;
 
-        addChild(createLabel(Vec(3.5, y), 28, "Name", theme, ::pachde::style::control_label_left));
+        addChild(createLabel(Vec(3.5, y), 28, "Name", ::pachde::style::control_label_left));
 
-        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, theme, "",
+        name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, "",
             [=](std::string text){ on_name_text_changed(text); },
             nullptr,
             "Pad name");
@@ -221,8 +221,8 @@ struct PadEdit : OpaqueWidget
         addChild(pad_palette);
 
         y += 6.5f;
-        addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", theme, mini_label_style));
-        addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "pad", theme, mini_label_style));
+        addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", mini_label_style));
+        addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "pad", mini_label_style));
 
         y += 16.f;
 
@@ -243,22 +243,22 @@ struct PadEdit : OpaqueWidget
         btn->latched = false;
         btn->setHandler([=](bool,bool) { clear_pad(); });
         addChild(btn);
-        addChild(createLabel(Vec(x,y + 8.f),25, "clear", theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),25, "clear", mini_label_style));
 
         x = CENTER;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Compile definition to MIDI");
         btn->setHandler([=](bool,bool){ commit(true); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),34, "compile", theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),34, "compile", mini_label_style));
 
         x = CENTER + 28.f;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Send MIDI (test)");
         btn->setHandler([=](bool,bool){ send_pad(); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),25, "send", theme, mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f),25, "send", mini_label_style));
 
         y += 24.f;
-        addChild(status = createLabel<TipLabel>(Vec(3.5, y), WIDTH - 7, "", theme, S::warning_label));
+        addChild(status = createLabel<TipLabel>(Vec(3.5, y), WIDTH - 7, "", S::warning_label));
 
         // tab order
         title_field->nextField = name_field;
@@ -269,6 +269,7 @@ struct PadEdit : OpaqueWidget
         name_field->prevField = title_field;
         midi_field->prevField = name_field;
 
+        applyChildrenTheme(this, ui->getSvgTheme());
         initializing = false;
     }
 
@@ -290,7 +291,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
 
     {
         auto panel = createThemedPanel(panelFilename(), &module_svgs);
-        panelBorder = attachPartnerPanelBorder(panel, theme);
+        panelBorder = attachPartnerPanelBorder(panel);
         setPanel(panel);
     }
 
@@ -304,7 +305,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         addChild(createThemedWidget<ThemeScrew>(Vec(0, 0), &module_svgs));
         addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, 0), &module_svgs));
     }
-    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", theme, LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
+    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
 
     float x = 15.f;
     float y = 60.f;
@@ -342,7 +343,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     x = INPUT_ROW_CX;
     y = INPUT_TOP_CY;
     for (int i = 0; i < 16; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port)));
         if (3 == i % 4) {
             x = INPUT_ROW_CX;
             y += INPUT_DY;
@@ -353,7 +354,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
 
     // footer
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
@@ -370,6 +371,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     }
 
     module_svgs.changeTheme(theme);
+    applyChildrenTheme(this, theme);
 
     if (my_module) {
         my_module->set_chem_ui(this);

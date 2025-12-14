@@ -43,7 +43,7 @@ struct TrackWidget : TransparentWidget, IThemed
     void set_active(bool enable);
     void set_value(float value);
     void set_min_max_value(float min, float max);
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
 };
@@ -56,7 +56,6 @@ struct TrackIndicator : TrackWidget {
 template <typename TTrack = TrackWidget>
 TTrack * createTrackWidget(
     Knob * knob,
-    std::shared_ptr<SvgTheme> theme,
     const char * track_theme_key = track_constant::default_track_key,
     const char * inactive_theme_key = track_constant::default_inactive_track_key
     )
@@ -64,7 +63,6 @@ TTrack * createTrackWidget(
     auto o = new TTrack();
     if (track_theme_key) o->track_key = track_theme_key;
     if (inactive_theme_key) o->inactive_key = inactive_theme_key;
-    o->applyTheme(theme);
 
     o->min_angle = knob->minAngle;
     o->max_angle = knob->maxAngle;
@@ -79,7 +77,6 @@ TTrack * createTrackWidget(
     float knob_radius,
     float min_angle,
     float max_angle,
-    std::shared_ptr<SvgTheme> theme,
     const char * track_theme_key = track_constant::default_track_key,
     const char * inactive_theme_key = track_constant::default_inactive_track_key
     )
@@ -87,7 +84,6 @@ TTrack * createTrackWidget(
     auto o = new TTrack();
     if (track_theme_key) o->track_key = track_theme_key;
     if (inactive_theme_key) o->inactive_key = inactive_theme_key;
-    o->applyTheme(theme);
     o->box.pos = pos;
     o->box.size = Vec{knob_radius + 2.f, knob_radius + 2.f};
     o->min_angle = min_angle;

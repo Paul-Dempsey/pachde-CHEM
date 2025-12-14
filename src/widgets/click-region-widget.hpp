@@ -29,23 +29,17 @@ struct ClickRegion : Widget, ILayoutHelp, IThemed
         box.size.y = 0;
     }
 
-    void set_hover_key(const char* key)
-    {
+    void set_hover_key(const char* key) {
         hover_style.key = key;
     }
 
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override
-    {
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
         if (hoverable) {
             hover_style.apply_theme(theme);
-            return true;
-        } else {
-            return false;
         }
     }
 
-    void set_handler(std::function<void (int, int)> callback)
-    {
+    void set_handler(std::function<void (int, int)> callback) {
         handler = callback;
     }
 
@@ -67,8 +61,7 @@ struct ClickRegion : Widget, ILayoutHelp, IThemed
         }
     }
 
-    void onAction(const ActionEvent& e) override
-    {
+    void onAction(const ActionEvent& e) override {
         if (enabled && handler) {
             handler(identifier, mods);
         } else {

@@ -18,7 +18,6 @@ struct PresetMenu : Hamburger
     PresetMenu() : ui(nullptr) { }
 
     void setUi(PresetUi* w) { ui = w; }
-    //bool applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme) override;
     void appendContextMenu(ui::Menu* menu) override;
 
     void onHoverKey(const HoverKeyEvent& e) override
@@ -35,11 +34,6 @@ struct PresetMenu : Hamburger
         Base::onHoverKey(e);
     }
 };
-
-// bool PresetMenu::applyTheme(SvgThemeEngine& engine, std::shared_ptr<SvgTheme> theme)
-// {
-//     return Base::applyTheme(engine, theme);
-// }
 
 void PresetMenu::appendContextMenu(ui::Menu* menu)
 {
@@ -159,20 +153,20 @@ PresetUi::PresetUi(PresetModule *module) :
     );
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
-    panelBorder = attachPartnerPanelBorder(panel, theme);
+    panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
 
     float x, y;
 
     x = 23.5f;
     y = 18.f;
-    search_entry = createThemedTextInput(x, y, 114.f, 14.f, theme, "",
+    search_entry = createThemedTextInput(x, y, 114.f, 14.f, "",
         [=](std::string text){ on_search_text_changed(text); },
         [=](std::string text){ on_search_text_enter(); },
         "preset search");
     addChild(search_entry);
 
-    menu = Center(createThemedWidget<SearchMenu>(Vec(x + 122.f, y + 7.f), theme));
+    menu = Center(createWidget<SearchMenu>(Vec(x + 122.f, y + 7.f)));
     menu->setUi(this);
     menu->describe("Search options");
     addChild(menu);
@@ -184,11 +178,11 @@ PresetUi::PresetUi(PresetModule *module) :
     // tab labels
     x = 270.f;
     y = 18.f;
-    addChild(user_label = createLabel<TextLabel>(Vec(x,y), 26.f, "User", theme, tab_style));
+    addChild(user_label = createLabel<TextLabel>(Vec(x,y), 26.f, "User", tab_style));
     addChild(createClickRegion(RECT_ARGS(user_label->box.grow(Vec(6,2))), (int)PresetTab::User, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
     x += 55.f;
-    addChild(system_label = createLabel<TextLabel>(Vec(x,y), 40.f, "System", theme, current_tab_style));
+    addChild(system_label = createLabel<TextLabel>(Vec(x,y), 40.f, "System", current_tab_style));
     addChild(createClickRegion(RECT_ARGS(system_label->box.grow(Vec(6,2))), (int)PresetTab::System, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
     // right controls
@@ -196,7 +190,7 @@ PresetUi::PresetUi(PresetModule *module) :
     x = RCENTER;
     y = 28.f;
     LabelStyle style{"dytext", TextAlignment::Center, 9.f};
-    addChild(page_label = createLabel<TextLabel>(Vec(x - .75, y), 30.f, "1 of 1", theme, style));
+    addChild(page_label = createLabel<TextLabel>(Vec(x - .75, y), 30.f, "1 of 1", style));
 
     y = 46.f;
     up_button = createWidgetCentered<UpButton>(Vec(x, y));
@@ -238,7 +232,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(next);
 
-    menu = Center(createThemedWidget<PresetMenu>(Vec(x, 148.f), theme));
+    menu = createWidgetCentered<PresetMenu>(Vec(x, 148.f));
     menu->setUi(this);
     menu->describe("Preset actions menu");
     addChild(menu);
@@ -249,23 +243,23 @@ PresetUi::PresetUi(PresetModule *module) :
     y = 205.f;
     FilterButton* filter{nullptr};
 
-    addChild(Center(filter = makeCatFilter(Vec(x,y), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
+    addChild(Center(filter = makeCatFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
     filter_buttons.push_back(filter);
 
     y += FILTER_DY;
-    addChild(Center(filter = makeTypeFilter(Vec(x,y), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
+    addChild(Center(filter = makeTypeFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
     filter_buttons.push_back(filter);
 
     y += FILTER_DY;
-    addChild(Center(filter = makeCharacterFilter(Vec(x,y), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
+    addChild(Center(filter = makeCharacterFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
     filter_buttons.push_back(filter);
 
     y += FILTER_DY;
-    addChild(Center(filter = makeMatrixFilter(Vec(x,y), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
+    addChild(Center(filter = makeMatrixFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
     filter_buttons.push_back(filter);
 
     y += FILTER_DY;
-    addChild(Center(filter = makeSettingFilter(Vec(x,y), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
+    addChild(Center(filter = makeSettingFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
     filter_buttons.push_back(filter);
 
     y += FILTER_DY + 6.f;
@@ -288,8 +282,7 @@ PresetUi::PresetUi(PresetModule *module) :
     // preset grid
     x = 9.f; y = PRESET_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
-        auto entry = PresetEntry::create(Vec(x,y), preset_grid, this, theme);
-        entry->applyTheme(theme);
+        auto entry = PresetEntry::create(Vec(x,y), preset_grid, this);
         preset_grid.push_back(entry);
         addChild(entry);
         y += 16.f;
@@ -300,7 +293,7 @@ PresetUi::PresetUi(PresetModule *module) :
     }
 
     LabelStyle help_style{"curpreset", TextAlignment::Center, 16.f, true};
-    addChild(help_label = createLabel<TextLabel>(Vec(172,180), 280.f, "", theme, help_style));
+    addChild(help_label = createLabel<TextLabel>(Vec(172,180), 280.f, "", help_style));
 
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), &module_svgs, "Core link");
@@ -312,11 +305,11 @@ PresetUi::PresetUi(PresetModule *module) :
     addChild(link_button);
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(32.f, box.size.y - 13.f), 150.f, S::NotConnected, theme, S::haken_label));
+        Vec(32.f, box.size.y - 13.f), 150.f, S::NotConnected, S::haken_label));
 
     LabelStyle cp_style{"curpreset", TextAlignment::Right, 10.f, true};
     addChild(live_preset_label = createLabel<TipLabel>(
-        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 125.f, "[preset]", theme, cp_style));
+        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 125.f, "[preset]", cp_style));
     live_preset_label->glowing(true);
 
     if (S::show_screws()) {
@@ -330,6 +323,7 @@ PresetUi::PresetUi(PresetModule *module) :
     }
 
     module_svgs.changeTheme(theme);
+    applyChildrenTheme(this, theme);
 
     if (module) {
         my_module->set_chem_ui(this);

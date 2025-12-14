@@ -12,16 +12,15 @@ BasicTextLabel::BasicTextLabel() :
 }
 
 // IThemed
-bool BasicTextLabel::applyTheme(std::shared_ptr<SvgTheme> theme)
+void BasicTextLabel::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
-    if (0 == *_style.key || !theme) return false;
+    if (0 == *_style.key || !theme) return;
     auto style = theme->getStyle(_style.key);
     PackedColor co = colors::NoColor;
     if (style) {
         co = style->fill_color();
     }
     _color = packed_color::isVisible(co) ? fromPacked(co) : RampGray(G_65);
-    return true;
 }
 
 void BasicTextLabel::render(const DrawArgs& args)

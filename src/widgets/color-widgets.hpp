@@ -11,8 +11,8 @@ void drawCheckers(const rack::widget::Widget::DrawArgs& args, float x, float y, 
 struct Swatch: Widget {
     PackedColor color{0};
     void draw(const DrawArgs& args) override {
-        FillRect(args.vg, 0.f, 0.f, box.size.x*.5f, box.size.y, RampGray(G_WHITE));
-        FillRect(args.vg, box.size.x*.5f, 0.f, box.size.x*.5f, box.size.y, RampGray(G_BLACK));
+        FillRect(args.vg, 0.f, 0.f, box.size.x*.5f, box.size.y, nvgRGB(255,255,255));
+        FillRect(args.vg, box.size.x*.5f, 0.f, box.size.x*.5f, box.size.y, nvgRGB(0,0,0));
         drawCheckers(args, 0.f, 0.f, box.size.x, box.size.y);
         if (color) {
             FillRect(args.vg, 0.f, 0.f, box.size.x, box.size.y, fromPacked(color));

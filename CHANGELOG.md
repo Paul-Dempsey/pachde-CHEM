@@ -1,5 +1,15 @@
 # CHEM Change Log
 
+## 2.0.3
+
+- HakenMidi.h 10.61
+  - Remove obsolete MIDI rate
+
+- Import ui improvements from pachde1
+  - ColorPicker
+  - improved theme system
+  - menu widgets
+
 ## 2.0.2
 
 - #5, Not correctly initializing conv data.

@@ -31,7 +31,7 @@ void TrackWidget::set_min_max_value(float min, float max) {
     max_value = max;
 }
 
-bool TrackWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
+void TrackWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     auto style = theme->getStyle(track_key);
     if (style) {
@@ -64,7 +64,6 @@ bool TrackWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
     } else {
         inactive_track_color = track_constant::default_inactive_color;
     }
-    return true;
 }
 
 void TrackWidget::drawLayer(const DrawArgs& args, int layer)

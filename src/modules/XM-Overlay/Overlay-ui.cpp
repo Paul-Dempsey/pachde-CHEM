@@ -2,7 +2,7 @@
 #include "services/colors.hpp"
 #include "em/em-hardware.h"
 #include "widgets/widgets.hpp"
-
+#include "widgets/text-input.hpp"
 namespace S = pachde::style;
 using namespace svg_theme;
 using namespace pachde;
@@ -34,7 +34,7 @@ struct OverlayMenu: Hamburger
 
         menu->addChild(createSubmenuItem("Title", ui->my_module ? ui->my_module->title : "<none>",
             [=](Menu *menu) {
-                menu->addChild(createTextInput<TextInputMenu>(0, 0, 150, 0, ui->my_module ? ui->my_module->title : "<title>", [=](std::string text) { ui->set_title(text); }));
+                menu->addChild(createThemedTextInput<TextInputMenu>(0, 0, 150, 0, ui->my_module ? ui->my_module->title : "<title>", [=](std::string text) { ui->set_title(text); }));
             }));
 
         menu->addChild(createSubmenuItem("Background", "", [=](Menu* menu) {
@@ -66,12 +66,12 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     setModule(module);
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
-    panelBorder = attachPartnerPanelBorder(panel, theme);
+    panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
 
     bool browsing = !module;
 
-    bg_widget = createWidget<Swatch>(Vec(0.f, 15.f));
+    bg_widget = createWidget<SolidSwatch>(Vec(0.f, 15.f));
     bg_widget->box.size = Vec(30.f, 350.f);
     if (my_module) {
         bg_widget->color = my_module->bg_color;
@@ -92,7 +92,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
         title_widget->set_text_color(0xffe6e6e6);
     }
 
-    auto menu = Center(createThemedWidget<OverlayMenu>(Vec(15.f, 24.f), theme));
+    auto menu = createWidgetCentered<OverlayMenu>(Vec(15.f, 24.f));
     menu->setUi(this);
     menu->describe("Overlay menu");
     addChild(menu);

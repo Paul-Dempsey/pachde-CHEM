@@ -7,7 +7,7 @@
 
 namespace pachde {
 
-PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers, std::shared_ptr<SvgTheme> theme) :
+PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers) :
     preset_index(-1),
     live(false),
     current(false),
@@ -15,11 +15,11 @@ PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers, std::shared_ptr<SvgTh
     peers(peers)
 {
     LabelStyle grid_style{"preset"};
-    addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", theme, grid_style));
+    addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", grid_style));
 }
 
-PresetEntry* PresetEntry::create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host, std::shared_ptr<SvgTheme> theme) {
-    PresetEntry* pe = new PresetEntry(peers, theme);
+PresetEntry* PresetEntry::create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host) {
+    PresetEntry* pe = new PresetEntry(peers);
     pe->box.pos = pos;
     pe->box.size.x = pe->label->box.size.x + 2;
     pe->box.size.y = 14.f;
@@ -58,15 +58,14 @@ void PresetEntry::clear_preset()
     notifyChange(this);
 }
 
-bool PresetEntry::applyTheme(std::shared_ptr<SvgTheme> theme)
+void PresetEntry::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     preset_element.apply_theme(theme);
     live_element.apply_theme(theme);
     current_element.apply_theme(theme);
     hover_element.apply_theme(theme);
     category_style.apply_theme(theme);
-    label->applyTheme(theme);
-    return true;
+    //label->applyTheme(theme);
 }
 
 void PresetEntry::appendContextMenu(ui::Menu *menu)

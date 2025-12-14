@@ -29,7 +29,7 @@ struct BasicSlider : Knob, IThemed
     void unmodulate() { mod_value = NAN; }
     void set_modulation(float mod) { mod_value = mod; }
     float thumb_pos();
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void draw_stem(const DrawArgs& args);
     void draw_thumb(const DrawArgs& args);
     void draw_mod(const DrawArgs& args);
@@ -44,10 +44,10 @@ struct FillSlider : BasicSlider
 
     FillSlider() : fill("slide-fill", "hsl(32,90%,60%)", "hsl(32,90%,60%)", 3.5f) {}
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         fill.apply_theme(theme);
-        return Base::applyTheme(theme);
+        Base::applyTheme(theme);
     }
     void draw_fill(const DrawArgs& args);
     void draw(const DrawArgs& args) override;

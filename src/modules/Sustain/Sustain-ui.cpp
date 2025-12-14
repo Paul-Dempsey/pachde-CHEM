@@ -30,24 +30,24 @@ void SusUi::create_ui()
 {
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
-    panelBorder = attachPartnerPanelBorder(panel, theme);
+    panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
     float x, y;
     x = CENTER;
     const float MIDDLE = 160.f;
     y = MIDDLE - 64.f - 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_MAX)));
-    addChild(slider = Center(createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE, theme)));
+    addChild(slider = Center(createSlider<FillSlider>(Vec(x,MIDDLE), 128.f, my_module, SM::P_VALUE)));
     y = MIDDLE + 64.f + 4.f;
     addChild(Center(createThemedParamButton<DotParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_MIN)));
 
     auto co_port = PORT_CORN;
     y = S::PORT_TOP;
-    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, SM::P_MOD_AMOUNT,theme));
+    addChild(mod_knob = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, SM::P_MOD_AMOUNT));
 
     y += S::PORT_DY;
-    addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_MOD, S::InputColorKey, co_port, theme)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), theme, S::in_port_label));
+    addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_MOD, S::InputColorKey, co_port)));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, InputLabel(), S::in_port_label));
 
     link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));

@@ -180,15 +180,14 @@ struct SvgCache: ILoadSvg
 // or need custom update logic on theme changes.
 struct IThemed
 {
-    virtual bool applyTheme(std::shared_ptr<SvgTheme> theme) = 0;
+    virtual void applyTheme(std::shared_ptr<SvgTheme> theme) = 0;
 };
 
 // Walks the Widget tree from `widget`, finding widgets
 // implementing IThemed, and applies the theme.
-// If modifications to widgets are detected, the DirtyEvent is sent down the
-// tree so that affected widgets will be redrawn.
+// The DirtyEvent is sent to the top widget at the end of traversal
 //
-bool applyChildrenTheme(Widget * widget, std::shared_ptr<SvgTheme> theme, bool top = true);
+void applyChildrenTheme(Widget * widget, std::shared_ptr<SvgTheme> theme, bool top = true);
 
 // send Dirty event to widget
 void sendDirty(Widget* widget);

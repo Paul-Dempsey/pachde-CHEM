@@ -165,8 +165,8 @@ struct DrawButtonBase: OpaqueWidget, IThemed
         return no_light;
     }
 
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
-        if (color_styles.empty()) return false;
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
+        if (color_styles.empty()) return;
         for (ColorStyle& style : color_styles) {
             PackedColor pcolor = colors::NoColor;
             switch (style.kind) {
@@ -178,7 +178,6 @@ struct DrawButtonBase: OpaqueWidget, IThemed
             }
             style.color = packed_color::isVisible(pcolor) ? fromPacked(pcolor) : style.default_color;
         }
-        return true;
     }
 
 };

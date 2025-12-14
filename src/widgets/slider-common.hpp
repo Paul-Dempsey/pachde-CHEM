@@ -11,7 +11,7 @@ namespace widgetry {
 enum class Axis { X, Y };
 
 template <typename TSlider>
-TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id,std::shared_ptr<SvgTheme> theme)
+TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int param_id)
 {
     TSlider* o = createParam<TSlider>(pos, module, param_id);
     if (TSlider::axis == Axis::Y) {
@@ -19,7 +19,6 @@ TSlider* createSlider(Vec pos, float length, ::rack::engine::Module* module, int
     } else {
         o->box.size.x = length;
     }
-    o->applyTheme(theme);
     return o;
 }
 

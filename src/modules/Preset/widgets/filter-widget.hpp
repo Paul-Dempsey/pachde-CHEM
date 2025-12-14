@@ -142,8 +142,7 @@ struct FilterButton : SvgButton
     void init (
         const std::string& name, int rows, float item_width,
         const std::vector<std::string>& items,
-        ILoadSvg* loader,
-        std::shared_ptr<svg_theme::SvgTheme> theme);
+        ILoadSvg* loader);
 
     uint64_t get_state() { return dialog->get_state(); }
     void set_state(uint64_t state) {
@@ -213,10 +212,10 @@ struct FilterButton : SvgButton
     void step() override;
 };
 
-FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
-FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
+FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
+FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
+FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
 
 }

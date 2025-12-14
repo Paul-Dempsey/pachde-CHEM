@@ -25,7 +25,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     setModule(module);
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
-    panelBorder = attachPartnerPanelBorder(panel, theme);
+    panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
     if (style::show_screws()) {
         createScrews();
@@ -35,8 +35,8 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     LabelStyle heading_style{"ctl-label-hi", TextAlignment::Left, 14.f, true};
 
     y = 32.f;
-    addChild(createLabel<TextLabel>(Vec(7.5f, y), 25.f, "Pre",  theme,  heading_style));
-    addChild(createLabel<TextLabel>(Vec(204.f, y), 25.f, "Post",  theme, heading_style));
+    addChild(createLabel<TextLabel>(Vec(7.5f, y), 25.f, "Pre", heading_style));
+    addChild(createLabel<TextLabel>(Vec(204.f, y), 25.f, "Post", heading_style));
 
     // knobs
 
@@ -53,15 +53,15 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     };
     for (int p = 0; p < 4; ++p) {
         if (p & 1) {
-            addChild(knobs[p] = createChemKnob<BasicKnob>(Vec(pcx[p], y), &module_svgs, my_module, p, theme));
+            addChild(knobs[p] = createChemKnob<BasicKnob>(Vec(pcx[p], y), &module_svgs, my_module, p));
         } else {
-            addChild(knobs[p] = createChemKnob<BlueKnob>(Vec(pcx[p], y), &module_svgs, my_module, p, theme));
+            addChild(knobs[p] = createChemKnob<BlueKnob>(Vec(pcx[p], y), &module_svgs, my_module, p));
         }
-        addChild(tracks[p] = createTrackWidget(knobs[p], theme));
+        addChild(tracks[p] = createTrackWidget(knobs[p]));
     }
     addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
         Vec(258.f, 26.f), &module_svgs, my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL)));
-    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", theme, S::control_label));
+    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", S::control_label));
 
     const float KX = 34.f;
     x = KX;
@@ -72,7 +72,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float kdx[] { K_DX, K_DX, WL_DX, K_DX, IR_DX, 0.f};
     const char* labels[] { "Length", "Tuning", "Width", "Left", "Right", "IR" };
     for (int i = 0; i < 6; ++i) {
-        addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], theme, S::control_label));
+        addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], S::control_label));
         x += kdx[i];
     }
     auto ir_style = LabelStyle{"dytext", TextAlignment::Center, 12.f, false};
@@ -82,19 +82,19 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 6; ++j) {
             auto wi = widget_info[iwi++];
-            addChild(knobs[wi.param] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, wi.param, theme));
+            addChild(knobs[wi.param] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, wi.param));
             if (wi.input >= 0) {
-                addChild(tracks[wi.input] = createTrackWidget(knobs[wi.param], theme));
+                addChild(tracks[wi.input] = createTrackWidget(knobs[wi.param]));
             }
             x += kdx[j];
         }
-        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", theme, ir_style);
+        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", ir_style);
         addChild(ir_labels[i]);
         x = KX;
         y += ROW_DY;
     }
 
-    addChild(knobs[CM::P_MOD_AMOUNT] = createChemKnob<TrimPot>(Vec(210.f, S::PORT_TOP), &module_svgs, my_module, CM::P_MOD_AMOUNT, theme));
+    addChild(knobs[CM::P_MOD_AMOUNT] = createChemKnob<TrimPot>(Vec(210.f, S::PORT_TOP), &module_svgs, my_module, CM::P_MOD_AMOUNT));
 
     // inputs
     auto co_port = PORT_CORN;
@@ -116,7 +116,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             while (wi.input < 0) {
                 wi = widget_info[iwi++];
             }
-            addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port, theme)));
+            addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port)));
             addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - PORT_MOD_DX, y - PORT_MOD_DY), my_module, wi.light));
             if (my_module) {
                 addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
@@ -137,9 +137,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const char * port_name[] {"MIX", "IDX"};
     for (int i = 0; i < 4; ++i, ++iwi) {
         auto wi = widget_info[iwi];
-        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, wi.light));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, port_name[i & 1], theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, port_name[i & 1], S::in_port_label));
         if (my_module) {
             addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }
@@ -154,7 +154,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
@@ -171,6 +171,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     }
 
     module_svgs.changeTheme(theme);
+    applyChildrenTheme(this, theme);
 
     // init
 

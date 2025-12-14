@@ -4,7 +4,7 @@ namespace widgetry {
 
 static const char * _digits = "123456789";
 
-bool TabHeader::applyTheme(std::shared_ptr<SvgTheme> theme)
+void TabHeader::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     item_style.apply_theme(theme);
     current_style.apply_theme(theme);
@@ -13,7 +13,6 @@ bool TabHeader::applyTheme(std::shared_ptr<SvgTheme> theme)
     hover_text_style.apply_theme(theme);
     box.size.x = (cell * n_items) + ((2 + n_items-1) * item_style.width());
     box.size.y = cell + (2 * item_style.width());
-    return true;
 }
 
 int TabHeader::index_of_pos(Vec pos)

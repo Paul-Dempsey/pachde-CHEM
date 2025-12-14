@@ -19,7 +19,7 @@ struct FlipSwitch: ::rack::app::Switch, IThemed
 
     FlipSwitch();
 
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
     //TODO: ctrl+click for reverse
     void onDragStart(const DragStartEvent& e) override;
 	void onDragEnd(const DragEndEvent& e) override;

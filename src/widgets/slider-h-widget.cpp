@@ -36,15 +36,13 @@ void BasicHSlider::onHover(const HoverEvent &e) {
     slider_impl::onHover<BasicHSlider, Base>(this, e);
 }
 
-void BasicHSlider::onDragStart(const DragStartEvent& e)
-{
+void BasicHSlider::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
     drag_distance = 0.f;
     Base::onDragStart(e);
 }
 
-void BasicHSlider::onDragEnd(const DragEndEvent& e)
-{
+void BasicHSlider::onDragEnd(const DragEndEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
 
     // Dispatch Action event if mouse traveled less than a threshold distance
@@ -57,8 +55,7 @@ void BasicHSlider::onDragEnd(const DragEndEvent& e)
     ParamWidget::onDragEnd(e);
 }
 
-void BasicHSlider::onDragMove(const DragMoveEvent& e)
-{
+void BasicHSlider::onDragMove(const DragMoveEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT) return;
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
@@ -72,21 +69,18 @@ void BasicHSlider::onDragMove(const DragMoveEvent& e)
     Base::onDragMove(e);
 }
 
-void BasicHSlider::onDragLeave(const DragLeaveEvent& e)
-{
+void BasicHSlider::onDragLeave(const DragLeaveEvent& e) {
     Base::onDragLeave(e);
 }
 
-float BasicHSlider::thumb_pos()
-{
+float BasicHSlider::thumb_pos() {
     auto pq = getParamQuantity();
     float pos = pq ? pq->getValue() : 0.f;
     float range = coord(axis, box.size) - coord(axis, thumb_size);
     return rescale(pos, pq ? pq->getMinValue() : 0.f, pq ? pq->getMaxValue() : 10.f, 0.f, range);
 }
 
-float BasicHSlider::mod_pos()
-{
+float BasicHSlider::mod_pos() {
     if (std::isnan(mod_value)) return mod_value;
     auto pq = getParamQuantity();
     if (!pq) return NAN;
@@ -94,30 +88,25 @@ float BasicHSlider::mod_pos()
     return rescale(mod_value, pq->getMinValue(), pq->getMaxValue(), 0.f, range);
 }
 
-bool BasicHSlider::applyTheme(std::shared_ptr<SvgTheme> theme)
-{
+void BasicHSlider::applyTheme(std::shared_ptr<SvgTheme> theme) {
     wire = theme->name == "Wire";
     stem.apply_theme(theme);
     thumb.apply_theme(theme);
     foot.apply_theme(theme);
     mod.apply_theme(theme);
-    return false;
 }
 
-void BasicHSlider::draw_feet(const DrawArgs &args)
-{
+void BasicHSlider::draw_feet(const DrawArgs &args) {
     Line(args.vg, 0.f, 1.5f, 0.f, box.size.y-1.5f, foot.nvg_stroke_color(), foot.width());
     Line(args.vg, box.size.x, 1.5f, box.size.x, box.size.y-1.5f, foot.nvg_stroke_color(), foot.width());
 }
 
-void BasicHSlider::draw_stem(const DrawArgs &args)
-{
+void BasicHSlider::draw_stem(const DrawArgs &args) {
     float CENTER = box.size.y * .5f;
     Line(args.vg, 0.f, CENTER, box.size.x, CENTER, stem.nvg_stroke_color(), stem.width());
 }
 
-void BasicHSlider::draw_thumb(const DrawArgs &args)
-{
+void BasicHSlider::draw_thumb(const DrawArgs &args) {
     auto vg = args.vg;
     float CENTER = box.size.y * .5f;
 
@@ -134,8 +123,7 @@ void BasicHSlider::draw_thumb(const DrawArgs &args)
     }
 }
 
-void BasicHSlider::draw_mod(const DrawArgs &args)
-{
+void BasicHSlider::draw_mod(const DrawArgs &args) {
     if (std::isnan(mod_value)) return;
 
     float middle = box.size.y *.5f;
@@ -149,8 +137,7 @@ void BasicHSlider::draw_mod(const DrawArgs &args)
     }
 }
 
-void BasicHSlider::draw(const DrawArgs &args)
-{
+void BasicHSlider::draw(const DrawArgs &args) {
     draw_stem(args);
     draw_feet(args);
     draw_mod(args);
@@ -159,15 +146,13 @@ void BasicHSlider::draw(const DrawArgs &args)
 
 // ----------------------------------------------
 
-void FillHSlider::draw_fill(const DrawArgs &args)
-{
+void FillHSlider::draw_fill(const DrawArgs &args) {
     float CENTER = box.size.y *.5f;
     auto pos = thumb_pos();
     Line(args.vg, 0, CENTER, pos, CENTER, fill.nvg_stroke_color(), fill.width());
 }
 
-void FillHSlider::draw(const DrawArgs &args)
-{
+void FillHSlider::draw(const DrawArgs &args) {
     draw_stem(args);
     draw_fill(args);
     draw_feet(args);

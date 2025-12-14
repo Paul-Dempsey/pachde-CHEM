@@ -27,21 +27,22 @@ float Hue1(const NVGcolor& color)
     return result;
 }
 
-PackedColor packed_gray_ramp[] = {
-    colors::G0, colors::G5, colors::G10, colors::G15, colors::G18,
-    colors::G20, colors::G25,
-    colors::G30, colors::G35,
-    colors::G40, colors::G45,
-    colors::G50, colors::G55,
-    colors::G60, colors::G65,
-    colors::G70, colors::G75,
-    colors::G80, colors::G85,
-    colors::G90, colors::G95,
-    colors::G100
+NVGcolor gray_ramp[] = {
+    fromPacked(colors::G0), fromPacked(colors::G5),
+    fromPacked(colors::G10), fromPacked(colors::G15), fromPacked(colors::G18),
+    fromPacked(colors::G20), fromPacked(colors::G25),
+    fromPacked(colors::G30), fromPacked(colors::G35),
+    fromPacked(colors::G40), fromPacked(colors::G45),
+    fromPacked(colors::G50), fromPacked(colors::G55),
+    fromPacked(colors::G60), fromPacked(colors::G65),
+    fromPacked(colors::G70), fromPacked(colors::G75),
+    fromPacked(colors::G80), fromPacked(colors::G85),
+    fromPacked(colors::G90), fromPacked(colors::G95),
+    fromPacked(colors::G100)
 };
 
-NVGcolor RampGray(Ramp g) {
-    return fromPacked(packed_gray_ramp[rack::math::clamp(g, G_BLACK, G_WHITE)]);
+const NVGcolor& RampGray(Ramp g) {
+    return gray_ramp[rack::math::clamp(g, G_BLACK, G_WHITE)];
 }
 
 const NVGcolor panel_border_color = nvgRGBAf(0.5, 0.5, 0.5, 0.5);

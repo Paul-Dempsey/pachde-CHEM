@@ -84,7 +84,7 @@ struct PadWidget : TipWidget, IThemed
     void onHover(const HoverEvent& e) override;
     void onLeave(const LeaveEvent& e) override;
     void onButton(const ButtonEvent& e) override;
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void step() override;
     void draw(const DrawArgs& args) override;
 

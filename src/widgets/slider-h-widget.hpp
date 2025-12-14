@@ -31,7 +31,7 @@ struct BasicHSlider: ParamWidget, IThemed
     float thumb_pos();
     float mod_pos();
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void onEnter(const EnterEvent& e) override;
     void onLeave(const LeaveEvent& e) override;
@@ -59,10 +59,10 @@ struct FillHSlider: BasicHSlider
 
     FillHSlider() : fill("hslide-fill", "#f9a54b", 2.5f) {}
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         fill.apply_theme(theme);
-        return Base::applyTheme(theme);
+        Base::applyTheme(theme);
     }
     void draw_fill(const DrawArgs& args);
     void draw(const DrawArgs& args) override;

@@ -88,8 +88,7 @@ struct TKnob : GlowKnob, IThemed
     }
 
     // IThemed
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
-    {
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override     {
         wire = (theme->name == "Wire");
 
         PackedColor screen{colors::NoColor};
@@ -98,7 +97,6 @@ struct TKnob : GlowKnob, IThemed
         } else {
             disabled_screen = nvgRGBAf(.4, .4, .4, .6f);
         }
-        return true;
     }
 
     void drawLayer(const DrawArgs& args, int layer) override {
@@ -173,11 +171,10 @@ using GreenTrimPot = TKnob<GreenTrimPotSvg>;
 using GrayTrimPot = TKnob<GrayTrimPotSvg>;
 
 template <typename TKnob>
-TKnob* createChemKnob(Vec pos, ILoadSvg* loader, Module * module, int paramId, std::shared_ptr<SvgTheme> theme)
+TKnob* createChemKnob(Vec pos, ILoadSvg* loader, Module * module, int paramId)
 {
 	auto o = createParam<TKnob>(pos, module, paramId);
     o->loadSvg(loader);
-    o->applyTheme(theme);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
     return o;
 }

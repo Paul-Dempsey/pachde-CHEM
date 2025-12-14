@@ -15,18 +15,15 @@ const char * default_pad_name[] = {
     "D1", "D2", "D3", "D4"
 };
 
-MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c), text_color(0xff000000), error_pos(0)
-{
+MidiPad::MidiPad(int id) : id(id), color(0xff8c8c8c), text_color(0xff000000), error_pos(0) {
     name = default_pad_name[id];
 }
 
-MidiPad::MidiPad(json_t *j) : error_pos(0)
-{
+MidiPad::MidiPad(json_t *j) : error_pos(0) {
     from_json(j);
 }
 
-bool MidiPad::compile()
-{
+bool MidiPad::compile() {
     HclCompiler hc;
     ok = hc.compile(this->def, &this->midi);
     if (ok) {
@@ -39,8 +36,7 @@ bool MidiPad::compile()
     return ok;
 }
 
-json_t * MidiPad::to_json()
-{
+json_t * MidiPad::to_json() {
     json_t * root = json_object();
     set_json_int(root, "pad", id);
     set_json(root, "name", name.c_str());
@@ -50,8 +46,7 @@ json_t * MidiPad::to_json()
     return root;
 }
 
-void MidiPad::from_json(json_t* root)
-{
+void MidiPad::from_json(json_t* root) {
     id = get_json_int(root, "pad", -1);
     def = get_json_string(root, "midi");
     name = get_json_string(root, "name");
@@ -61,13 +56,11 @@ void MidiPad::from_json(json_t* root)
     //compile();
 }
 
-PadWidget::PadWidget()
-{
+PadWidget::PadWidget() {
     box.size = Vec(24.f, 24.f);
 }
 
-std::string PadWidget::extract_description()
-{
+std::string PadWidget::extract_description() {
     if (!pad || pad->def.empty()) return "";
     const char * p = pad->def.c_str();
     while (std::isspace(*p)) ++p;
@@ -92,20 +85,18 @@ void PadWidget::init(
     id = identifier;
     on_click = callback;
     addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
-    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", theme, LabelStyle{"", TextAlignment::Center, 12.f}));
+    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", LabelStyle{"", TextAlignment::Center, 12.f}));
     applyTheme(theme);
     set_pad(the_pad);
 }
 
-void PadWidget::set_pad(std::shared_ptr<MidiPad> the_pad)
-{
+void PadWidget::set_pad(std::shared_ptr<MidiPad> the_pad) {
     pad = the_pad;
     assert(!pad || id == pad->id);
     on_pad_change(true, true);
 }
 
-void PadWidget::on_pad_change(bool name, bool description)
-{
+void PadWidget::on_pad_change(bool name, bool description) {
     if (pad) {
         label->color(fromPacked(pad->text_color));
         if (name) label->text(pad->name);
@@ -129,20 +120,17 @@ void PadWidget::on_pad_change(bool name, bool description)
     }
 }
 
-void PadWidget::onHover(const HoverEvent &e)
-{
+void PadWidget::onHover(const HoverEvent &e) {
     Base::onHover(e);
     e.consume(this);
 }
 
-void PadWidget::onLeave(const LeaveEvent &e)
-{
+void PadWidget::onLeave(const LeaveEvent &e) {
     Base::onLeave(e);
     button_down = false;
 }
 
-void PadWidget::onButton(const ButtonEvent &e)
-{
+void PadWidget::onButton(const ButtonEvent &e) {
     if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
         if (e.action == GLFW_PRESS) {
             button_down = true;
@@ -156,17 +144,14 @@ void PadWidget::onButton(const ButtonEvent &e)
     Base::onButton(e);
 }
 
-bool PadWidget::applyTheme(std::shared_ptr<SvgTheme> theme)
-{
+void PadWidget::applyTheme(std::shared_ptr<SvgTheme> theme) {
     wire = (0 == theme->name.compare("Wire"));
     pad_style.apply_theme(theme);
     pad_sel_style.apply_theme(theme);
     pad_down_style.apply_theme(theme);
-    return true;
 }
 
-void PadWidget::step()
-{
+void PadWidget::step() {
     Base::step();
 
     NVGcolor co(fromPacked(0));
@@ -178,8 +163,7 @@ void PadWidget::step()
     (*light->baseColors.begin()) = co;
 }
 
-void PadWidget::draw(const DrawArgs& args)
-{
+void PadWidget::draw(const DrawArgs& args) {
     auto vg = args.vg;
     if (wire && (pad_style.width() > .01f)) {
         nvgBeginPath(vg);

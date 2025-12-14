@@ -4,8 +4,8 @@
 
 namespace widgetry {
 
-void ColorPicker::set_text_color()
-{
+void ColorPicker::set_text_color() {
+    if (APP->event->getSelectedWidget() == text_input) return;
     switch (syntax) {
     case ColorSyntax::Unknown:
         break;
@@ -114,6 +114,12 @@ ColorPicker::ColorPicker()
             syntax_selector->syntax = syntax;
             set_color(co);
         };
+    });
+    text_input->set_on_tab([=](bool, bool){
+        APP->event->setSelectedWidget(this);
+    });
+    text_input->set_on_enter([=](std::string text){
+        APP->event->setSelectedWidget(this);
     });
     addChild(text_input);
 

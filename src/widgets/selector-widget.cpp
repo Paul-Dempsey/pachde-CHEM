@@ -21,14 +21,12 @@ SelectorWidget::SelectorWidget() :
     box.size.y = radius*3.f + (radius * ((maximum + 1 - minimum)*4));
 }
 
-SelectorWidget::~SelectorWidget()
-{
+SelectorWidget::~SelectorWidget() {
     if (tip_holder) delete tip_holder;
     tip_holder = nullptr;
 }
 
-void SelectorWidget::initParamQuantity()
-{
+void SelectorWidget::initParamQuantity() {
     Base::initParamQuantity();
     auto pq = getParamQuantity();
 	if (pq) {
@@ -42,8 +40,7 @@ void SelectorWidget::initParamQuantity()
     }
 }
 
-bool SelectorWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
-{
+void SelectorWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) {
     wire = ("Wire" == theme->name);
     auto style = theme->getStyle("selector");
     if (style) {
@@ -70,26 +67,24 @@ bool SelectorWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
         active_color = stem_color;
         inactive_color = RampGray(G_50);
     }
-    return true;
 }
-void SelectorWidget::ensure_tip_holder()
-{
+
+void SelectorWidget::ensure_tip_holder() {
     if (!tip_holder) {
         tip_holder = new TipHolder();
     }
 }
-void SelectorWidget::set_tip_text(std::string text)
-{
+
+void SelectorWidget::set_tip_text(std::string text) {
     ensure_tip_holder();
     tip_holder->setText(text);
 }
 
-void SelectorWidget::destroy_tip()
-{
+void SelectorWidget::destroy_tip() {
     if (tip_holder) { tip_holder->destroyTip(); }
 }
-void SelectorWidget::create_tip()
-{
+
+void SelectorWidget::create_tip() {
     ensure_tip_holder();
     if (tip_holder) { tip_holder->createTip(); }
 }
@@ -204,8 +199,7 @@ void SelectorWidget::drawLayer(const DrawArgs& args, int layer)
     Line(vg, x, y, x, y + radius + radius, stem, stem_width);
 }
 
-int SelectorWidget::index_of_pos(Vec pos)
-{
+int SelectorWidget::index_of_pos(Vec pos) {
     if (pos.x < 0 ||pos.x > box.size.x) return -1;
     float top = radius * 1.8f;
     if (pos.y < top) return -1;
@@ -217,8 +211,7 @@ int SelectorWidget::index_of_pos(Vec pos)
     return result;
 }
 
-void SelectorWidget::draw(const DrawArgs& args)
-{
+void SelectorWidget::draw(const DrawArgs& args) {
     auto vg = args.vg;
     auto pq = getParamQuantity();
     auto value = pq ? static_cast<int>(std::floor(pq->getValue())) : 0;

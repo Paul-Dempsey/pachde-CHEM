@@ -322,9 +322,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     const NVGcolor& taskStateColor(ChemTask::State state);
     void set_theme_colors(const std::string& theme = "");
 
-    MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device, std::shared_ptr<SvgTheme> theme);
+    MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device);
 
-    void createMidiPickers(std::shared_ptr<SvgTheme> theme);
+    void createMidiPickers();
     void createRoundingLeds(float x, float y, float spread);
     void create_stop_button();
     void remove_stop_button();

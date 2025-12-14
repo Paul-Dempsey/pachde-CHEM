@@ -12,47 +12,55 @@ namespace widgetry {
 
 struct HamData
 {
-    uint8_t patties{3};
     float patty_width{1.5f};
-    NVGcolor patty_color{RampGray(G_50)};
-    NVGcolor hover_color{RampGray(G_65)};
+    float circle_width{.75f};
+    NVGcolor co_patty{RampGray(G_50)};
+    PackedColor co_patty_hover{colors::G50};
+    PackedColor co_hover{colors::G65};
     bool hovered{false};
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) {
+    void applyTheme(std::shared_ptr<SvgTheme> theme) {
         if (theme) {
             PackedColor color;
             if (theme->getFillColor(color, "patty", true)) {
-                patty_color = fromPacked(color);
+                co_patty = fromPacked(color);
             } else {
-                patty_color = RampGray(G_50);
+                co_patty = RampGray(G_50);
             }
-            if (theme->getFillColor(color, "patty-hover", true)) {
-                hover_color = fromPacked(color);
+            auto style = theme->getStyle("patty-hover");
+            if (style) {
+                co_patty_hover = style->fillWithOpacity();
+                co_hover = style->strokeWithOpacity();
+                circle_width = style->stroke_width;
             } else {
-                hover_color = RampGray(G_65);
+                co_hover = colors::G65;
             }
         } else {
-            patty_color = RampGray(G_50);
-            hover_color = RampGray(G_65);
+            co_patty = RampGray(G_50);
+            co_hover = colors::G65;
+            circle_width = .75f;
         }
-        return false;
     }
 
     void draw(Widget* host, const Widget::DrawArgs& args) {
         auto vg = args.vg;
-        auto co  = patty_color;
 
         if (hovered) {
-            co = hover_color;
             auto half_x = host->box.size.x * .5f;
             auto half_y = host->box.size.y * .5f;
-            OpenCircle(vg, half_x, half_y, half_x + .25f, co, .75f);
+            OpenCircle(vg, half_x, half_y, half_x + .25f, fromPacked(co_hover), circle_width);
         }
         float y = 3.5f;
         float step = std::max(2.5f, patty_width + 1);
-        for (auto n = 0; n < patties; ++n) {
-            Line(vg, 2.f, y, host->box.size.x - 2.f, y, co, patty_width); y += step;
-        }
+        float right = host->box.size.x - 2.f;
+
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, 2.f, y); nvgLineTo(vg, right, y); y += step;
+        nvgMoveTo(vg, 2.f, y); nvgLineTo(vg, right, y); y += step;
+        nvgMoveTo(vg, 2.f, y); nvgLineTo(vg, right, y);
+        nvgStrokeColor(vg, hovered ? fromPacked(co_patty_hover) : co_patty);
+        nvgStrokeWidth(vg, patty_width);
+        nvgStroke(vg);
     }
 
 };
@@ -135,8 +143,8 @@ struct Hamburger : TipWidget, IThemed
         Base::onButton(e);
     }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override {
-        return data.applyTheme(theme);
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override {
+        data.applyTheme(theme);
     }
 
     void onHoverKey(const HoverKeyEvent& e) override {

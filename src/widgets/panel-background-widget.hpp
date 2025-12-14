@@ -28,7 +28,7 @@ struct PanelBackgroundWidget : Widget, IThemed
         e.unconsume();
     }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         auto style = theme->getStyle("g-panel");
         if (style) {
@@ -45,7 +45,6 @@ struct PanelBackgroundWidget : Widget, IThemed
             g_0 = 0xff282828;
             g_1 = 0xff181818;
         }
-        return true;
     }
 
     void step() override

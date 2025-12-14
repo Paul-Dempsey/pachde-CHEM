@@ -17,14 +17,13 @@ struct TextButton : FrameButton
     void set_text(std::string t) { text = t; }
     void set_style(LabelStyle style) { label_style = style; }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override {
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override {
         Base::applyTheme(theme);
 
         if (!theme->getFillColor(color, label_style.key, true)) {
             color = GetPackedStockColor(StockColor::Gray_65p);
         }
         theme->getFillColor(bg, "tbtn-face", true);
-        return false;
     }
 
     void draw(const DrawArgs& args) override

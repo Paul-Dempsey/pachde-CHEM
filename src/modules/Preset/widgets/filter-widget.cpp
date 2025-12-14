@@ -31,17 +31,16 @@ FilterButton* makeFilter (
     const char * up_svg,
     const char * down_svg,
     ILoadSvg* loader,
-    std::shared_ptr<SvgTheme> theme,
     std::function<void(uint64_t item)> on_change
     )
 {
     FilterButton* o = new FilterButton(up_svg, down_svg, on_change);
     o->box.pos = pos;
-    o->init(name, rows, item_width, items, loader, theme);
+    o->init(name, rows, item_width, items, loader);
     return o;
 }
 
-FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Classic",
@@ -66,11 +65,11 @@ FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme>
         "Category",
         "res/widgets/category-button.svg",
         "res/widgets/category-button-down.svg",
-        loader, theme, on_change
+        loader, on_change
     );
 }
 
-FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Atonal",
@@ -95,11 +94,11 @@ FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme
         "Type",
         "res/widgets/type-button.svg",
         "res/widgets/type-button-down.svg",
-        loader, theme, on_change
+        loader, on_change
     );
 }
 
-FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Acoustic",
@@ -150,11 +149,11 @@ FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<Svg
         "Character",
         "res/widgets/character-button.svg",
         "res/widgets/character-button-down.svg",
-        loader, theme, on_change
+        loader, on_change
     );
 }
 
-FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Additive",
@@ -184,11 +183,11 @@ FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgThe
         "Matrix",
         "res/widgets/matrix-button.svg",
         "res/widgets/matrix-button-down.svg",
-        loader, theme, on_change
+        loader, on_change
     );
 }
 
-FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTheme> theme, std::function<void(uint64_t item)> on_change)
+FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change)
 {
     std::vector<std::string> info {
         "Channel 1",
@@ -209,7 +208,6 @@ FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<SvgTh
         "res/widgets/gear-button.svg",
         "res/widgets/gear-button-down.svg",
         loader,
-        theme,
         on_change
     );
 }
@@ -224,14 +222,14 @@ FilterButton::FilterButton(const char *svg_up, const char *svg_down, std::functi
     this->shadow->hide();
 }
 
-void FilterButton::init(const std::string &name, int rows, float item_width, const std::vector<std::string> &items, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme)
+void FilterButton::init(const std::string &name, int rows, float item_width, const std::vector<std::string> &items, ILoadSvg* loader)
 {
     if (item_width <= 0.f) item_width = 42;
     loadSvg(loader);
 
     const float DIALOG_SEP = 3.5f;
 
-    dialog = new BitsWidget(name, rows, item_width, items, theme,
+    dialog = new BitsWidget(name, rows, item_width, items,
         [=](uint64_t state) {
             describe(dialog->make_summary());
             if (change_fn) {

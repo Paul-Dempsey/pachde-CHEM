@@ -109,7 +109,7 @@ struct OverlayUi : ChemModuleWidget, IChemClient
 
     LinkButton* link_button{nullptr};
     IndicatorWidget* link{nullptr};
-    Swatch* bg_widget{nullptr};
+    SolidSwatch* bg_widget{nullptr};
     VText* title_widget{nullptr};
 
     OverlayUi(OverlayModule *module);

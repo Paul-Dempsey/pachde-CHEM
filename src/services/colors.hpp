@@ -46,7 +46,7 @@ enum Ramp {
     G_85, G_90, G_95, G_100,
     G_WHITE = G_100
 };
-NVGcolor RampGray(Ramp g);
+const NVGcolor& RampGray(Ramp g);
 
 #define COLOR_BRAND    nvgRGB(0x45,0x7a,0xa6)  // #457aa6
 #define COLOR_BRAND_MD nvgRGB(0x4e,0x8b,0xbf)  // #4e8dbf

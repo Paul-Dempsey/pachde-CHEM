@@ -25,7 +25,7 @@ struct PartnerPanelBorder : ::rack::app::PanelBorder, IThemed
     }
     void setPartners(bool isLeft, bool isRight);
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void draw(const DrawArgs& args) override;
 };
@@ -33,7 +33,7 @@ struct PartnerPanelBorder : ::rack::app::PanelBorder, IThemed
 void removePanelBorder(::rack::app::SvgPanel* panel);
 void replacePanelBorder(::rack::app::SvgPanel* panel, ::rack::app::PanelBorder* border);
 
-PartnerPanelBorder* attachPartnerPanelBorder(::rack::app::SvgPanel *panel, std::shared_ptr<svg_theme::SvgTheme> theme);
+PartnerPanelBorder* attachPartnerPanelBorder(::rack::app::SvgPanel *panel);
 
 template<class TModuleWidget>
 void setPartnerPanelBorder(TModuleWidget* me)

@@ -11,7 +11,7 @@ FlipSwitch::FlipSwitch() :
     box.size.y = 12.f;
 }
 
-bool FlipSwitch::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
+void FlipSwitch::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
 {
     auto style = theme->getStyle("fswhi");
     if (style)     {
@@ -29,7 +29,6 @@ bool FlipSwitch::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
         lo = RampGray(G_55);
         lo_width = 1.25f;
     }
-    return false;
 }
 
 void FlipSwitch::onDragStart(const DragStartEvent& e)

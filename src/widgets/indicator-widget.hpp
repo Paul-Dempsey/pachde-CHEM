@@ -72,13 +72,12 @@ struct StateIndicatorWidget : IndicatorWidget, IThemed
 
     bool wire{false};
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override
     {
         wire = (0 == theme->name.compare("Wire"));
         option_on.apply_theme(theme);
         option_off.apply_theme(theme);
         set_state(get_state());
-        return true;
     }
 };
 

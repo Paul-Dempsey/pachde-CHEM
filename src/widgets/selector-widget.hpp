@@ -30,7 +30,7 @@ struct SelectorWidget: rack::app::ParamWidget, IThemed
     virtual ~SelectorWidget();
 
     // IThemed
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
 
     // ParamWidget
     void initParamQuantity() override;

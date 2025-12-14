@@ -113,14 +113,14 @@ struct BasicTextLabel: Widget, IThemed, ILayoutHelp
     }
 
     // IThemed
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void render(const DrawArgs& args);
     void drawLayer(const DrawArgs& args, int layer) override;
     void draw(const DrawArgs& args) override;
 };
 
-struct TextLabel: Widget, IThemed, ILayoutHelp
+struct TextLabel: Widget, ILayoutHelp
 {
     using Base = Widget;
 
@@ -174,10 +174,7 @@ struct TextLabel: Widget, IThemed, ILayoutHelp
         _label->glowing(glow);
         dirty();
     }
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override
-    {
-        return _label->applyTheme(theme);
-    }
+
     void draw(const DrawArgs& args) override
     {
         Base::draw(args);
@@ -188,13 +185,7 @@ struct TextLabel: Widget, IThemed, ILayoutHelp
 };
 
 template<typename TWidget = TextLabel>
-TWidget* createStaticTextLabel(
-    math::Vec pos,
-    float width,
-    std::string text,
-    std::shared_ptr<SvgTheme> theme
-    )
-{
+TWidget* createStaticTextLabel(math::Vec pos, float width, std::string text) {
     TWidget* w = createWidget<TWidget>(pos);
     w->text(text);
     w->color(RampGray(G_90));
@@ -204,19 +195,11 @@ TWidget* createStaticTextLabel(
         w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
-    w->applyTheme(theme);
     return w;
 }
 
 template<typename TWidget = TextLabel>
-TWidget* createLabel(
-    math::Vec pos,
-    float width,
-    std::string text,
-    std::shared_ptr<SvgTheme> theme,
-    const LabelStyle& style
-    )
-{
+TWidget* createLabel(math::Vec pos, float width, std::string text, const LabelStyle& style) {
     TWidget* w = createWidget<TWidget>(pos);
     w->text(text);
     w->_label->style(style);
@@ -227,7 +210,6 @@ TWidget* createLabel(
         w->setPos(Vec(w->box.pos.x - width, w->box.pos.y));
     }
     w->setSize(Vec(width, w->_label->text_height()));
-    w->applyTheme(theme);
     return w;
 }
 

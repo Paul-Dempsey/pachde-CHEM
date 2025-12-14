@@ -4,22 +4,18 @@ using namespace pachde;
 
 namespace widgetry {
 
-TextInput::TextInput()
-{
+TextInput::TextInput() {
     multiline = false;
 }
 
-bool TextInput::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
-{
+void TextInput::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) {
     bg_style.apply_theme(theme);
     text_style.apply_theme(theme);
     prompt_style.apply_theme(theme);
     selection_style.apply_theme(theme);
-    return true;
 }
 
-void TextInput::onSelectKey(const SelectKeyEvent &e)
-{
+void TextInput::onSelectKey(const SelectKeyEvent &e) {
     if (e.action == GLFW_PRESS) {
         if (GLFW_KEY_TAB == e.key) {
             Base::onSelectKey(e);
@@ -27,6 +23,7 @@ void TextInput::onSelectKey(const SelectKeyEvent &e)
                 APP->event->setSelectedWidget(getParent());
             }
             e.consume(this);
+            if (change_handler) change_handler(text);
             if (tab_handler) {
                 tab_handler(0 != (e.mods & RACK_MOD_CTRL), 0 != (e.mods & GLFW_MOD_SHIFT));
             }
@@ -45,18 +42,15 @@ void TextInput::onSelectKey(const SelectKeyEvent &e)
     Base::onSelectKey(e);
 }
 
-void TextInput::onChange(const ChangeEvent &e)
-{
+void TextInput::onChange(const ChangeEvent &e) {
     if (change_handler) change_handler(text);
 }
 
-void TextInput::onAction(const ActionEvent &e)
-{
+void TextInput::onAction(const ActionEvent &e) {
     if (enter_handler) enter_handler(text);
 }
 
-int TextInput::getTextPosition(math::Vec mousePos)
-{
+int TextInput::getTextPosition(math::Vec mousePos) {
     if (text.empty()) return 0.f;
 
     if (mousePos.x < 1.5f) return 0;
@@ -88,8 +82,7 @@ int TextInput::getTextPosition(math::Vec mousePos)
     return text.size();
 }
 
-void TextInput:: draw(const DrawArgs& args)
-{
+void TextInput:: draw(const DrawArgs& args) {
     auto font = GetPluginFontRegular();
     if (!FontOk(font)) return;
     auto vg = args.vg;

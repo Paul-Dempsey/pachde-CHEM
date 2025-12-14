@@ -15,8 +15,7 @@ void no_preset(TipLabel* label) {
     label->describe("(none)");
 }
 
-void PresetUi::on_list_changed(eaganmatrix::PresetTab which)
-{
+void PresetUi::on_list_changed(eaganmatrix::PresetTab which) {
     Tab& tab = get_tab(which);
     std::shared_ptr<PresetList> ppl{nullptr};
     if (chem_host) {
@@ -35,8 +34,7 @@ void PresetUi::on_list_changed(eaganmatrix::PresetTab which)
     if (!my_module->track_live) scroll_to_live();
 }
 
-bool PresetUi::load_presets(PresetTab which)
-{
+bool PresetUi::load_presets(PresetTab which) {
     valid_tab(which);
     if (!host_available()) return false;
     auto pl = chem_host->host_ipreset_list();
@@ -46,8 +44,7 @@ bool PresetUi::load_presets(PresetTab which)
     return (nullptr != tab.list.preset_list) && !tab.list.preset_list->empty();
 }
 
-void PresetUi::sort_presets(PresetOrder order)
-{
+void PresetUi::sort_presets(PresetOrder order) {
     if (!my_module) return;
 
     Tab & tab = active_tab();
@@ -73,8 +70,7 @@ void PresetUi::sort_presets(PresetOrder order)
     }
 }
 
-void PresetUi::onSystemBegin()
-{
+void PresetUi::onSystemBegin() {
     other_system_gather = true;
     help_label->text("scanning System presets");
     help_label->setVisible(true);
@@ -82,8 +78,7 @@ void PresetUi::onSystemBegin()
     live_preset_label->describe("");
 }
 
-void PresetUi::onSystemComplete()
-{
+void PresetUi::onSystemComplete() {
     other_system_gather = false;
     system_tab.list.refresh_filter_view();
     if (active_tab_id == PresetTab::System) {
@@ -93,8 +88,7 @@ void PresetUi::onSystemComplete()
     help_label->text("");
 }
 
-void PresetUi::onUserBegin()
-{
+void PresetUi::onUserBegin() {
     other_user_gather = true;
     help_label->text("scanning User presets");
     help_label->setVisible(true);
@@ -102,8 +96,7 @@ void PresetUi::onUserBegin()
     live_preset_label->describe("");
 }
 
-void PresetUi::onUserComplete()
-{
+void PresetUi::onUserComplete() {
     other_user_gather = false;
     user_tab.list.refresh_filter_view();
     if (active_tab_id == PresetTab::User) {
@@ -113,8 +106,7 @@ void PresetUi::onUserComplete()
     help_label->text("");
 }
 
-void PresetUi::onPresetChange()
-{
+void PresetUi::onPresetChange() {
     // ignore preset changes while gathering presets
     if (other_user_gather || other_system_gather) return;
 
@@ -155,21 +147,18 @@ void PresetUi::onPresetChange()
     }
 }
 
-void PresetUi::set_current_index(size_t index)
-{
+void PresetUi::set_current_index(size_t index) {
     active_tab().current_index = index;
 }
 
-bool PresetUi::host_available()
-{
+bool PresetUi::host_available() {
     if (!chem_host) return false;
     if (chem_host->host_busy()) return false;
     if (!chem_host->host_connection(ChemDevice::Haken)) return false;
     return true;
 }
 
-void PresetUi::onConnectHost(IChemHost *host)
-{
+void PresetUi::onConnectHost(IChemHost *host) {
     if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em) em->unsubscribeEMEvents(this);
@@ -190,8 +179,7 @@ void PresetUi::onConnectHost(IChemHost *host)
     }
 }
 
-void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
+void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) {
     if (ChemDevice::Haken == device) {
         user_tab.clear();
         system_tab.clear();
@@ -201,8 +189,7 @@ void PresetUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceC
     start_delay.run();
 }
 
-void PresetUi::set_track_live(bool track)
-{
+void PresetUi::set_track_live(bool track) {
     if (!module) return;
     if (track == my_module->track_live) return;
     my_module->track_live = track;
@@ -211,15 +198,13 @@ void PresetUi::set_track_live(bool track)
     }
 }
 
-void PresetUi::on_search_text_changed(std::string text)
-{
+void PresetUi::on_search_text_changed(std::string text) {
     if (my_module->search_incremental || text.empty()) {
         on_search_text_enter();
     }
 }
 
-void PresetUi::on_search_text_enter()
-{
+void PresetUi::on_search_text_enter() {
     if (!my_module) return;
     Tab& tab{active_tab()};
     auto query = search_entry->getText();
@@ -236,13 +221,11 @@ void PresetUi::on_search_text_enter()
     scroll_to_page_of_index(tab.current_index);
 }
 
-bool PresetUi::filtering()
-{
+bool PresetUi::filtering() {
     return !search_entry->empty() || active_tab().list.filtered();
 }
 
-void PresetUi::on_filter_change(FilterId filter, uint64_t state)
-{
+void PresetUi::on_filter_change(FilterId filter, uint64_t state) {
     if (!my_module) return;
     my_module->filters()[filter] = state;
 
@@ -257,8 +240,7 @@ void PresetUi::on_filter_change(FilterId filter, uint64_t state)
     scroll_to_page_of_index(tab.current_index);
 }
 
-void PresetUi::clear_filters()
-{
+void PresetUi::clear_filters() {
     Tab& tab{active_tab()};
     PresetId current_id = tab.current_id();
     PresetId track_id;
@@ -280,8 +262,7 @@ void PresetUi::clear_filters()
     scroll_to_page_of_index(tab.current_index);
 }
 
-void PresetUi::set_tab(PresetTab tab_id, bool fetch)
-{
+void PresetUi::set_tab(PresetTab tab_id, bool fetch) {
     switch (tab_id) {
     case PresetTab::User:
         user_label->style(current_tab_style);
@@ -314,15 +295,14 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch)
         load_presets(tab_id);
     }
     auto theme = getSvgTheme();
-    user_label->applyTheme(theme);
-    system_label->applyTheme(theme);
+    applyChildrenTheme(user_label, theme);
+    applyChildrenTheme(system_label, theme);
 
     scroll_to(tab.scroll_top);
     //update_help();
 }
 
-void PresetUi::scroll_to(ssize_t index)
-{
+void PresetUi::scroll_to(ssize_t index) {
     Tab& tab = active_tab();
     tab.scroll_top = index < 0 ? 0 : size_t(index);
     size_t ip = tab.scroll_top;
@@ -340,20 +320,17 @@ void PresetUi::scroll_to(ssize_t index)
     update_page_controls();
 }
 
-void PresetUi::scroll_to_page_of_index(ssize_t index)
-{
+void PresetUi::scroll_to_page_of_index(ssize_t index) {
     scroll_to(page_index(index));
 }
 
-ssize_t PresetUi::page_index(ssize_t index)
-{
+ssize_t PresetUi::page_index(ssize_t index) {
     index = std::max(ssize_t(0), index);
     index = std::min(ssize_t(active_tab().count()), index);
     return PAGE_CAPACITY * (index / PAGE_CAPACITY);
 }
 
-void PresetUi::scroll_to_live()
-{
+void PresetUi::scroll_to_live() {
     auto live_id = get_live_id();
     if (!live_id.valid()) return;
     ssize_t index = active_tab().list.index_of_id(live_id);
@@ -361,8 +338,7 @@ void PresetUi::scroll_to_live()
     scroll_to(page_index(index));
 }
 
-void PresetUi::page_up(bool ctrl, bool shift)
-{
+void PresetUi::page_up(bool ctrl, bool shift) {
     Tab& tab = active_tab();
     if (tab.scroll_top < PAGE_CAPACITY) return;
     if (ctrl) {
@@ -373,8 +349,7 @@ void PresetUi::page_up(bool ctrl, bool shift)
     }
 }
 
-void PresetUi::page_down(bool ctrl, bool shift)
-{
+void PresetUi::page_down(bool ctrl, bool shift) {
     Tab& tab = active_tab();
     auto count = tab.list.count();
     if (count < PAGE_CAPACITY) {
@@ -389,8 +364,7 @@ void PresetUi::page_down(bool ctrl, bool shift)
     }
 }
 
-void PresetUi::update_page_controls()
-{
+void PresetUi::update_page_controls() {
     Tab& tab = active_tab();
     size_t count = tab.list.count();
     size_t page = 1 + (tab.scroll_top / PAGE_CAPACITY);
@@ -420,8 +394,7 @@ void PresetUi::update_page_controls()
     }
 }
 
-void PresetUi::update_help()
-{
+void PresetUi::update_help() {
     Tab& tab = active_tab();
     if (tab.list.empty()) {
         help_label->text("scan presets using the Core actions menu");
@@ -432,8 +405,7 @@ void PresetUi::update_help()
     }
 }
 
-void PresetUi::select_random_preset()
-{
+void PresetUi::select_random_preset() {
     Tab& tab = active_tab();
     if (tab.list.empty()) return;
     ssize_t index = std::round(rack::random::uniform() * (tab.count()-1));
@@ -441,8 +413,7 @@ void PresetUi::select_random_preset()
     send_preset(index);
 }
 
-void PresetUi::send_preset(ssize_t index)
-{
+void PresetUi::send_preset(ssize_t index) {
     if (index < 0) return;
     Tab& tab = active_tab();
     if (index >= ssize_t(tab.count())) return;
@@ -452,8 +423,7 @@ void PresetUi::send_preset(ssize_t index)
     }
 }
 
-void PresetUi::next_preset(bool ctrl, bool shift)
-{
+void PresetUi::next_preset(bool ctrl, bool shift) {
     Tab& tab = active_tab();
     if (tab.current_index < 0) {
         if (live_preset) {
@@ -478,8 +448,7 @@ void PresetUi::next_preset(bool ctrl, bool shift)
     send_preset(tab.current_index);
 }
 
-void PresetUi::previous_preset(bool ctrl, bool shift)
-{
+void PresetUi::previous_preset(bool ctrl, bool shift) {
     Tab& tab = active_tab();
     if (tab.current_index < 0) {
         if (live_preset) {

@@ -3,6 +3,12 @@
 using namespace pachde;
 namespace widgetry {
 
+static NVGcolor co_white{WHITE};
+static NVGcolor co_black{BLACK};
+static NVGcolor co_gray{nvgGRAYf(.5f)};
+static NVGcolor co_nada{COLOR_NONE};
+static NVGcolor co_dot{COLOR_BRAND};
+
 void AlphaWidget::onEnter(const EnterEvent &e) {
     OpaqueWidget::onEnter(e);
     glfwSetCursor(APP->window->win, glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR));
@@ -17,7 +23,6 @@ void AlphaWidget::onDragMove(const DragMoveEvent& e) {
     drag_pos = drag_pos.plus(e.mouseDelta.div(getAbsoluteZoom()));
 
     setOpacity(vertical() ? (drag_pos.y / box.size.y) : (drag_pos.x / box.size.x));
-    alpha = ::rack::math::clamp(alpha);
     if (clickHandler) {
         clickHandler(alpha);
     }
@@ -51,7 +56,7 @@ void drawCheckers(const rack::widget::Widget::DrawArgs& args, float x, float y, 
             g = !g;
         }
     }
-    nvgFillColor(vg, nvgRGBAf(.5,.5f,.5, 1.f));
+    nvgFillColor(vg, co_gray);
     nvgFill(vg);
     nvgResetScissor(vg);
 }
@@ -59,8 +64,6 @@ void drawCheckers(const rack::widget::Widget::DrawArgs& args, float x, float y, 
 void AlphaWidget::draw(const DrawArgs& args) {
     auto vg = args.vg;
 
-    auto co_white = RampGray(G_WHITE);
-    auto co_black = RampGray(G_BLACK);
     nvgBeginPath(vg);
     nvgRect(vg, 0, 0, box.size.x, box.size.y);
     nvgFillColor(vg, co_white);
@@ -69,37 +72,23 @@ void AlphaWidget::draw(const DrawArgs& args) {
     drawCheckers(args, 0, 0, box.size.x, box.size.y);
 
     nvgBeginPath(vg);
-    int r = 0;
-    for (float y = 0; y < box.size.y; y += 5.f, r++) {
-        bool g = (0 == (r & 1));
-        for (float x = 0; x < box.size.x; x += 5.f) {
-            if (g) nvgRect(vg, x, y, 5.f, 5.f);
-            g = !g;
-        }
-    }
-    nvgFillColor(vg, nvgRGBAf(.5,.5f,.5, 1.f));
-    nvgFill(vg);
-
-    nvgBeginPath(vg);
     nvgRect(vg, 0, 0, box.size.x, box.size.y);
-    auto co_nada = nvgRGBAf(1.f,1.f,1.f,0.f);
     NVGpaint paint = vertical()
         ? nvgLinearGradient(vg, 0, 0, 0, box.size.y, co_nada, co_white)
         : nvgLinearGradient(vg, 0, 0, box.size.x, 0, co_nada, co_white);
     nvgFillPaint(vg, paint);
     nvgFill(vg);
 
-    auto co_dot{COLOR_BRAND};
     if (vertical()) {
         auto y = alpha * box.size.y;
-        Circle(vg, box.size.x *.5, y + .375f, 3.f, co_dot);
         Line(vg, 0.f, y, box.size.x, y, co_white, 1.f);
         Line(vg, 0.f, y + .75f, box.size.x, y + .75f, co_black, 1.f);
+        Circle(vg, box.size.x *.5, y + .375f, 3.f, co_dot);
     } else {
         auto x = alpha * box.size.x;
-        Circle(vg, x + .375f, box.size.y*.5f, 3.f, co_dot);
         Line(vg, x, 0.f, x, box.size.y, co_white, 1.f);
         Line(vg, x + .75f, 0.f, x + .75f, box.size.y, co_black, 1.f);
+        Circle(vg, x + .375f, box.size.y*.5f, 3.f, co_dot);
     }
 }
 
@@ -184,14 +173,14 @@ void HueWidget::draw(const DrawArgs & args) {
 
     if (vertical()) {
         auto y = hue * box.size.y;
-        Circle(vg, box.size.x *.5, y + .375f, 3.f, co_dot);
         Line(vg, 0.f, y, box.size.x, y, co_white, 1.f);
         Line(vg, 0.f, y + .75f, box.size.x, y + .75f, co_black, 1.f);
+        Circle(vg, box.size.x *.5, y + .375f, 3.f, co_dot);
     } else {
         auto x = hue * box.size.x;
-        Circle(vg, x + .375f, box.size.y*.5f, 3.f, co_dot);
         Line(vg, x, 0.f, x, box.size.y, co_white, 1.f);
         Line(vg, x + .75f, 0.f, x + .75f, box.size.y, co_black, 1.f);
+        Circle(vg, x + .375f, box.size.y*.5f, 3.f, co_dot);
     }
 
 }

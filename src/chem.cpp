@@ -29,7 +29,7 @@ void ChemModule::dataFromJson(json_t* root)
     if (j && json_boolean_value(j)) {
         theme_setting = theme::theme_name::Ui;
     } else {
-        theme_setting = get_json_string(root, "theme", theme::theme_name::PreferDark);
+        theme_setting = get_json_string(root, "theme", theme_setting);
     }
     actual_theme = theme::get_actual_theme(theme_setting);
 }
@@ -134,7 +134,6 @@ void ChemModuleWidget::setThemeName(const std::string& name, void *context)
     //     panel->setBackground(newSvg);
     // }
     svg_theme::applyChildrenTheme(this, svg_theme);
-    sendDirty(this);
 
     if (context == this) {
         set_extender_theme(LeftRight::Left, name);
@@ -262,7 +261,7 @@ void ChemModuleWidget::appendContextMenu(Menu *menu)
 
     menu->addChild(new MenuSeparator);
     menu->addChild(createMenuLabel<HamburgerTitle>("Themes"));
-//TODO    AppendThemeMenu(menu, this, theme_engine, follow, this);
+    add_theme_items(menu, this, this);
 
     menu->addChild(new MenuSeparator);
     bool screws = style::show_screws();

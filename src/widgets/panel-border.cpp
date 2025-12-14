@@ -24,10 +24,9 @@ void replacePanelBorder(SvgPanel* panel, PanelBorder* border) {
     panel->fb->setDirty();
 }
 
-PartnerPanelBorder* attachPartnerPanelBorder(rack::app::SvgPanel *panel, std::shared_ptr<svg_theme::SvgTheme> theme)
+PartnerPanelBorder* attachPartnerPanelBorder(rack::app::SvgPanel *panel)
 {
     auto panelBorder = new PartnerPanelBorder();
-    panelBorder->applyTheme(theme);
     replacePanelBorder(panel, panelBorder);
     return panelBorder;
 }
@@ -42,7 +41,7 @@ void PartnerPanelBorder::setPartners(bool isLeft, bool isRight)
     }
 }
 
-bool PartnerPanelBorder::applyTheme(std::shared_ptr<SvgTheme> theme)
+void PartnerPanelBorder::applyTheme(std::shared_ptr<SvgTheme> theme)
 {
     auto style = theme->getStyle("panel-border");
     if (style) {
@@ -55,7 +54,6 @@ bool PartnerPanelBorder::applyTheme(std::shared_ptr<SvgTheme> theme)
     if (!style) {
         line_stroke_width = ring_stroke_width = 0.5f;
     }
-    return true;
 }
 
 void PartnerPanelBorder::draw(const DrawArgs& args)

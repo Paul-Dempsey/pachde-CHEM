@@ -31,10 +31,9 @@ struct BitsWidget : OpaqueWidget, IThemed
         int rows,
         float item_width,
         const std::vector<std::string>& items,
-        std::shared_ptr<svg_theme::SvgTheme> theme,
         std::function<void(uint64_t state)> on_change
     );
-    bool applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;
     uint64_t get_state() { return state; }
     void set_state(uint64_t the_state) { state = the_state; }
     std::string make_summary();

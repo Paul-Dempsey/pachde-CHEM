@@ -13,7 +13,7 @@ struct TextInput : TextField, IThemed
     float text_height = 12.f;
 
     ElementStyle bg_style{"entry-bg", "hsla(42, 20%, 100%, 5%)", "hsl(42, 50%, 40%)", .25f};
-    ElementStyle text_style{"entry-text", "hsl(0, 0%, 65%)"};
+    ElementStyle text_style{"entry-text", "hsl(0, 0%, 85%)"};
     ElementStyle prompt_style{"entry-prompt", "hsla(0, 0%, 55%, 75%)"};
     ElementStyle selection_style{"entry-sel", "hsl(200, 50%, 40%)"};
     std::function<void(std::string)> change_handler{nullptr};
@@ -26,7 +26,7 @@ struct TextInput : TextField, IThemed
 
     TextInput();
     bool empty() { return text.empty(); }
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
     void onSelectKey(const SelectKeyEvent& e) override;
     void onChange(const ChangeEvent& e) override;
     void onAction(const ActionEvent& e) override;
@@ -111,28 +111,6 @@ struct TextInputMenu : TextInput
 template <typename Tin = TextInput>
 Tin* createThemedTextInput(
     float x, float y, float width, float height,
-    std::shared_ptr<SvgTheme> theme,
-    std::string content,
-    std::function<void(std::string)> on_change = nullptr,
-    std::function<void(std::string)> on_enter = nullptr,
-    const char* placeholder = nullptr
-    )
-{
-    Tin* t = createWidget<Tin>(Vec(x, y));
-    if (width <= 0) width = 120.f;
-    if (height <= 0) height = 14.f;
-    t->box.size = Vec(width, height);
-    t->applyTheme(theme);
-    t->setText(content);
-    if (on_change) t->set_on_change(on_change);
-    if (on_enter) t->set_on_enter(on_enter);
-    if (placeholder) t->placeholder = placeholder;
-    return t;
-}
-
-template <typename Tin = TextInput>
-Tin* createTextInput(
-    float x, float y, float width, float height,
     std::string content,
     std::function<void(std::string)> on_change = nullptr,
     std::function<void(std::string)> on_enter = nullptr,
@@ -149,7 +127,5 @@ Tin* createTextInput(
     if (placeholder) t->placeholder = placeholder;
     return t;
 }
-
-
 
 }

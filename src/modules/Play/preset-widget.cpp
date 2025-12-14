@@ -44,7 +44,7 @@ PackedColor unchecked_fill_color(std::shared_ptr<SvgTheme> theme, const char * k
     return co;
 }
 
-bool PresetWidget::applyTheme(std::shared_ptr<SvgTheme> theme) {
+void PresetWidget::applyTheme(std::shared_ptr<SvgTheme> theme) {
     wire_style = theme->name == "Wire";
     grip_color =          fromPacked(unchecked_fill_color(theme, "preset-grip"));
     live_color =          fromPacked(unchecked_fill_color(theme, "preset-live"));
@@ -56,7 +56,6 @@ bool PresetWidget::applyTheme(std::shared_ptr<SvgTheme> theme) {
     drag_color =          fromPacked(unchecked_fill_color(theme, "preset-drag"));
     drag_current_color =  fromPacked(unchecked_fill_color(theme, "preset-dragcur"));
     hover_element.apply_theme(theme);
-    return true;
 }
 
 void PresetWidget::clear_preset()

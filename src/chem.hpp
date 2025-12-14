@@ -21,7 +21,7 @@ struct ChemModule : Module, IThemeHolder
 {
     private: std::string actual_theme;
     public:
-    std::string theme_setting;
+    std::string theme_setting{theme_name::PreferDark};
     bool seek_host{false};
     IChemHost* chem_host{nullptr};
     ChemModuleWidget* chem_ui{nullptr};

@@ -90,7 +90,7 @@ public:
     }
     void set_agent(IPresetAction* client) { agent = client; }
 
-    bool applyTheme(std::shared_ptr<SvgTheme> theme) override;
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override;
 
     void appendContextMenu(ui::Menu* menu);
     void createContextMenu()
@@ -127,9 +127,9 @@ public:
     void draw(const DrawArgs& args) override;
 };
 
-inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetInfo>>* presets, float x, float y, std::shared_ptr<SvgTheme> theme)
+inline PresetWidget* createPresetWidget(IPresetAction* agent, std::deque<std::shared_ptr<PresetInfo>>* presets, float x, float y)
 {
-    auto o = createThemedWidget<PresetWidget>(Vec(x,y), theme);
+    auto o = createWidget<PresetWidget>(Vec(x,y));
     o->set_agent(agent);
     o->set_preset_list(presets);
     return o;

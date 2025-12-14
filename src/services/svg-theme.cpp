@@ -18,26 +18,18 @@ const char * scanTag(const char * id)
     return id;
 }
 
-bool applyChildrenTheme(Widget *widget, std::shared_ptr<SvgTheme> theme, bool top)
-{
-    bool modified = false;
+void applyChildrenTheme(Widget *widget, std::shared_ptr<SvgTheme> theme, bool top) {
 
     for (Widget* child : widget->children) {
-        if (applyChildrenTheme(child, theme, false)) {
-            modified = true;
-        }
+        applyChildrenTheme(child, theme, false);
     }
 
     auto themed = dynamic_cast<IThemed*>(widget);
-    if (themed && themed->applyTheme(theme)) {
-        modified = true;
-    }
+    if (themed) themed->applyTheme(theme);
 
-    if (top && modified) {
+    if (top) {
         sendDirty(widget);
     }
-
-    return modified;
 }
 
 void sendDirty(Widget *widget)

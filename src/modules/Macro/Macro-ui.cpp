@@ -41,7 +41,7 @@ MacroUi::MacroUi(MacroModule *module) :
     setModule(module);
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
-    panelBorder = attachPartnerPanelBorder(panel, theme);
+    panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
     float x, y;
     bool browsing = !module;
@@ -49,22 +49,22 @@ MacroUi::MacroUi(MacroModule *module) :
     // knobs
     x = KNOB_CX;
     y = KNOB_CY;
-    addChild(knobs[M1] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M1, theme)); y += MACRO_DY;
-    addChild(knobs[M2] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M2, theme)); y += MACRO_DY;
-    addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M3, theme)); y += MACRO_DY;
-    addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M4, theme)); y += MACRO_DY;
-    addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M5, theme)); y += MACRO_DY;
-    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M6, theme));
+    addChild(knobs[M1] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M1)); y += MACRO_DY;
+    addChild(knobs[M2] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M2)); y += MACRO_DY;
+    addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M3)); y += MACRO_DY;
+    addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M4)); y += MACRO_DY;
+    addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M5)); y += MACRO_DY;
+    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M6));
 
-    addChild(tracks[M1] = createTrackWidget(knobs[M1], theme));
-    addChild(tracks[M2] = createTrackWidget(knobs[M2], theme));
-    addChild(tracks[M3] = createTrackWidget(knobs[M3], theme));
-    addChild(tracks[M4] = createTrackWidget(knobs[M4], theme));
-    addChild(tracks[M5] = createTrackWidget(knobs[M5], theme));
-    addChild(tracks[M6] = createTrackWidget(knobs[M6], theme));
+    addChild(tracks[M1] = createTrackWidget(knobs[M1]));
+    addChild(tracks[M2] = createTrackWidget(knobs[M2]));
+    addChild(tracks[M3] = createTrackWidget(knobs[M3]));
+    addChild(tracks[M4] = createTrackWidget(knobs[M4]));
+    addChild(tracks[M5] = createTrackWidget(knobs[M5]));
+    addChild(tracks[M6] = createTrackWidget(knobs[M6]));
 
     addChild(preset_label = createLabel<TipLabel>(
-        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "", theme,
+        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "",
         LabelStyle{"curpreset", TextAlignment::Center, 12.f, false}));
 
     // knob labels
@@ -73,33 +73,33 @@ MacroUi::MacroUi(MacroModule *module) :
     LabelStyle control_style{S::control_label};
     control_style.align = TextAlignment::Left;
 
-    addChild(m1_label = createLabel(Vec(x,y), 75.f, "i",   theme, control_style)); y += MACRO_DY;
-    addChild(m2_label = createLabel(Vec(x,y), 75.f, "ii",  theme, control_style)); y += MACRO_DY;
-    addChild(m3_label = createLabel(Vec(x,y), 75.f, "iii", theme, control_style)); y += MACRO_DY;
-    addChild(m4_label = createLabel(Vec(x,y), 75.f, "iv",  theme, control_style)); y += MACRO_DY;
-    addChild(m5_label = createLabel(Vec(x,y), 75.f, "v",   theme, control_style)); y += MACRO_DY;
-    addChild(m6_label = createLabel(Vec(x,y), 75.f, "vi",  theme, control_style));
+    addChild(m1_label = createLabel(Vec(x,y), 75.f, "i", control_style)); y += MACRO_DY;
+    addChild(m2_label = createLabel(Vec(x,y), 75.f, "ii", control_style)); y += MACRO_DY;
+    addChild(m3_label = createLabel(Vec(x,y), 75.f, "iii", control_style)); y += MACRO_DY;
+    addChild(m4_label = createLabel(Vec(x,y), 75.f, "iv", control_style)); y += MACRO_DY;
+    addChild(m5_label = createLabel(Vec(x,y), 75.f, "v", control_style)); y += MACRO_DY;
+    addChild(m6_label = createLabel(Vec(x,y), 75.f, "vi", control_style));
 
     // knob pedal annotations
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m2_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m3_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m4_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m5_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label)); y += MACRO_DY;
-    addChild(m6_ped_label = createLabel(Vec(x,y), 20.f, "", theme, S::pedal_label));
+    addChild(m1_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
+    addChild(m2_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
+    addChild(m3_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
+    addChild(m4_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
+    addChild(m5_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
+    addChild(m6_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
     x = INPUT_LEFT;
     y = S::PORT_TOP + S::PORT_DY*.5f - 5.f;
-    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, MacroModule::P_MOD_AMOUNT, theme));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, MacroModule::P_MOD_AMOUNT));
     x += INPUT_DX;
     y = S::PORT_TOP;
     for (int i = 0; i <= M6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port, theme)));
+        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), theme, S::in_port_label));
+        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), S::in_port_label));
         if (my_module) {
             float xoff {0.f};
             float w {29.25f};
@@ -119,7 +119,7 @@ MacroUi::MacroUi(MacroModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, theme, style::haken_label));
+        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, style::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
@@ -147,13 +147,13 @@ MacroUi::MacroUi(MacroModule *module) :
         }
     }
 
-    module_svgs.changeTheme(theme);
-
     // init
-
     if (!my_module || my_module->glow_knobs) {
         glowing_knobs(true);
     }
+
+    module_svgs.changeTheme(theme);
+    applyChildrenTheme(this, theme);
 
     if (my_module) {
         my_module->set_chem_ui(this);
