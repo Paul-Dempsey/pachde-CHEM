@@ -1,16 +1,17 @@
 #include "chem.hpp"
 #include "chem-core.hpp"
+#include "chem-task.hpp"
 #include "em/EaganMatrix.hpp"
 #include "em/preset-list.hpp"
+#include "preset-enum.hpp"
+#include "preset-file-info.hpp"
+#include "relay-midi.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/HakenMidiOutput.hpp"
 #include "services/midi-devices.hpp"
 #include "services/midi-io.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/widgets.hpp"
-#include "relay-midi.hpp"
-#include "chem-task.hpp"
-#include "preset-enum.hpp"
-#include "preset-file-info.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -232,6 +233,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     };
     enum Outputs {
         OUT_READY,
+        OUT_W,
+        OUT_X,
+        OUT_Y,
+        OUT_Z,
         NUM_OUTPUTS
     };
     enum Lights {
@@ -268,6 +273,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     json_t* dataToJson() override;
 
     void onRandomize() override {}
+    void onPortChange(const PortChangeEvent& e) override;
     void process_params(const ProcessArgs &args);
     void processLights(const ProcessArgs &args);
     void process_gather(const ProcessArgs &args);
@@ -322,13 +328,13 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     const NVGcolor& taskStateColor(ChemTask::State state);
     void set_theme_colors(const std::string& theme = "");
 
-    MidiPicker* createMidiPicker(float x, float y, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device);
+    MidiPicker* createMidiPicker(Vec pos, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device);
 
-    void createMidiPickers();
-    void createRoundingLeds(float x, float y, float spread);
+    void createMidiPickers(::svg_query::BoundsIndex& bounds);
+    void createRoundingLeds(Vec pos, float spread);
     void create_stop_button();
     void remove_stop_button();
-    void createIndicatorsCentered(float x, float y, float spread);
+    void createIndicatorsCentered(Vec pos, float spread);
     void updateIndicators();
     void connect_midi(bool on);
     void open_user_preset_file();

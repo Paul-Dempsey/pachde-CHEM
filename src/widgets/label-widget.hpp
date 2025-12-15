@@ -212,5 +212,15 @@ TWidget* createLabel(math::Vec pos, float width, std::string text, const LabelSt
     w->setSize(Vec(width, w->_label->text_height()));
     return w;
 }
+template<typename TWidget = TextLabel>
+TWidget* createLabel(math::Rect bounds, std::string text, const LabelStyle& style) {
+    TWidget* w = new TWidget;
+    w->text(text);
+    w->_label->style(style);
+    w->color(RampGray(G_90));
+    w->setPos(bounds.pos);
+    w->setSize(bounds.size);
+    return w;
+}
 
 }

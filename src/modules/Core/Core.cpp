@@ -50,6 +50,10 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     configLight(L_READY,         "Haken device ready");
 
     configOutput(Outputs::OUT_READY, "Ready gate");
+    configOutput(Outputs::OUT_W, "W (gate)");
+    configOutput(Outputs::OUT_X, "X (V/Oct)");
+    configOutput(Outputs::OUT_Y, "Y");
+    configOutput(Outputs::OUT_Z, "Z");
 
     startup_tasks.init(this);
     recurring_tasks.init(this);
@@ -911,7 +915,34 @@ void CoreModule::processLights(const ProcessArgs &args) {
     getLight(L_C2_CHANNEL_MAP).setBrightnessSmooth(getParam(P_C2_CHANNEL_MAP).getValue(), 45.f);
 }
 
-void CoreModule::process_params(const ProcessArgs &args) {
+void CoreModule::onPortChange(const PortChangeEvent &e)
+{
+    if (e.type == Port::INPUT) return;
+    if (e.connecting) {
+        switch (e.portId) {
+            case OUT_W:
+                getOutput(OUT_W).setChannels(16);
+                em.set_w_out(getOutput(OUT_W).getVoltages(0));
+                break;
+            case OUT_X: break;
+            case OUT_Y: break;
+            case OUT_Z: break;
+        }
+    } else {
+        switch (e.portId) {
+            case OUT_W:
+                getOutput(OUT_W).setChannels(0);
+                em.set_w_out(nullptr);
+                break;
+            case OUT_X: break;
+            case OUT_Y: break;
+            case OUT_Z: break;
+        }
+    }
+}
+
+void CoreModule::process_params(const ProcessArgs &args)
+{
     if (is_controller_1_connected()) {
         controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));
         controller1_midi_in.set_music_pass(getParamInt(getParam(P_C1_MUSIC_FILTER)));

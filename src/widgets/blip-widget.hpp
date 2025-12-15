@@ -38,4 +38,10 @@ Blip* createBlipCentered(
     NVGcolor hole = nvgRGBA(0, 0, 0, 0)
 );
 
+Blip* createBlipCentered(
+    Vec pos, const char * tip,
+    NVGcolor light = GetStockColor(StockColor::Azure),
+    NVGcolor rim = RampGray(G_50),
+    NVGcolor hole = nvgRGBA(0, 0, 0, 0)
+    );
 }

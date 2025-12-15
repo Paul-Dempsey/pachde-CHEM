@@ -82,4 +82,16 @@ Blip* createBlipCentered(
     return w;
 }
 
+Blip* createBlipCentered(
+    Vec pos, const char * tip,
+    NVGcolor light, NVGcolor rim, NVGcolor hole
+    )
+{
+    auto w = new Blip(hole, rim, light);
+    w->box.pos = pos;
+    if (tip) w->describe(tip);
+    Center(w);
+    return w;
+}
+
 }

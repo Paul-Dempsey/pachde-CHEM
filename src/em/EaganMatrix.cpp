@@ -534,6 +534,17 @@ void EaganMatrix::onMessage(PackedMidiMessage msg)
     uint8_t channel = midi_channel(msg);
     uint8_t status = midi_status(msg);
 
+    if (any_out()) {
+        switch (status) {
+        case MidiStatus_NoteOn:
+            w_out[channel] = 10.f * (msg.bytes.data1 != 0);
+            break;
+        case MidiStatus_NoteOff:
+            w_out[channel] = 0.f;
+            break;
+        }
+    }
+
     switch (channel) {
     case Haken::ch1: {
         switch (status) {
