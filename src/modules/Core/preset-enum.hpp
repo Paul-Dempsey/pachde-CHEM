@@ -40,6 +40,7 @@ struct PresetIdListBuilder : IHandleEmEvents
     IChemHost * chem{nullptr};
     bool end_received{false};
     bool complete{false};
+    float end_time{-1.f};
 
     virtual ~PresetIdListBuilder() {}
     PresetIdListBuilder(ChemId client_id, IChemHost* host, HakenPresetEnumerator* e) :

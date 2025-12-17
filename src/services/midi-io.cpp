@@ -115,9 +115,11 @@ void MidiInput::set_logger(const std::string& source, MidiLog* logger)
 
 void MidiInput::dispatch(float sampleTime)
 {
-    float midi_time = midi_timer.process(sampleTime);
-    if (midi_time < MIDI_RATE) return;
-    midi_timer.reset();
+    if (sampleTime > 0) {
+        float midi_time = midi_timer.process(sampleTime);
+        if (midi_time < MIDI_RATE) return;
+        midi_timer.reset();
+    }
 
     while (!ring.empty()) {
         auto message = ring.shift();
