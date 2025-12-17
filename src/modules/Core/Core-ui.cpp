@@ -612,6 +612,27 @@ void CoreModuleWidget::draw(const DrawArgs& args)
     ChemModuleWidget::draw(args);
     if (!my_module) return;
 
+    // Debug wxyz
+    // float base_y = 160;
+    // float range = 25;
+    // auto vg = args.vg;
+    // for (int i = 0; i < 16; i++) {
+    //     float x = 3.5 + i*2;
+    //     Circle(vg, x, base_y, 1, PORT_YELLOW);
+    //     Circle(vg, x, base_y - range, 1, PORT_YELLOW);
+    //     Circle(vg, x, base_y + range, 1, PORT_YELLOW);
+    // }
+    // nvgBeginPath(vg);
+    // for (int i = 0; i < 16; i++) {
+    //     float x = 3.5 + i*2;
+    //     nvgMoveTo(vg, x, base_y);
+    //     float y = base_y + my_module->mm_to_cv.bend[i] * range;
+    //     nvgLineTo(vg, x, y);
+    // }
+    // nvgStrokeColor(vg, PORT_YELLOW);
+    // nvgStrokeWidth(vg, 1.f);
+    // nvgStroke(vg);
+
     if (connected(my_module) && rack::settings::rackBrightness >= .95f) {
         drawMidiAnimation(args, false);
     }
@@ -780,28 +801,29 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
 
     menu->addChild(createSubmenuItem("Haken Requests", "", [=](Menu* menu) {
         menu->addChild(new MenuSeparator);
+
         menu->addChild(createMenuItem("Editor Hello", "", [my_module]() {
             my_module->haken_midi.editor_present(ChemId::Core);
-        }, busy));
+        }));
         menu->addChild(createMenuItem("ConText", "", [my_module]() {
             my_module->haken_midi.request_con_text(ChemId::Core);
-        }, busy));
+        }));
         menu->addChild(createMenuItem("Updates", "", [my_module]() {
             my_module->haken_midi.request_updates(ChemId::Core);
         }));
         menu->addChild(createMenuItem("Configuration", "", [my_module]() {
             my_module->haken_midi.request_configuration(ChemId::Core);
-        }, busy));
+        }));
         menu->addChild(createMenuItem("User presets", "", [my_module]() {
             my_module->haken_midi.request_user(ChemId::Core);
-        }, busy));
+        }));
         menu->addChild(createMenuItem("System presets", "", [my_module]() {
             my_module->haken_midi.request_system(ChemId::Core);
-        }, busy));
+        }));
         menu->addChild(new MenuSeparator);
         menu->addChild(createMenuItem("Remake Mahling data", "", [my_module]() {
             my_module->haken_midi.remake_mahling(ChemId::Core);
-        }, busy));
+        }));
 
     }));
 

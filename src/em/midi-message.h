@@ -43,6 +43,7 @@ struct IDoMidi {
 inline uint8_t midi_status(PackedMidiMessage msg) { return msg.bytes.status_byte & STATUS_MASK; }
 inline uint8_t midi_channel(PackedMidiMessage msg) { return msg.bytes.status_byte & CHANNEL_MASK; }
 inline uint8_t midi_cc(PackedMidiMessage msg) { return msg.bytes.data1; }
+inline uint8_t midi_note(PackedMidiMessage msg) { return msg.bytes.data1; }
 inline uint8_t midi_cc_value(PackedMidiMessage msg) { return msg.bytes.data2; }
 inline uint8_t midi_tag(PackedMidiMessage msg) { return msg.bytes.tag; }
 inline void midi_set_channel(PackedMidiMessage& msg, uint8_t channel) {
@@ -61,13 +62,13 @@ inline PackedMidiMessage MakeNoteOff(uint8_t channel, uint8_t note, uint8_t velo
     return MakeRaw(MidiStatus_NoteOff, channel, note, velocity);
 }
 inline PackedMidiMessage MakeNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-    return MakeRaw(MidiStatus_NoteOn, channel, note, velocity); 
+    return MakeRaw(MidiStatus_NoteOn, channel, note, velocity);
 }
 inline PackedMidiMessage MakePolyKeyPressure(uint8_t channel, uint8_t note, uint8_t pressure) {
-    return MakeRaw(MidiStatus_PolyKeyPressure, channel, note, pressure); 
+    return MakeRaw(MidiStatus_PolyKeyPressure, channel, note, pressure);
 }
 inline PackedMidiMessage MakeCC(uint8_t channel, uint8_t cc, uint8_t value) {
-    return MakeRaw(MidiStatus_CC, channel, cc, value); 
+    return MakeRaw(MidiStatus_CC, channel, cc, value);
 }
 inline PackedMidiMessage MakeProgramChange(uint8_t channel, uint8_t program) {
     return MakeRaw(MidiStatus_ProgramChange, channel, program, 0);

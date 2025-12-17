@@ -1,3 +1,4 @@
+#pragma once
 #include "chem.hpp"
 #include "chem-core.hpp"
 #include "chem-task.hpp"
@@ -12,6 +13,7 @@
 #include "services/midi-io.hpp"
 #include "services/svg-query.hpp"
 #include "widgets/widgets.hpp"
+#include "wxyz.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -81,6 +83,11 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool in_preset_request{false};
     // ui options
     bool glow_knobs{false};
+
+    // Music (Note) processing
+    //int music_outs{0}; // count of connected wxyz outputs
+    //bool wxyz_connected() { return 0 != music_outs; }
+    MusicMidiToCV mm_to_cv;
 
     std::shared_ptr<PresetList> user_presets{nullptr};
     std::shared_ptr<PresetList> system_presets{nullptr};

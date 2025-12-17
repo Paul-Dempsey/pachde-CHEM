@@ -115,14 +115,6 @@ struct EaganMatrix
     uint16_t post;
     ConvolutionParams convolution;
 
-    // note/expression output
-    float* w_out{nullptr};
-    float* x_out{nullptr};
-    float* y_out{nullptr};
-    float* z_out{nullptr};
-    uint8_t ch_frac_xyz[16]{0}; // cc87
-    bool any_out() { return 0 != ((intptr_t)w_out + (intptr_t)x_out + (intptr_t)y_out + (intptr_t)z_out); }
-
     FixedStringBuffer<32> name_buffer;
     FixedStringBuffer<256> text_buffer;
     PresetDescription preset;
@@ -133,11 +125,6 @@ struct EaganMatrix
     bool is_ready() { return ready; }
     void reset();
 
-    void set_w_out(float* pw) { w_out = pw; }
-    void set_x_out(float* pw) { x_out = pw; }
-    void set_y_out(float* pw) { y_out = pw; }
-    void set_z_out(float* pw) { z_out = pw; }
-
     uint16_t get_macro_value(int id) { return macro[id]; }
     float get_macro_voltage(int id);
 
@@ -146,7 +133,7 @@ struct EaganMatrix
     uint16_t get_post() { return post; }
     uint8_t get_hardware() { return hardware; }
     bool is_osmose() { return (Haken::hw_o49 == hardware); }
-    // device has a touch surface any Continuum or ContinuuMini
+    // device has a touch surface: any Continuum or ContinuuMini
     bool is_surface();
 
     ConvolutionParams& get_convolution() { return convolution; }

@@ -63,6 +63,8 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     midi_relay.register_target(&haken_midi_out);
 
     em.subscribeEMEvents(this);
+    mm_to_cv.em = &em;
+
     haken_midi.set_handler(&midi_relay);
 
     haken_device.init(ChemDevice::Haken, this);
@@ -824,11 +826,14 @@ void CoreModule::init_osmose() {
 }
 
 void CoreModule::do_message(PackedMidiMessage message) {
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Core) == midi_tag(message)) return;
+
+    mm_to_cv.do_message(message);
+
+    if (Haken::ccStat1 != message.bytes.status_byte) return;
     if (host_busy()) return;
 
-    auto cc = midi_cc(message);
+    uint8_t cc = midi_cc(message);
     switch (cc) {
     case Haken::ccAtten: {
         EmControlPort& port = modulation.get_port(0);
@@ -918,26 +923,14 @@ void CoreModule::processLights(const ProcessArgs &args) {
 void CoreModule::onPortChange(const PortChangeEvent &e)
 {
     if (e.type == Port::INPUT) return;
+
     if (e.connecting) {
-        switch (e.portId) {
-            case OUT_W:
-                getOutput(OUT_W).setChannels(16);
-                em.set_w_out(getOutput(OUT_W).getVoltages(0));
-                break;
-            case OUT_X: break;
-            case OUT_Y: break;
-            case OUT_Z: break;
-        }
+        //++music_outs;
+        getOutput(e.portId).setChannels(16);
     } else {
-        switch (e.portId) {
-            case OUT_W:
-                getOutput(OUT_W).setChannels(0);
-                em.set_w_out(nullptr);
-                break;
-            case OUT_X: break;
-            case OUT_Y: break;
-            case OUT_Z: break;
-        }
+        //--music_outs;
+        //assert(music_outs >= 0);
+        getOutput(e.portId).setChannels(0);
     }
 }
 
@@ -980,10 +973,19 @@ void CoreModule::process_gather(const ProcessArgs &args) {
 
     if (id_builder) {
         if (id_builder->finished()) {
-            em.unsubscribeEMEvents(id_builder);
-            delete id_builder;
+            auto t_builder = id_builder;
             id_builder = nullptr;
+            em.unsubscribeEMEvents(t_builder);
+            delete t_builder;
+            ui()->em_status_label->text("Starting full scan...");
             full_build->start_building();
+        } else if (id_builder->end_received && (-1.f == id_builder->end_time)) {
+            id_builder->end_time = 0.f;
+        } else if (id_builder->end_time >= 0.f) {
+            id_builder->end_time += args.sampleTime;
+            if (id_builder->end_time > 5.f) {
+                id_builder->complete = true;
+            }
         }
         return;
     }
@@ -1043,7 +1045,43 @@ void CoreModule::process(const ProcessArgs &args) {
     auto sample_time = args.sampleTime;
     controller1_midi_in.dispatch(sample_time);
     controller2_midi_in.dispatch(sample_time);
-    haken_midi_in.dispatch(sample_time);
+    haken_midi_in.dispatch(0.f);
+
+    float chv[16];
+    if (getOutput(OUT_W).isConnected()) {
+        for (uint8_t channel = 0; channel < 16; channel++) {
+            float v = 10.f * mm_to_cv.w[channel];
+            chv[channel] = v;
+        }
+        getOutput(OUT_W).writeVoltages(chv);
+    }
+
+    if (getOutput(OUT_X).isConnected()) {
+        for (uint8_t channel = 0; channel < 16; channel++) {
+            if (mm_to_cv.nn[channel]) {
+                double bend = mm_to_cv.bend[channel];
+                double nnv = ((double)mm_to_cv.nn[channel] + bend - 60.0) / 12.0;
+                chv[channel] = nnv;
+            } else {
+                chv[channel] = 0;
+            }
+        }
+        getOutput(OUT_X).writeVoltages(chv);
+    }
+
+    if (getOutput(OUT_Y).isConnected()) {
+        for (uint8_t channel = 0; channel < 16; channel++) {
+            chv[channel] = unipolar_14_to_rack(mm_to_cv.y[channel]);
+        }
+        getOutput(OUT_Y).writeVoltages(chv);
+    }
+
+    if (getOutput(OUT_Z).isConnected()) {
+        for (uint8_t channel = 0; channel < 16; channel++) {
+            chv[channel] = unipolar_14_to_rack(mm_to_cv.z[channel]);
+        }
+        getOutput(OUT_Z).writeVoltages(chv);
+    }
 
     if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {
         haken_midi_out.dispatch(DISPATCH_NOW);
