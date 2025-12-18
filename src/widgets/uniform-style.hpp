@@ -29,6 +29,7 @@ constexpr const float CORE_LINK_TEXT_DY = 13.f;
 extern widgetry::LabelStyle warning_label; // "warning" 9px left
 extern widgetry::LabelStyle haken_label;   // "dytext" 10px left
 extern widgetry::LabelStyle in_port_label; // "in-label" 12px center
+extern widgetry::LabelStyle out_port_label; // "out-label" 12px center
 extern widgetry::LabelStyle control_label; // "ctl-label" 14px center
 extern widgetry::LabelStyle control_label_left;  // "ctl-label" 14px left
 extern widgetry::LabelStyle small_control_label; // "label" 10px center

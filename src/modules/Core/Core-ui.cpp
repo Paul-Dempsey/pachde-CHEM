@@ -116,19 +116,19 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     addChild(Center(createThemedColorInput(bounds["k:c2mut"].getCenter(), &module_svgs, my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port)));
     addChild(createLabel<TextLabel>(bounds["k:c2mut-label"], "M2", S::in_port_label));
 
-    addChild(createLabel<TextLabel>(bounds["k:ok-label"], "OK", S::in_port_label));
+    addChild(createLabel<TextLabel>(bounds["k:ok-label"], "OK", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:ok"].getCenter(), &module_svgs, my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA)));
 
-    addChild(createLabel<TextLabel>(bounds["k:w-label"], "W", S::in_port_label));
+    addChild(createLabel<TextLabel>(bounds["k:w-label"], "W", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:w"].getCenter(), &module_svgs, my_module, CoreModule::OUT_W, "mpe-ring", PORT_GREEN)));
 
-    addChild(createLabel<TextLabel>(bounds["k:x-label"], "X", S::in_port_label));
+    addChild(createLabel<TextLabel>(bounds["k:x-label"], "X", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:x"].getCenter(), &module_svgs, my_module, CoreModule::OUT_X, "mpe-ring", PORT_GREEN)));
 
-    addChild(createLabel<TextLabel>(bounds["k:y-label"], "Y", S::in_port_label));
+    addChild(createLabel<TextLabel>(bounds["k:y-label"], "Y", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:y"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Y, "mpe-ring", PORT_GREEN)));
 
-    addChild(createLabel<TextLabel>(bounds["k:z-label"], "Z", S::in_port_label));
+    addChild(createLabel<TextLabel>(bounds["k:z-label"], "Z", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:z"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Z, "mpe-ring", PORT_GREEN)));
 
     module_svgs.changeTheme(theme);
@@ -396,6 +396,12 @@ void CoreModuleWidget::setThemeName(const std::string& name, void * context)
 {
     set_theme_colors(name);
     ChemModuleWidget::setThemeName(name, context);
+}
+
+void CoreModuleWidget::hot_reload() {
+    Base::hot_reload();
+    auto svg = module_svgs.loadSvg(panelFilename());
+    svg_query::hideElements(svg, "k:");
 }
 
 // IChemClient

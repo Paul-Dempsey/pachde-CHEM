@@ -29,6 +29,7 @@ struct StateButton : SvgButton
         down_svg(svg_down),
         click_fn(on_click)
     {
+        this->shadow->hide();
     };
     virtual ~StateButton()
     {

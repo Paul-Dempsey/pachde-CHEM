@@ -5,7 +5,7 @@
   <g>
     <path
        id="ctl-glyph"
-       fill="hsl(0,0%,70%)"
+       fill="#b2b2b2"
        d="
        M 1, 1 h 6 v 1 h -6 z
        M 1, 5 h 6 v 1 h -6 z
@@ -15,6 +15,5 @@
        M 9, 5 h 6 v 1 h -6 z
        M 9, 9 h 6 v 1 h -6 z
        M 9,13 h 6 v 1 h -6 z
-
        " />  </g>
 </svg>

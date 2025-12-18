@@ -168,7 +168,7 @@ struct Hamburger : TipWidget, IThemed
 };
 
 template <class TBaseWidget>
-struct HamburgerUi : TBaseWidget
+struct HamburgerUi : TBaseWidget, IThemed
 {
     using Base = TBaseWidget;
     HamData data;
@@ -208,7 +208,9 @@ struct HamburgerUi : TBaseWidget
         Base::onButton(e);
     }
 
-    void applyTheme(std::shared_ptr<SvgTheme> theme) { data.applyTheme(theme); }
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override {
+        data.applyTheme(theme);
+    }
 
     void draw(const ::rack::Widget::DrawArgs& args) override {
         Base::draw(args);

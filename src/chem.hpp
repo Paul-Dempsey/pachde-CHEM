@@ -70,14 +70,12 @@ struct ChemModuleWidget : ModuleWidget, IThemeHolder
     std::shared_ptr<SvgTheme> getSvgTheme();
 
     virtual void createScrews() {}
+    virtual void hot_reload();
     void set_extender_theme(LeftRight which, const std::string& name);
 
     void onHoverKey(const HoverKeyEvent& e) override;
     void step() override;
 
-    #ifdef LAYOUT_HELP
-    void drawCrossLine(NVGcontext *vg, float x, float y);
-    #endif
     void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };

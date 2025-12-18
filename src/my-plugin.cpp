@@ -95,6 +95,9 @@ void initThemeCache() {
             ErrorContext* error_context = nullptr;
 #endif
     for (size_t i = 0; i < sizeof(theme_files)/sizeof(theme_files[0]); i++) {
+#ifdef DEV_BUILD
+        DEBUG("Loading %s", theme_files[i]);
+#endif
         auto theme = loadSvgThemeFile(asset::plugin(pluginInstance, theme_files[i]), error_context);
 #ifdef DEV_BUILD
         if (!theme) {

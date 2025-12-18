@@ -303,6 +303,8 @@ enum ThemeColor {
 
 struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
 {
+    using Base = ChemModuleWidget;
+
     CoreModuleWidget(CoreModule *module);
     virtual ~CoreModuleWidget();
 
@@ -368,6 +370,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     void onTaskMessage(uint8_t code) override;
     void onLED(uint8_t led) override;
 
+    void hot_reload() override;
     void setThemeName(const std::string& name, void *context) override;
 
     void drawMidiAnimation(const DrawArgs& args, bool halo);

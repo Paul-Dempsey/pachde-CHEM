@@ -115,11 +115,11 @@ JackUi::JackUi(JackModule *module) :
     addChild(level_2 = createWidgetCentered<LevelWidget>(Vec(CENTER + 14.25f, y - 5.f + S::PORT_DY)));
 
     addChild(Center(createThemedColorOutput(Vec(x , y), &module_svgs, my_module, JackModule::OUT_JACK_1, S::OutputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "1", S::out_port_label));
 
     y += S::PORT_DY;
     addChild(Center(createThemedColorOutput(Vec(x, y), &module_svgs, my_module, JackModule::OUT_JACK_2, S::OutputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", S::in_port_label));
+    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 8, "2", S::out_port_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(30.f,box.size.y-9.f, RampGray(G_50), "[connection]"));

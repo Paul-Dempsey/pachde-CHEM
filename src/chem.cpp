@@ -107,7 +107,7 @@ void remove_screws()
     }
 }
 
-void ChemModuleWidget::set_extender_theme(LeftRight which, const std::string& name)
+void ChemModuleWidget::set_extender_theme(LeftRight which, const std::string &name)
 {
     auto expander = left(which) ? module->getLeftExpander().module : module->getRightExpander().module;
     if (isPeerModule(module, expander)) {
@@ -119,20 +119,19 @@ void ChemModuleWidget::set_extender_theme(LeftRight which, const std::string& na
     }
 }
 
+void ChemModuleWidget::hot_reload() {
+    reloadThemeCache();
+    module_svgs.reloadAll();
+    setThemeName(getThemeName(), nullptr);
+}
+
 void ChemModuleWidget::setThemeName(const std::string& name, void *context)
 {
     if (!module) return;
 
-    // auto panel = dynamic_cast<rack::app::SvgPanel*>(getPanel());
-    // if (!panel) return;
-
     getChemModule()->setThemeName(name, context);
     auto svg_theme = getSvgTheme();
     module_svgs.changeTheme(svg_theme);
-    // std::shared_ptr<Svg> newSvg = module_svgs.loadSvg(panelFilename());
-    // if (applySvgTheme(newSvg, svg_theme)) {
-    //     panel->setBackground(newSvg);
-    // }
     svg_theme::applyChildrenTheme(this, svg_theme);
 
     if (context == this) {
@@ -180,8 +179,7 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
     case GLFW_KEY_F5: {
         if (e.action == GLFW_RELEASE && (0 == mods)) {
             e.consume(this);
-            reloadThemeCache();
-            setThemeName(getThemeName(), nullptr);
+            hot_reload();
         }
     } break;
 
@@ -193,17 +191,7 @@ void ChemModuleWidget::onHoverKey(const HoverKeyEvent& e)
         break;
     }
     Base::onHoverKey(e);
-
 }
-
-#ifdef LAYOUT_HELP
-void ChemModuleWidget::drawCrossLine(NVGcontext *vg, float x, float y)
-{
-    NVGcolor co = Overlay(GetStockColor(StockColor::Gold), 0.35f);
-    Line(vg, 0.f, y, box.size.x, y, co, 0.5f);
-    Line(vg, x, 0.f, x, box.size.y, co, 0.5f);
-}
-#endif
 
 void ChemModuleWidget::draw(const DrawArgs& args)
 {
