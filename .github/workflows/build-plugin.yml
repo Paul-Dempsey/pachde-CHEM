@@ -15,7 +15,7 @@ on:
   pull_request:
 
 env:
-  rack-sdk-version: 2.6.3
+  rack-sdk-version: 2.6.6
   rack-plugin-toolchain-dir: /home/build/rack-plugin-toolchain
 
 defaults:
