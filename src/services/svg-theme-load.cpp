@@ -63,8 +63,9 @@ void ErrorContext::setErrorText(ErrorCode code, const char * where)
     error = code;
     auto scan = line_start;
     while (*scan && '\n' != *scan) scan++;
-    std::strncpy(text, line_start, scan - line_start);
-    text[scan - line_start] = 0;
+    int lim = std::min((int)(scan - line_start), (int)sizeof(text)-1);
+    std::strncpy(text, line_start, lim);
+    text[lim] = 0;
     offset = where - line_start;
 }
 
@@ -746,7 +747,8 @@ std::shared_ptr<SvgTheme> loadSvgThemeFile(std::string path, ErrorContext* error
             if (!name.empty()) {
                 theme->name = name;
                 if (error_context) {
-                    strncpy(error_context->theme_name, name.c_str(), sizeof(error_context->theme_name));
+                    strncpy(error_context->theme_name, name.c_str(), sizeof(error_context->theme_name)-1);
+                    error_context->theme_name[64] = 0;
                 }
             }
         } else {
