@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="8" height="8" viewBox="0 0 8 8" version="1.1"
+  xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <linearGradient id="g-face" x1="2.17" y1="1.05" x2="5.36" y2="7.04" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#7ec77c" offset="0" />
+    <stop stop-color="#d6f6d5" offset="1" />
+  </linearGradient>
+  <linearGradient id="g-bevel" x1="5" y1="0" x2="7" y2="8" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#e1f2e2" offset="0" />
+    <stop stop-color="#097105" offset="1" />
+  </linearGradient>
+  <circle id="tt-bevel" fill="url(#g-bevel)" cx="3.95" cy="3.95" r="3.9" />
+  <circle id="tt-rim" fill="none" stroke="#143913" stroke-width=".25" cx="3.95" cy="3.95" r="3.78" />
+  <circle id="tt-face" fill="url(#g-face)" cx="3.95" cy="3.95" r="3.4" />
+</svg>

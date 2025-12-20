@@ -39,6 +39,8 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     snap(configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", ""));
     dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
+    dp4(configParam(P_Y_SLEW, 0.f, 1.f, 0.f, "Y Slew", "%", 0.f, 100.f));
+    dp4(configParam(P_Z_SLEW, 0.f, 1.f, 0.f, "Z Slew", "%", 0.f, 100.f));
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
     configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
@@ -936,6 +938,14 @@ void CoreModule::onPortChange(const PortChangeEvent &e)
 
 void CoreModule::process_params(const ProcessArgs &args)
 {
+    float p = getParam(P_Y_SLEW).getValue();
+    if (p > 0.) p = (10. / p);
+    y_slew.configure(p, p);
+
+    p = getParam(P_Z_SLEW).getValue();
+    if (p > 0.) p = (10. / p);
+    z_slew.configure(p, p);
+
     if (is_controller_1_connected()) {
         controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));
         controller1_midi_in.set_music_pass(getParamInt(getParam(P_C1_MUSIC_FILTER)));
@@ -1047,40 +1057,46 @@ void CoreModule::process(const ProcessArgs &args) {
     controller2_midi_in.dispatch(sample_time);
     haken_midi_in.dispatch(0.f);
 
-    float chv[16];
     if (getOutput(OUT_W).isConnected()) {
         for (uint8_t channel = 0; channel < 16; channel++) {
-            float v = 10.f * mm_to_cv.w[channel];
-            chv[channel] = v;
+            getOutput(OUT_W).setVoltage(10.f * mm_to_cv.w[channel], channel);
         }
-        getOutput(OUT_W).writeVoltages(chv);
     }
 
     if (getOutput(OUT_X).isConnected()) {
         for (uint8_t channel = 0; channel < 16; channel++) {
-            if (mm_to_cv.nn[channel]) {
-                double bend = mm_to_cv.bend[channel];
-                double nnv = ((double)mm_to_cv.nn[channel] + bend - 60.0) / 12.0;
-                chv[channel] = nnv;
-            } else {
-                chv[channel] = 0;
-            }
+            uint8_t nn = mm_to_cv.nn[channel];
+            float v = nn ? ((double)nn + mm_to_cv.bend[channel] - 60.0) / 12.0 : 0.f;
+            getOutput(OUT_X).setVoltage(v, channel);
         }
-        getOutput(OUT_X).writeVoltages(chv);
     }
 
     if (getOutput(OUT_Y).isConnected()) {
-        for (uint8_t channel = 0; channel < 16; channel++) {
-            chv[channel] = unipolar_14_to_rack(mm_to_cv.y[channel]);
+        if (y_slew.slewing()) {
+            for (uint8_t channel = 0; channel < 16; channel++) {
+                float sample(unipolar_14_to_rack(mm_to_cv.y[channel]));
+                float last{getOutput(OUT_Y).getVoltage(channel)};
+                getOutput(OUT_Y).setVoltage(y_slew.next(sample, last, args.sampleTime), channel);
+            }
+        } else {
+            for (uint8_t channel = 0; channel < 16; channel++) {
+                getOutput(OUT_Y).setVoltage(unipolar_14_to_rack(mm_to_cv.y[channel]), channel);
+            }
         }
-        getOutput(OUT_Y).writeVoltages(chv);
     }
 
     if (getOutput(OUT_Z).isConnected()) {
-        for (uint8_t channel = 0; channel < 16; channel++) {
-            chv[channel] = unipolar_14_to_rack(mm_to_cv.z[channel]);
+        if (z_slew.slewing()) {
+            for (uint8_t channel = 0; channel < 16; channel++) {
+                float sample {unipolar_14_to_rack(mm_to_cv.z[channel])};
+                float prev {getOutput(OUT_Z).getVoltage(channel)};
+                getOutput(OUT_Z).setVoltage(z_slew.next(sample, prev, args.sampleTime), channel);
+            }
+        } else {
+            for (uint8_t channel = 0; channel < 16; channel++) {
+                getOutput(OUT_Z).setVoltage(unipolar_14_to_rack(mm_to_cv.z[channel]), channel);
+            }
         }
-        getOutput(OUT_Z).writeVoltages(chv);
     }
 
     if (haken_midi_out.ring.size() > 2*(haken_midi_out.ring.capacity()/3)) {

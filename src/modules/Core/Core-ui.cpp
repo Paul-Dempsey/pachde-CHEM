@@ -24,11 +24,6 @@ CoreModuleWidget::~CoreModuleWidget()
 // Layout
 constexpr const int MODULE_WIDTH = 165;
 constexpr const float CENTER = static_cast<float>(MODULE_WIDTH) * .5f;
-constexpr const float NAV_ROW = 144.f;
-constexpr const float PICKER_TOP = 222.f;
-constexpr const float PICKER_INTERVAL = 36.5f;
-constexpr const float PICKER_LABEL_OFFSET = 12.5f;
-constexpr const float MIDI_ANIMATION_OFFSET = 27.75f;
 constexpr const float ROUND_LIGHT_SPREAD = 6.f;
 constexpr const int MIDI_ANIMATION_MARGIN = 8.f;
 namespace S = pachde::style;
@@ -84,10 +79,11 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     addChild(preset_label = createLabel<TipLabel>(bounds["k:preset"], "[preset]", style));
     preset_label->glowing(true);
 
-    createRoundingLeds(Vec(CENTER + 40.f, NAV_ROW), ROUND_LIGHT_SPREAD);
-    create_octave_shift_leds(this, CENTER - 40.f, NAV_ROW, 4.5f, my_module, CoreModule::L_OCT_SHIFT_FIRST);
+    Vec pos = bounds["k:prev"].getCenter();
+    createRoundingLeds(Vec(CENTER + 40.f, pos.y), ROUND_LIGHT_SPREAD);
+    create_octave_shift_leds(this, CENTER - 40.f, pos.y, 4.5f, my_module, CoreModule::L_OCT_SHIFT_FIRST);
 
-    auto prev = createWidgetCentered<PrevButton>(bounds["k:prev"].getCenter());
+    auto prev = createWidgetCentered<PrevButton>(pos);
     if (my_module) {
         prev->describe("Select previous preset");
         prev->setHandler([this](bool, bool){ my_module->prev_preset(); });
@@ -127,9 +123,11 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     addChild(createLabel<TextLabel>(bounds["k:y-label"], "Y", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:y"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Y, "mpe-ring", PORT_GREEN)));
+    addChild(createChemKnob<TinyTrimPot>(bounds["k:slewy"].getCenter(), &module_svgs, my_module, CoreModule::P_Y_SLEW));
 
     addChild(createLabel<TextLabel>(bounds["k:z-label"], "Z", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:z"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Z, "mpe-ring", PORT_GREEN)));
+    addChild(createChemKnob<TinyTrimPot>(bounds["k:slewz"].getCenter(), &module_svgs, my_module, CoreModule::P_Z_SLEW));
 
     module_svgs.changeTheme(theme);
     applyChildrenTheme(this, theme);
@@ -156,6 +154,7 @@ void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
         Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", style));
 
     LabelStyle midi_style{"midi-name", TextAlignment::Left, 12.f};
+
     haken_picker = createMidiPicker(bounds["k:haken"].pos, "HAKEN device", &my_module->haken_device, &my_module->haken_device);
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
     addChild(haken_device_label = createLabel<TextLabel>(bounds["k:haken-device"], text, midi_style));
@@ -225,16 +224,16 @@ void CoreModuleWidget::createRoundingLeds(Vec pos, float spread)
 void CoreModuleWidget::create_stop_button()
 {
     if (!stop_button) {
-        stop_button = createWidget<TextButton>(Vec(CENTER, NAV_ROW));
-        stop_button->box.size.x = 80.f;
-        stop_button->box.size.y = 18.f;
+        stop_button = new TextButton();
+        auto layout = module_svgs.loadSvg(panelFilename());
+        stop_button->box = svg_query::elementBounds(layout, "k:stop-scan");
         stop_button->set_text("stop scan");
         stop_button->setHandler([=](bool, bool){
             my_module->stop_scan = true;
             remove_stop_button();
             em_status_label->text("Preset scan stopped");
         });
-        addChild(Center(stop_button));
+        addChild(stop_button);
     }
 }
 
@@ -286,14 +285,6 @@ void CoreModuleWidget::updateIndicators()
     }
 }
 
-// void CoreModuleWidget::resetIndicators()
-// {
-//     auto co = themeColor(coTask0);
-//     mididevice_indicator   ->setColor(co); mididevice_indicator   ->setFill(false);
-//     heartbeat_indicator    ->setColor(co); heartbeat_indicator    ->setFill(false);
-//     em_init_indicator      ->setColor(co); em_init_indicator      ->setFill(false);
-//     presetinfo_indicator   ->setColor(co); presetinfo_indicator   ->setFill(false);
-// }
 void CoreModuleWidget::connect_midi(bool on)
 {
     if (my_module) my_module->connect_midi(on);
@@ -574,8 +565,9 @@ void drawDotHalo(NVGcontext* vg, float x, float y, const NVGcolor& co, bool halo
 
 void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
 {
-    float y = PICKER_TOP + MIDI_ANIMATION_OFFSET;
+    const float cy_ani = 3.5;
     float x = midi_animation_cx(my_module->haken_midi_out.count());
+    float y = cy_ani + haken_device_label->box.getBottom();
     NVGcolor co = themeColor(ThemeColor::coHakenMidiOut);
     drawDotHalo(args.vg, x, y, co, halo);
 
@@ -583,17 +575,17 @@ void CoreModuleWidget::drawMidiAnimation(const DrawArgs& args, bool halo)
     x = midi_animation_cx(my_module->haken_midi_in.count());
     drawDotHalo(args.vg, x, y, co, halo);
 
-    y += PICKER_INTERVAL;
     if (my_module->is_controller_1_connected()) {
         co = themeColor(ThemeColor::coC1MidiIn);
         x = midi_animation_cx(my_module->controller1_midi_in.count());
+        y = cy_ani + controller1_device_label->box.getBottom();
         drawDotHalo(args.vg, x, y, co, halo);
     }
 
-    y += PICKER_INTERVAL;
     if (my_module->is_controller_2_connected()) {
         co = themeColor(ThemeColor::coC2MidiIn);
         x = midi_animation_cx(my_module->controller2_midi_in.count());
+        y = cy_ani + controller2_device_label->box.getBottom();
         drawDotHalo(args.vg, x, y, co, halo);
     }
 }

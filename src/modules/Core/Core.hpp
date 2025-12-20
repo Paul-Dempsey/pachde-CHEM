@@ -2,6 +2,7 @@
 #include "chem.hpp"
 #include "chem-core.hpp"
 #include "chem-task.hpp"
+#include "dsp.hpp"
 #include "em/EaganMatrix.hpp"
 #include "em/preset-list.hpp"
 #include "preset-enum.hpp"
@@ -85,9 +86,10 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
     bool glow_knobs{false};
 
     // Music (Note) processing
-    //int music_outs{0}; // count of connected wxyz outputs
-    //bool wxyz_connected() { return 0 != music_outs; }
     MusicMidiToCV mm_to_cv;
+
+    SimpleSlewLimiter y_slew;
+    SimpleSlewLimiter z_slew;
 
     std::shared_ptr<PresetList> user_presets{nullptr};
     std::shared_ptr<PresetList> system_presets{nullptr};
@@ -231,6 +233,8 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_C1_CHANNEL_MAP,
         P_C2_CHANNEL_MAP,
         P_ATTENUATION,
+        P_Y_SLEW,
+        P_Z_SLEW,
         NUM_PARAMS
     };
     enum Inputs {

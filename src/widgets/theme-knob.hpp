@@ -153,6 +153,10 @@ struct GrayTrimPotSvg {
     static std::string bg() { return "res/widgets/trimpot-gray-bg.svg"; }
     static std::string knob() { return "res/widgets/trimpot-gray.svg"; }
 };
+struct TinyTrimPotSvg {
+    static std::string bg() { return "res/widgets/tiny-trim-bg.svg"; }
+    static std::string knob() { return "res/widgets/tiny-trim.svg"; }
+};
 struct UselessSvg {
     static std::string bg() { return "res/widgets/useless-knob-bg.svg"; }
     static std::string knob() { return "res/widgets/useless-knob.svg"; }
@@ -167,6 +171,7 @@ using YellowKnob = TKnob<YellowKnobSvg>;
 using VioletKnob = TKnob<VioletKnobSvg>;
 
 using TrimPot = TKnob<TrimPotSvg>;
+using TinyTrimPot = TKnob<TinyTrimPotSvg>;
 using GreenTrimPot = TKnob<GreenTrimPotSvg>;
 using GrayTrimPot = TKnob<GrayTrimPotSvg>;
 
