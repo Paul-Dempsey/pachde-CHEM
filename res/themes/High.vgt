@@ -7,6 +7,7 @@ choice-hover = none stroke hsl(41, .75, .8) width 0.5
 choice = #ededed stroke #888 width 0.5
 cop-bezel = #595959 stroke none
 cop-ring = #666666
+cop-hole = #000
 ctl-active = #5b74f0
 ctl-disabled = #888 stroke #888
 ctl-frame-hi = stroke #a6a6a6
