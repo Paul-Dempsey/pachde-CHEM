@@ -149,6 +149,7 @@ setting = hsl(60, .5, .6)
 slide-fill = stroke hsl(32, .9, .6) width 3.5
 slide-stem = stroke hsl(200, .5, .5) width 3.5
 slide-thumb = hsl(120, .5, .5)
+slide-mod = hsl(41, .5, .5) stroke hsl(41, .5, .5) width .25
 t-face = opacity 1 [ #c982c4, #4e054e ]
 t-gnomen = opacity 1 #f5f5ef
 t-pin = opacity 1 stroke #da4dda width .3

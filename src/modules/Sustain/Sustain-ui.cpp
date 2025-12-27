@@ -67,6 +67,7 @@ void SusUi::create_ui()
     }
 
     module_svgs.changeTheme(theme);
+    applyChildrenTheme(this, theme);
 
     // init
 
