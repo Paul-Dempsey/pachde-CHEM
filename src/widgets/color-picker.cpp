@@ -10,13 +10,13 @@ void ColorPicker::set_text_color() {
     case ColorSyntax::Unknown:
         break;
     case ColorSyntax::Hex:
-        text_input->text = hex_string(color);
+        text_input->setText(hex_string(color));
         break;
     case ColorSyntax::RGB:
-        text_input->text = rgba_string(color);
+        text_input->setText(rgba_string(color));
         break;
     case ColorSyntax::HSL:
-        text_input->text = hsla_string(hue, saturation, lightness, nvg_color.a);
+        text_input->setText(hsla_string(hue, saturation, lightness, nvg_color.a));
         break;
     }
 }

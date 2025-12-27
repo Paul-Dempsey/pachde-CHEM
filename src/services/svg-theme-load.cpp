@@ -747,8 +747,9 @@ std::shared_ptr<SvgTheme> loadSvgThemeFile(std::string path, ErrorContext* error
             if (!name.empty()) {
                 theme->name = name;
                 if (error_context) {
-                    strncpy(error_context->theme_name, name.c_str(), sizeof(error_context->theme_name)-1);
-                    error_context->theme_name[64] = 0;
+                    int lim = sizeof(error_context->theme_name)-1;
+                    strncpy(error_context->theme_name, name.c_str(), lim);
+                    error_context->theme_name[lim] = 0;
                 }
             }
         } else {
