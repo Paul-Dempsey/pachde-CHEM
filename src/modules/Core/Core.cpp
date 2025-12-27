@@ -39,8 +39,10 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     configSwitch(Params::P_C2_CHANNEL_MAP, 0.f, 1.f, 0.f, "MIDI 2 Channel map", { "off", "reflect" } );
     snap(configParam(Params::P_NOTHING, 0.f, 60*60, 0.f, "CHEM-time", ""));
     dp2(configParam(Params::P_ATTENUATION, 0.f, 10.f, 0.f, "Volume"));
+
     dp4(configParam(P_Y_SLEW, 0.f, 1.f, 0.f, "Y Slew", "%", 0.f, 100.f));
     dp4(configParam(P_Z_SLEW, 0.f, 1.f, 0.f, "Z Slew", "%", 0.f, 100.f));
+    configSwitch(P_EXTEND_SLEW, 0.f, 1.f, 0.f, "Slew time", { "normal", "extended"});
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
     configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
@@ -768,15 +770,17 @@ void CoreModule::dataFromJson(json_t *root) {
     controller2.set_claim(get_json_string(root, "controller-2"));
     enable_logging(get_json_bool(root, "log-midi", false));
     glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
+    mm_to_cv.zero_xyz = get_json_bool(root, "zero-xyz", mm_to_cv.zero_xyz);
 }
 
 json_t* CoreModule::dataToJson() {
     json_t* root = ChemModule::dataToJson();
-    json_object_set_new(root, "haken-device", json_string(haken_device.get_claim().c_str()));
-    json_object_set_new(root, "controller-1", json_string(controller1.get_claim().c_str()));
-    json_object_set_new(root, "controller-2", json_string(controller2.get_claim().c_str()));
-    json_object_set_new(root, "log-midi", json_boolean(is_logging()));
-    json_object_set_new(root, "glow-knobs", json_boolean(glow_knobs));
+    set_json(root, "haken-device", haken_device.get_claim());
+    set_json(root, "controller-1", controller1.get_claim());
+    set_json(root, "controller-2", controller2.get_claim());
+    set_json(root, "log-midi", is_logging());
+    set_json(root, "glow-knobs", glow_knobs);
+    set_json(root, "zero-xyz", mm_to_cv.zero_xyz);
     return root;
 }
 
@@ -938,13 +942,20 @@ void CoreModule::onPortChange(const PortChangeEvent &e)
 
 void CoreModule::process_params(const ProcessArgs &args)
 {
-    float p = getParam(P_Y_SLEW).getValue();
-    if (p > 0.) p = (10. / p);
-    y_slew.configure(p, p);
+    {
+        float extend = getParam(P_EXTEND_SLEW).getValue();
+        getLight(L_EXTEND_SLEW).setBrightness(extend);
 
-    p = getParam(P_Z_SLEW).getValue();
-    if (p > 0.) p = (10. / p);
-    z_slew.configure(p, p);
+        float slew_range = extend > .5f ? 1. : 10.;
+
+        float p = getParam(P_Y_SLEW).getValue();
+        if (p > 0.) p = (slew_range / p);
+        y_slew.configure(p, p);
+
+        p = getParam(P_Z_SLEW).getValue();
+        if (p > 0.) p = (slew_range / p);
+        z_slew.configure(p, p);
+    }
 
     if (is_controller_1_connected()) {
         controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));

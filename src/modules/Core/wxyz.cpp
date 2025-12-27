@@ -43,10 +43,12 @@ void MusicMidiToCV::do_message(PackedMidiMessage msg) {
 
     case MidiStatus_NoteOff:
         w[channel] = 0;
-        nn[channel] = 0;
-        bend[channel] = 0;
-        y[channel] = 0;
-        z[channel] = 0;
+        if (zero_xyz) {
+            nn[channel] = 0;
+            bend[channel] = 0;
+            y[channel] = 0;
+            z[channel] = 0;
+        }
         break;
     }
 

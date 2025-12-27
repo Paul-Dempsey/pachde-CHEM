@@ -9,6 +9,7 @@ struct MusicMidiToCV
     uint16_t y[16]{0};
     uint16_t z[16]{0};
     uint8_t fracXYZ[16]{0};
+    bool zero_xyz{false};
 
     eaganmatrix::EaganMatrix * em{nullptr};
 
@@ -17,6 +18,5 @@ struct MusicMidiToCV
         fracXYZ[channel] = 0;
         return r;
     }
-
     void do_message(PackedMidiMessage message);
 };

@@ -115,6 +115,9 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     addChild(createLabel<TextLabel>(bounds["k:ok-label"], "OK", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:ok"].getCenter(), &module_svgs, my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA)));
 
+    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
+        bounds["k:extend-slew"].getCenter(), &module_svgs, my_module, CoreModule::P_EXTEND_SLEW, CoreModule::L_EXTEND_SLEW)));
+
     addChild(createLabel<TextLabel>(bounds["k:w-label"], "W", S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:w"].getCenter(), &module_svgs, my_module, CoreModule::OUT_W, "mpe-ring", PORT_GREEN)));
 
@@ -758,6 +761,13 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
         my_module->disconnected ? false : busy
     ));
 
+    menu->addChild(createCheckMenuItem("Zero XYZ on Note off", "",
+        [my_module](){ return my_module->mm_to_cv.zero_xyz; },
+        [my_module](){ my_module->mm_to_cv.zero_xyz = !my_module->mm_to_cv.zero_xyz; }
+    ));
+
+    menu->addChild(new MenuSeparator);
+
     bool logos = style::show_browser_logo();
     menu->addChild(createCheckMenuItem("Show logos in browser", "",
         [=](){ return logos; },
@@ -778,6 +788,8 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
             ui->glowing_knobs(my_module->glow_knobs);
         }
     ));
+
+    menu->addChild(new MenuSeparator);
 
     if (my_module->em.is_surface()) {
         menu->addChild(createSubmenuItem("Calibration", "", [=](Menu* menu) {

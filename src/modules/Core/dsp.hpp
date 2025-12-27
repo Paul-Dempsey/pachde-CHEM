@@ -17,10 +17,9 @@ struct SimpleSlewLimiter {
 
     float next(float sample, float last_sample, float sampleTime){
         if (0.f == last_sample) return sample;
-        float dx = fall * sampleTime;
         return clamp(sample,
-            last_sample - dx,
-            last_sample + dx
+            last_sample - (fall * sampleTime),
+            last_sample + (rise * sampleTime)
         );
     }
 };
