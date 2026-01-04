@@ -116,6 +116,7 @@ struct PreUi : ChemModuleWidget, IChemClient
     TrackWidget* tracks[PreModule::NUM_MOD_PARAMS];
 
     PreUi(PreModule *module);
+    virtual ~PreUi();
 
     bool connected();
     void glowing_knobs(bool glow);

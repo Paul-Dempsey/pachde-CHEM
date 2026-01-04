@@ -152,6 +152,12 @@ PreUi::PreUi(PreModule *module) :
     }
 }
 
+PreUi::~PreUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
+}
+
 void PreUi::glowing_knobs(bool glow) {
     for (int i = 0; i < PreModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);

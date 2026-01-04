@@ -116,6 +116,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     TrackWidget* tracks[PostModule::NUM_PARAMS];
 
     PostUi(PostModule *module);
+    virtual ~PostUi();
 
     bool connected();
     void glowing_knobs(bool glow);

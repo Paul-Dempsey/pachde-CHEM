@@ -145,6 +145,12 @@ PostUi::PostUi(PostModule *module) :
     }
 }
 
+PostUi::~PostUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
+}
+
 void PostUi::glowing_knobs(bool glow) {
     for (int i = 0; i < PostModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);

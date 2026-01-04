@@ -26,6 +26,12 @@ SusUi::SusUi(SusModule *module) :
     setModule(module);
 }
 
+SusUi::~SusUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
+}
+
 void SusUi::create_ui()
 {
     auto theme = getSvgTheme();

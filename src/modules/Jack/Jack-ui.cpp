@@ -146,6 +146,9 @@ JackUi::JackUi(JackModule *module) :
     }
 }
 
+JackUi::~JackUi(){
+    if (my_module) my_module->set_chem_ui(nullptr);
+}
 
 void JackUi::onConnectHost(IChemHost* host)
 {

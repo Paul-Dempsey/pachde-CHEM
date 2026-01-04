@@ -1,6 +1,6 @@
 #include "MidiPad.hpp"
-#include "services/colors.hpp"
 #include "em/em-hardware.h"
+#include "services/colors.hpp"
 #include "widgets/widgets.hpp"
 
 namespace S = pachde::style;
@@ -377,6 +377,10 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         my_module->set_chem_ui(this);
         onConnectHost(my_module->chem_host);
     }
+}
+
+MidiPadUi::~MidiPadUi() {
+    if (my_module) my_module->set_chem_ui(nullptr);
 }
 
 void changePanelWidth(SvgPanel* panel, float width)

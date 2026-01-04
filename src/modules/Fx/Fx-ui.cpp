@@ -135,6 +135,10 @@ FxUi::FxUi(FxModule *module) :
     }
 }
 
+FxUi::~FxUi() {
+    if (my_module) my_module->set_chem_ui(nullptr);
+}
+
 void FxUi::glowing_knobs(bool glow) {
     for (int i = 0; i < FxModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);

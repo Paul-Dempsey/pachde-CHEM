@@ -127,6 +127,9 @@ struct XMUi : ChemModuleWidget
 
     XMUi(XMModule *module);
     virtual ~XMUi() {
+        if (my_module) {
+            my_module->set_chem_ui(nullptr);
+        }
         if (editing) set_edit_mode(false);
     }
 

@@ -113,6 +113,7 @@ struct OverlayUi : ChemModuleWidget, IChemClient
     VText* title_widget{nullptr};
 
     OverlayUi(OverlayModule *module);
+    virtual ~OverlayUi();
 
     bool connected();
     void set_title(std::string text);

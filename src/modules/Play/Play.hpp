@@ -121,7 +121,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     std::string playlist_device;
 
     PlayUi(PlayModule *module);
-    ~PlayUi();
+    virtual ~PlayUi();
 
     bool connected();
     void select_preset(PresetId id);

@@ -138,6 +138,12 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     }
 }
 
+OverlayUi::~OverlayUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
+}
+
 void OverlayUi::onConnectHost(IChemHost* host)
 {
     chem_host = host;

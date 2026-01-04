@@ -130,6 +130,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     TrackWidget* tracks[MacroModule::NUM_KNOBS];
 
     MacroUi(MacroModule *module);
+    virtual ~MacroUi();
 
     bool connected();
     void glowing_knobs(bool glow);

@@ -106,6 +106,7 @@ struct JackUi : ChemModuleWidget, IChemClient
     int last_p1, last_p2;
 
     JackUi(JackModule *module);
+    virtual ~JackUi();
 
     bool connected();
 

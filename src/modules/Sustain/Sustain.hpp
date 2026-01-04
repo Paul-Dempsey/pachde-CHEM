@@ -94,6 +94,7 @@ struct SusUi : ChemModuleWidget, IChemClient
     FillSlider* slider{nullptr};
 
     SusUi(SusModule *module);
+    virtual ~SusUi();
 
     void create_ui();
     bool connected();

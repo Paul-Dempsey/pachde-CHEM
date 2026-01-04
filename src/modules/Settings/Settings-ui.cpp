@@ -314,8 +314,13 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     }
 }
 
-void SettingsUi::onConnectHost(IChemHost* host)
-{
+SettingsUi::~SettingsUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
+}
+
+void SettingsUi::onConnectHost(IChemHost* host) {
     chem_host = host;
     if (chem_host) {
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));

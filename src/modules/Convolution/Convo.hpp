@@ -140,6 +140,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     TrackWidget* tracks[ConvoModule::NUM_INPUTS];
 
     ConvoUi(ConvoModule *module);
+    virtual ~ConvoUi();
 
     bool connected();
     void glowing_knobs(bool glow);

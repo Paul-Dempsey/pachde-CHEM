@@ -163,6 +163,10 @@ MacroUi::MacroUi(MacroModule *module) :
     }
 }
 
+MacroUi::~MacroUi() {
+    if (my_module) my_module->set_chem_ui(nullptr);
+}
+
 void MacroUi::glowing_knobs(bool glow) {
     for (int i = 0; i < MacroModule::NUM_KNOBS; ++i) {
         knobs[i]->glowing(glow);

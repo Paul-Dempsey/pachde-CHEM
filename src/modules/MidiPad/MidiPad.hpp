@@ -99,6 +99,7 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     int edit_pad{-1};
 
     MidiPadUi(MidiPadModule *module);
+    virtual ~MidiPadUi();
 
     bool connected();
     void refresh();

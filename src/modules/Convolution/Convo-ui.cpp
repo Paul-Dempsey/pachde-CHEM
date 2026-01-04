@@ -23,6 +23,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     my_module(module)
 {
     setModule(module);
+    if (module) module->set_chem_ui(this);
     auto theme = getSvgTheme();
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
     panelBorder = attachPartnerPanelBorder(panel);
@@ -185,6 +186,12 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             onConnectHost(my_module->chem_host);
         }
         onConnectHost(my_module->chem_host);
+    }
+}
+
+ConvoUi::~ConvoUi() {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
     }
 }
 

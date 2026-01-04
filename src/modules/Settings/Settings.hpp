@@ -174,6 +174,8 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     FillHSlider* round_rate_slider{nullptr};
 
     SettingsUi(SettingsModule *module);
+    virtual ~SettingsUi();
+
     GlowKnob* mod_knob;
 
     bool connected();

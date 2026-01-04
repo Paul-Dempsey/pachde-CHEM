@@ -23,6 +23,9 @@ bool PlayUi::connected() {
 
 PlayUi::~PlayUi()
 {
+    if (my_module) {
+        my_module->set_chem_ui(nullptr);
+    }
     if (modified && module && !my_module->playlist_file.empty()) {
         save_playlist();
     }
