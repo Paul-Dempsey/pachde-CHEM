@@ -31,7 +31,7 @@ FxUi::FxUi(FxModule *module) :
     const float CENTER = PANEL_WIDTH*.5f;
 
     addChild(selector = createParam<SelectorWidget>(Vec(3.5f, 28.f), my_module, FxModule::P_EFFECT));
-    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER, 20.f), 100.f, "Short reverb", LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createLabel(Vec(CENTER, 20.f), "Short reverb", &control_label_style, 100.f));
 
     // knobs with labels
     const float DY_KNOB = 62.f;
@@ -51,7 +51,7 @@ FxUi::FxUi(FxModule *module) :
     y -= 8.f;
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
         Vec(x, y), &module_svgs, my_module, FxModule::P_DISABLE, FxModule::L_DISABLE)));
-    addChild(createLabel<TextLabel>(Vec(x, y + 12.f), 80.f, "Fx Off", S::control_label));
+    addChild(createLabel(Vec(x, y + 12.f), "Fx Off", &S::control_label, 80.f));
 
     y = KNOB_TOP;
     x = KNOB_AXIS - KNOB_DX;
@@ -59,7 +59,7 @@ FxUi::FxUi(FxModule *module) :
         addChild(knobs[i] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, i));
         addChild(tracks[i] = createTrackWidget(knobs[i]));
 
-        r_labels[i] = createLabel<TipLabel>(Vec(x, y + LABEL_DY), 80.f, format_string("R%d", 1+i), S::control_label);
+        r_labels[i] = createLabel<TipLabel>(Vec(x, y + LABEL_DY), format_string("R%d", 1+i), &S::control_label, 80.f);
         addChild(r_labels[i]);
 
         if (i & 1) {
@@ -80,14 +80,14 @@ FxUi::FxUi(FxModule *module) :
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, FxModule::IN_MIX, S::InputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, "MIX", S::in_port_label));
+    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "MIX", &S::in_port_label, label_width));
     if (my_module){ addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, FxModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, FxModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     for (int i = 0; i <= K_R6; ++i) {
         addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port)));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), label_width, format_string("R%d", 1+i), S::in_port_label));
+        addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), format_string("R%d", 1+i), &S::in_port_label, label_width));
         if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
 
@@ -102,7 +102,7 @@ FxUi::FxUi(FxModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
@@ -190,50 +190,50 @@ void FxUi::sync_labels()
     auto index = pq ? getParamIndex(pq) : 0;
     if (index != effect) {
         effect = index;
-        effect_label->text(pq ? pq->getDisplayValueString() : "Short reverb");
+        effect_label->set_text(pq ? pq->getDisplayValueString() : "Short reverb");
 
         bool six_param = (Haken::R_shortRev == effect || Haken::R_longRev == effect);
         knobs[K_R5]->enable(six_param);
         knobs[K_R6]->enable(six_param);
         if (!six_param) {
-            r_labels[K_R5]->text("—");
-            r_labels[K_R6]->text("—");
+            r_labels[K_R5]->set_text("—");
+            r_labels[K_R6]->set_text("—");
         }
 
         switch (effect) {
         case Haken::R_shortRev:
         case Haken::R_longRev:
-            r_labels[K_R1]->text("Diffuse");
-            r_labels[K_R2]->text("LPF");
-            r_labels[K_R3]->text("Damping");
-            r_labels[K_R4]->text("Decay");
-            r_labels[K_R5]->text("PreDelay");
-            r_labels[K_R6]->text("HPF");
+            r_labels[K_R1]->set_text("Diffuse");
+            r_labels[K_R2]->set_text("LPF");
+            r_labels[K_R3]->set_text("Damping");
+            r_labels[K_R4]->set_text("Decay");
+            r_labels[K_R5]->set_text("PreDelay");
+            r_labels[K_R6]->set_text("HPF");
             break;
         case Haken::R_modDel:
         case Haken::R_swepEcho:
-            r_labels[K_R1]->text("ModDepth");
-            r_labels[K_R2]->text("ModRate");
-            r_labels[K_R3]->text("Feedback");
-            r_labels[K_R4]->text("Time");
+            r_labels[K_R1]->set_text("ModDepth");
+            r_labels[K_R2]->set_text("ModRate");
+            r_labels[K_R3]->set_text("Feedback");
+            r_labels[K_R4]->set_text("Time");
             break;
         default:
             switch (effect) {
             case Haken::R_anaEcho:
-                r_labels[K_R1]->text("Noise");
+                r_labels[K_R1]->set_text("Noise");
                 break;
             case Haken::R_digEchoLPF:
-                r_labels[K_R1]->text("LPF");
+                r_labels[K_R1]->set_text("LPF");
                 break;
             case Haken::R_digEchoHPF:
-                r_labels[K_R1]->text("HPF");
+                r_labels[K_R1]->set_text("HPF");
                 break;
-            default: r_labels[K_R1]->text("R1");
+            default: r_labels[K_R1]->set_text("R1");
                 break;
             }
-            r_labels[K_R2]->text("Offset");
-            r_labels[K_R3]->text("Feedback");
-            r_labels[K_R4]->text("Time");
+            r_labels[K_R2]->set_text("Offset");
+            r_labels[K_R3]->set_text("Feedback");
+            r_labels[K_R4]->set_text("Time");
             break;
         }
     }

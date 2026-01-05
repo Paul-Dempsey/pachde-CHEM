@@ -4,7 +4,7 @@ using namespace ::rack;
 #include "em/midi-message.h"
 #include "services/colors.hpp"
 #include "widgets/element-style.hpp"
-#include "widgets/label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/tip-widget.hpp"
 using namespace ::svg_theme;
 using namespace ::widgetry;
@@ -62,7 +62,6 @@ struct PadWidget : TipWidget, IThemed
     std::function<void(int)> on_click{nullptr};
     TinyLight<WhiteLight>* light{nullptr};
     TextLabel* label{nullptr};
-
     ElementStyle pad_style{"pad", DEFAULT_PAD_COLOR, DEFAULT_PAD_COLOR, .35f};
     ElementStyle pad_sel_style{"pad-sel", 0xffefef20, 0xffefef20, 1.f};
     ElementStyle pad_down_style{"pad-down", 0xff802020, 0xff802020, 1.f};

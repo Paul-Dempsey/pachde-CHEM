@@ -4,11 +4,10 @@
 #include "services/colors.hpp"
 #include "services/ModuleBroker.hpp"
 #include "widgets/indicator-widget.hpp"
-#include "widgets/label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/level-widget.hpp"
 #include "widgets/symbol-set.hpp"
 #include "widgets/theme-button.hpp"
-#include "widgets/tip-label-widget.hpp"
 #include "./widgets/jack-param.hpp"
 #include "./widgets/shift-param.hpp"
 
@@ -96,6 +95,7 @@ struct JackUi : ChemModuleWidget, IChemClient
 
     TextLabel* assign_1_label{nullptr};
     TextLabel* assign_2_label{nullptr};
+    LabelStyle knob_label_style ={"ctl-label", HAlign::Center, 10.f, false};
     SymbolProvider symbols;
     SymbolSetWidget* pedal_image_1{nullptr};
     SymbolSetWidget* pedal_image_2{nullptr};

@@ -276,7 +276,7 @@ PresetResult CoreModule::load_quick_user_presets() {
 
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
-        ui()->em_status_label->text("Scanning quick User presets...");
+        ui()->em_status_label->set_text("Scanning quick User presets...");
     }
     gathering = QuickUserPresets;
     stash_user_preset_file = user_presets->filename;
@@ -304,7 +304,7 @@ PresetResult CoreModule::load_full_user_presets() {
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
-        ui()->em_status_label->text("Scanning full User presets...");
+        ui()->em_status_label->set_text("Scanning full User presets...");
     }
     em.begin_user_scan();
     if (em.is_osmose()) {
@@ -327,7 +327,7 @@ PresetResult CoreModule::scan_osmose_presets(uint8_t page) {
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
-        ui()->em_status_label->text(format_string("Scanning User presets (page %d)...", page-90+1));
+        ui()->em_status_label->set_text(format_string("Scanning User presets (page %d)...", page-90+1));
     }
     em.begin_user_scan();
     full_build = new PresetListBuildCoordinator(midi_log, true, new OsmosePresetEnumerator(ChemId::Core, page));
@@ -399,7 +399,7 @@ PresetResult CoreModule::load_full_system_presets() {
     if (chem_ui && !ui()->showing_busy()) {
         ui()->show_busy(true);
         ui()->create_stop_button();
-        ui()->em_status_label->text("Scanning Full System presets...");
+        ui()->em_status_label->set_text("Scanning Full System presets...");
     }
     em.begin_system_scan();
     if (em.is_osmose()) {
@@ -731,6 +731,7 @@ void CoreModule::onMidiDeviceChange(const MidiDeviceHolder* source) {
         break;
 
     case ChemDevice::Unknown:
+    default:
         break;
     }
 }
@@ -998,7 +999,7 @@ void CoreModule::process_gather(const ProcessArgs &args) {
             id_builder = nullptr;
             em.unsubscribeEMEvents(t_builder);
             delete t_builder;
-            ui()->em_status_label->text("Starting full scan...");
+            ui()->em_status_label->set_text("Starting full scan...");
             full_build->start_building();
         } else if (id_builder->end_received && (-1.f == id_builder->end_time)) {
             id_builder->end_time = 0.f;
@@ -1014,7 +1015,7 @@ void CoreModule::process_gather(const ProcessArgs &args) {
     if (full_build) {
         using PHASE = PresetListBuildCoordinator::Phase;
         if (chem_ui && (PHASE::Start == full_build->phase)) {
-            ui()->em_status_label->text(format_string("Scanning %s", full_build->iter->next_text().c_str()));
+            ui()->em_status_label->set_text(format_string("Scanning %s", full_build->iter->next_text().c_str()));
         }
         if (!full_build->process(&haken_midi, &em, args)) {
             switch (full_build->get_phase()) {

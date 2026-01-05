@@ -15,6 +15,8 @@ struct GlowKnob : rack::RoundKnob {
     bool wire{false};
     NVGcolor disabled_screen{nvgRGBAf(.4, .4, .4, .6f)};
 
+    std::function<void(void)> clickHandler;
+
     GlowKnob() {
         box.size.x = 32.f;
         box.size.y = 32.f;
@@ -23,6 +25,10 @@ struct GlowKnob : rack::RoundKnob {
 
     // enabling
     void enable(bool on) { enabled = on; }
+
+    void set_handler(std::function<void(void)> callback) {
+        clickHandler = callback;
+    }
 
     void onButton(const ButtonEvent& e) override{
         if (!enabled) {
@@ -40,6 +46,13 @@ struct GlowKnob : rack::RoundKnob {
     void onChange(const ChangeEvent& e) override {
         Base::onChange(e);
         e.consume(this);
+    }
+
+    void onAction(const ActionEvent& e) override {
+        rack::RoundKnob::onAction(e);
+        if (enabled && clickHandler) {
+            clickHandler();
+        }
     }
 
     // "glowing"
@@ -161,6 +174,11 @@ struct UselessSvg {
     static std::string bg() { return "res/widgets/useless-knob-bg.svg"; }
     static std::string knob() { return "res/widgets/useless-knob.svg"; }
 };
+struct EndlessSvg {
+    static std::string bg() { return "res/widgets/endless-bg.svg"; }
+    static std::string knob() { return "res/widgets/endless.svg"; }
+};
+
 using BasicKnob = TKnob<GrayKnobSvg>;
 using UselessKnob = TKnob<UselessSvg>;
 using GrayKnob = TKnob<GrayKnobSvg>;
@@ -169,7 +187,7 @@ using RedKnob = TKnob<RedKnobSvg>;
 using GreenKnob = TKnob<GreenKnobSvg>;
 using YellowKnob = TKnob<YellowKnobSvg>;
 using VioletKnob = TKnob<VioletKnobSvg>;
-
+using EndlessKnob = TKnob<EndlessSvg>;
 using TrimPot = TKnob<TrimPotSvg>;
 using TinyTrimPot = TKnob<TinyTrimPotSvg>;
 using GreenTrimPot = TKnob<GreenTrimPotSvg>;

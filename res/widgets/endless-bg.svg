@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="24" height="24" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+<linearGradient id="g-face" x1="9.17" y1="2.25" x2="11.6" y2="19.9" gradientUnits="userSpaceOnUse" >
+  <stop stop-color="#f4f4f4" offset="0" />
+  <stop stop-color="#171717" offset="1" />
+</linearGradient>
+<linearGradient id="g-rim" x1="10.5" y1="1.97" x2="13.8" y2="19.5" gradientUnits="userSpaceOnUse" >
+  <stop stop-color="#7d7d7d" offset="0" />
+  <stop stop-color="#242424" offset="1" />
+</linearGradient>
+<linearGradient id="g-dent" x1="11" y1="8" x2="12" y2="16" gradientUnits="userSpaceOnUse" >
+  <stop stop-color="#c1bfbf" offset="0" />
+  <stop stop-color="#363636" offset="1" />
+</linearGradient>
+<circle id="e-punch" fill="#0d0d0d" cx="12" cy="12" r="9.5" />
+<circle id="e-rim"  fill="url(#g-rim)" cx="12" cy="12" r="9" />
+<circle id="e-face" fill="url(#g-face)" cx="12" cy="12" r="8.5" />
+<circle id="e-dent" fill="url(#g-dent)" cx="12.0" cy="12.0" r="4.0" />
+</svg>

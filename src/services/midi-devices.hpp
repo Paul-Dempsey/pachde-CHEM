@@ -87,10 +87,10 @@ struct MidiDeviceHolder
     MidiDeviceHolder & operator=(const MidiDeviceHolder &) = delete;
     MidiDeviceHolder(const MidiDeviceHolder&) = delete;
 
-    std::shared_ptr<MidiDeviceConnection> connection;
+    std::shared_ptr<MidiDeviceConnection> connection{nullptr};
     std::string device_claim;
     ChemDevice device_role;
-    IMidiDeviceNotify * client;
+    IMidiDeviceNotify * client{nullptr};
 
     MidiDeviceHolder() : connection(nullptr), device_role(ChemDevice::Unknown), client(nullptr) {}
     void init(ChemDevice role, IMidiDeviceNotify *client) { device_role = role; subscribe(client); }

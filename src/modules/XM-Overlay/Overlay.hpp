@@ -8,7 +8,6 @@
 #include "../XM-shared/macro-usage.hpp"
 #include "../XM-shared/xm-overlay.hpp"
 #include "../XM-shared/macro-data.hpp"
-#include "v-text.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -110,7 +109,8 @@ struct OverlayUi : ChemModuleWidget, IChemClient
     LinkButton* link_button{nullptr};
     IndicatorWidget* link{nullptr};
     SolidSwatch* bg_widget{nullptr};
-    VText* title_widget{nullptr};
+    TextLabel* title_widget{nullptr};
+    LabelStyle* title_style{nullptr};
 
     OverlayUi(OverlayModule *module);
     virtual ~OverlayUi();

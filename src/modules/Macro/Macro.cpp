@@ -98,7 +98,7 @@ void MacroModule::onPresetChange()
 
 void MacroModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (chem_ui) ui()->onConnectionChange(device, connection);
+    if (chem_ui && (device == ChemDevice::Haken)) ui()->onConnectionChange(device, connection);
 }
 
 void MacroModule::do_message(PackedMidiMessage message)

@@ -317,9 +317,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     CoreModule* my_module = nullptr;
     bool spinning{false};
 
-    MidiPicker* haken_picker{nullptr};
-    MidiPicker* controller1_picker{nullptr};
-    MidiPicker* controller2_picker{nullptr};
+    CoreMidiPicker* haken_picker{nullptr};
+    CoreMidiPicker* controller1_picker{nullptr};
+    CoreMidiPicker* controller2_picker{nullptr};
     TextLabel* haken_device_label{nullptr};
     TextLabel* controller1_device_label{nullptr};
     TextLabel* controller2_device_label{nullptr};
@@ -335,6 +335,9 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     IndicatorWidget* presetinfo_indicator{nullptr};
     IndicatorWidget* user_presets_indicator{nullptr};
     IndicatorWidget* system_presets_indicator{nullptr};
+    LabelStyle dytext_style{"dytext", HAlign::Center, 10.f};
+    LabelStyle midi_style{"midi-name", HAlign::Left, 12.f};
+    LabelStyle preset_style{"curpreset", HAlign::Center, 16.f, true};
 
     IndicatorWidget* widget_for_task(ChemTaskId task);
 
@@ -343,7 +346,7 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     const NVGcolor& taskStateColor(ChemTask::State state);
     void set_theme_colors(const std::string& theme = "");
 
-    MidiPicker* createMidiPicker(Vec pos, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device);
+    CoreMidiPicker* createMidiPicker(Vec pos, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device);
 
     void createMidiPickers(::svg_query::BoundsIndex& bounds);
     void createRoundingLeds(Vec pos, float spread);

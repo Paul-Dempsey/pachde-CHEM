@@ -14,6 +14,7 @@ constexpr const float LOGO_CENTER{62.f};
 CoreModuleWidget::~CoreModuleWidget()
 {
     if (my_module) {
+        my_module->set_chem_ui(nullptr);
         my_module->em.unsubscribeEMEvents(this);
     }
     if (chem_host) {
@@ -34,9 +35,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 {
     setModule(module);
 
-    if (my_module) {
-        my_module->set_chem_ui(this);
-    }
     IHandleEmEvents::em_event_mask =
         EME::HardwareChanged
         + EME::PresetChanged
@@ -50,9 +48,8 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
     panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
-    auto layout = panel->svg;
     ::svg_query::BoundsIndex bounds;
-    svg_query::addBounds(layout, "k:", bounds, true);
+    svg_query::addBounds(panel->svg, "k:", bounds, true);
 
     set_theme_colors();
 
@@ -75,9 +72,12 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     menu->describe("Core actions menu");
     addChild(menu);
 
-    LabelStyle style{"curpreset", TextAlignment::Center, 16.f, true};
-    addChild(preset_label = createLabel<TipLabel>(bounds["k:preset"], "[preset]", style));
+    preset_label = new TipLabel;
+    preset_label->box = bounds["k:preset"];
+    preset_label->format = &dytext_style;
+    preset_label->set_text("[preset]");
     preset_label->glowing(true);
+    addChild(preset_label);
 
     Vec pos = bounds["k:prev"].getCenter();
     createRoundingLeds(Vec(CENTER + 40.f, pos.y), ROUND_LIGHT_SPREAD);
@@ -102,33 +102,33 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     addChild(attenuation_knob = createChemKnob<BlueKnob>(bounds["k:vol"].getCenter(), &module_svgs, my_module, CoreModule::P_ATTENUATION));
 
-    LabelStyle status_style{"brand", TextAlignment::Center, 10.f, false};
-    addChild(em_status_label = createLabel<TextLabel>(bounds["k:emstatus"], "", status_style));
+    LabelStyle status_style{"brand", HAlign::Center, 10.f, false};
+    addChild(em_status_label = createLabel(bounds["k:emstatus"], "", &status_style));
 
     const NVGcolor co_port = PORT_CORN;
     addChild(Center(createThemedColorInput(bounds["k:c1mut"].getCenter(), &module_svgs, my_module, CoreModule::IN_C1_MUTE_GATE, S::InputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(bounds["k:c1mut-label"], "M1", S::in_port_label));
+    addChild(createLabel(bounds["k:c1mut-label"], "M1", &S::in_port_label));
 
     addChild(Center(createThemedColorInput(bounds["k:c2mut"].getCenter(), &module_svgs, my_module, CoreModule::IN_C2_MUTE_GATE, S::InputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(bounds["k:c2mut-label"], "M2", S::in_port_label));
+    addChild(createLabel(bounds["k:c2mut-label"], "M2", &S::in_port_label));
 
-    addChild(createLabel<TextLabel>(bounds["k:ok-label"], "OK", S::out_port_label));
+    addChild(createLabel(bounds["k:ok-label"], "OK", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:ok"].getCenter(), &module_svgs, my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA)));
 
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
         bounds["k:extend-slew"].getCenter(), &module_svgs, my_module, CoreModule::P_EXTEND_SLEW, CoreModule::L_EXTEND_SLEW)));
 
-    addChild(createLabel<TextLabel>(bounds["k:w-label"], "W", S::out_port_label));
+    addChild(createLabel(bounds["k:w-label"], "W", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:w"].getCenter(), &module_svgs, my_module, CoreModule::OUT_W, "mpe-ring", PORT_GREEN)));
 
-    addChild(createLabel<TextLabel>(bounds["k:x-label"], "X", S::out_port_label));
+    addChild(createLabel(bounds["k:x-label"], "X", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:x"].getCenter(), &module_svgs, my_module, CoreModule::OUT_X, "mpe-ring", PORT_GREEN)));
 
-    addChild(createLabel<TextLabel>(bounds["k:y-label"], "Y", S::out_port_label));
+    addChild(createLabel(bounds["k:y-label"], "Y", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:y"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Y, "mpe-ring", PORT_GREEN)));
     addChild(createChemKnob<TinyTrimPot>(bounds["k:slewy"].getCenter(), &module_svgs, my_module, CoreModule::P_Y_SLEW));
 
-    addChild(createLabel<TextLabel>(bounds["k:z-label"], "Z", S::out_port_label));
+    addChild(createLabel(bounds["k:z-label"], "Z", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:z"].getCenter(), &module_svgs, my_module, CoreModule::OUT_Z, "mpe-ring", PORT_GREEN)));
     addChild(createChemKnob<TinyTrimPot>(bounds["k:slewz"].getCenter(), &module_svgs, my_module, CoreModule::P_Z_SLEW));
 
@@ -152,19 +152,15 @@ void CoreModuleWidget::createScrews()
 
 void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
 {
-    LabelStyle style{"dytext", TextAlignment::Center, 10.f};
-    addChild(firmware_label = createLabel<TextLabel>(
-        Vec(CENTER, box.size.y - 12.5f), 140.f, "v00.00", style));
-
-    LabelStyle midi_style{"midi-name", TextAlignment::Left, 12.f};
+    addChild(firmware_label = createLabel(Vec(CENTER, box.size.y - 12.5f), "v00.00", &dytext_style, 140.f));
 
     haken_picker = createMidiPicker(bounds["k:haken"].pos, "HAKEN device", &my_module->haken_device, &my_module->haken_device);
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";
-    addChild(haken_device_label = createLabel<TextLabel>(bounds["k:haken-device"], text, midi_style));
+    addChild(haken_device_label = createLabel(bounds["k:haken-device"], text, &midi_style));
 
     controller1_picker = createMidiPicker(bounds["k:c1"].pos, "MIDI controller #1", &my_module->controller1, &my_module->haken_device);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
-    addChild(controller1_device_label = createLabel<TextLabel>(bounds["k:c1-device"], text, midi_style));
+    addChild(controller1_device_label = createLabel(bounds["k:c1-device"], text, &midi_style));
 
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c1map"].getCenter(), &module_svgs, my_module, CoreModule::P_C1_CHANNEL_MAP, CoreModule::L_C1_CHANNEL_MAP)));
@@ -175,7 +171,7 @@ void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
 
     controller2_picker = createMidiPicker(bounds["k:c2"].pos, "MIDI controller #2", &my_module->controller2, &my_module->haken_device);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
-    addChild(controller2_device_label = createLabel<TextLabel>(bounds["k:c2-device"], text, midi_style));
+    addChild(controller2_device_label = createLabel(bounds["k:c2-device"], text, &midi_style));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c2map"].getCenter(), &module_svgs, my_module, CoreModule::P_C2_CHANNEL_MAP, CoreModule::L_C2_CHANNEL_MAP)));
     addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
@@ -215,6 +211,17 @@ void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
     addChild(w);
 }
 
+CoreMidiPicker* CoreModuleWidget::createMidiPicker(Vec pos, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device)
+{
+    auto picker = createThemedWidget<CoreMidiPicker>(pos, &module_svgs);
+    picker->describe(tip);
+    if (my_module) {
+        picker->setDeviceHolder(device, haken_device);
+    }
+    addChild(picker);
+    return picker;
+}
+
 void CoreModuleWidget::createRoundingLeds(Vec pos, float spread)
 {
     float x = pos.x - 1.5 * spread;
@@ -234,7 +241,7 @@ void CoreModuleWidget::create_stop_button()
         stop_button->setHandler([=](bool, bool){
             my_module->stop_scan = true;
             remove_stop_button();
-            em_status_label->text("Preset scan stopped");
+            em_status_label->set_text("Preset scan stopped");
         });
         addChild(stop_button);
     }
@@ -312,7 +319,7 @@ void CoreModuleWidget::show_busy(bool busy)
     } else {
         stopSpinner(this);
         spinning = false;
-        em_status_label->text("");
+        em_status_label->set_text("");
     }
 }
 
@@ -355,17 +362,6 @@ void CoreModuleWidget::open_user_preset_file()
         my_module->user_presets->load(path);
         my_module->update_user_preset_file_infos();
     }
-}
-
-MidiPicker* CoreModuleWidget::createMidiPicker(Vec pos, const char *tip, MidiDeviceHolder* device, MidiDeviceHolder* haken_device)
-{
-    auto picker = createThemedWidget<MidiPicker>(pos, &module_svgs);
-    picker->describe(tip);
-    if (my_module) {
-        picker->setDeviceHolder(device, haken_device);
-    }
-    addChild(picker);
-    return picker;
 }
 
 void CoreModuleWidget::set_theme_colors(const std::string& theme_name)
@@ -418,13 +414,13 @@ void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<Mid
     std::string name = connection ? connection->info.friendly(NameFormat::Short) : nothing;
     switch (device) {
     case ChemDevice::Haken:
-        em_status_label->text(nothing);
-        preset_label->text(nothing);
+        em_status_label->set_text(nothing);
+        preset_label->set_text(nothing);
         preset_label->describe(nothing);
-        haken_device_label->text(name);
+        haken_device_label->set_text(name);
         break;
-    case ChemDevice::Midi1: controller1_device_label->text(name); break;
-    case ChemDevice::Midi2: controller2_device_label->text(name); break;
+    case ChemDevice::Midi1: controller1_device_label->set_text(name); break;
+    case ChemDevice::Midi2: controller2_device_label->set_text(name); break;
     default: break;
     }
 }
@@ -432,17 +428,17 @@ void CoreModuleWidget::onConnectionChange(ChemDevice device, std::shared_ptr<Mid
 // IHandleEmEvents
 void CoreModuleWidget::onHardwareChanged(uint8_t hardware, uint16_t firmware_version)
 {
-    firmware_label->text(format_string("%s v%03.2f", ShortHardwareName(hardware), firmware_version/100.f));
+    firmware_label->set_text(format_string("%s v%03.2f", ShortHardwareName(hardware), firmware_version/100.f));
 }
 
 void CoreModuleWidget::onPresetChanged()
 {
     auto preset = my_module->host_preset();
     if (preset) {
-        preset_label->text(preset->name);
+        preset_label->set_text(preset->name);
         preset_label->describe(preset->meta_text());
     } else {
-        preset_label->text("");
+        preset_label->set_text("");
         preset_label->describe("");
     }
 }
@@ -455,49 +451,49 @@ void CoreModuleWidget::onTaskMessage(uint8_t code)
         case Haken::eraseMessage:
         case Haken::endSysNames:
         case Haken::endUserNames:
-            em_status_label->text("");
+            em_status_label->set_text("");
             break;
         case Haken::archiveFail:
-            em_status_label->text("Archive Fail");
+            em_status_label->set_text("Archive Fail");
             break;
         case Haken::reduceGain:
-            em_status_label->text("Reduce Gain");
+            em_status_label->set_text("Reduce Gain");
             break;
         case Haken::reducePoly:
-            em_status_label->text("Reduce Polyphony");
+            em_status_label->set_text("Reduce Polyphony");
             break;
         case Haken::inFactCalib:
-            em_status_label->text("Factory Calibration...");
+            em_status_label->set_text("Factory Calibration...");
             break;
         case Haken::midiLoopback:
-            em_status_label->text("MIDI Loop Detected");
+            em_status_label->set_text("MIDI Loop Detected");
             break;
         case Haken::createLed:
             em_led->set_light_color(yellow_light);
             em_led->set_brightness(1.0);
             break;
         case Haken::tenSecsOld:
-            em_status_label->text("The EaganMatrix says hello.");
+            em_status_label->set_text("The EaganMatrix says hello.");
             break;
         case Haken::testErr:
-            em_status_label->text("MIDI test failed");
+            em_status_label->set_text("MIDI test failed");
             break;
         case Haken::beginSysNames:
-            em_status_label->text("Gathering System presets...");
+            em_status_label->set_text("Gathering System presets...");
             break;
         case Haken::beginUserNames:
-            em_status_label->text("Gathering User presets...");
+            em_status_label->set_text("Gathering User presets...");
             break;
         case Haken::rxOver:
         case Haken::txOver:
         case Haken::rxSynErr:
         case Haken::rxBitErr:
-            em_status_label->text("MIDI comms error");
+            em_status_label->set_text("MIDI comms error");
             break;
         case Haken::sensComm:
         case Haken::nanErr:
         case Haken::ceeSeq:
-            em_status_label->text("EaganMatrix internal error");
+            em_status_label->set_text("EaganMatrix internal error");
             break;
     }
 }

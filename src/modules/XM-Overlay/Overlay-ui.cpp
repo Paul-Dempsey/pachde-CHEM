@@ -80,17 +80,16 @@ OverlayUi::OverlayUi(OverlayModule *module) :
 
     addChild(Center(createLight<SmallLight<GreenLight>>(Vec(15.f, 15.f), my_module, OverlayModule::L_CONNECTED)));
 
-    title_widget = createWidget<VText>(Vec(0, 15));
-    title_widget->set_size(Vec(30.f, 350.f));
-    title_widget->set_text_height(28.f);
+    title_style = new LabelStyle("", my_module ? my_module->fg_color : 0xffe6e6e6, 28.f, true);
+    title_style->orientation = Orientation::Up;
+    title_style->halign = HAlign::Center;
+    title_style->valign = VAlign::Middle;
+    title_style->applyTheme(theme);
+
+    Rect r_title{Vec(0, 15), Vec(30.f, 350.f)};
+    std::string title = my_module ? my_module->title : std::string(DEFAULT_TITLE);
+    title_widget = createLabel(r_title, title, title_style, theme);
     addChild(title_widget);
-    if (my_module) {
-        title_widget->set_text_color(my_module->fg_color);
-        title_widget->set_text(my_module->title);
-    } else {
-        title_widget->set_text(DEFAULT_TITLE);
-        title_widget->set_text_color(0xffe6e6e6);
-    }
 
     auto menu = createWidgetCentered<OverlayMenu>(Vec(15.f, 24.f));
     menu->setUi(this);
@@ -178,7 +177,7 @@ void OverlayUi::set_bg_color(PackedColor color)
 
 void OverlayUi::set_fg_color(PackedColor color)
 {
-    if (title_widget) title_widget->set_text_color(color);
+    if (title_widget) title_widget->set_color(color);
     if (!my_module) return;
     my_module->fg_color = color;
 }

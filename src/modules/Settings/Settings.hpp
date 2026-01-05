@@ -5,10 +5,9 @@
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
 #include "widgets/em-led-widget.hpp"
-#include "widgets/label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
-#include "widgets/tip-label-widget.hpp"
 #include "widgets/slider-h-widget.hpp"
 #include "./widgets/tuning.hpp"
 #include "./widgets/x-param.hpp"
@@ -171,6 +170,9 @@ struct SettingsUi : ChemModuleWidget, IChemClient
     TextLabel* mono_interval_value{nullptr};
     TextLabel* round_type_value{nullptr};
     TextLabel* tuning_value{nullptr};
+    LabelStyle  value_style{"setting", HAlign::Left, 12.f};
+    LabelStyle label_right_style{"ctl-label", HAlign::Right, 12.f};
+
     FillHSlider* round_rate_slider{nullptr};
 
     SettingsUi(SettingsModule *module);

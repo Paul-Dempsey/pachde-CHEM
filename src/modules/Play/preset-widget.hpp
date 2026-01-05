@@ -3,7 +3,7 @@
 #include "em/preset.hpp"
 #include "widgets/element-style.hpp"
 #include "widgets/themed-widgets.hpp"
-#include "widgets/tip-label-widget.hpp"
+#include "widgets/label.hpp"
 
 using namespace ::rack;
 using namespace ::svg_theme;

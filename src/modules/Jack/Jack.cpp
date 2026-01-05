@@ -69,7 +69,7 @@ void JackModule::onPresetChange()
 void JackModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     pull_jack_data();
-    if (chem_ui) ui()->onConnectionChange(device, connection);
+    if (chem_ui && (device == ChemDevice::Haken)) ui()->onConnectionChange(device, connection);
 }
 
 void JackModule::pull_jack_data()

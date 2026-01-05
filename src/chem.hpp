@@ -135,6 +135,6 @@ template <typename TModuleWidget>
 void onConnectionChangeUiImpl(TModuleWidget* self, ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    self->haken_device_label->text(connection ? connection->info.friendly(NameFormat::Short) : "[not connected]");
+    self->haken_device_label->set_text(connection ? connection->info.friendly(NameFormat::Short) : "[not connected]");
     self->haken_device_label->describe(connection ? connection->info.friendly(NameFormat::Long) : "[not connected]");
 }

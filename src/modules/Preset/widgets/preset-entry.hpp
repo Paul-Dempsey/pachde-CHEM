@@ -1,6 +1,6 @@
 #pragma once
 #include <rack.hpp>
-#include "widgets/tip-label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/element-style.hpp"
 #include "em/preset.hpp"
 
@@ -26,6 +26,7 @@ struct PresetEntry : OpaqueWidget, IThemed
     ElementStyle current_element{"preset-current", "hsl(60, 90%, 50%)", "hsl(60, 90%, 50%)", .25f};
     ElementStyle hover_element  {"preset-hover", "hsla(0, 0%, 100%, 5%)", "hsl(120, 50%, 30%)", .5f};
     ElementStyle category_style {"preset-cat", "hsl(200, 50%, 50%)"};
+    LabelStyle grid_style{"preset"};
 
     void set_ui(PresetUi* host) { ui = host; }
 

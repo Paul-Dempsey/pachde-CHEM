@@ -103,3 +103,4 @@ bool preset_equal(const PresetDescription *a, const PresetDescription *b)
 }
 
 }
+

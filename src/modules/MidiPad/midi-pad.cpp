@@ -85,7 +85,11 @@ void PadWidget::init(
     id = identifier;
     on_click = callback;
     addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
-    addChild(label = createLabel(Vec(12, 8.5), 24, the_pad ? the_pad->name : "", LabelStyle{"", TextAlignment::Center, 12.f}));
+
+    label = createLabel(Vec(12, 8.5), the_pad ? the_pad->name : "", new LabelStyle("", HAlign::Center, 12.f), 24);
+    label->own_format = true;
+    addChild(label);
+
     applyTheme(theme);
     set_pad(the_pad);
 }
@@ -98,8 +102,8 @@ void PadWidget::set_pad(std::shared_ptr<MidiPad> the_pad) {
 
 void PadWidget::on_pad_change(bool name, bool description) {
     if (pad) {
-        label->color(fromPacked(pad->text_color));
-        if (name) label->text(pad->name);
+        label->set_color(pad->text_color);
+        if (name) label->set_text(pad->name);
         if (description) {
             auto desc = extract_description();
             desc = desc.empty() ? pad->name : pad->name + ": " + desc;
@@ -114,8 +118,8 @@ void PadWidget::on_pad_change(bool name, bool description) {
             describe(desc);
         }
     } else {
-        label->color(fromPacked(colors::Black));
-        label->text("");
+        label->set_color(colors::Black);
+        label->set_text("");
         describe("(undefined)");
     }
 }

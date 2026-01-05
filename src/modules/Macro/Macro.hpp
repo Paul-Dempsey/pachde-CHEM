@@ -8,8 +8,7 @@
 #include "services/ModuleBroker.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
-#include "widgets/label-widget.hpp"
-#include "widgets/tip-label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/knob-track-widget.hpp"
 
 using namespace pachde;
@@ -125,6 +124,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     TextLabel* m4_ped_label;
     TextLabel* m5_ped_label;
     TextLabel* m6_ped_label;
+    LabelStyle preset_style{"curpreset", HAlign::Center, 12.f, false};
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
     TrackWidget* tracks[MacroModule::NUM_KNOBS];

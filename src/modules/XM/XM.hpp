@@ -106,6 +106,7 @@ struct XMUi : ChemModuleWidget
 
     ElementStyle edit_style{"xm-edit", "hsl(60,80%,75%)", "hsl(60,80%,75%)", .85f};
     ElementStyle placeholder_style{"xm-placeholder", "hsl(0,0%,55%)", "hsl(0,0%,55%)", .25f};
+    LabelStyle no_style{"", HAlign::Center, 12.f, true};
 
     bool editing{false};
     bool draw_placeholders{true};

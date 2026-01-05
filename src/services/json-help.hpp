@@ -29,3 +29,7 @@ inline void set_json(json_t* root, const char* key, bool value) {
 inline void set_json(json_t* root, const char* key, float value) {
     json_object_set_new(root, key, json_real(value));
 }
+
+inline void set_json(json_t* root, const char* key, json_t* object) {
+    json_object_set_new(root, key, object);
+}

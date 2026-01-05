@@ -10,8 +10,7 @@
 #include "widgets/theme-button.hpp"
 #include "widgets/draw-button.hpp"
 #include "widgets/hamburger.hpp"
-#include "widgets/label-widget.hpp"
-#include "widgets/tip-label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/spinner.hpp"
 #include "preset-widget.hpp"
 
@@ -98,6 +97,9 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     TipLabel*   live_preset_label{nullptr};
     TipLabel*   warning_label{nullptr};
     Blip*       blip{nullptr};
+    LabelStyle dytext_style{"dytext", HAlign::Left, 14.f};
+    LabelStyle page_style{"dytext", HAlign::Center, 9.f};
+    LabelStyle preset_style{"curpreset", HAlign::Center, 14.f, true};
 
     bool pending_device_check{false};
     bool modified{false};

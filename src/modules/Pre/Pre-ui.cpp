@@ -42,7 +42,7 @@ PreUi::PreUi(PreModule *module) :
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
     addChild(selector = createParam<SelectorWidget>(Vec(3.5f, 66.f), my_module, PreModule::P_SELECT));
-    addChild(effect_label = createLabel<TextLabel>(Vec(CENTER + 3.5f, 58.f), 90.f, "", LabelStyle{"ctl-label", TextAlignment::Center, 16.f, true}));
+    addChild(effect_label = createLabel(Vec(CENTER + 3.5f, 58.f), "", &control_label_style, 90.f));
 
     // knobs
     x = CENTER;
@@ -58,22 +58,21 @@ PreUi::PreUi(PreModule *module) :
     const float PARAM_TOP = 135.f;
     const float PARAM_DY = 54.f;
     const float label_offset = 18.f;
-    LabelStyle knob_label_style ={"ctl-label", TextAlignment::Center, 14.f, false};
 
     y = PARAM_TOP;
     addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_THRESHOLD_DRIVE));
     addChild(tracks[K_THRESH_DRIVE] = createTrackWidget(knobs[K_THRESH_DRIVE]));
-    addChild(top_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", knob_label_style));
+    addChild(top_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
 
     y += PARAM_DY;
     addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_ATTACK));
     addChild(tracks[K_ATTACK_X] = createTrackWidget(knobs[K_ATTACK_X]));
-    addChild(mid_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", knob_label_style));
+    addChild(mid_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
 
     y += PARAM_DY;
     addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_RATIO_MAKEUP));
     addChild(tracks[K_RATIO_MAKEUP] = createTrackWidget(knobs[K_RATIO_MAKEUP]));
-    addChild(bot_knob_label= createLabel<TextLabel>(Vec(x,y + label_offset), 90.f, "", knob_label_style));
+    addChild(bot_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
 
     // inputs
     auto co_port = PORT_CORN;
@@ -83,38 +82,38 @@ PreUi::PreUi(PreModule *module) :
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "LVL", S::in_port_label));
+    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "LVL", &S::in_port_label, 20.f));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_PRE_LEVEL_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port)));
-    addChild(in_attack_x = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "", S::in_port_label));
+    addChild(in_attack_x = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_ATTACK_MOD));
 
     y += S::PORT_DY;
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_MIX, S::InputColorKey, co_port)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20.f, "MIX", S::in_port_label));
+    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "MIX", &S::in_port_label, 20.f));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_MIX_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_THRESHOLD_DRIVE, S::InputColorKey, co_port)));
-    addChild(in_thresh_drive = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", S::in_port_label));
+    addChild(in_thresh_drive = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_THRESHOLD_DRIVE_MOD));
 
     x += S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_RATIO_MAKEUP, S::InputColorKey, co_port)));
-    addChild(in_ratio_makeup = createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 20, "", S::in_port_label));
+    addChild(in_ratio_makeup = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
     if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
     addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
 
     // footer
 
-    addChild(haken_device_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+    addChild(haken_device_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
@@ -185,7 +184,7 @@ void PreUi::onConnectHost(IChemHost* host)
     if (chem_host) {
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
     } else {
-        haken_device_label->text(S::NotConnected);
+        haken_device_label->set_text(S::NotConnected);
     }
 }
 
@@ -206,27 +205,27 @@ void PreUi::sync_labels()
     }
     if (comp_type == -1) comp_type = 0;
     if (comp_type > 0){
-        effect_label   ->text("Tanh");
+        effect_label   ->set_text("Tanh");
 
-        top_knob_label ->text("Drive");
-        mid_knob_label ->text("—");
+        top_knob_label ->set_text("Drive");
+        mid_knob_label ->set_text("—");
         knobs[K_ATTACK_X]->enable(false);
-        bot_knob_label ->text("Makeup");
+        bot_knob_label ->set_text("Makeup");
 
-        in_attack_x    ->text("—");
-        in_thresh_drive->text("D");
-        in_ratio_makeup->text("M");
+        in_attack_x    ->set_text("—");
+        in_thresh_drive->set_text("D");
+        in_ratio_makeup->set_text("M");
     } else {
-        effect_label   ->text("Compressor");
+        effect_label   ->set_text("Compressor");
 
-        top_knob_label ->text("Threshhold");
-        mid_knob_label ->text("Attack");
+        top_knob_label ->set_text("Threshhold");
+        mid_knob_label ->set_text("Attack");
         knobs[K_ATTACK_X]->enable(true);
-        bot_knob_label ->text("Ratio");
+        bot_knob_label ->set_text("Ratio");
 
-        in_attack_x    ->text("A");
-        in_thresh_drive->text("TH");
-        in_ratio_makeup->text("R");
+        in_attack_x    ->set_text("A");
+        in_thresh_drive->set_text("TH");
+        in_ratio_makeup->set_text("R");
     }
 
 }

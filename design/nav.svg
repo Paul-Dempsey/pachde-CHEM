@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="26" height="26" viewBox="0 0 26 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+
+<linearGradient id="sg" x1="12" y1="9.5" x2="13" y2="16.6" gradientUnits="userSpaceOnUse" >
+    <stop offset="0" stop-color="#a6a6a6" />
+    <stop offset="1" stop-color="#212121" />
+</linearGradient>
+  <circle id="nav" fill="#555" stroke="#000" stroke-width=".75" cx="13" cy="13" r="12.25" />
+  <path id="u" fill="#ddd" d="M13,8 l -4,0 4,-6 4,6 z" />
+  <path id="d" fill="#ddd" d="M13,18 l -4,0 4,6 4,-6 z" />
+  <path id="l" fill="#ddd" d="M8,13 l 0,-4 -6,4 6,4 z" />
+  <path id="r" fill="#ddd" d="M18,13 l 0,4 6,-4 -6,-4 z" />
+  <circle id="select" fill="#363636" stroke="#ddd" stroke-width=".85" cx="13" cy="13" r="3.25" style="fill:url(#sg)" />
+</svg>

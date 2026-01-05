@@ -121,7 +121,7 @@ void PreModule::onPresetChange()
 
 void PreModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (chem_ui) ui()->onConnectionChange(device, connection);
+    if (chem_ui && (device == ChemDevice::Haken)) ui()->onConnectionChange(device, connection);
 }
 
 void PreModule::process_params(const ProcessArgs &args)

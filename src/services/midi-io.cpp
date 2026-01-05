@@ -3,6 +3,7 @@
 #include "my-plugin.hpp"
 #include "services/kv-store.hpp"
 #include "services/misc.hpp"
+#include "services/text.hpp"
 #include "em/wrap-HakenMidi.hpp"
 using namespace ::rack;
 

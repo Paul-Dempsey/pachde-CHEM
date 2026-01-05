@@ -129,14 +129,14 @@ PlayUi::PlayUi(PlayModule *module) :
         addChild(pw);
         y += 20;
     }
-    addChild(haken_device_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+    haken_device_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f);
+    addChild(haken_device_label);
 
-    addChild(warning_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 22.f), box.size.x, "", S::warning_label));
+    addChild(warning_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 22.f), "", &S::warning_label, box.size.x));
     warning_label->describe("[warning/status]");
     warning_label->glowing(true);
 
-    LabelStyle style{"dytext", TextAlignment::Left, 14.f};
-    addChild(playlist_label = createLabel<TipLabel>(Vec(ONEU, 16), 148.f, "My Favorites", style));
+    addChild(playlist_label = createLabel<TipLabel>(Vec(ONEU, 16), "My Favorites", &dytext_style, 148.f));
     playlist_label->glowing(true);
 
     addChild(blip = createBlipCentered(7.5f, 24.f, "Playlist unsaved when lit"));
@@ -145,9 +145,7 @@ PlayUi::PlayUi(PlayModule *module) :
     blip->set_light_color(ColorFromTheme(theme, "warning", nvgRGB(0xe7, 0xe7, 0x45)));
     blip->set_brightness(0.f);
 
-    style.height = 9.f;
-    style.align = TextAlignment::Center;
-    addChild(page_label = createLabel<TextLabel>(Vec(RIGHT_MARGIN_CENTER, 35.f),  35.f, "1 of 1", style));
+    addChild(page_label = createLabel(Vec(RIGHT_MARGIN_CENTER, 35.f), "1 of 1", &page_style, 35.f));
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), &module_svgs, "Add to playlist");
     heart->setHandler([this](bool c, bool s){
@@ -155,11 +153,8 @@ PlayUi::PlayUi(PlayModule *module) :
     });
     addChild(heart);
 
-    style.key = "curpreset";
-    style.height = 14.f;
-    style.bold = true;
     addChild(live_preset_label = createLabel<TipLabel>(
-        Vec(87, 340.f), 150.f, "[current device preset]", style));
+        Vec(87, 340.f), "[current device preset]", &preset_style, 150.f));
     live_preset_label->glowing(true);
 
     play_menu = createWidgetCentered<PlayMenu>(Vec(RIGHT_MARGIN_CENTER, 148.f));

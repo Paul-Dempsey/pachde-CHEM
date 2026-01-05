@@ -8,16 +8,18 @@ const char * const NotConnected = "[not connected]";
 const char * const InputColorKey = "in-ring";
 const char * const OutputColorKey = "out-ring";
 
-LabelStyle warning_label      {"warning",    TextAlignment::Left,      9.f, false};
-LabelStyle haken_label        {"dytext",     TextAlignment::Left,     10.f, false};
-LabelStyle in_port_label      {"in-label",   TextAlignment::Center,   12.f, true};
-LabelStyle out_port_label     {"out-label",  TextAlignment::Center,   12.f, true};
-LabelStyle control_label      {"ctl-label",  TextAlignment::Center,   14.f, false};
-LabelStyle control_label_left {"ctl-label",  TextAlignment::Left,     14.f, false};
-LabelStyle small_control_label{"label",      TextAlignment::Center,   10.f, false};
-LabelStyle med_control_label  {"label",      TextAlignment::Center,   12.f, false};
-LabelStyle heading_label      {"ctl-label",  TextAlignment::Center,   16.f, true};
-LabelStyle pedal_label        {"ped-assign", TextAlignment::Left,     10.f, false};
+LabelStyle warning_label      {"warning",    HAlign::Left,      9.f, false};
+LabelStyle haken_label        {"dytext",     HAlign::Left,     10.f, false};
+LabelStyle in_port_label      {"in-label",   HAlign::Center,   12.f, true};
+LabelStyle out_port_label     {"out-label",  HAlign::Center,   12.f, true};
+LabelStyle control_label      {"ctl-label",  HAlign::Center,   14.f, false};
+LabelStyle control_label_small{"ctl-label",  HAlign::Center,   12.f, false};
+LabelStyle control_label_left {"ctl-label",  HAlign::Left,     14.f, false};
+LabelStyle small_label        {"label",      HAlign::Center,   10.f, false};
+LabelStyle med_label          {"label",      HAlign::Center,   12.f, false};
+LabelStyle heading_label      {"ctl-label",  HAlign::Center,   16.f, true};
+LabelStyle pedal_label        {"ped-assign", HAlign::Left,     10.f, false};
+LabelStyle pedal_label_center {"ped-assign", HAlign::Center,   10.f, false};
 
 bool show_screws()
 {

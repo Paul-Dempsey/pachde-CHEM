@@ -33,7 +33,7 @@ bool PlayUi::load_playlist(std::string path, bool set_folder)
     my_module->update_mru(path);
 
     playlist_name = system::getStem(path);
-    playlist_label->text(playlist_name);
+    playlist_label->set_text(playlist_name);
     std::string tip = my_module->playlist_file;
     if (!playlist_device.empty()) {
         tip.append("\n- for ");
@@ -134,7 +134,7 @@ void PlayUi::save_as_playlist()
             }
         }
         playlist_name = system::getStem(path);
-        playlist_label->text(playlist_name);
+        playlist_label->set_text(playlist_name);
 
         auto tip = my_module->playlist_file;
         if (!playlist_device.empty()) {
@@ -151,7 +151,7 @@ void PlayUi::save_as_playlist()
 
 void PlayUi::clear_playlist(bool forget_file)
 {
-    warning_label->text("");
+    warning_label->set_text("");
     if (!my_module) return;
     for (auto pw : preset_widgets) {
         pw->clear_preset();
@@ -159,7 +159,7 @@ void PlayUi::clear_playlist(bool forget_file)
     if (forget_file) {
         my_module->playlist_file = "";
         playlist_name = "";
-        playlist_label->text("");
+        playlist_label->set_text("");
         playlist_label->describe("");
         playlist_device = "";
         set_modified(false);

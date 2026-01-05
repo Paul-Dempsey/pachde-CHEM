@@ -6,12 +6,13 @@
 #include "widgets/uniform-style.hpp"
 #include "widgets/hamburger.hpp"
 #include "widgets/spinner.hpp"
+#include "./widgets/midi-config-dialog.hpp"
 
 using PM = PresetModule;
 using namespace eaganmatrix;
 
 void no_preset(TipLabel* label) {
-    label->text("");
+    label->set_text("");
     label->describe("(none)");
 }
 
@@ -72,9 +73,9 @@ void PresetUi::sort_presets(PresetOrder order) {
 
 void PresetUi::onSystemBegin() {
     other_system_gather = true;
-    help_label->text("scanning System presets");
+    help_label->set_text("scanning System presets");
     help_label->setVisible(true);
-    live_preset_label->text("");
+    live_preset_label->set_text("");
     live_preset_label->describe("");
 }
 
@@ -85,14 +86,14 @@ void PresetUi::onSystemComplete() {
         scroll_to(0);
     }
     help_label->setVisible(false);
-    help_label->text("");
+    help_label->set_text("");
 }
 
 void PresetUi::onUserBegin() {
     other_user_gather = true;
-    help_label->text("scanning User presets");
+    help_label->set_text("scanning User presets");
     help_label->setVisible(true);
-    live_preset_label->text("");
+    live_preset_label->set_text("");
     live_preset_label->describe("");
 }
 
@@ -103,7 +104,7 @@ void PresetUi::onUserComplete() {
         scroll_to(0);
     }
     help_label->setVisible(false);
-    help_label->text("");
+    help_label->set_text("");
 }
 
 void PresetUi::onPresetChange() {
@@ -115,7 +116,7 @@ void PresetUi::onPresetChange() {
         if (preset) {
             live_preset = std::make_shared<PresetInfo>();
             live_preset->init(preset);
-            live_preset_label->text(preset->name);
+            live_preset_label->set_text(preset->name);
             live_preset_label->describe(live_preset->meta_text());
             Tab& tab = active_tab();
             auto n = tab.list.index_of_id(preset->id);
@@ -136,10 +137,11 @@ void PresetUi::onPresetChange() {
         live_preset = nullptr;
         no_preset(live_preset_label);
     }
+    auto current = active_tab().current_index;
     if (live_preset && my_module->track_live) {
         scroll_to_live();
+        set_nav_param(current);
     }
-    auto current = active_tab().current_index;
     for (auto pw : preset_grid) {
         if (!pw->valid()) break;
         pw->live = live_preset && live_preset->valid() && (pw->preset_id() == live_preset->id);
@@ -147,8 +149,22 @@ void PresetUi::onPresetChange() {
     }
 }
 
+void PresetUi::set_live_current() {
+    if (!module) return;
+    if (live_preset && live_preset->valid()) {
+        Tab& tab = active_tab();
+        auto index = tab.list.index_of_id(live_preset->id);
+        if (index >= 0) {
+            set_nav_param(index);
+            set_current_index(index);
+            scroll_to_page_of_index(index);
+        }
+    }
+}
+
 void PresetUi::set_current_index(size_t index) {
-    active_tab().current_index = index;
+    Tab& tab = active_tab();
+    tab.current_index = clamp(index, 0, tab.count());
 }
 
 bool PresetUi::host_available() {
@@ -240,6 +256,10 @@ void PresetUi::on_filter_change(FilterId filter, uint64_t state) {
     scroll_to_page_of_index(tab.current_index);
 }
 
+void PresetUi::configure_midi() {
+    show_preset_midi_configuration(this, getSvgTheme());
+}
+
 void PresetUi::clear_filters() {
     Tab& tab{active_tab()};
     PresetId current_id = tab.current_id();
@@ -265,8 +285,8 @@ void PresetUi::clear_filters() {
 void PresetUi::set_tab(PresetTab tab_id, bool fetch) {
     switch (tab_id) {
     case PresetTab::User:
-        user_label->style(current_tab_style);
-        system_label->style(tab_style);
+        user_label->set_style(&current_tab_style);
+        system_label->set_style(&tab_style);
         active_tab_id = PresetTab::User;
         break;
 
@@ -276,8 +296,8 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch) {
 
     case PresetTab::System:
     sys:
-        user_label->style(tab_style);
-        system_label->style(current_tab_style);
+        user_label->set_style(&tab_style);
+        system_label->set_style(&current_tab_style);
         active_tab_id = PresetTab::System;
         break;
     }
@@ -370,7 +390,7 @@ void PresetUi::update_page_controls() {
     size_t page = 1 + (tab.scroll_top / PAGE_CAPACITY);
     size_t pages = 1 + (count / PAGE_CAPACITY);
     auto info = format_string("%d of %d", page, pages);
-    page_label->text(info);
+    page_label->set_text(info);
 
     if (0 == tab.scroll_top) {
         up_button->enable(false);
@@ -397,15 +417,15 @@ void PresetUi::update_page_controls() {
 void PresetUi::update_help() {
     Tab& tab = active_tab();
     if (tab.list.empty()) {
-        help_label->text("scan presets using the Core actions menu");
+        help_label->set_text("scan presets using the Core actions menu");
         help_label->setVisible(true);
     } else {
-        help_label->text("");
+        help_label->set_text("");
         help_label->setVisible(false);
     }
 }
 
-void PresetUi::select_random_preset() {
+void PresetUi::send_random_preset() {
     Tab& tab = active_tab();
     if (tab.list.empty()) return;
     ssize_t index = std::round(rack::random::uniform() * (tab.count()-1));

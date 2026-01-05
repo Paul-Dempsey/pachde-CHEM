@@ -1,9 +1,34 @@
 #include "Preset.hpp"
+#include "services/svg-query.hpp"
 
-void PresetUi::onButton(const ButtonEvent &e)
-{
-   //e.consume(this);
-   Base::onButton(e);
+void PresetUi::set_nav_param(ssize_t index) {
+    if (my_module) {
+        my_module->getParam(PresetModule::P_NAV).setValue(index);
+    }
+}
+
+void PresetUi::select_previous_preset() {
+    Tab& tab = active_tab();
+    if (tab.current_index < 0) {
+        tab.current_index = 0;
+        scroll_to_page_of_index(0);
+    } else if (tab.current_index > 0) {
+        tab.current_index -= 1;
+        scroll_to_page_of_index(tab.current_index);
+    }
+    set_nav_param(tab.current_index);
+}
+
+void PresetUi::select_next_preset() {
+    Tab& tab = active_tab();
+    if (tab.current_index < 0) {
+        tab.current_index = 0;
+        scroll_to_page_of_index(0);
+    } else if (tab.current_index < ssize_t(tab.count())) {
+        tab.current_index += 1;
+        scroll_to_page_of_index(tab.current_index);
+    }
+    set_nav_param(tab.current_index);
 }
 
 void PresetUi::onSelectKey(const SelectKeyEvent &e)
@@ -31,7 +56,6 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
             if (0 == mods)  {
                 if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
                     chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
-                    //chem_host->host_haken()->select_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
                 }
             }
             e.consume(this);
@@ -45,6 +69,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                 tab.current_index = 0;
                 scroll_to_page_of_index(0);
             }
+            set_nav_param(tab.current_index);
             e.consume(this);
             return;
 
@@ -56,20 +81,13 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                 tab.current_index = tab.count() - 1;
                 scroll_to_page_of_index(tab.current_index);
             }
+            set_nav_param(tab.current_index);
             e.consume(this);
             return;
 
         case GLFW_KEY_UP:
             if (0 == mods)  {
-                if (tab.current_index < 0) {
-                    tab.current_index = 0;
-                    scroll_to_page_of_index(0);
-                    e.consume(this);
-                    return;
-                } else if (tab.current_index > 0) {
-                    tab.current_index -= 1;
-                    scroll_to_page_of_index(tab.current_index);
-                }
+                select_previous_preset();
             }
             e.consume(this);
             return;
@@ -89,18 +107,13 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                 if (tab.current_index < 0) tab.current_index = 0;
                 scroll_to_page_of_index(tab.current_index);
             }
+            set_nav_param(tab.current_index);
             e.consume(this);
             return;
 
         case GLFW_KEY_DOWN:
             if (0 == mods) {
-                if (tab.current_index < 0) {
-                    tab.current_index = 0;
-                    scroll_to_page_of_index(0);
-                } else if (tab.current_index < ssize_t(tab.count())) {
-                    tab.current_index += 1;
-                    scroll_to_page_of_index(tab.current_index);
-                }
+                select_next_preset();
             }
             e.consume(this);
             return;
@@ -114,6 +127,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                     tab.current_index = std::min(ssize_t(tab.count()) -1, tab.current_index + PAGE_CAPACITY);
                     scroll_to_page_of_index(tab.current_index);
                 }
+                set_nav_param(tab.current_index);
             }
             e.consume(this);
             return;
@@ -127,6 +141,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                     tab.current_index = std::min(ssize_t(tab.count()) -1, tab.current_index + ROWS);
                     scroll_to_page_of_index(tab.current_index);
                 }
+                set_nav_param(tab.current_index);
             }
             e.consume(this);
             return;
@@ -140,6 +155,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
                     tab.current_index = std::max(ssize_t(0), tab.current_index - ROWS);
                     scroll_to_page_of_index(tab.current_index);
                 }
+                set_nav_param(tab.current_index);
             }
             e.consume(this);
             return;
@@ -150,7 +166,7 @@ void PresetUi::onSelectKey(const SelectKeyEvent &e)
 
 void PresetUi::onHoverScroll(const HoverScrollEvent &e)
 {
-    if (in_range(e.pos.x, 2.f, 378.f) && in_range(e.pos.y, 38.f, 358.f)) {
+    if (in_range(e.pos.x, 2.f, 335.f) && in_range(e.pos.y, 38.f, 358.f)) {
         int delta = PAGE_CAPACITY * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
         if (0 != delta) {
             Tab& tab = active_tab();
@@ -165,6 +181,12 @@ void PresetUi::onHoverScroll(const HoverScrollEvent &e)
     Base::onHoverScroll(e);
 }
 
+void PresetUi::hot_reload() {
+    Base::hot_reload();
+    auto svg = module_svgs.loadSvg(panelFilename());
+    svg_query::hideElements(svg, "k:");
+}
+
 void PresetUi::step()
 {
     Base::step();
@@ -176,16 +198,13 @@ void PresetUi::step()
         } else {
             return;
         }
-    }// else if (chem_host && !chem_host->host_busy()) {
-    //    start_delay.run();
-    //}
+    }
 
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available()) {
         set_tab(active_tab_id, true);
         update_help();
     }
-
     if (filtering()) {
         filter_off_button->button_down = true;
     }
@@ -195,7 +214,7 @@ void PresetUi::draw(const DrawArgs &args)
 {
     Base::draw(args);
     if (start_delay.running()) {
-        FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 3.f, page_label->get_color());
+        FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 3.f, fromPacked(page_label->get_color()));
     }
     #ifdef LAYOUT_HELP
     if (hints) {

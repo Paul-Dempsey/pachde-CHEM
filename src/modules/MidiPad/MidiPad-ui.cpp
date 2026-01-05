@@ -40,6 +40,9 @@ struct PadEdit : OpaqueWidget
     MultiTextInput* midi_field{nullptr};
     TipLabel* status{nullptr};
 
+    LabelStyle mini_label_style{"ctl-label", HAlign::Center, 10.f, true};
+    LabelStyle section_label_style{"ctl-label-hi", HAlign::Center, 14.f, true};
+
     PadEdit() {
         using namespace pad_edit_constants;
         box.size = Vec(WIDTH, HEIGHT);
@@ -48,7 +51,7 @@ struct PadEdit : OpaqueWidget
     void commit(bool force = false)
     {
         if (-1 == pad_id) {
-            status->text("");
+            status->set_text("");
             status->describe("");
             return;
         }
@@ -61,7 +64,7 @@ struct PadEdit : OpaqueWidget
             pad->compile();
             set_status(pad);
             if (pad->ok) {
-                status->text("OK");
+                status->set_text("OK");
             }
             ui->pad_ui[pad_id]->on_pad_change(true, true);
             modified = false;
@@ -94,7 +97,7 @@ struct PadEdit : OpaqueWidget
 
         pad_id = id;
         auto pad = ui->get_pad(pad_id);
-        coordinate->text(default_pad_name[pad_id]);
+        coordinate->set_text(default_pad_name[pad_id]);
         name_field->setText(pad->name);
         midi_field->setText(pad->def);
         set_status(pad);
@@ -107,7 +110,7 @@ struct PadEdit : OpaqueWidget
     {
         if (!ui->my_module) return;
         ui->my_module->title = text;
-        ui->title->text(text);
+        ui->title->set_text(text);
     }
 
     void on_name_text_changed(std::string text)
@@ -125,12 +128,12 @@ struct PadEdit : OpaqueWidget
     void set_status(std::shared_ptr<pachde::MidiPad> pad)
     {
         if (!pad->ok) {
-            status->text(ellipse_string(pad->error_message, 30));
+            status->set_text(ellipse_string(pad->error_message, 30));
             status->describe(pad->error_message);
             midi_field->cursor = pad->error_pos;
             midi_field->selection = pad->error_pos;
         } else {
-            status->text("");
+            status->set_text("");
             status->describe("");
         }
     }
@@ -157,8 +160,6 @@ struct PadEdit : OpaqueWidget
         initializing = true;
         ui = mw;
         auto theme = ui->getSvgTheme();
-        LabelStyle mini_label_style{"ctl-label", TextAlignment::Center, 10.f, true};
-        LabelStyle section_label_style{"ctl-label-hi", TextAlignment::Center, 14.f, true};
         {
             auto style = theme->getStyle("ctl-label-hi");
             hi_color = style ? style->fillWithOpacity() : 0xffd9d9d9;
@@ -179,11 +180,11 @@ struct PadEdit : OpaqueWidget
         addChild(title_field);
 
         y = SECTION_TOP;
-        addChild(coordinate = createLabel(Vec(CENTER,y), 40, "", section_label_style));
+        addChild(coordinate = createLabel(Vec(CENTER,y), "", &section_label_style, 40));
 
         y += 18;
 
-        addChild(createLabel(Vec(3.5, y), 28, "Name", ::pachde::style::control_label_left));
+        addChild(createLabel(Vec(3.5, y), "Name", &S::control_label_left, 28));
 
         name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, "",
             [=](std::string text){ on_name_text_changed(text); },
@@ -221,8 +222,8 @@ struct PadEdit : OpaqueWidget
         addChild(pad_palette);
 
         y += 6.5f;
-        addChild(createLabel(Vec(CENTER - PALETTE_DX,y),25, "text", mini_label_style));
-        addChild(createLabel(Vec(CENTER + PALETTE_DX,y),25, "pad", mini_label_style));
+        addChild(createLabel(Vec(CENTER - PALETTE_DX,y), "text", &mini_label_style, 25));
+        addChild(createLabel(Vec(CENTER + PALETTE_DX,y), "pad", &mini_label_style, 25));
 
         y += 16.f;
 
@@ -230,7 +231,7 @@ struct PadEdit : OpaqueWidget
         midi_field->box.size = Vec(113, 132);
         midi_field->set_on_change( [=](std::string text){
             modified = true;
-            status->text("");
+            status->set_text("");
             status->describe("");
         });
         midi_field->set_on_enter( [=](std::string text){ on_midi_text_changed(text); });
@@ -243,22 +244,22 @@ struct PadEdit : OpaqueWidget
         btn->latched = false;
         btn->setHandler([=](bool,bool) { clear_pad(); });
         addChild(btn);
-        addChild(createLabel(Vec(x,y + 8.f),25, "clear", mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f), "clear", &mini_label_style, 25));
 
         x = CENTER;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Compile definition to MIDI");
         btn->setHandler([=](bool,bool){ commit(true); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),34, "compile", mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f), "compile", &mini_label_style, 34));
 
         x = CENTER + 28.f;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Send MIDI (test)");
         btn->setHandler([=](bool,bool){ send_pad(); });
         addChild(Center(btn));
-        addChild(createLabel(Vec(x,y + 8.f),25, "send", mini_label_style));
+        addChild(createLabel(Vec(x,y + 8.f), "send", &mini_label_style, 25));
 
         y += 24.f;
-        addChild(status = createLabel<TipLabel>(Vec(3.5, y), WIDTH - 7, "", S::warning_label));
+        addChild(status = createLabel<TipLabel>(Vec(3.5, y), "", &S::warning_label, WIDTH - 7));
 
         // tab order
         title_field->nextField = name_field;
@@ -305,7 +306,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
         addChild(createThemedWidget<ThemeScrew>(Vec(0, 0), &module_svgs));
         addChild(createThemedWidget<ThemeScrew>(Vec(box.size.x - RACK_GRID_WIDTH, 0), &module_svgs));
     }
-    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), 120.f - 7.5f, my_module ? my_module->title : "Midi Pad", LabelStyle{"ctl-label-hi", TextAlignment::Center, 16.f, true}));
+    addChild(title = createLabel(Vec(box.size.x*.5f, 20.f), my_module ? my_module->title : "Midi Pad", &hi_control_label_style, 120.f - 7.5f));
 
     float x = 15.f;
     float y = 60.f;
@@ -354,7 +355,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
 
     // footer
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
@@ -395,7 +396,7 @@ void changePanelWidth(SvgPanel* panel, float width)
 void MidiPadUi::refresh()
 {
     if (!my_module) return;
-    title->text(my_module->title);
+    title->set_text(my_module->title);
     for (int i = 0; i < 16; ++i) {
         pad_ui[i]->set_pad(my_module->pad_defs[i]);
     }

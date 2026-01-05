@@ -5,11 +5,10 @@
 #include "services/colors.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
-#include "widgets/label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/selector-widget.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
-#include "widgets/tip-label-widget.hpp"
 #include "widgets/knob-track-widget.hpp"
 
 using namespace pachde;
@@ -129,6 +128,8 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     float last_ir[4]{NAN};
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
+    LabelStyle heading_style{"ctl-label-hi", HAlign::Left, 14.f, true};
+    LabelStyle ir_style{"dytext", HAlign::Center, 12.f, false};
 
     SmallRoundParamButton* extend_button;
 

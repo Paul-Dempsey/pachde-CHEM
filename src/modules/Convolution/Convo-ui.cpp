@@ -33,11 +33,10 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     }
     float x, y;
     bool browsing = !module;
-    LabelStyle heading_style{"ctl-label-hi", TextAlignment::Left, 14.f, true};
 
     y = 32.f;
-    addChild(createLabel<TextLabel>(Vec(7.5f, y), 25.f, "Pre", heading_style));
-    addChild(createLabel<TextLabel>(Vec(204.f, y), 25.f, "Post", heading_style));
+    addChild(createLabel(Vec(7.5f, y), "Pre", &heading_style, 25.f));
+    addChild(createLabel(Vec(204.f, y), "Post", &heading_style, 25.f));
 
     // knobs
 
@@ -62,7 +61,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     }
     addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
         Vec(258.f, 26.f), &module_svgs, my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL)));
-    addChild(createLabel<TextLabel>(Vec(258.f, 42.f), 36, "Phase", S::control_label));
+    addChild(createLabel(Vec(258.f, 42.f), "Phase", &S::control_label, 36));
 
     const float KX = 34.f;
     x = KX;
@@ -73,10 +72,10 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float kdx[] { K_DX, K_DX, WL_DX, K_DX, IR_DX, 0.f};
     const char* labels[] { "Length", "Tuning", "Width", "Left", "Right", "IR" };
     for (int i = 0; i < 6; ++i) {
-        addChild(createLabel<TextLabel>(Vec(x, 68.f), 30, labels[i], S::control_label));
+        addChild(createLabel(Vec(x, 68.f), labels[i], &S::control_label, 30));
         x += kdx[i];
     }
-    auto ir_style = LabelStyle{"dytext", TextAlignment::Center, 12.f, false};
+
     x = KX;
     y = 104.f;
     int iwi = W_IDX_KR;
@@ -89,7 +88,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             }
             x += kdx[j];
         }
-        ir_labels[i] = createLabel<TextLabel>(Vec(142, y + 17.f), 150.f, "", ir_style);
+        ir_labels[i] = createLabel(Vec(142, y + 17.f), "", &ir_style, 150.f);
         addChild(ir_labels[i]);
         x = KX;
         y += ROW_DY;
@@ -140,7 +139,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
         auto wi = widget_info[iwi];
         addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, wi.light));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 35.f, port_name[i & 1], S::in_port_label));
+        addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), port_name[i & 1], &S::in_port_label, 35.f));
         if (my_module) {
             addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }
@@ -155,7 +154,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
@@ -234,7 +233,7 @@ void ConvoUi::step()
             last_ir[p] = v;
             auto sq = my_module->getParamQuantity(CM::P_1_TYPE+p);
             if (sq) {
-                ir_labels[p]->text(sq->getDisplayValueString());
+                ir_labels[p]->set_text(sq->getDisplayValueString());
             }
         }
     }

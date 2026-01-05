@@ -5,12 +5,11 @@
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
 #include "widgets/indicator-widget.hpp"
-#include "widgets/label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/slider-widget.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
 #include "widgets/themed-widgets.hpp"
-#include "widgets/tip-label-widget.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;

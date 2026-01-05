@@ -97,6 +97,7 @@ struct MidiPadUi : ChemModuleWidget, IChemClient
     PadEdit* edit_ui{nullptr};
     std::vector<saveModulePos> module_positions;
     int edit_pad{-1};
+    LabelStyle hi_control_label_style{"ctl-label-hi", HAlign::Center, 16.f, true};
 
     MidiPadUi(MidiPadModule *module);
     virtual ~MidiPadUi();

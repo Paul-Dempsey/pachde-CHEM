@@ -115,133 +115,131 @@ SettingsUi::SettingsUi(SettingsModule *module) :
     const float label_dx = 9.f;
     const float row_dy = 14.f;
     const float menu_axis = CENTER - 18.f;
-    auto value_style = LabelStyle{"setting", TextAlignment::Left, 12.f};
-    auto label_right_style = LabelStyle{"ctl-label", TextAlignment::Right, 12.f};
 
     y = 20.f;
-    addChild(Center(createThemedParamButton<SurfaceDirectionParamButton>(Vec(CENTER,y),&module_svgs, my_module, SM::P_SURFACE_DIRECTION)));
+    addChild(Center(createThemedParamButton<SurfaceDirectionParamButton>(Vec(CENTER,y), &module_svgs, my_module, SM::P_SURFACE_DIRECTION)));
 
     y = 38.f;
     x = 58.f;
-    addChild(createLabel<TextLabel>(Vec(x-12.f,y-value_dy), 50.f, "Middle C", label_right_style));
+    addChild(createLabel(Vec(x-12.f,y-value_dy), "Middle C", &label_right_style, 50.f));
     addChild(createChemKnob<TrimPot>(Vec(x, y), &module_svgs, my_module, SM::P_MIDDLE_C));
-    addChild(middle_c_value = createLabel<TextLabel>(Vec(x+13.f,y-value_dy), 100.f, "", value_style));
+    addChild(middle_c_value = createLabel(Vec(x+13.f,y-value_dy), "", &value_style, 100.f));
 
     x += 110.f;
-    addChild(createLabel<TextLabel>(Vec(x-12.f,y-value_dy), 58.f, "Touch area", label_right_style));
+    addChild(createLabel(Vec(x-12.f,y-value_dy), "Touch area", &label_right_style, 58.f));
     addChild(createChemKnob<TrimPot>(Vec(x, y), &module_svgs, my_module, SM::P_TOUCH_AREA));
-    addChild(touch_area_value = createLabel<TextLabel>(Vec(x+12.f,y-value_dy), 100.f, "", value_style));
+    addChild(touch_area_value = createLabel(Vec(x+12.f,y-value_dy), "", &value_style, 100.f));
 
     x = menu_axis;
     y = 54.f;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "X", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "X", &label_right_style, 8.f));
     addChild(createParamCentered<BendMenu>(Vec(x,y), my_module, SM::P_X));
-    addChild(x_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", value_style));
+    addChild(x_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Y", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Y", &label_right_style, 8.f));
     addChild(createParamCentered<YMenu>(Vec(x,y), my_module, SM::P_Y));
-    addChild(y_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", value_style));
+    addChild(y_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 8.f, "Z", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Z", &label_right_style, 8.f));
     addChild(createParamCentered<ZMenu>(Vec(x,y), my_module, SM::P_Z));
-    addChild(z_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", value_style));
+    addChild(z_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
 
     x = menu_axis - 22.f;
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Polyphony", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Polyphony", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY));
-    addChild(base_polyphony_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 10.f, "", value_style));
+    addChild(base_polyphony_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 10.f));
 
     float x2 = 145.f;
-    addChild(createLabel<TextLabel>(Vec(x2,y-value_dy), 60.f, "Fine tune", label_right_style));
+    addChild(createLabel(Vec(x2,y-value_dy), "Fine tune", &label_right_style, 60.f));
     auto slider = createSlider<BasicHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_FINE);
     slider->increment = 1.f;
     addChild(slider);
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Expand", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Expand", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_EXPAND_POLYPHONY)));
 
-    addChild(createLabel<TextLabel>(Vec(x2,y-value_dy), 60.f, "Actuation", label_right_style));
+    addChild(createLabel(Vec(x2,y-value_dy), "Actuation", &label_right_style, 60.f));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_ACTUATION);
     slider->increment = 1.f;
     addChild(slider);
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "2x rate", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "2x rate", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_DOUBLE_COMPUTATION)));
 
-    addChild(createLabel<TextLabel>(Vec(x2,y-value_dy), 60.f, "Audio in", label_right_style));
+    addChild(createLabel(Vec(x2,y-value_dy), "Audio in", &label_right_style, 60.f));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_AUDIO_IN);
     addChild(slider);
 
     x = menu_axis;
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note processing", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Note processing", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PROCESSING));
-    addChild(note_processing_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", value_style));
+    addChild(note_processing_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Note priority", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Note priority", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PRIORITY));
-    addChild(note_priority_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 120.f, "", value_style));
+    addChild(note_priority_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono mode", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Mono mode", &label_right_style, 80.f));
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y), &module_svgs, my_module,SM::P_MONO, SM::L_MONO)));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE));
-    addChild(mono_mode_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 140.f, "", value_style));
+    addChild(mono_mode_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 140.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Mono interval", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Mono interval", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL));
-    addChild(mono_interval_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", value_style));
+    addChild(mono_interval_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Tuning", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Tuning", &label_right_style, 50.f));
     addChild(createParamCentered<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING));
-    addChild(tuning_value = createLabel<TextLabel>(Vec(x+value_dx,y-value_dy), 100.f, "", value_style));
+    addChild(tuning_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
     create_rounding_leds(this, 20.f, y, 6.f, my_module, SM::L_ROUND_Y);
 
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Rounding", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Rounding", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_ROUND_TYPE));
-    addChild(round_type_value = createLabel<TextLabel>(Vec(x+value_dx, y-value_dy), 60.f, "", value_style));
+    addChild(round_type_value = createLabel(Vec(x+value_dx, y-value_dy), "", &value_style, 60.f));
 
     y += row_dy;
 
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round initial", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Round initial", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_ROUND_INITIAL)));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Round rate", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Round rate", &label_right_style, 80.f));
     addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 120.f, my_module, SM::P_ROUND_RATE));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 50.f, "Keep MIDI", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Keep MIDI", &label_right_style, 50.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_KEEP_MIDI)));
 
     y += row_dy;
-    addChild(createLabel<TextLabel>(Vec(x-label_dx,y-value_dy), 80.f, "Keep Surface", label_right_style));
+    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Keep Surface", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_KEEP_SURFACE)));
 
     // routing
     x = 42.5f;
     y = 274.5f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", S::med_control_label));
+    addChild(createLabel(Vec(x, y), "MIDI", &S::med_label, 40.f));
     y += 15.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 50.f, "Surface", S::med_control_label));
+    addChild(createLabel(Vec(x, y), "Surface", &S::med_label, 50.f));
     y += 22.f;
     x = 81.5f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "DSP", S::med_control_label));
+    addChild(createLabel(Vec(x, y), "DSP", &S::med_label, 30.f));
     x += 30.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 30.f, "CVC", S::med_control_label));
+    addChild(createLabel(Vec(x, y), "CVC", &S::med_label, 30.f));
     x += 30.f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "MIDI", S::med_control_label));
+    addChild(createLabel(Vec(x, y), "MIDI", &S::med_label, 40.f));
 
     const float col_dsp = 82.5f;
     const float col_cvc = col_dsp + 30.f;
@@ -259,7 +257,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     x = 180.f;
     y = 274.5f;
-    addChild(createLabel<TextLabel>(Vec(x, y), 40.f, "AES3", LabelStyle{"ctl-label", TextAlignment::Center, 12.f}));
+    addChild(createLabel(Vec(x, y), "AES3", &S::control_label_small, 40.f));
     y += 18.f;
     auto aes = createWidgetCentered<AesMenu>(Vec(x,y));
     aes->setModule(my_module);
@@ -272,15 +270,15 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     x = CENTER;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_ROUND_RATE, S::InputColorKey, PORT_CORN)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 25.f, "RATE", S::in_port_label));
+    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "RATE", &S::in_port_label, 25.f));
 
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_ROUND_INITIAL, S::InputColorKey, PORT_GRASS)));
-    addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 25.f, "INIT", S::in_port_label));
+    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "INIT", &S::in_port_label, 25.f));
 
     // footer
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, S::haken_label));
+        Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
@@ -325,14 +323,14 @@ void SettingsUi::onConnectHost(IChemHost* host) {
     if (chem_host) {
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
     } else {
-        haken_device_label->text(S::NotConnected);
+        haken_device_label->set_text(S::NotConnected);
     }
 }
 
 void SettingsUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
     if (device != ChemDevice::Haken) return;
-    haken_device_label->text(connection ? connection->info.friendly(NameFormat::Short) : S::NotConnected);
+    haken_device_label->set_text(connection ? connection->info.friendly(NameFormat::Short) : S::NotConnected);
     haken_device_label->describe(connection ? connection->info.friendly(NameFormat::Long) : S::NotConnected);
 }
 
@@ -341,9 +339,9 @@ void sync_switch_label(Module* module, int param_id, TextLabel* label)
     auto pq = module->getParamQuantity(param_id);
     auto text = pq->getDisplayValueString();
     if (text.empty()) {
-        label->text(format_string("?%f", pq->getValue()));
+        label->set_text(format_string("?%f", pq->getValue()));
     } else {
-        label->text(text);
+        label->set_text(text);
     }
 }
 
@@ -351,13 +349,13 @@ void SettingsUi::sync_labels()
 {
     if (my_module) {
         auto value = my_module->em_values[SM::P_MIDDLE_C];
-        middle_c_value->text(format_string("nn%d", value));
+        middle_c_value->set_text(format_string("nn%d", value));
 
         value = my_module->em_values[SM::P_TOUCH_AREA];
         if (value <= 16) {
-            touch_area_value->text("none");
+            touch_area_value->set_text("none");
         } else {
-            touch_area_value->text(format_string("nn%d", value));
+            touch_area_value->set_text(format_string("nn%d", value));
         }
 
         sync_switch_label(my_module, SM::P_X, x_value);

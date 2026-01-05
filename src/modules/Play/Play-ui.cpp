@@ -210,7 +210,7 @@ void PlayUi::onConnectHost(IChemHost* host)
         onConnectionChange(ChemDevice::Haken, chem_host->host_connection(ChemDevice::Haken));
     } else {
         onConnectionChange(ChemDevice::Haken, nullptr);
-        live_preset_label->text("");
+        live_preset_label->set_text("");
         live_preset_label->describe("none");
     }
 }
@@ -249,7 +249,7 @@ void PlayUi::update_up_down()
 
     int page  = 1 + (scroll_top / PAGE_CAPACITY);
     int total = 1 + (preset_count() / PAGE_CAPACITY);
-    page_label->text(format_string("%d of %d", page, total));
+    page_label->set_text(format_string("%d of %d", page, total));
 }
 
 void PlayUi::page_up(bool ctrl, bool shift)
@@ -531,10 +531,10 @@ void PlayUi::onPresetChange()
         } else {
             live_preset = nullptr;
         }
-        live_preset_label->text(preset ? preset->name : "");
+        live_preset_label->set_text(preset ? preset->name : "");
         live_preset_label->describe(preset ? preset->text : "");
     } else {
-        live_preset_label->text("");
+        live_preset_label->set_text("");
         live_preset_label->describe("(none)");
     }
 
@@ -556,7 +556,7 @@ void PlayUi::onPresetChange()
 void PlayUi::check_playlist_device()
 {
     if (!connected() || playlist_device.empty()) {
-        warning_label->text("");
+        warning_label->set_text("");
         pending_device_check = false;
         return;
     }
@@ -565,13 +565,13 @@ void PlayUi::check_playlist_device()
         if (em && em->hardware != 0) {
             const char * current_device = PresetClassName(em->hardware);
             if (0 != strcmp(current_device, playlist_device.c_str())) {
-                warning_label->text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
+                warning_label->set_text(format_string("[WARNING] Playlist for %s", playlist_device.c_str()));
             } else {
-                warning_label->text("");
+                warning_label->set_text("");
             }
             pending_device_check = false;
         } else {
-            warning_label->text("");
+            warning_label->set_text("");
         }
     }
 }

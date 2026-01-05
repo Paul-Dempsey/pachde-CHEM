@@ -2,14 +2,15 @@
 #pragma once
 #include <rack.hpp>
 #include <string>
+#include "text.hpp"
 
 using namespace ::rack;
 namespace pachde {
 
 #define U8(arg) static_cast<uint8_t>(arg)
 
-std::string format_string(const char *fmt, ...);
-size_t format_buffer(char * buffer, size_t length, const char* fmt, ...);
+//std::string format_string(const char *fmt, ...);
+//size_t format_buffer(char * buffer, size_t length, const char* fmt, ...);
 std::string hsl_string(float hue, float saturation, float lightness, float alpha);
 inline std::string u64_to_string(uint64_t value) { return format_string("%0.8llx", value); }
 uint64_t parse_hex_u64(const std::string& str);

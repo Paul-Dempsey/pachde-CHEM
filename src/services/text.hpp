@@ -1,28 +1,24 @@
-// Copyright (C) Paul Chase Dempsey
 #pragma once
-#include "my-plugin.hpp"
-#include "colors.hpp"
+#include <rack.hpp>
 using namespace ::rack;
+#include <string>
+#include "colors.hpp"
+#include "text-align.hpp"
 
 namespace pachde {
 
-inline std::shared_ptr<window::Font> GetPluginFontSemiBold()
-{
-    return APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/HankenGrotesk-SemiBold.ttf"));
-}
+std::string format_string(const char *fmt, ...);
+size_t format_buffer(char * buffer, size_t length, const char* fmt, ...);
+std::string hsla_string(float hue, float saturation, float lightness, float alpha);
+std::string rgba_string(PackedColor color);
 
-inline std::shared_ptr<window::Font> GetPluginFontRegular()
-{
-    return APP->window->loadFont(asset::plugin(pluginInstance, "res/fonts/HankenGrotesk-Regular.ttf"));
-}
+std::shared_ptr<window::Font> GetPluginFontSemiBold(const char * path = NULL);
+
+std::shared_ptr<window::Font> GetPluginFontRegular(const char * path = NULL);
 
 inline bool FontOk(std::shared_ptr<window::Font> font) {
     return font && font->handle >= 0;
 }
-
-std::string rgba_string(PackedColor color);
-
-std::string hsla_string(float hue, float saturation, float lightness, float alpha);
 
 void SetTextStyle(NVGcontext *vg, std::shared_ptr<window::Font> font, NVGcolor color = RampGray(G_20), float height = 16);
 
@@ -30,14 +26,38 @@ void SetTextStyle(NVGcontext *vg, std::shared_ptr<window::Font> font, NVGcolor c
 // Text style must have been previously set
 void CenterText(NVGcontext *vg, float x, float y, const char * text, const char * end);
 
-enum class BaselineCorrection {
-    None,
-    Baseline
-};
-
-// The y coordinate is the baseline (BaselineCorrection::none)
-// or the bottom of text box (BaselineCorrection::Baseline).
 // Text style must have been previously set.
-void RightAlignText(NVGcontext *vg, float x, float y, const char * text, const char * end, BaselineCorrection correction = BaselineCorrection::None);
+void RightAlignText(NVGcontext *vg, float x, float y, const char * text, const char * end);
+
+void draw_text_box (
+    NVGcontext *vg,
+    float x, float y, float w, float h,
+    float left_margin, float right_margin,
+    float top_margin, float bottom_margin,
+    std::string text,
+    std::shared_ptr<rack::window::Font> font,
+    float font_size,
+    PackedColor text_color,
+    HAlign halign,
+    VAlign valign,
+    PackedColor margin_color = colors::NoColor,
+    float first_baseline = INFINITY
+);
+
+void draw_oriented_text_box(
+    NVGcontext *vg,
+    Rect box,
+    float left_margin, float right_margin,
+    float top_margin, float bottom_margin,
+    const std::string& text,
+    std::shared_ptr<rack::window::Font> font,
+    float font_size,
+    PackedColor text_color,
+    HAlign halign,
+    VAlign valign,
+    Orientation orientation,
+    PackedColor margin_color = colors::NoColor,
+    float first_baseline = INFINITY
+);
 
 } // namespace pachde

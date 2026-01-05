@@ -2,7 +2,7 @@
 #include <rack.hpp>
 using namespace ::rack;
 #include "click-region-widget.hpp"
-#include "label-widget.hpp"
+#include "label.hpp"
 
 namespace widgetry {
 
@@ -25,6 +25,10 @@ struct BitsWidget : OpaqueWidget, IThemed
     ElementStyle control_frame{"ctl-frame", "hsl(0, 0%, 55%)", "hsl(0, 0%, 55%)", .5f};
     ElementStyle control_glyph{"ctl-glyph", "hsl(0, 0%, 65%)", "hsl(0, 0%, 65%)", .25f};
     ElementStyle check_style{"option-check", "hsl(120, 50%, 50%)", "hsl(120, 50%, 50%)", .25f};
+
+    LabelStyle title_style{"options-title", HAlign::Center, 10.f, true};
+    LabelStyle center_style{"choice", HAlign::Center, 9.f, false};
+    LabelStyle left_style{"choice", HAlign::Left, 9.f, false};
 
     BitsWidget(
         const std::string& name,

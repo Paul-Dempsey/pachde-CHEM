@@ -6,8 +6,7 @@
 #include "services/ModuleBroker.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
-#include "widgets/label-widget.hpp"
-#include "widgets/tip-label-widget.hpp"
+#include "widgets/label.hpp"
 #include "widgets/knob-track-widget.hpp"
 
 using namespace pachde;
@@ -114,7 +113,7 @@ struct PostUi : ChemModuleWidget, IChemClient
     SmallSimpleLight<GreenLight>* mix_light;
     GlowKnob* knobs[PostModule::NUM_PARAMS];
     TrackWidget* tracks[PostModule::NUM_PARAMS];
-
+    LabelStyle center_label{"ctl-label", HAlign::Center, 16.f, true};
     PostUi(PostModule *module);
     virtual ~PostUi();
 

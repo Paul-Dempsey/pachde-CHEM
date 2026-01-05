@@ -25,31 +25,26 @@ BitsWidget::BitsWidget(
     box.size.x = (MARGIN_DX * 2) + (cols * (label_width + CHECK_DX)) + ((cols-1) * COLUMN_SEP);
     float x, y;
 
-    LabelStyle title_style{"options-title", TextAlignment::Center, 10.f, true};
-    addChild(title = createLabel<TextLabel>(Vec(box.size.x*.5f, MARGIN_DY), 100.f, name, title_style));
+    addChild(title = createLabel(Vec(box.size.x*.5f, MARGIN_DY), name, &title_style, 100.f));
 
     auto r = exit_box_rect();
     addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) { close(); }, "option-exit"));
 
-    LabelStyle style{"choice", TextAlignment::Center, 9.f, false};
-
     y = MARGIN_DY + title->box.size.y + MARGIN_DY;
 
-    TextLabel* none_label = createLabel<TextLabel>(Vec(box.size.x*.5f, y), 32.f, "[ any ]", style);
+    TextLabel* none_label = createLabel(Vec(box.size.x*.5f, y), "[ any ]", &center_style, 32.f);
     addChild(none_label);
     addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) {
         state = 0;
         if (change_fn) change_fn(state);
     }, "choice-hover"));
 
-    style.align = TextAlignment::Left;
     auto item_it = items.cbegin();
     x = MARGIN_DX + CHECK_DX;
     y += ROW_HEIGHT;
     float top = y;
     for (size_t i = 0; i < items.size(); ++i, item_it++) {
-
-        auto label = createLabel<TextLabel>(Vec(x,y+1), label_width, *item_it, style);
+        auto label = createLabel(Vec(x,y+1), *item_it, &left_style, label_width);
         labels.push_back(label);
         addChild(label);
 
@@ -74,6 +69,9 @@ void BitsWidget::applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme)
     control_frame.apply_theme(theme);
     control_glyph.apply_theme(theme);
     check_style.apply_theme(theme);
+    title_style.applyTheme(theme);
+    center_style.applyTheme(theme);
+    left_style.applyTheme(theme);
 }
 
 std::string BitsWidget::make_summary()
@@ -94,7 +92,7 @@ std::string BitsWidget::make_summary()
                     result.append(", ");
                 }
             }
-            auto text = label->getText();
+            auto text = label->get_text();
             char_count += text.size();
             result.append(text);
             separator = true;

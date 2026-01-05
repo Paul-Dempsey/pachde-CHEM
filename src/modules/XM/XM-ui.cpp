@@ -142,6 +142,10 @@ struct MacroEdit : OpaqueWidget, IThemed
     Palette1Button* palette_fg{nullptr};
     Palette2Button* palette_bg{nullptr};
 
+    LabelStyle mini_label_style{"ctl-label", HAlign::Center, 10.f, true};
+    LabelStyle r_label_style{"ctl-label",  HAlign::Right, 14.f, false};
+    LabelStyle header_style{"ctl-label-hi", HAlign::Center, 16.f, true};
+
     TextLabel* knob_id{nullptr};
     TextInput* name_entry{nullptr};
     TextInput* macro_entry{nullptr};
@@ -250,7 +254,7 @@ void MacroEdit::applyTheme(std::shared_ptr<SvgTheme> theme)
 
 void MacroEdit::update_from_macro()
 {
-    knob_id->text(std::string(1, KN[macro.knob_id]));
+    knob_id->set_text(std::string(1, KN[macro.knob_id]));
     name_entry->setText (macro.name);
     macro_entry->setText(macro_number_to_string(macro.macro_number));
     add_input_port->set_plus(!macro.cv_port);
@@ -289,10 +293,6 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
 {
     using namespace me_constants;
 
-    LabelStyle mini_label_style{"ctl-label", TextAlignment::Center, 10.f, true};
-    LabelStyle r_label_style{"ctl-label",  TextAlignment::Right, 14.f, false};
-    LabelStyle header_style{"ctl-label-hi", TextAlignment::Center, 16.f, true};
-
     TextButton* close = createWidget<TextButton>(Vec(box.size.x - 14.f, 1.5f));
     close->set_text("x");
     close->setHandler([=](bool, bool){ ui->set_edit_mode(false); });
@@ -302,7 +302,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     x = LEFT_AXIS;
     y = TOP;
 
-    addChild(createLabel(Vec(7.5f,y), FULL_WIDTH, "Title:", S::control_label_left));
+    addChild(createLabel(Vec(7.5f,y), "Title:", &S::control_label_left, FULL_WIDTH));
 
     y += SMALL_ROW_DY;
     title_entry = createThemedTextInput(7.5f, y, FULL_WIDTH, 14.f,
@@ -338,17 +338,17 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(palette_bg);
 
     y += 12.5f;
-    addChild(createLabel(Vec(me_CENTER - PALETTE_DX,y),25, "text", mini_label_style));
-    addChild(createLabel(Vec(me_CENTER + PALETTE_DX,y),25, "bg", mini_label_style));
+    addChild(createLabel(Vec(me_CENTER - PALETTE_DX,y), "text", &mini_label_style, 25.f));
+    addChild(createLabel(Vec(me_CENTER + PALETTE_DX,y), "bg", &mini_label_style, 25.f));
 
     macro.module_id = ui->module->id;
     macro.knob_id = knob_index;
 
     y += ROW_DY;
-    addChild(knob_id = createLabel(Vec(me_CENTER, y), 40.f, std::string(1, KN[knob_index]), header_style));
+    addChild(knob_id = createLabel(Vec(me_CENTER, y), std::string(1, KN[knob_index]), &header_style, 40.f));
 
     y += 4.f + ROW_DY;
-    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), 50.f, "Name", r_label_style));
+    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), "Name", &r_label_style, 50.f));
     name_entry = createThemedTextInput(x, y, 90, 14,
         "",
         [=](std::string s){ macro.name = s; },
@@ -357,7 +357,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(name_entry);
 
     y += ROW_DY;
-    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), 60.f, "Macro", r_label_style));
+    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), "Macro", &r_label_style, 60.f));
     addChild(macro_entry = createThemedTextInput(x, y, 65, 14,
         "",
         [=](std::string s) { macro.macro_number = macro_number_from_string(s); },
@@ -379,7 +379,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
         macro.cv_port = add_input_port->plus;
     });
     addChild(add_input_port);
-    addChild(createLabel(Vec(x + 16.f, y), 60.f, "Input jack", S::control_label_left));
+    addChild(createLabel(Vec(x + 16.f, y), "Input jack", &S::control_label_left, 60.f));
 
     y += ROW_DY;
     add_modulation = createWidget<PlusMinusButton>(Vec(x,y));
@@ -389,10 +389,10 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
         macro.modulation = add_modulation->plus;
     });
     addChild(add_modulation);
-    addChild(createLabel(Vec(x + 16.f, y), 60.f, "Modulation", S::control_label_left));
+    addChild(createLabel(Vec(x + 16.f, y), "Modulation", &S::control_label_left, 60.f));
 
     y += ROW_DY;
-    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), 60.f, "Range", r_label_style));
+    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), "Range", &r_label_style, 60.f));
 
     StateIndicatorWidget* indicator{nullptr};
     x = OPT_CX;
@@ -402,7 +402,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     indicator->applyTheme(theme);
     addChild(indicator);
     range_options.push_back(indicator);
-    addChild(createLabel(Vec(x + 6.f, y), 50, "Bipolar", S::control_label_left));
+    addChild(createLabel(Vec(x + 6.f, y), "Bipolar", &S::control_label_left, 50));
     addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Bipolar), [=](int id, int) {
         set_range(MacroRange(id));
     }));
@@ -412,7 +412,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     indicator->applyTheme(theme);
     addChild(indicator);
     range_options.push_back(indicator);
-    addChild(createLabel(Vec(x + 6.f, y), 50, "Unipolar", S::control_label_left));
+    addChild(createLabel(Vec(x + 6.f, y), "Unipolar", &S::control_label_left, 50));
     addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Unipolar), [=](int id, int) {
         set_range(MacroRange(id));
     }));
@@ -422,23 +422,23 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     indicator->applyTheme(theme);
     addChild(indicator);
     range_options.push_back(indicator);
-    addChild(createLabel(Vec(x + 6.f, y), 50, "Custom", S::control_label_left));
+    addChild(createLabel(Vec(x + 6.f, y), "Custom", &S::control_label_left, 50));
     addChild(createClickRegion(x -6.f, y - 1.f, 60, 14, int(MacroRange::Custom), [=](int id, int) {
         set_range(MacroRange(id));
     }));
 
     y += ROW_DY + 8.f;
     addChild(min_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER - MINMAX_DX, y), &ui->module_svgs, ui->my_module, XMModule::P_RANGE_MIN));
-    addChild(createLabel(Vec(me_CENTER - MINMAX_DX, y + 9.5f), 25, "min", mini_label_style));
+    addChild(createLabel(Vec(me_CENTER - MINMAX_DX, y + 9.5f), "min", &mini_label_style, 25));
     addChild(max_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER + MINMAX_DX, y), &ui->module_svgs, ui->my_module, XMModule::P_RANGE_MAX));
-    addChild(createLabel(Vec(me_CENTER + MINMAX_DX, y + 9.5f), 25, "max", mini_label_style));
+    addChild(createLabel(Vec(me_CENTER + MINMAX_DX, y + 9.5f), "max", &mini_label_style, 25));
 
     y += ROW_DY + 8.f;
     x = LEFT_AXIS;
     auto resetButton = Center(createThemedButton<DotButton>(Vec(x,y+ 7.f), &ui->module_svgs, "Reset"));
     resetButton->setHandler([=](bool,bool) { macro.clear(); update_from_macro(); });
     addChild(resetButton);
-    addChild(createLabel(Vec(x + 10.f, y), 60.f, "Reset", S::control_label_left));
+    addChild(createLabel(Vec(x + 10.f, y), "Reset", &S::control_label_left, 60));
 
     // tab order
     title_entry->nextField = name_entry;
@@ -515,9 +515,8 @@ XMUi::XMUi(XMModule *module) :
     title_bar->color = title_bg;
     addChild(title_bar);
 
-    LabelStyle no_style{"", TextAlignment::Center, 12.f, true};
-    title = createLabel(Vec(CENTER, 1.5), PANEL_WIDTH, browsing ? "XM": my_module->title, no_style);
-    title->color(fromPacked(title_fg));
+    title = createLabel(Vec(CENTER, 1.5), browsing ? "XM": my_module->title, &no_style, PANEL_WIDTH);
+    title->set_color(title_fg);
     addChild(title);
 
     update_main_ui(theme);
@@ -638,7 +637,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
             addChild(knob);
         }
 
-        auto label = createLabel(Vec(pos.x, pos.y + 8.f), 45, macro->name, S::med_control_label);
+        auto label = createLabel(Vec(pos.x, pos.y + 8.f), macro->name, &S::med_label, 45);
         labels[i] = label;
         addChild(label);
 
@@ -838,12 +837,12 @@ void  XMUi::xm_clear() {
         title_bg = my_module->title_bg;
     }
 
-    this->title->text("");
+    this->title->set_text("");
     title_bar->color = title_bg;
-    title->color(fromPacked(title_fg));
+    title->format->color = title_fg;
 }
 
-std::string XMUi::get_header_text() { return title->getText(); }
+std::string XMUi::get_header_text() { return title->get_text(); }
 PackedColor XMUi::get_header_color() { return title_bg; }
 PackedColor XMUi::get_header_text_color() { return title_fg; }
 
@@ -857,13 +856,13 @@ void XMUi::set_header_color(PackedColor color)
 void XMUi::set_header_text_color(PackedColor color)
 {
     title_fg = color;
-    title->color(fromPacked(color));
+    title->format->color = color;
     if (my_module) my_module->title_fg = color;
 }
 
 void XMUi::set_header_text(std::string title)
 {
-    this->title->text(title);
+    this->title->set_text(title);
     if (my_module) my_module->title = title;
 }
 

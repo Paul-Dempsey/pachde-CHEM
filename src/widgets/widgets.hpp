@@ -11,7 +11,7 @@
 #include "hamburger.hpp"
 #include "indicator-widget.hpp"
 #include "knob-track-widget.hpp"
-#include "label-widget.hpp"
+#include "label.hpp"
 #include "layout-help.hpp"
 #include "level-widget.hpp"
 #include "logo-widget.hpp"
@@ -32,7 +32,6 @@
 #include "theme-button.hpp"
 #include "theme-knob.hpp"
 #include "themed-widgets.hpp"
-#include "tip-label-widget.hpp"
 #include "tip-widget.hpp"
 #include "uniform-style.hpp"
 using namespace widgetry;

@@ -64,30 +64,28 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(tracks[M6] = createTrackWidget(knobs[M6]));
 
     addChild(preset_label = createLabel<TipLabel>(
-        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f), box.size.x, browsing ? "—preset—" : "",
-        LabelStyle{"curpreset", TextAlignment::Center, 12.f, false}));
+        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f),
+        browsing ? "—preset—" : "", &preset_style, box.size.x));
 
     // knob labels
     x = LABEL_LEFT;
     y = LABEL_TOP;
-    LabelStyle control_style{S::control_label};
-    control_style.align = TextAlignment::Left;
 
-    addChild(m1_label = createLabel(Vec(x,y), 75.f, "i", control_style)); y += MACRO_DY;
-    addChild(m2_label = createLabel(Vec(x,y), 75.f, "ii", control_style)); y += MACRO_DY;
-    addChild(m3_label = createLabel(Vec(x,y), 75.f, "iii", control_style)); y += MACRO_DY;
-    addChild(m4_label = createLabel(Vec(x,y), 75.f, "iv", control_style)); y += MACRO_DY;
-    addChild(m5_label = createLabel(Vec(x,y), 75.f, "v", control_style)); y += MACRO_DY;
-    addChild(m6_label = createLabel(Vec(x,y), 75.f, "vi", control_style));
+    addChild(m1_label = createLabel(Vec(x,y), "i", &S::control_label_left, 75.f)); y += MACRO_DY;
+    addChild(m2_label = createLabel(Vec(x,y), "ii", &S::control_label_left, 75.f)); y += MACRO_DY;
+    addChild(m3_label = createLabel(Vec(x,y), "iii", &S::control_label_left, 75.f)); y += MACRO_DY;
+    addChild(m4_label = createLabel(Vec(x,y), "iv", &S::control_label_left, 75.f)); y += MACRO_DY;
+    addChild(m5_label = createLabel(Vec(x,y), "v", &S::control_label_left, 75.f)); y += MACRO_DY;
+    addChild(m6_label = createLabel(Vec(x,y), "vi", &S::control_label_left, 75.f));
 
     // knob pedal annotations
     y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
-    addChild(m2_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
-    addChild(m3_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
-    addChild(m4_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
-    addChild(m5_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label)); y += MACRO_DY;
-    addChild(m6_ped_label = createLabel(Vec(x,y), 20.f, "", S::pedal_label));
+    addChild(m1_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
+    addChild(m2_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
+    addChild(m3_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
+    addChild(m4_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
+    addChild(m5_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
+    addChild(m6_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f));
 
     // inputs
     const NVGcolor co_port = PORT_CORN;
@@ -99,7 +97,7 @@ MacroUi::MacroUi(MacroModule *module) :
     for (int i = 0; i <= M6; ++i) {
         addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createLabel<TextLabel>(Vec(x, y + S::PORT_LABEL_DY), 18.f, format_string("M%d", 1 + i), S::in_port_label));
+        addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), format_string("M%d", 1 + i), &S::in_port_label, 18.f));
         if (my_module) {
             float xoff {0.f};
             float w {29.25f};
@@ -119,7 +117,7 @@ MacroUi::MacroUi(MacroModule *module) :
     // footer
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), 200.f, S::NotConnected, style::haken_label));
+        Vec(28.f, box.size.y - 13.f), S::NotConnected, &style::haken_label, 200.f));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
@@ -133,14 +131,14 @@ MacroUi::MacroUi(MacroModule *module) :
     // Browsing UI
 
     if (browsing) {
-        m1_label->text("i");
-        m2_label->text("ii");
-        m3_label->text("iii");
-        m4_label->text("iv");
-        m5_label->text("v");
-        m6_label->text("vi");
-        m1_ped_label->text("p1");
-        m3_ped_label->text("p2");
+        m1_label->set_text("i");
+        m2_label->set_text("ii");
+        m3_label->set_text("iii");
+        m4_label->set_text("iv");
+        m5_label->set_text("v");
+        m6_label->set_text("vi");
+        m1_ped_label->set_text("p1");
+        m3_ped_label->set_text("p2");
 
         if (S::show_browser_logo()) {
             addChild(createWidgetCentered<OpaqueLogo>(Vec(68, box.size.y*.25)));
@@ -202,32 +200,32 @@ void MacroUi::unconnected_ui()
 {
     center_knobs();
     //if (my_module) { my_module->modulation.zero_modulation(); }
-    preset_label->text("");
+    preset_label->set_text("");
     preset_label->describe("[no preset]");
-    m1_label->text("");
-    m2_label->text("");
-    m3_label->text("");
-    m4_label->text("");
-    m5_label->text("");
-    m6_label->text("");
+    m1_label->set_text("");
+    m2_label->set_text("");
+    m3_label->set_text("");
+    m4_label->set_text("");
+    m5_label->set_text("");
+    m6_label->set_text("");
 }
 
 void MacroUi::onPresetChange()
 {
     if (my_module) {
         //if (my_module->batch_busy()) return;
-        m1_label->text(my_module->macro_names.macro[M1]);
-        m2_label->text(my_module->macro_names.macro[M2]);
-        m3_label->text(my_module->macro_names.macro[M3]);
-        m4_label->text(my_module->macro_names.macro[M4]);
-        m5_label->text(my_module->macro_names.macro[M5]);
-        m6_label->text(my_module->macro_names.macro[M6]);
+        m1_label->set_text(my_module->macro_names.macro[M1]);
+        m2_label->set_text(my_module->macro_names.macro[M2]);
+        m3_label->set_text(my_module->macro_names.macro[M3]);
+        m4_label->set_text(my_module->macro_names.macro[M4]);
+        m5_label->set_text(my_module->macro_names.macro[M5]);
+        m6_label->set_text(my_module->macro_names.macro[M6]);
         auto preset = chem_host ? chem_host->host_preset() : nullptr;
         if (preset) {
-            preset_label->text(preset->name);
+            preset_label->set_text(preset->name);
             preset_label->describe(preset->text);
         } else {
-            preset_label->text("");
+            preset_label->set_text("");
             preset_label->describe("");
         }
     }
@@ -237,14 +235,14 @@ void set_pedal_text(TextLabel* label, uint8_t item_cc, uint8_t a1, uint8_t a2)
 {
     if (item_cc == a1 || item_cc == a2) {
         if (a1 == a2) {
-            label->text("p1,p2");
+            label->set_text("p1,p2");
         } else if (item_cc == a1) {
-            label->text("p1");
+            label->set_text("p1");
         } else {
-            label->text("p2");
+            label->set_text("p2");
         }
     } else {
-        label->text("");
+        label->set_text("");
     }
 
 }

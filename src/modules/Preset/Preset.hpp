@@ -14,19 +14,28 @@
 using namespace pachde;
 using namespace eaganmatrix;
 struct PresetUi;
+struct PresetModule;
+
+struct PresetMidiHandler: IDoMidi {
+    PresetModule* host{nullptr};
+    MidiLog * logger{nullptr};
+    void init(PresetModule* the_host) { host = the_host; }
+    void enable_logging(bool logging);
+    void do_message(PackedMidiMessage msg) override;
+};
 
 namespace S = pachde::style;
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 
-struct PresetModule : ChemModule, IChemClient
+struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
 {
     enum Params {
+        P_NAV,
         NUM_PARAMS
     };
     enum Inputs {
-        // IN_PREV,
-        // IN_NEXT,
+        IN_SELECT_PRESET,
         NUM_INPUTS
     };
     enum Outputs {
@@ -37,32 +46,45 @@ struct PresetModule : ChemModule, IChemClient
         NUM_LIGHTS
     };
 
+    rack::dsp::SchmittTrigger select_preset_trigger;
+    //float last_nav{0.f};
+
+    // MIDI input
+    MidiDeviceHolder midi_device;
+    std::string midi_device_claim;
+    MidiInput midi_in{ChemId::Preset};
+    PresetMidiHandler midi_handler;
+    MidiLog* midi_log{nullptr};
+
     std::string device_claim;
-    bool track_live{false};
-    bool keep_search_filters{true};
+    std::string search_query;
     PresetTab active_tab{PresetTab::System};
 
     uint64_t user_filters[5]{0};
     uint64_t system_filters[5]{0};
     uint64_t* filters();
-    std::string search_query;
+
+    bool track_live{false};
+    bool keep_search_filters{true};
     bool search_name{true};
     bool search_meta{true};
     bool search_anchor{false};
     bool search_incremental{true};
+    bool nav_input_relative{false};
+    bool log_midi{false};
 
     PresetModule();
-    ~PresetModule() {
-        if (chem_host) {
-            chem_host->unregister_chem_client(this);
-        }
-    }
+    ~PresetModule();
+
     PresetUi* ui() { return reinterpret_cast<PresetUi*>(chem_ui); }
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
     void clear_filters(PresetTab tab_id);
+
+    // IMidiDeviceHolder
+    void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
@@ -114,18 +136,24 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     LinkButton* link_button{nullptr};
     TipLabel* haken_device_label{nullptr};
     TextInput* search_entry{nullptr};
-    LabelStyle tab_style{"tab-label", TextAlignment::Right, 16.f};
-    LabelStyle current_tab_style{"tab-label-hi", TextAlignment::Right, 16.f, true};
+
     TextLabel* user_label{nullptr};
     TextLabel* system_label{nullptr};
     TextLabel* page_label{nullptr};
     TextLabel* help_label{nullptr};
+
     UpButton* up_button{nullptr};
     DownButton* down_button{nullptr};
     TipLabel* live_preset_label{nullptr};
     PresetMenu* menu{nullptr};
     std::vector<FilterButton*> filter_buttons;
     StateButton * filter_off_button{nullptr};
+
+    LabelStyle tab_style{"tab-label", HAlign::Right, 16.f};
+    LabelStyle current_tab_style{"tab-label-hi", HAlign::Right, 16.f, true};
+    LabelStyle dytext_style{"dytext", HAlign::Center, 9.f};
+    LabelStyle help_style{"curpreset", HAlign::Center, 16.f, true};
+    LabelStyle cp_style{"curpreset", HAlign::Right, 10.f, true};
 
     WallTimer start_delay{3.5};
 
@@ -161,12 +189,15 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void set_tab(PresetTab tab, bool fetch);
     PresetTabList& preset_list(PresetTab which) { return get_tab(which).list; }
     PresetTabList& presets() { return preset_list(active_tab_id); }
+    ssize_t get_current_index() { return active_tab().current_index; }
+    void set_nav_param(ssize_t index);
     void set_current_index(size_t index);
     bool host_available();
     PresetId get_live_id() { return live_preset ? live_preset->id : PresetId{}; }
     bool load_presets(PresetTab which);
     void sort_presets(PresetOrder order);
     void set_track_live(bool track);
+    void set_live_current();
     void scroll_to(ssize_t index);
     void scroll_to_page_of_index(ssize_t index);
     ssize_t page_index(ssize_t index);
@@ -175,16 +206,20 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void page_down(bool control, bool shift);
     void update_page_controls();
     void update_help();
-    void select_random_preset();
+    void send_random_preset();
     void send_preset(ssize_t index);
     void previous_preset(bool c, bool s);
     void next_preset(bool c, bool s);
+    void select_previous_preset();
+    void select_next_preset();
 
     void on_search_text_changed(std::string text);
     void on_search_text_enter();
     bool filtering();
     void clear_filters();
     void on_filter_change(FilterId id, uint64_t state);
+
+    void configure_midi();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
@@ -196,6 +231,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-preset.svg"); }
     void createScrews() override;
+    void hot_reload() override;
 
     // IPresetListClient
     void on_list_changed(eaganmatrix::PresetTab which) override;
@@ -207,7 +243,6 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void onUserComplete() override;
 
     // ModuleWidget
-    void onButton(const ButtonEvent&e) override;
     void onSelectKey(const SelectKeyEvent &e) override;
     void onHoverScroll(const HoverScrollEvent & e) override;
 

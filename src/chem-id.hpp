@@ -29,6 +29,6 @@ enum class ChemId : uint8_t {
 inline uint8_t as_u8(ChemId tag) { return static_cast<uint8_t>(tag); }
 inline ChemId as_chem_id(uint8_t byte) { return static_cast<ChemId>(byte); }
 
-enum class ChemDevice : uint8_t { Unknown, Haken, Midi1, Midi2 };
+enum class ChemDevice : uint8_t { Unknown, Haken, Midi1, Midi2, Preset };
 
 }

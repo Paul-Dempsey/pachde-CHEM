@@ -1,6 +1,7 @@
 #include "midi-log.hpp"
 #include <ghc/filesystem.hpp>
 #include "misc.hpp"
+#include "text.hpp"
 #include "my-plugin.hpp"
 #include "chem-id.hpp"
 #include "em/wrap-HakenMidi.hpp"

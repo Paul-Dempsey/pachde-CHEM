@@ -1,6 +1,8 @@
 #include "Preset.hpp"
+#include "Preset-menu.hpp"
 #include "em/preset-meta.hpp"
 #include "services/colors.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/click-region-widget.hpp"
 #include "widgets/logo-widget.hpp"
 #include "widgets/menu-widgets.hpp"
@@ -8,137 +10,6 @@
 #include "widgets/spinner.hpp"
 
 using PM = PresetModule;
-
-// PresetMenu
-struct PresetMenu : Hamburger
-{
-    using Base = Hamburger;
-
-    PresetUi* ui;
-    PresetMenu() : ui(nullptr) { }
-
-    void setUi(PresetUi* w) { ui = w; }
-    void appendContextMenu(ui::Menu* menu) override;
-
-    void onHoverKey(const HoverKeyEvent& e) override
-    {
-        switch (e.key) {
-            case GLFW_KEY_ENTER:
-            case GLFW_KEY_MENU:
-            if (e.action == GLFW_RELEASE) {
-                e.consume(this);
-                createContextMenu();
-                return;
-            }
-        }
-        Base::onHoverKey(e);
-    }
-};
-
-void PresetMenu::appendContextMenu(ui::Menu* menu)
-{
-    menu->addChild(createMenuLabel<HamburgerTitle>("Preset Actions"));
-
-    Tab & tab = ui->active_tab();
-    PresetOrder order = tab.list.preset_list ? tab.list.preset_list->order : PresetOrder::Alpha;
-
-    auto entry = new OptionMenuEntry(PresetOrder::Alpha == order,
-        createMenuItem("Sort alphabetically", "", [=](){ ui->sort_presets(PresetOrder::Alpha); }));
-    menu->addChild(entry);
-
-    entry = new OptionMenuEntry(PresetOrder::Category == order,
-        createMenuItem("Sort by category", "", [this](){ ui->sort_presets(PresetOrder::Category); }));
-    menu->addChild(entry);
-
-    entry = new OptionMenuEntry(PresetOrder::Natural == order,
-        createMenuItem("Sort by preset number", "", [this](){ ui->sort_presets(PresetOrder::Natural); }));
-    menu->addChild(entry);
-
-    menu->addChild(new MenuSeparator);
-
-    menu->addChild(createMenuItem("Clear filters", "",
-        [this](){ ui->clear_filters(); },
-        !ui->filtering()
-    ));
-
-    menu->addChild(new MenuSeparator);
-    menu->addChild(createMenuItem("Show live preset", "",
-        [this](){ ui->scroll_to_live(); },
-        !ui->get_live_id().valid()
-    ));
-    menu->addChild(createCheckMenuItem("Track live preset", "",
-        [this](){ return ui->my_module->track_live; },
-        [this](){ ui->set_track_live(!ui->my_module->track_live); },
-        !ui->my_module
-    ));
-
-    menu->addChild(createCheckMenuItem("Keep search filters", "",
-        [this]() { return ui->my_module->keep_search_filters; },
-        [this]() { ui->my_module->keep_search_filters = !ui->my_module->keep_search_filters; },
-        !ui->my_module
-    ));
-}
-
-struct SearchMenu : PresetMenu
-{
-    void appendContextMenu(ui::Menu* menu) override {
-
-        if (!ui->my_module) return;
-
-        menu->addChild(createMenuLabel<HamburgerTitle>("Search Options"));
-
-        menu->addChild(createCheckMenuItem("Search preset Name", "",
-            [this](){ return ui->my_module->search_name; },
-            [this](){
-                ui->my_module->search_name = !ui->my_module->search_name;
-                if (!ui->my_module->search_name) {
-                    ui->my_module->search_meta = true;
-                }
-                ui->on_search_text_enter();
-            }
-        ));
-        menu->addChild(createCheckMenuItem("Search preset Metadata", "",
-            [this](){ return ui->my_module->search_meta; },
-            [this](){
-                ui->my_module->search_meta = !ui->my_module->search_meta;
-                if (!ui->my_module->search_meta) {
-                    ui->my_module->search_name = true;
-                }
-                ui->on_search_text_enter();
-            },
-            !ui->my_module
-        ));
-        menu->addChild(createCheckMenuItem("Match at Word start", "",
-            [this](){ return ui->my_module->search_anchor; },
-            [this](){
-                ui->my_module->search_anchor = !ui->my_module->search_anchor;
-                ui->on_search_text_enter();
-            },
-            !ui->my_module
-        ));
-
-        menu->addChild(new MenuSeparator);
-        menu->addChild(createMenuItem("Clear filters", "",
-            [this](){ ui->clear_filters(); },
-            !ui->filtering()
-        ));
-
-        menu->addChild(new MenuSeparator);
-
-        auto entry = new OptionMenuEntry(!ui->my_module->search_incremental,
-            createMenuItem("Search on ENTER", "",
-                [this](){ ui->my_module->search_incremental = false; }));
-        menu->addChild(entry);
-
-        entry = new OptionMenuEntry(ui->my_module->search_incremental,
-            createMenuItem("Search as you type", "",
-                [this](){ ui->my_module->search_incremental = true; }));
-        menu->addChild(entry);
-    }
-};
-
-
-// PresetUi
 
 PresetUi::PresetUi(PresetModule *module) :
     my_module(module)
@@ -155,45 +26,35 @@ PresetUi::PresetUi(PresetModule *module) :
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
     panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
+    ::svg_query::BoundsIndex bounds;
+    svg_query::addBounds(panel->svg, "k:", bounds, true);
 
-    float x, y;
-
-    x = 23.5f;
-    y = 18.f;
-    search_entry = createThemedTextInput(x, y, 114.f, 14.f, "",
+    Rect r = bounds["k:search-edit"];
+    search_entry = createThemedTextInput(r.pos.x, r.pos.y, r.size.x, r.size.y, "",
         [=](std::string text){ on_search_text_changed(text); },
         [=](std::string text){ on_search_text_enter(); },
         "preset search");
     addChild(search_entry);
 
-    menu = Center(createWidget<SearchMenu>(Vec(x + 122.f, y + 7.f)));
+    menu = Center(createWidget<SearchMenu>(bounds["k:search-menu"].getCenter()));
     menu->setUi(this);
     menu->describe("Search options");
     addChild(menu);
 
-    x = 170.f;
-    y = 25.f;
-    addChild(createLightCentered<SmallLight<RedLight>>(Vec(x,y), my_module, PresetModule::L_FILTER));;
+    addChild(createLightCentered<SmallLight<RedLight>>(bounds["k:l-filter"].getCenter(), my_module, PresetModule::L_FILTER));;
 
     // tab labels
-    x = 270.f;
-    y = 18.f;
-    addChild(user_label = createLabel<TextLabel>(Vec(x,y), 26.f, "User", tab_style));
+    addChild(user_label = createLabel(bounds["k:user-tab"], "User", &tab_style));
     addChild(createClickRegion(RECT_ARGS(user_label->box.grow(Vec(6,2))), (int)PresetTab::User, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
-    x += 55.f;
-    addChild(system_label = createLabel<TextLabel>(Vec(x,y), 40.f, "System", current_tab_style));
+    addChild(system_label = createLabel(bounds["k:system-tab"], "System", &current_tab_style));
     addChild(createClickRegion(RECT_ARGS(system_label->box.grow(Vec(6,2))), (int)PresetTab::System, [=](int id, int mods) { set_tab((PresetTab)id, true); }));
 
     // right controls
 
-    x = RCENTER;
-    y = 28.f;
-    LabelStyle style{"dytext", TextAlignment::Center, 9.f};
-    addChild(page_label = createLabel<TextLabel>(Vec(x - .75, y), 30.f, "1 of 1", style));
+    addChild(page_label = createLabel<TextLabel>(bounds["k:pager"], "1 of 1", &dytext_style));
 
-    y = 46.f;
-    up_button = createWidgetCentered<UpButton>(Vec(x, y));
+    up_button = createWidgetCentered<UpButton>(bounds["k:up"].getCenter());
     up_button->describe("Page up");
     up_button->applyTheme(theme);
     up_button->setHandler([this](bool c, bool s){
@@ -202,8 +63,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(up_button);
 
-    y += 15.f;
-    down_button = createWidgetCentered<DownButton>(Vec(x, y));
+    down_button = createWidgetCentered<DownButton>(bounds["k:down"].getCenter());
     down_button->describe("Page down");
     down_button->applyTheme(theme);
     down_button->setHandler([this](bool c, bool s){
@@ -212,8 +72,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(down_button);
 
-    y = 84.f;
-    auto prev = createWidgetCentered<PrevButton>(Vec(x, y));
+    auto prev = createWidgetCentered<PrevButton>(bounds["k:prev"].getCenter());
     prev->describe("Select previous preset");
     prev->applyTheme(theme);
     prev->setHandler([this](bool c, bool s) {
@@ -222,8 +81,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(prev);
 
-    y += 15.f;
-    auto next = createWidgetCentered<NextButton>(Vec(x, y));
+    auto next = createWidgetCentered<NextButton>(bounds["k:next"].getCenter());
     next->describe("Select next preset");
     next->applyTheme(theme);
     next->setHandler([this](bool c, bool s){
@@ -232,43 +90,55 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(next);
 
-    menu = createWidgetCentered<PresetMenu>(Vec(x, 148.f));
+    menu = createWidgetCentered<PresetMenu>(bounds["k:action-menu"].getCenter());
     menu->setUi(this);
     menu->describe("Preset actions menu");
     addChild(menu);
 
-    // Filter buttons
+    {   // Filter buttons
+        FilterButton* filter{nullptr};
 
-    const float FILTER_DY = 20.f;
-    y = 205.f;
-    FilterButton* filter{nullptr};
+        addChild(Center(filter = makeCatFilter(bounds["k:cat"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
+        filter_buttons.push_back(filter);
 
-    addChild(Center(filter = makeCatFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
-    filter_buttons.push_back(filter);
+        addChild(Center(filter = makeTypeFilter(bounds["k:type"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
+        filter_buttons.push_back(filter);
 
-    y += FILTER_DY;
-    addChild(Center(filter = makeTypeFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
-    filter_buttons.push_back(filter);
+        addChild(Center(filter = makeCharacterFilter(bounds["k:char"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
+        filter_buttons.push_back(filter);
 
-    y += FILTER_DY;
-    addChild(Center(filter = makeCharacterFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
-    filter_buttons.push_back(filter);
+        addChild(Center(filter = makeMatrixFilter(bounds["k:mat"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
+        filter_buttons.push_back(filter);
 
-    y += FILTER_DY;
-    addChild(Center(filter = makeMatrixFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
-    filter_buttons.push_back(filter);
+        addChild(Center(filter = makeSettingFilter(bounds["k:set"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
+        filter_buttons.push_back(filter);
+    }
 
-    y += FILTER_DY;
-    addChild(Center(filter = makeSettingFilter(Vec(x,y), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
-    filter_buttons.push_back(filter);
-
-    y += FILTER_DY + 6.f;
-    addChild(filter_off_button = Center(makeFilterStateButton(Vec(x,y), &module_svgs, [=]() {
+    addChild(filter_off_button = Center(makeFilterStateButton(bounds["k:state"].getCenter(), &module_svgs, [=]() {
         if (filtering()) {
             clear_filters();
             filter_off_button->button_down = false;
         }
     })));
+
+    auto nav = createChemKnob<EndlessKnob>(bounds["k:nav-knob"].getCenter(), &module_svgs, my_module, PresetModule::P_NAV);
+    nav->set_handler([=](){
+        Tab& tab = active_tab();
+        if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
+            chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+        }
+    });
+    addChild(nav);
+
+    addChild(Center(createThemedColorInput(bounds["k:in-select"].getCenter(), &module_svgs, my_module, PresetModule::IN_SELECT_PRESET, S::InputColorKey, PORT_CORN)));
+
+    auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
+    picker->describe("Preset Midi controller");
+    if (my_module) {
+        picker->setDeviceHolder(&my_module->midi_device);
+        picker->set_configure_handler( [=](){ configure_midi(); });
+    }
+    addChild(picker);
 
     if (my_module) {
         user_tab.list.init_filters(my_module->user_filters);
@@ -280,7 +150,7 @@ PresetUi::PresetUi(PresetModule *module) :
     }
 
     // preset grid
-    x = 9.f; y = PRESET_TOP;
+    float x = 9.f; float y = PRESET_TOP;
     for (int i = 0; i < PAGE_CAPACITY; ++i) {
         auto entry = PresetEntry::create(Vec(x,y), preset_grid, this);
         preset_grid.push_back(entry);
@@ -292,8 +162,7 @@ PresetUi::PresetUi(PresetModule *module) :
         }
     }
 
-    LabelStyle help_style{"curpreset", TextAlignment::Center, 16.f, true};
-    addChild(help_label = createLabel<TextLabel>(Vec(172,180), 280.f, "", help_style));
+    addChild(help_label = createLabel<TextLabel>(bounds["k:help"], "", &help_style));
 
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), &module_svgs, "Core link");
@@ -305,11 +174,9 @@ PresetUi::PresetUi(PresetModule *module) :
     addChild(link_button);
 
     addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(32.f, box.size.y - 13.f), 150.f, S::NotConnected, S::haken_label));
+        Vec(32.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 150.f));
 
-    LabelStyle cp_style{"curpreset", TextAlignment::Right, 10.f, true};
-    addChild(live_preset_label = createLabel<TipLabel>(
-        Vec(box.size.x - 2*RACK_GRID_WIDTH, box.size.y - 13.f), 125.f, "[preset]", cp_style));
+    addChild(live_preset_label = createLabel<TipLabel>(bounds["k:live"], "[preset]", &cp_style));
     live_preset_label->glowing(true);
 
     if (S::show_screws()) {
@@ -334,7 +201,10 @@ PresetUi::PresetUi(PresetModule *module) :
 
 PresetUi::~PresetUi()
 {
+    my_module->set_chem_ui(nullptr);
     if (chem_host) {
+        auto em = chem_host->host_matrix();
+        if (em) em->unsubscribeEMEvents(this);
         auto ipl = chem_host->host_ipreset_list();
         if (ipl) {
             ipl->unregister_preset_list_client(this);

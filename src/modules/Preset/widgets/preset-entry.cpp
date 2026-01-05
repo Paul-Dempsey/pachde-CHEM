@@ -14,8 +14,7 @@ PresetEntry::PresetEntry(std::vector<PresetEntry*>& peers) :
     hovered(false),
     peers(peers)
 {
-    LabelStyle grid_style{"preset"};
-    addChild(label = createLabel<TipLabel>(Vec(1,1), 158.f, "", grid_style));
+    addChild(label = createLabel<TipLabel>(Vec(1,1), "", &grid_style, 158.f));
 }
 
 PresetEntry* PresetEntry::create(Vec pos, std::vector<PresetEntry*>& peers, PresetUi* host) {
@@ -33,7 +32,7 @@ void PresetEntry::set_preset(int index, bool is_current, bool is_live, std::shar
     preset_index = index;
     live = is_live;
     current = is_current;
-    label->text(preset->name);
+    label->set_text(preset->name);
     label->describe(preset->meta_text());
     notifyChange(this);
 }
@@ -53,7 +52,7 @@ void PresetEntry::clear_preset()
     preset_index = -1;
     live = false;
     current = false;;
-    label->text("");
+    label->set_text("");
     label->describe("");
     notifyChange(this);
 }
@@ -172,7 +171,7 @@ void PresetEntry::draw(const DrawArgs &args)
 
         nvgSave(vg);
         SetTextStyle(vg, font, category_style.nvg_color(), 8.f);
-        RightAlignText(vg, box.size.x - 1.5, label->box.size.y, preset->category_code().c_str(), nullptr, BaselineCorrection::Baseline);
+        RightAlignText(vg, box.size.x - 1.5, label->box.size.y, preset->category_code().c_str(), nullptr);
         nvgRestore(vg);
     }
 }

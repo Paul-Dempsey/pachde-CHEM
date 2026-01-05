@@ -57,7 +57,6 @@ SOURCES += src/widgets/color-widgets.cpp
 SOURCES += src/widgets/element-style.cpp
 SOURCES += src/widgets/flip-switch.cpp
 SOURCES += src/widgets/knob-track-widget.cpp
-SOURCES += src/widgets/label-widget.cpp
 SOURCES += src/widgets/menu-widgets.cpp
 SOURCES += src/widgets/panel-border.cpp
 SOURCES += src/widgets/pic.cpp
@@ -115,6 +114,7 @@ SOURCES += src/modules/Preset/Preset-ui-create.cpp
 SOURCES += src/modules/Preset/Preset-ui-events.cpp
 SOURCES += src/modules/Preset/preset-tab.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
+SOURCES += src/modules/Preset/widgets/midi-config-dialog.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
 
 SOURCES += src/modules/XM-shared/macro-data.cpp

@@ -98,7 +98,7 @@ void PlayModule::onPresetChange()
 
 void PlayModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
 {
-    if (chem_ui) ui()->onConnectionChange(device, connection);
+    if (chem_ui && (device == ChemDevice::Haken)) ui()->onConnectionChange(device, connection);
 }
 
 void PlayModule::process(const ProcessArgs& args)
