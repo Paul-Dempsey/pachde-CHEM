@@ -103,6 +103,8 @@ namespace colors {
     constexpr const PackedColor G100{0xffffffff};
     constexpr const PackedColor Black{G0};
     constexpr const PackedColor White{G100};
+    constexpr const PackedColor Red{0xff0000c0};
+    constexpr const PackedColor BrightRed{0xff0000ff};
 
     // HSL 30-degree hue increments
     extern const PackedColor PortRed;

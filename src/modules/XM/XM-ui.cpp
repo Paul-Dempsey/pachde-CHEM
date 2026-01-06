@@ -338,17 +338,17 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(palette_bg);
 
     y += 12.5f;
-    addChild(createLabel(Vec(me_CENTER - PALETTE_DX,y), "text", &mini_label_style, 25.f));
-    addChild(createLabel(Vec(me_CENTER + PALETTE_DX,y), "bg", &mini_label_style, 25.f));
+    addChild(createLabelCentered(Vec(me_CENTER - PALETTE_DX,y), "text", &mini_label_style, 25.f));
+    addChild(createLabelCentered(Vec(me_CENTER + PALETTE_DX,y), "bg", &mini_label_style, 25.f));
 
     macro.module_id = ui->module->id;
     macro.knob_id = knob_index;
 
     y += ROW_DY;
-    addChild(knob_id = createLabel(Vec(me_CENTER, y), std::string(1, KN[knob_index]), &header_style, 40.f));
+    addChild(knob_id = createLabelCentered(Vec(me_CENTER, y), std::string(1, KN[knob_index]), &header_style, 40.f));
 
     y += 4.f + ROW_DY;
-    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), "Name", &r_label_style, 50.f));
+    addChild(createLabelRight(Vec(x - LABEL_OFFSET_DX, y), "Name", &r_label_style, 50.f));
     name_entry = createThemedTextInput(x, y, 90, 14,
         "",
         [=](std::string s){ macro.name = s; },
@@ -357,7 +357,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(name_entry);
 
     y += ROW_DY;
-    addChild(createLabel(Vec(x - LABEL_OFFSET_DX, y), "Macro", &r_label_style, 60.f));
+    addChild(createLabelRight(Vec(x - LABEL_OFFSET_DX, y), "Macro", &r_label_style, 60.f));
     addChild(macro_entry = createThemedTextInput(x, y, 65, 14,
         "",
         [=](std::string s) { macro.macro_number = macro_number_from_string(s); },
@@ -429,9 +429,9 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
 
     y += ROW_DY + 8.f;
     addChild(min_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER - MINMAX_DX, y), &ui->module_svgs, ui->my_module, XMModule::P_RANGE_MIN));
-    addChild(createLabel(Vec(me_CENTER - MINMAX_DX, y + 9.5f), "min", &mini_label_style, 25));
+    addChild(createLabelCentered(Vec(me_CENTER - MINMAX_DX, y + 9.5f), "min", &mini_label_style, 25));
     addChild(max_knob = createChemKnob<GreenTrimPot>(Vec(me_CENTER + MINMAX_DX, y), &ui->module_svgs, ui->my_module, XMModule::P_RANGE_MAX));
-    addChild(createLabel(Vec(me_CENTER + MINMAX_DX, y + 9.5f), "max", &mini_label_style, 25));
+    addChild(createLabelCentered(Vec(me_CENTER + MINMAX_DX, y + 9.5f), "max", &mini_label_style, 25));
 
     y += ROW_DY + 8.f;
     x = LEFT_AXIS;
@@ -515,7 +515,7 @@ XMUi::XMUi(XMModule *module) :
     title_bar->color = title_bg;
     addChild(title_bar);
 
-    title = createLabel(Vec(CENTER, 1.5), browsing ? "XM": my_module->title, &no_style, PANEL_WIDTH);
+    title = createLabelCentered(Vec(CENTER, 1.5), browsing ? "XM": my_module->title, &no_style, PANEL_WIDTH);
     title->set_color(title_fg);
     addChild(title);
 
@@ -637,7 +637,7 @@ void XMUi::update_main_ui(std::shared_ptr<SvgTheme> theme)
             addChild(knob);
         }
 
-        auto label = createLabel(Vec(pos.x, pos.y + 8.f), macro->name, &S::med_label, 45);
+        auto label = createLabelCentered(Vec(pos.x, pos.y + 8.f), macro->name, &S::med_label, 45);
         labels[i] = label;
         addChild(label);
 

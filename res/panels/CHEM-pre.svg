@@ -1,24 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="90" height="380" viewBox="0 0 90 380" version="1.1"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-   <defs>
-      <linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse" >
-         <stop offset="0" stop-color="#282828" />
-         <stop offset="1" stop-color="#181818" />
-      </linearGradient>
-   </defs>
-   <g id="g1">
-      <rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="90" height="380" />
-      <path id="t--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,57 h 102" />
-      <path id="f--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,290 h 102" />
-   </g>
+<svg width="90" height="380" viewBox="0 0 90 380" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+<linearGradient id="gpanel" x1="0" y1="0" x2="0" y2="380" gradientUnits="userSpaceOnUse" >
+  <stop offset="0" stop-color="#282828" />
+  <stop offset="1" stop-color="#181818" />
+</linearGradient>
+<rect opacity="1" id="g-panel" fill="url(#gpanel)" x="0" y="0" width="90" height="380" />
 
-   <g id="PRE" transform="translate(31,3.5)">
-      <path fill="#f9a54b"
-         d="m 0,0 h 1.125 q 0.953613,0 1.538086,0.4482422 0.584473,0.4482422 0.584473,1.1645505 0,0.720703 -0.619629,1.208496 -0.615235,0.487793 -1.872071,0.474609 v 2.302735 H 0 Z m 0.755859,0.6679688 v 1.9599609 q 0.861329,-0.0088 1.274415,-0.2417 0.41748,-0.237304 0.41748,-0.755859 0,-0.391113 -0.316406,-0.6767574 Q 1.819336,0.6679688 0.755859,0.6679688 Z M 12.438477,0 h 1.21289 q 0.905274,0 1.472168,0.4526367 0.571289,0.4482422 0.571289,1.151367 0,0.5625 -0.36914,0.993164 -0.369141,0.430664 -1.151368,0.606445 l 1.630372,2.39502 h -0.874512 l -1.555664,-2.302735 h -0.171387 v 2.302735 h -0.764648 z m 0.764648,0.6767578 v 1.9511719 q 1.691895,0.03516 1.691895,-0.979981 0,-0.355957 -0.197754,-0.5800776 Q 14.499512,0.8393555 14.169922,0.7602539 13.840332,0.6767579 13.203125,0.6767578 Z M 24.758301,0 h 3.102539 v 0.7646485 h -2.34668 v 1.3974602 h 2.34668 v 0.75586 h -2.34668 v 1.924804 h 2.34668 v 0.75586 h -3.102539 z"
-         id="PRE--title" />
-   </g>
-   <path id="th" stroke="#f9a54b" stroke-width=".25" d="M 5,6.25 h 16 M 85,6.25 h -16" />
+<circle id="k:level" fill="#a37113" cx="45" cy="35" r="16"/>
+
+<path id="t--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,57 h 102" />
+
+<rect id="k:selector" fill="#2b2" x="3.5" y="66" width="12" height="50"/>
+<rect id="k:effect-label" fill="#aaa8" x="18" y="66" width="72" height="16" />
+<circle id="k:mix" fill="#2298ff" cx="45" cy="96" r="16"/>
+<circle id="k:mix-light" cx="67" cy="87" r="1.48" fill="#fff" />
+
+<circle id="k:thr" fill="#999" cx="45" cy="135" r="16"/>
+<rect id="k:thr-label" fill="#aaa8" x="0" y="153" width="90" height="14" />
+
+<circle id="k:att" fill="#999" cx="45" cy="189" r="16"/>
+<rect id="k:att-label" fill="#aaa8" x="0" y="207" width="90" height="14" />
+
+<circle id="k:rat" fill="#999" cx="45" cy="243" r="16"/>
+<rect id="k:rat-label" fill="#aaa8" x="0" y="261" width="90" height="14" />
+
+<path id="f--div" fill="none" stroke="#737373" stroke-width="0.75"  d="M 2,290 h 102" />
+
+<circle id="k:amount" cx="15" cy="316" r="8.9" fill="#bd10c3" />
+<circle id="k:mod-lvl" fill="#66a" cx="45" cy="316" r="8" />
+<circle id="k:mod-att" fill="#66a" cx="75" cy="316" r="8" />
+<circle id="k:mod-mix" fill="#66a" cx="15" cy="350" r="8" />
+<circle id="k:mod-thr" fill="#66a" cx="45" cy="350" r="8" />
+<circle id="k:mod-rat" fill="#66a" cx="75" cy="350" r="8" />
+
+<rect id="k:m-lvl-label" fill="#aaa8" x="35" y="296" width="20" height="12"/>
+<rect id="k:m-att-label" fill="#aaa8" x="65" y="296" width="20" height="12"/>
+<rect id="k:m-mix-label" fill="#aaa8" x="5"  y="330" width="20" height="12"/>
+<rect id="k:m-thr-label" fill="#aaa8" x="35" y="330" width="20" height="12"/>
+<rect id="k:m-rat-label" fill="#aaa8" x="65" y="330" width="20" height="12"/>
+
+<rect id="k:m-lvl-click" fill="none" stroke="#ee0f95" stroke-width=".25" x="28" y="296" width="32" height="21"/>
+<rect id="k:m-att-click" fill="none" stroke="#ee0f95" stroke-width=".25" x="60" y="296" width="30" height="21"/>
+<rect id="k:m-mix-click" fill="none" stroke="#ee0f95" stroke-width=".25" x="0"  y="330" width="30" height="21"/>
+<rect id="k:m-thr-click" fill="none" stroke="#ee0f95" stroke-width=".25" x="30" y="330" width="30" height="21"/>
+<rect id="k:m-rat-click" fill="none" stroke="#ee0f95" stroke-width=".25" x="60" y="330" width="30" height="21"/>
+
+<rect id="k:haken" fill="#5d8ed7" x="28" y="367" width="200" height="9"/>
+
+<g id="PRE" transform="translate(31,3.5)">
+    <path fill="#f9a54b"
+        d="m 0,0 h 1.125 q 0.953613,0 1.538086,0.4482422 0.584473,0.4482422 0.584473,1.1645505 0,0.720703 -0.619629,1.208496 -0.615235,0.487793 -1.872071,0.474609 v 2.302735 H 0 Z m 0.755859,0.6679688 v 1.9599609 q 0.861329,-0.0088 1.274415,-0.2417 0.41748,-0.237304 0.41748,-0.755859 0,-0.391113 -0.316406,-0.6767574 Q 1.819336,0.6679688 0.755859,0.6679688 Z M 12.438477,0 h 1.21289 q 0.905274,0 1.472168,0.4526367 0.571289,0.4482422 0.571289,1.151367 0,0.5625 -0.36914,0.993164 -0.369141,0.430664 -1.151368,0.606445 l 1.630372,2.39502 h -0.874512 l -1.555664,-2.302735 h -0.171387 v 2.302735 h -0.764648 z m 0.764648,0.6767578 v 1.9511719 q 1.691895,0.03516 1.691895,-0.979981 0,-0.355957 -0.197754,-0.5800776 Q 14.499512,0.8393555 14.169922,0.7602539 13.840332,0.6767579 13.203125,0.6767578 Z M 24.758301,0 h 3.102539 v 0.7646485 h -2.34668 v 1.3974602 h 2.34668 v 0.75586 h -2.34668 v 1.924804 h 2.34668 v 0.75586 h -3.102539 z"
+        id="PRE--title" />
+</g>
+<path id="th" stroke="#f9a54b" stroke-width=".25" d="M 5,6.25 h 16 M 85,6.25 h -16" />
 
 </svg>

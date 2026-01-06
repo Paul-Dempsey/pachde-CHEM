@@ -86,7 +86,7 @@ void PadWidget::init(
     on_click = callback;
     addChild(light = createLightCentered<TinyLight<WhiteLight>>(Vec(20,4), module, identifier));
 
-    label = createLabel(Vec(12, 8.5), the_pad ? the_pad->name : "", new LabelStyle("", HAlign::Center, 12.f), 24);
+    label = createLabelCentered(Vec(12, 8.5), the_pad ? the_pad->name : "", new LabelStyle("", HAlign::Center, 12.f), 24);
     label->own_format = true;
     addChild(label);
 

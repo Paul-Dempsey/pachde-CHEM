@@ -99,4 +99,6 @@
 <circle id="k:z" fill="#66a" cx="148" cy="350" r="8" />
 <circle id="k:slewz" fill="f22" cx="158" cy="338" r="4" />
 
+<rect id="k:firmware" fill="#d0808080" x="15" y="367" width="135" height="9"/>
+
 </svg>

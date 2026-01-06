@@ -88,12 +88,12 @@
   <rect id="k:search-menu" fill="#aae8" x="142" y="19" width="12" height="12"/>
   <circle id="k:l-filter"  cx="170" cy="25" r="2.95" fill="#fff" />
 
-  <rect id="k:user-tab" fill="#aae8" x="246" y="18" width="26" height="16" />
+  <rect id="k:user-tab" fill="#aae8" x="242" y="18" width="30" height="16" />
 
   <path id="U|S--vsep" fill="none" stroke="#8c8c8c" stroke-width="0.75" d="M 278,20 v 14" />
-  <rect id="k:system-tab" fill="#aae8" x="284" y="18" width="40" height="16" />
+  <rect id="k:system-tab" fill="#aae8" x="284" y="18" width="45" height="16" />
 
-  <rect id="k:pager" fill="#aae8" x="329.25" y="28" width="30" height="9" />
+  <rect id="k:pager" fill="#aae8" x="330" y="28" width="32" height="9" />
   <rect id="k:up"   fill="#aea8" x="338" y="38.5" width="15" height="15" />
   <rect id="k:down" fill="#aae8" x="338" y="53.5" width="15" height="15" />
 

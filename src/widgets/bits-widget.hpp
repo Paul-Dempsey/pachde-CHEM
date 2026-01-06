@@ -21,20 +21,21 @@ struct BitsWidget : OpaqueWidget, IThemed
 
     std::function<void(uint64_t item)> change_fn{nullptr};
 
-    ElementStyle envelope{"options-box", "#282828", "hsl(0, 0%, 65%)", 1.25f};
-    ElementStyle control_frame{"ctl-frame", "hsl(0, 0%, 55%)", "hsl(0, 0%, 55%)", .5f};
-    ElementStyle control_glyph{"ctl-glyph", "hsl(0, 0%, 65%)", "hsl(0, 0%, 65%)", .25f};
+    ElementStyle envelope{"options-box", colors::G18, colors::G55, 1.25f};
+    ElementStyle control_frame{"ctl-frame", colors::G55, colors::G55, .5f};
+    ElementStyle control_glyph{"ctl-glyph", colors::G65, colors::G65, .25f};
     ElementStyle check_style{"option-check", "hsl(120, 50%, 50%)", "hsl(120, 50%, 50%)", .25f};
 
-    LabelStyle title_style{"options-title", HAlign::Center, 10.f, true};
-    LabelStyle center_style{"choice", HAlign::Center, 9.f, false};
-    LabelStyle left_style{"choice", HAlign::Left, 9.f, false};
+    LabelStyle title_style{"options-title", HAlign::Center, 14.f, true};
+    LabelStyle center_style{"choice", HAlign::Center, 12.f, false};
+    LabelStyle left_style{"choice", HAlign::Left, 12.f, false};
 
     BitsWidget(
         const std::string& name,
         int rows,
         float item_width,
-        const std::vector<std::string>& items,
+        std::vector<const char *>& items,
+        std::shared_ptr<svg_theme::SvgTheme> theme,
         std::function<void(uint64_t state)> on_change
     );
     void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override;

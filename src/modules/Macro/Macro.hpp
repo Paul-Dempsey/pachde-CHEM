@@ -6,6 +6,7 @@
 #include "services/colors.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
 #include "widgets/label.hpp"
@@ -111,19 +112,19 @@ struct MacroUi : ChemModuleWidget, IChemClient
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
 
-    TipLabel* preset_label;
-    TextLabel* m1_label;
-    TextLabel* m2_label;
-    TextLabel* m3_label;
-    TextLabel* m4_label;
-    TextLabel* m5_label;
-    TextLabel* m6_label;
-    TextLabel* m1_ped_label;
-    TextLabel* m2_ped_label;
-    TextLabel* m3_ped_label;
-    TextLabel* m4_ped_label;
-    TextLabel* m5_ped_label;
-    TextLabel* m6_ped_label;
+    TipLabel* preset_label{nullptr};
+    TextLabel* m1_label{nullptr};
+    TextLabel* m2_label{nullptr};
+    TextLabel* m3_label{nullptr};
+    TextLabel* m4_label{nullptr};
+    TextLabel* m5_label{nullptr};
+    TextLabel* m6_label{nullptr};
+    TextLabel* m1_ped_label{nullptr};
+    TextLabel* m2_ped_label{nullptr};
+    TextLabel* m3_ped_label{nullptr};
+    TextLabel* m4_ped_label{nullptr};
+    TextLabel* m5_ped_label{nullptr};
+    TextLabel* m6_ped_label{nullptr};
     LabelStyle preset_style{"curpreset", HAlign::Center, 12.f, false};
 
     GlowKnob* knobs[MacroModule::NUM_KNOBS];
@@ -137,6 +138,7 @@ struct MacroUi : ChemModuleWidget, IChemClient
     void center_knobs();
 
     void unconnected_ui();
+    void add_input(::svg_query::BoundsIndex& bounds, const char* port_key, const char * label_key, const char * click_key, const char * label, int index);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

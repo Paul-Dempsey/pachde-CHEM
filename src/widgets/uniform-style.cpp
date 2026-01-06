@@ -21,6 +21,8 @@ LabelStyle heading_label      {"ctl-label",  HAlign::Center,   16.f, true};
 LabelStyle pedal_label        {"ped-assign", HAlign::Left,     10.f, false};
 LabelStyle pedal_label_center {"ped-assign", HAlign::Center,   10.f, false};
 
+const Vec light_dx{PORT_MOD_DX, PORT_MOD_DX};
+
 bool show_screws()
 {
     auto kv = get_plugin_kv_store();

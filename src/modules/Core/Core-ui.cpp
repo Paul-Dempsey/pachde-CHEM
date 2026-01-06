@@ -74,7 +74,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     preset_label = new TipLabel;
     preset_label->box = bounds["k:preset"];
-    preset_label->format = &dytext_style;
+    preset_label->format = &preset_style;
     preset_label->set_text("[preset]");
     preset_label->glowing(true);
     addChild(preset_label);
@@ -102,7 +102,6 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     addChild(attenuation_knob = createChemKnob<BlueKnob>(bounds["k:vol"].getCenter(), &module_svgs, my_module, CoreModule::P_ATTENUATION));
 
-    LabelStyle status_style{"brand", HAlign::Center, 10.f, false};
     addChild(em_status_label = createLabel(bounds["k:emstatus"], "", &status_style));
 
     const NVGcolor co_port = PORT_CORN;
@@ -152,7 +151,7 @@ void CoreModuleWidget::createScrews()
 
 void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
 {
-    addChild(firmware_label = createLabel(Vec(CENTER, box.size.y - 12.5f), "v00.00", &dytext_style, 140.f));
+    addChild(firmware_label = createLabel(bounds["k:firmware"], "v00.00", &dytext_style));
 
     haken_picker = createMidiPicker(bounds["k:haken"].pos, "HAKEN device", &my_module->haken_device, &my_module->haken_device);
     std::string text = (my_module) ? my_module->device_name(ChemDevice::Haken) : "[Eagan Matrix Device]";

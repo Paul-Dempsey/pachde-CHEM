@@ -1,6 +1,6 @@
 #include "Pre.hpp"
-#include "services/colors.hpp"
 #include "em/em-hardware.h"
+#include "services/colors.hpp"
 #include "widgets/click-region-widget.hpp"
 #include "widgets/logo-widget.hpp"
 #include "widgets/uniform-style.hpp"
@@ -36,84 +36,77 @@ PreUi::PreUi(PreModule *module) :
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
     panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
-    float x, y;
+    ::svg_query::BoundsIndex bounds;
+    svg_query::addBounds(panel->svg, "k:", bounds, true);
+
     bool browsing = !module;
 
     comp_type = module ? getParamIndex(my_module->getParamQuantity(PreModule::P_SELECT)) : 0;
 
-    addChild(selector = createParam<SelectorWidget>(Vec(3.5f, 66.f), my_module, PreModule::P_SELECT));
-    addChild(effect_label = createLabel(Vec(CENTER + 3.5f, 58.f), "", &control_label_style, 90.f));
+    addChild(selector = createParam<SelectorWidget>(bounds["k:selector"].pos, my_module, PreModule::P_SELECT));
+    addChild(effect_label = createLabel(Vec(3.5f, 58.f), "", &control_label_style, 90.f));
 
     // knobs
-    x = CENTER;
-    addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(Vec(x, 35.f), &module_svgs, my_module, PreModule::P_PRE_LEVEL));
+    addChild(knobs[K_PRE_LEVEL] = createChemKnob<YellowKnob>(bounds["k:level"].getCenter(), &module_svgs, my_module, PreModule::P_PRE_LEVEL));
     addChild(tracks[K_PRE_LEVEL] = createTrackWidget(knobs[K_PRE_LEVEL]));
 
-    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(Vec(x, 96.f), &module_svgs, my_module, PreModule::P_MIX));
+    addChild(knobs[K_MIX] = createChemKnob<BlueKnob>(bounds["k:mix"].getCenter(), &module_svgs, my_module, PreModule::P_MIX));
     addChild(tracks[K_MIX] = createTrackWidget(knobs[K_MIX]));
 
-    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(Vec(x + 22.f, 96.f-9.f), my_module, PreModule::L_MIX));
+    addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(bounds["k:mix-light"].getCenter(), my_module, PreModule::L_MIX));
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme);
 
-    const float PARAM_TOP = 135.f;
-    const float PARAM_DY = 54.f;
-    const float label_offset = 18.f;
-
-    y = PARAM_TOP;
-    addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_THRESHOLD_DRIVE));
+    addChild(knobs[K_THRESH_DRIVE] = createChemKnob<BasicKnob>(bounds["k:thr"].getCenter(), &module_svgs, my_module, PreModule::P_THRESHOLD_DRIVE));
     addChild(tracks[K_THRESH_DRIVE] = createTrackWidget(knobs[K_THRESH_DRIVE]));
-    addChild(top_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
+    addChild(top_knob_label= createLabel(bounds["k:thr-label"], "", &knob_label_style));
 
-    y += PARAM_DY;
-    addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_ATTACK));
+    addChild(knobs[K_ATTACK_X] = createChemKnob<BasicKnob>(bounds["k:att"].getCenter(), &module_svgs, my_module, PreModule::P_ATTACK));
     addChild(tracks[K_ATTACK_X] = createTrackWidget(knobs[K_ATTACK_X]));
-    addChild(mid_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
+    addChild(mid_knob_label= createLabel(bounds["k:att-label"], "", &knob_label_style));
 
-    y += PARAM_DY;
-    addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, my_module, PreModule::P_RATIO_MAKEUP));
+    addChild(knobs[K_RATIO_MAKEUP] = createChemKnob<BasicKnob>(bounds["k:rat"].getCenter(), &module_svgs, my_module, PreModule::P_RATIO_MAKEUP));
     addChild(tracks[K_RATIO_MAKEUP] = createTrackWidget(knobs[K_RATIO_MAKEUP]));
-    addChild(bot_knob_label= createLabel(Vec(x,y + label_offset), "", &knob_label_style, 90.f));
+    addChild(bot_knob_label= createLabel(bounds["k:rat-label"], "", &knob_label_style));
 
     // inputs
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(bounds["k:amount"].getCenter(), &module_svgs, module, PreModule::P_MOD_AMOUNT));
+
     auto co_port = PORT_CORN;
-    y = S::PORT_TOP;
-    x = CENTER - S::PORT_DX;
-    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, PreModule::P_MOD_AMOUNT));
 
-    x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port)));
-    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "LVL", &S::in_port_label, 20.f));
-    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_PRE_LEVEL_MOD));
+    Vec pos{bounds["k:mod-lvl"].getCenter()};
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, PreModule::IN_PRE_LEVEL, S::InputColorKey, co_port)));
+    addChild(createLabel(bounds["k:m-lvl-label"], "LVL", &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds["k:m-lvl-click"], PreModule::IN_PRE_LEVEL, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, PreModule::L_PRE_LEVEL_MOD));
 
-    x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port)));
-    addChild(in_attack_x = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
-    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_ATTACK_MOD));
+    pos = bounds["k:mod-att"].getCenter();
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, PreModule::IN_ATTACK, S::InputColorKey, co_port)));
+    addChild(in_attack_x = createLabel(bounds["k:m-att-label"], "", &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds["k:m-att-click"], PreModule::IN_ATTACK, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, PreModule::L_ATTACK_MOD));
 
-    y += S::PORT_DY;
-    x = CENTER - S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_MIX, S::InputColorKey, co_port)));
-    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "MIX", &S::in_port_label, 20.f));
-    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_MIX_MOD));
 
-    x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_THRESHOLD_DRIVE, S::InputColorKey, co_port)));
-    addChild(in_thresh_drive = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
-    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_THRESHOLD_DRIVE_MOD));
+    pos = bounds["k:mod-mix"].getCenter();
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, PreModule::IN_MIX, S::InputColorKey, co_port)));
+    addChild(createLabel(bounds["k:m-mix-label"], "MIX", &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds["k:m-mix-click"], PreModule::IN_MIX, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, PreModule::L_MIX_MOD));
 
-    x += S::PORT_DX;
-    addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, PreModule::IN_RATIO_MAKEUP, S::InputColorKey, co_port)));
-    addChild(in_ratio_makeup = createLabel(Vec(x, y + S::PORT_LABEL_DY), "", &S::in_port_label, 20.f));
-    if (my_module) { addChild(Center(createClickRegion(x, y -S::CLICK_DY, S::CLICK_WIDTH, S::CLICK_HEIGHT, PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
-    addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, PreModule::L_RATIO_MAKEUP_MOD));
+    pos = bounds["k:mod-thr"].getCenter();
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, PreModule::IN_THRESHOLD_DRIVE, S::InputColorKey, co_port)));
+    addChild(in_thresh_drive = createLabel(bounds["k:m-thr-label"], "", &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds["k:m-thr-click"], PreModule::IN_THRESHOLD_DRIVE, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, PreModule::L_THRESHOLD_DRIVE_MOD));
+
+    pos = bounds["k:mod-rat"].getCenter();
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, PreModule::IN_RATIO_MAKEUP, S::InputColorKey, co_port)));
+    addChild(in_ratio_makeup = createLabel(bounds["k:m-rat-label"], "", &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds["k:m-rat-click"], PreModule::IN_RATIO_MAKEUP, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, PreModule::L_RATIO_MAKEUP_MOD));
 
     // footer
 
-    addChild(haken_device_label = createLabel<TipLabel>(Vec(28.f, box.size.y - 13.f), S::NotConnected, &S::haken_label, 200.f));
+    addChild(haken_device_label = createLabel<TipLabel>(bounds["k:haken"], S::NotConnected, &S::haken_label));
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {

@@ -1,5 +1,6 @@
 @theme = High Contrast
 
+brand = #f9a54b
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -80,6 +81,7 @@ kg-gnomen = opacity 1 #f5f5ef
 ky-face = opacity 1
 ky-rim = opacity 1 stroke hsl(45, .35, .35)
 ky-gnomen = opacity 1 #f5f5ef
+label = #d9d9d9
 led = hsl(190, .5, .25) stroke #80808080
 level = hsl(30, .8, .5) stroke hsl(200, .5, .25) width 0.25
 link-gface = [ #767575, #353434 ]
@@ -97,7 +99,7 @@ midi-label = #d9d9d9
 midi-name  = #e5e5e5
 option-check = hsl(120, .5, .4)
 option-exit = stroke hsl(60, .5, .9) width 0.75
-options-box = #333333 stroke #e6e6e6 width 1.75
+options-box = #000 stroke #dbdbdb width 1.75
 options-title = #f9eb6a
 outs = #222 stroke none
 out-label = #dbdbdb

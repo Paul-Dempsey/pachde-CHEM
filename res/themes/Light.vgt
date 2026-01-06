@@ -1,5 +1,5 @@
 @theme = Light
-
+brand = #c78d11
 c1-in = hsl(174, 90%, 30%)
 c2-in =  hsl(174, 90%, 30%)
 checked = #1a1a1a
@@ -93,7 +93,7 @@ midi-label = #d9d9d9
 midi-name = #0d0d0d
 outs = #666 stroke none
 out-label = #e6e6e6
-option-check = hsl(120, .5, .4)
+option-check = hsl(120, .5, .2)
 option-exit = stroke hsl(0, 0, .1) width .75
 options-box = #cccccc stroke #404040 width 1
 options-title = #000000

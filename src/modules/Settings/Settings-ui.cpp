@@ -121,125 +121,125 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     y = 38.f;
     x = 58.f;
-    addChild(createLabel(Vec(x-12.f,y-value_dy), "Middle C", &label_right_style, 50.f));
+    addChild(createLabelRight(Vec(x-12.f,y-value_dy), "Middle C", &label_right_style, 50.f));
     addChild(createChemKnob<TrimPot>(Vec(x, y), &module_svgs, my_module, SM::P_MIDDLE_C));
     addChild(middle_c_value = createLabel(Vec(x+13.f,y-value_dy), "", &value_style, 100.f));
 
     x += 110.f;
-    addChild(createLabel(Vec(x-12.f,y-value_dy), "Touch area", &label_right_style, 58.f));
+    addChild(createLabelRight(Vec(x-12.f,y-value_dy), "Touch area", &label_right_style, 58.f));
     addChild(createChemKnob<TrimPot>(Vec(x, y), &module_svgs, my_module, SM::P_TOUCH_AREA));
     addChild(touch_area_value = createLabel(Vec(x+12.f,y-value_dy), "", &value_style, 100.f));
 
     x = menu_axis;
     y = 54.f;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "X", &label_right_style, 8.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "X", &label_right_style, 8.f));
     addChild(createParamCentered<BendMenu>(Vec(x,y), my_module, SM::P_X));
     addChild(x_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Y", &label_right_style, 8.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Y", &label_right_style, 8.f));
     addChild(createParamCentered<YMenu>(Vec(x,y), my_module, SM::P_Y));
     addChild(y_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Z", &label_right_style, 8.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Z", &label_right_style, 8.f));
     addChild(createParamCentered<ZMenu>(Vec(x,y), my_module, SM::P_Z));
     addChild(z_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
 
     x = menu_axis - 22.f;
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Polyphony", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Polyphony", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_BASE_POLYPHONY));
     addChild(base_polyphony_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 10.f));
 
     float x2 = 145.f;
-    addChild(createLabel(Vec(x2,y-value_dy), "Fine tune", &label_right_style, 60.f));
+    addChild(createLabelRight(Vec(x2,y-value_dy), "Fine tune", &label_right_style, 60.f));
     auto slider = createSlider<BasicHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_FINE);
     slider->increment = 1.f;
     addChild(slider);
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Expand", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Expand", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_EXPAND_POLYPHONY)));
 
-    addChild(createLabel(Vec(x2,y-value_dy), "Actuation", &label_right_style, 60.f));
+    addChild(createLabelRight(Vec(x2,y-value_dy), "Actuation", &label_right_style, 60.f));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_ACTUATION);
     slider->increment = 1.f;
     addChild(slider);
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "2x rate", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "2x rate", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_DOUBLE_COMPUTATION)));
 
-    addChild(createLabel(Vec(x2,y-value_dy), "Audio in", &label_right_style, 60.f));
+    addChild(createLabelRight(Vec(x2,y-value_dy), "Audio in", &label_right_style, 60.f));
     slider = createSlider<FillHSlider>(Vec(x2 + 4.f, y-6.f), 64.f, my_module, SM::P_AUDIO_IN);
     addChild(slider);
 
     x = menu_axis;
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Note processing", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Note processing", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PROCESSING));
     addChild(note_processing_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Note priority", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Note priority", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_NOTE_PRIORITY));
     addChild(note_priority_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 120.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Mono mode", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Mono mode", &label_right_style, 80.f));
     addChild(Center(createThemedParamLightButton<DotParamButton, SmallSimpleLight<GreenLight>>(Vec(12.f, y), &module_svgs, my_module,SM::P_MONO, SM::L_MONO)));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_MODE));
     addChild(mono_mode_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 140.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Mono interval", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Mono interval", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_MONO_INTERVAL));
     addChild(mono_interval_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Tuning", &label_right_style, 50.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Tuning", &label_right_style, 50.f));
     addChild(createParamCentered<TuningMenu>(Vec(x,y), my_module, SM::P_TUNING));
     addChild(tuning_value = createLabel(Vec(x+value_dx,y-value_dy), "", &value_style, 100.f));
 
     y += row_dy;
     create_rounding_leds(this, 20.f, y, 6.f, my_module, SM::L_ROUND_Y);
 
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Rounding", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Rounding", &label_right_style, 80.f));
     addChild(createParamCentered<HamParam>(Vec(x,y), my_module, SM::P_ROUND_TYPE));
     addChild(round_type_value = createLabel(Vec(x+value_dx, y-value_dy), "", &value_style, 60.f));
 
     y += row_dy;
 
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Round initial", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Round initial", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_ROUND_INITIAL)));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Round rate", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Round rate", &label_right_style, 80.f));
     addChild(round_rate_slider = createSlider<FillHSlider>(Vec(x-5.f, y-6.f), 120.f, my_module, SM::P_ROUND_RATE));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Keep MIDI", &label_right_style, 50.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Keep MIDI", &label_right_style, 50.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_KEEP_MIDI)));
 
     y += row_dy;
-    addChild(createLabel(Vec(x-label_dx,y-value_dy), "Keep Surface", &label_right_style, 80.f));
+    addChild(createLabelRight(Vec(x-label_dx,y-value_dy), "Keep Surface", &label_right_style, 80.f));
     addChild(Center(createThemedParamButton<CheckParamButton>(Vec(x,y), &module_svgs, my_module, SM::P_KEEP_SURFACE)));
 
     // routing
     x = 42.5f;
     y = 274.5f;
-    addChild(createLabel(Vec(x, y), "MIDI", &S::med_label, 40.f));
+    addChild(createLabelCentered(Vec(x, y), "MIDI", &S::med_label, 40.f));
     y += 15.f;
-    addChild(createLabel(Vec(x, y), "Surface", &S::med_label, 50.f));
+    addChild(createLabelCentered(Vec(x, y), "Surface", &S::med_label, 50.f));
     y += 22.f;
     x = 81.5f;
-    addChild(createLabel(Vec(x, y), "DSP", &S::med_label, 30.f));
+    addChild(createLabelCentered(Vec(x, y), "DSP", &S::med_label, 30.f));
     x += 30.f;
-    addChild(createLabel(Vec(x, y), "CVC", &S::med_label, 30.f));
+    addChild(createLabelCentered(Vec(x, y), "CVC", &S::med_label, 30.f));
     x += 30.f;
-    addChild(createLabel(Vec(x, y), "MIDI", &S::med_label, 40.f));
+    addChild(createLabelCentered(Vec(x, y), "MIDI", &S::med_label, 40.f));
 
     const float col_dsp = 82.5f;
     const float col_cvc = col_dsp + 30.f;
@@ -257,7 +257,7 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     x = 180.f;
     y = 274.5f;
-    addChild(createLabel(Vec(x, y), "AES3", &S::control_label_small, 40.f));
+    addChild(createLabelCentered(Vec(x, y), "AES3", &S::control_label_small, 40.f));
     y += 18.f;
     auto aes = createWidgetCentered<AesMenu>(Vec(x,y));
     aes->setModule(my_module);
@@ -270,11 +270,11 @@ SettingsUi::SettingsUi(SettingsModule *module) :
 
     x = CENTER;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_ROUND_RATE, S::InputColorKey, PORT_CORN)));
-    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "RATE", &S::in_port_label, 25.f));
+    addChild(createLabelCentered(Vec(x, y + S::PORT_LABEL_DY), "RATE", &S::in_port_label, 25.f));
 
     x = CENTER - S::PORT_DX;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_ROUND_INITIAL, S::InputColorKey, PORT_GRASS)));
-    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), "INIT", &S::in_port_label, 25.f));
+    addChild(createLabelCentered(Vec(x, y + S::PORT_LABEL_DY), "INIT", &S::in_port_label, 25.f));
 
     // footer
     addChild(haken_device_label = createLabel<TipLabel>(

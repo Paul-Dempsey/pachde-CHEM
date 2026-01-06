@@ -145,7 +145,7 @@ PlayUi::PlayUi(PlayModule *module) :
     blip->set_light_color(ColorFromTheme(theme, "warning", nvgRGB(0xe7, 0xe7, 0x45)));
     blip->set_brightness(0.f);
 
-    addChild(page_label = createLabel(Vec(RIGHT_MARGIN_CENTER, 35.f), "1 of 1", &page_style, 35.f));
+    addChild(page_label = createLabelCentered(Vec(RIGHT_MARGIN_CENTER, 35.f), "1 of 1", &page_style, 35.f));
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), &module_svgs, "Add to playlist");
     heart->setHandler([this](bool c, bool s){
@@ -153,7 +153,7 @@ PlayUi::PlayUi(PlayModule *module) :
     });
     addChild(heart);
 
-    addChild(live_preset_label = createLabel<TipLabel>(
+    addChild(live_preset_label = createLabelCentered<TipLabel>(
         Vec(87, 340.f), "[current device preset]", &preset_style, 150.f));
     live_preset_label->glowing(true);
 

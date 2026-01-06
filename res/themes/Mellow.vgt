@@ -1,4 +1,6 @@
 @theme = Mellow
+
+brand = #f9a54b
 c1-in = #e744be
 c2-in = #e744be
 checked = #93f963ff
@@ -67,6 +69,7 @@ kg-gnomeno = opacity 0
 ky-face = opacity 1 [ #fff171, #803c04]
 ky-gnomeno = opacity 0
 ky-rim = opacity 1 stroke hsl(32, .45, .5)
+label = hsl(42, .8, .05)
 led =  rgb(157, 142, 30) stroke #80808080
 level = hsl(30, .8, .5) stroke hsl(200, .5, .25) width .25
 lrbtn-bezel = hsl(41, .353, .38)

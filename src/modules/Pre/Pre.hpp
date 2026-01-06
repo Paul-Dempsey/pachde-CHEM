@@ -4,6 +4,7 @@
 #include "services/colors.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/knob-track-widget.hpp"
 #include "widgets/label.hpp"
 #include "widgets/selector-widget.hpp"

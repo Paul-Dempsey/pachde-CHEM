@@ -17,6 +17,7 @@ constexpr const float PORT_LABEL_DY = -20.f;
 constexpr const float CLICK_WIDTH = PORT_DX - 2.f;
 constexpr const float CLICK_HEIGHT = 21.f;
 constexpr const float CLICK_DY = 14.f;
+extern const Vec light_dx;
 
 // port active modulation light
 constexpr const float PORT_MOD_DX = 12.75f;

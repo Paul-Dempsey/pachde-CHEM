@@ -98,19 +98,19 @@ PresetUi::PresetUi(PresetModule *module) :
     {   // Filter buttons
         FilterButton* filter{nullptr};
 
-        addChild(Center(filter = makeCatFilter(bounds["k:cat"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
+        addChild(Center(filter = makeCatFilter(bounds["k:cat"].getCenter(), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Category, state); })));
         filter_buttons.push_back(filter);
 
-        addChild(Center(filter = makeTypeFilter(bounds["k:type"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
+        addChild(Center(filter = makeTypeFilter(bounds["k:type"].getCenter(), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Type, state); })));
         filter_buttons.push_back(filter);
 
-        addChild(Center(filter = makeCharacterFilter(bounds["k:char"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
+        addChild(Center(filter = makeCharacterFilter(bounds["k:char"].getCenter(), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Character, state); })));
         filter_buttons.push_back(filter);
 
-        addChild(Center(filter = makeMatrixFilter(bounds["k:mat"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
+        addChild(Center(filter = makeMatrixFilter(bounds["k:mat"].getCenter(), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Matrix, state); })));
         filter_buttons.push_back(filter);
 
-        addChild(Center(filter = makeSettingFilter(bounds["k:set"].getCenter(), &module_svgs, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
+        addChild(Center(filter = makeSettingFilter(bounds["k:set"].getCenter(), &module_svgs, theme, [=](uint64_t state){ on_filter_change(FilterId::Setting, state); })));
         filter_buttons.push_back(filter);
     }
 
@@ -121,24 +121,24 @@ PresetUi::PresetUi(PresetModule *module) :
         }
     })));
 
-    auto nav = createChemKnob<EndlessKnob>(bounds["k:nav-knob"].getCenter(), &module_svgs, my_module, PresetModule::P_NAV);
-    nav->set_handler([=](){
-        Tab& tab = active_tab();
-        if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
-            chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
-        }
-    });
-    addChild(nav);
+    // auto nav = createChemKnob<EndlessKnob>(bounds["k:nav-knob"].getCenter(), &module_svgs, my_module, PresetModule::P_NAV);
+    // nav->set_handler([=](){
+    //     Tab& tab = active_tab();
+    //     if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
+    //         chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+    //     }
+    // });
+    // addChild(nav);
 
-    addChild(Center(createThemedColorInput(bounds["k:in-select"].getCenter(), &module_svgs, my_module, PresetModule::IN_SELECT_PRESET, S::InputColorKey, PORT_CORN)));
+    // addChild(Center(createThemedColorInput(bounds["k:in-select"].getCenter(), &module_svgs, my_module, PresetModule::IN_SELECT_PRESET, S::InputColorKey, PORT_CORN)));
 
-    auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
-    picker->describe("Preset Midi controller");
-    if (my_module) {
-        picker->setDeviceHolder(&my_module->midi_device);
-        picker->set_configure_handler( [=](){ configure_midi(); });
-    }
-    addChild(picker);
+    // auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
+    // picker->describe("Preset Midi controller");
+    // if (my_module) {
+    //     picker->setDeviceHolder(&my_module->midi_device);
+    //     picker->set_configure_handler( [=](){ configure_midi(); });
+    // }
+    // addChild(picker);
 
     if (my_module) {
         user_tab.list.init_filters(my_module->user_filters);
@@ -201,7 +201,8 @@ PresetUi::PresetUi(PresetModule *module) :
 
 PresetUi::~PresetUi()
 {
-    my_module->set_chem_ui(nullptr);
+    preset_grid.clear();
+    if (my_module) my_module->set_chem_ui(nullptr);
     if (chem_host) {
         auto em = chem_host->host_matrix();
         if (em) em->unsubscribeEMEvents(this);
@@ -210,6 +211,8 @@ PresetUi::~PresetUi()
             ipl->unregister_preset_list_client(this);
         }
     }
+    user_tab.clear();
+    system_tab.clear();
 }
 
 void PresetUi::createScrews()

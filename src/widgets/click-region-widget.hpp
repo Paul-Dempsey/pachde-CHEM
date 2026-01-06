@@ -109,6 +109,19 @@ TR* createClickRegion(float x, float y, float width, float height, int id,
 }
 
 template <typename TR = ClickRegion>
+TR* createClickRegion(Rect region, int id,
+    std::function<void (int, int)> callback,
+    bool enabled = true
+    )
+{
+    TR* o = new TR(id);
+    o->box = region;
+    o->set_handler(callback);
+    o->enable(enabled);
+    return o;
+}
+
+template <typename TR = ClickRegion>
 TR* createHoverClickRegion(float x, float y, float width, float height, int id,
     std::function<void (int, int)> callback,
     const char * hover_key

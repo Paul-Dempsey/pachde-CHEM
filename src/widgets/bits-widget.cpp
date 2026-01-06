@@ -2,17 +2,18 @@
 
 namespace widgetry {
 
-constexpr const float ROW_HEIGHT = 10.5f;
+constexpr const float ROW_HEIGHT = 14.25f;
 constexpr const float MARGIN_DX = 3.5f;
 constexpr const float MARGIN_DY = 3.5f;
-constexpr const float COLUMN_SEP = 1.5f;
-constexpr const float CHECK_DX = 6.f;
+constexpr const float COLUMN_SEP = 1.75f;
+constexpr const float CHECK_DX = 8.f;
 
 BitsWidget::BitsWidget(
     const std::string& name,
     int rows,
     float item_width,
-    const std::vector<std::string>& items,
+    std::vector<const char *>& items,
+    std::shared_ptr<svg_theme::SvgTheme> theme,
     std::function<void(uint64_t state)> on_change
 ) :
     name(name),
@@ -21,18 +22,21 @@ BitsWidget::BitsWidget(
     label_width(item_width),
     change_fn(on_change)
 {
+    applyTheme(theme); // init styles
+
     int cols = (items.size() / rows) + ((items.size() % rows) > 0);
     box.size.x = (MARGIN_DX * 2) + (cols * (label_width + CHECK_DX)) + ((cols-1) * COLUMN_SEP);
+    const float CENTER = box.size.x*.5f;
     float x, y;
 
-    addChild(title = createLabel(Vec(box.size.x*.5f, MARGIN_DY), name, &title_style, 100.f));
+    addChild(title = createLabelCentered(Vec(CENTER, MARGIN_DY), name, &title_style, box.size.x - MARGIN_DX * 2));
 
     auto r = exit_box_rect();
     addChild(createHoverClickRegion(RECT_ARGS(r), 0, [this](int, int) { close(); }, "option-exit"));
 
     y = MARGIN_DY + title->box.size.y + MARGIN_DY;
 
-    TextLabel* none_label = createLabel(Vec(box.size.x*.5f, y), "[ any ]", &center_style, 32.f);
+    TextLabel* none_label = createLabelCentered(Vec(CENTER, y), "[ any ]", &center_style, 50.f);
     addChild(none_label);
     addChild(createHoverClickRegion(RECT_ARGS(none_label->box), 0, [=](int id, int mods) {
         state = 0;
@@ -44,7 +48,7 @@ BitsWidget::BitsWidget(
     y += ROW_HEIGHT;
     float top = y;
     for (size_t i = 0; i < items.size(); ++i, item_it++) {
-        auto label = createLabel(Vec(x,y+1), *item_it, &left_style, label_width);
+        auto label = createLabel(Vec(x, y+1), *item_it, &left_style, label_width);
         labels.push_back(label);
         addChild(label);
 
@@ -214,7 +218,6 @@ void BitsWidget::draw(const DrawArgs& args)
 
     FittedBoxRect(vg, 0.f, 0.f, box.size.x, box.size.y, co_border, Fit::Inside, envelope.width());
 
-
     auto r = exit_box_rect();
     BoxRect(vg, RECT_ARGS(r), control_frame.nvg_stroke_color(), .5f);
     r = r.grow({-1.25, -1.25});
@@ -231,7 +234,7 @@ void BitsWidget::draw(const DrawArgs& args)
     for (size_t i = 0; i < count; ++i, bit <<= 1) {
         if (bit & state) {
             auto pos = check_pos(i);
-            SetTextStyle(vg, font, check_style.nvg_color(), 5.f);
+            SetTextStyle(vg, font, check_style.nvg_color(), 9.f);
             nvgText(vg, pos.x, pos.y, "✔", nullptr);
         }
     }

@@ -1,4 +1,5 @@
 @theme = Ice
+brand = #f9a54b
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -64,6 +65,7 @@ kg-gnomeno = opacity 0
 ky-face = opacity 1
 ky-gnomeno = opacity 0
 ky-rim = opacity 1 stroke hsl(45, .35, .35)
+label = #bfbfbf
 led = hsl(190, .50, .40) stroke #80808080
 level = hsl(30, .80, .50) stroke hsla(200, .50, .25, 1) width .25
 lrbtn-bezel = hsl(200, .45, .30)

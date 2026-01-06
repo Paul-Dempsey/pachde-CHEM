@@ -128,7 +128,7 @@ StateButton* makeFilterStateButton(
     std::function<void()> on_click
 );
 
-struct FilterButton : SvgButton
+struct FilterButton : SvgButton, IThemed
 {
     using Base = SvgButton;
 
@@ -142,13 +142,19 @@ struct FilterButton : SvgButton
 
     void init (
         const std::string& name, int rows, float item_width,
-        const std::vector<std::string>& items,
-        ILoadSvg* loader);
+        std::vector<const char *>& items,
+        ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme);
 
     uint64_t get_state() { return dialog->get_state(); }
     void set_state(uint64_t state) {
         dialog->set_state(state);
         describe(dialog->make_summary());
+    }
+
+    void applyTheme(std::shared_ptr<SvgTheme> theme) override {
+        if (dialog) {
+            applyChildrenTheme(dialog, theme);
+        }
     }
 
     virtual ~FilterButton()
@@ -191,20 +197,17 @@ struct FilterButton : SvgButton
         Base::onLeave(e);
     }
 
-    void onDragStart(const DragStartEvent& e) override
-    {
+    void onDragStart(const DragStartEvent& e) override {
         destroyTip();
         Base::onDragStart(e);
     }
 
-    void onDragLeave(const DragLeaveEvent& e) override
-    {
+    void onDragLeave(const DragLeaveEvent& e) override {
         destroyTip();
         Base::onDragLeave(e);
     }
 
-    void onDragEnd(const DragEndEvent& e) override
-    {
+    void onDragEnd(const DragEndEvent& e) override {
         Base::onDragEnd(e);
         destroyTip();
     }
@@ -213,10 +216,10 @@ struct FilterButton : SvgButton
     void step() override;
 };
 
-FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
-FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
-FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
-FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
-FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCatFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeTypeFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeCharacterFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeMatrixFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme, std::function<void(uint64_t item)> on_change);
+FilterButton* makeSettingFilter(Vec pos, ILoadSvg* loader, std::shared_ptr<svg_theme::SvgTheme> theme, std::function<void(uint64_t item)> on_change);
 
 }

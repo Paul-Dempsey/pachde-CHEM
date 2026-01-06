@@ -335,9 +335,11 @@ struct CoreModuleWidget : ChemModuleWidget, IChemClient, IHandleEmEvents
     IndicatorWidget* presetinfo_indicator{nullptr};
     IndicatorWidget* user_presets_indicator{nullptr};
     IndicatorWidget* system_presets_indicator{nullptr};
+
     LabelStyle dytext_style{"dytext", HAlign::Center, 10.f};
     LabelStyle midi_style{"midi-name", HAlign::Left, 12.f};
     LabelStyle preset_style{"curpreset", HAlign::Center, 16.f, true};
+    LabelStyle status_style{"brand", HAlign::Center, 10.f, false};
 
     IndicatorWidget* widget_for_task(ChemTaskId task);
 

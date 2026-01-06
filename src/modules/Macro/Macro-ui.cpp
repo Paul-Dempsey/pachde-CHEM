@@ -43,18 +43,19 @@ MacroUi::MacroUi(MacroModule *module) :
     auto panel = createThemedPanel(panelFilename(), &module_svgs);
     panelBorder = attachPartnerPanelBorder(panel);
     setPanel(panel);
-    float x, y;
+    ::svg_query::BoundsIndex bounds;
+    svg_query::addBounds(panel->svg, "k:", bounds, true);
+
     bool browsing = !module;
 
     // knobs
-    x = KNOB_CX;
-    y = KNOB_CY;
-    addChild(knobs[M1] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M1)); y += MACRO_DY;
-    addChild(knobs[M2] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M2)); y += MACRO_DY;
-    addChild(knobs[M3] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M3)); y += MACRO_DY;
-    addChild(knobs[M4] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M4)); y += MACRO_DY;
-    addChild(knobs[M5] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M5)); y += MACRO_DY;
-    addChild(knobs[M6] = createChemKnob<BasicKnob>(Vec(x, y), &module_svgs, module, MacroModule::P_M6));
+    addChild(knobs[M1] = createChemKnob<BasicKnob>(bounds["k:m1"].getCenter(), &module_svgs, module, MacroModule::P_M1));
+    addChild(knobs[M2] = createChemKnob<BasicKnob>(bounds["k:m2"].getCenter(), &module_svgs, module, MacroModule::P_M2));
+    addChild(knobs[M3] = createChemKnob<BasicKnob>(bounds["k:m3"].getCenter(), &module_svgs, module, MacroModule::P_M3));
+    addChild(knobs[M4] = createChemKnob<BasicKnob>(bounds["k:m4"].getCenter(), &module_svgs, module, MacroModule::P_M4));
+    addChild(knobs[M5] = createChemKnob<BasicKnob>(bounds["k:m5"].getCenter(), &module_svgs, module, MacroModule::P_M5));
+    addChild(knobs[M6] = createChemKnob<BasicKnob>(bounds["k:m6"].getCenter(), &module_svgs, module, MacroModule::P_M6));
+    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(bounds["k:amount"].getCenter(), &module_svgs, my_module, MacroModule::P_MOD_AMOUNT));
 
     addChild(tracks[M1] = createTrackWidget(knobs[M1]));
     addChild(tracks[M2] = createTrackWidget(knobs[M2]));
@@ -63,62 +64,35 @@ MacroUi::MacroUi(MacroModule *module) :
     addChild(tracks[M5] = createTrackWidget(knobs[M5]));
     addChild(tracks[M6] = createTrackWidget(knobs[M6]));
 
-    addChild(preset_label = createLabel<TipLabel>(
-        Vec(box.size.x *.5f, S::PORT_SECTION - 18.f),
-        browsing ? "—preset—" : "", &preset_style, box.size.x));
+    addChild(preset_label = createLabel<TipLabel>(bounds["k:preset"], browsing ? "—preset—" : "", &preset_style));
 
     // knob labels
-    x = LABEL_LEFT;
-    y = LABEL_TOP;
-
-    addChild(m1_label = createLabel(Vec(x,y), "i", &S::control_label_left, 75.f)); y += MACRO_DY;
-    addChild(m2_label = createLabel(Vec(x,y), "ii", &S::control_label_left, 75.f)); y += MACRO_DY;
-    addChild(m3_label = createLabel(Vec(x,y), "iii", &S::control_label_left, 75.f)); y += MACRO_DY;
-    addChild(m4_label = createLabel(Vec(x,y), "iv", &S::control_label_left, 75.f)); y += MACRO_DY;
-    addChild(m5_label = createLabel(Vec(x,y), "v", &S::control_label_left, 75.f)); y += MACRO_DY;
-    addChild(m6_label = createLabel(Vec(x,y), "vi", &S::control_label_left, 75.f));
+    addChild(m1_label = createLabel(bounds["k:m1-label"], "i", &S::control_label_left));
+    addChild(m2_label = createLabel(bounds["k:m2-label"], "ii", &S::control_label_left));
+    addChild(m3_label = createLabel(bounds["k:m3-label"], "iii", &S::control_label_left));
+    addChild(m4_label = createLabel(bounds["k:m4-label"], "iv", &S::control_label_left));
+    addChild(m5_label = createLabel(bounds["k:m5-label"], "v", &S::control_label_left));
+    addChild(m6_label = createLabel(bounds["k:m6-label"], "vi", &S::control_label_left));
 
     // knob pedal annotations
-    y = KNOB_TOP + 2.f;
-    addChild(m1_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
-    addChild(m2_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
-    addChild(m3_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
-    addChild(m4_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
-    addChild(m5_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f)); y += MACRO_DY;
-    addChild(m6_ped_label = createLabel(Vec(x,y), "", &S::pedal_label, 20.f));
+    addChild(m1_ped_label = createLabel(bounds["k:m1-ped"], "", &S::pedal_label));
+    addChild(m2_ped_label = createLabel(bounds["k:m2-ped"], "", &S::pedal_label));
+    addChild(m3_ped_label = createLabel(bounds["k:m3-ped"], "", &S::pedal_label));
+    addChild(m4_ped_label = createLabel(bounds["k:m4-ped"], "", &S::pedal_label));
+    addChild(m5_ped_label = createLabel(bounds["k:m5-ped"], "", &S::pedal_label));
+    addChild(m6_ped_label = createLabel(bounds["k:m6-ped"], "", &S::pedal_label));
 
-    // inputs
-    const NVGcolor co_port = PORT_CORN;
-    x = INPUT_LEFT;
-    y = S::PORT_TOP + S::PORT_DY*.5f - 5.f;
-    addChild(knobs[K_MODULATION] = createChemKnob<TrimPot>(Vec(x, y), &module_svgs, module, MacroModule::P_MOD_AMOUNT));
-    x += INPUT_DX;
-    y = S::PORT_TOP;
-    for (int i = 0; i <= M6; ++i) {
-        addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, i, S::InputColorKey, co_port)));
-        addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, i));
-        addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), format_string("M%d", 1 + i), &S::in_port_label, 18.f));
-        if (my_module) {
-            float xoff {0.f};
-            float w {29.25f};
-            if (i == 0 || i == 3) {
-                xoff = -3.f;
-                w += 5.f;
-            }
-            addChild(Center(createClickRegion(x + xoff, y -14.f, w, 21.f, i, [=](int id, int mods) { my_module->set_modulation_target(id); })));
-        }
-        x += INPUT_DX;
-        if (i == 2) {
-            y += S::PORT_DY;
-            x = INPUT_LEFT + INPUT_DX;
-        }
-    }
+
+    add_input(bounds, "k:mod-m1", "k:m-m1-label", "k:m-m1-click", "M1", MacroModule::IN_M1);
+    add_input(bounds, "k:mod-m2", "k:m-m2-label", "k:m-m2-click", "M2", MacroModule::IN_M2);
+    add_input(bounds, "k:mod-m3", "k:m-m3-label", "k:m-m3-click", "M3", MacroModule::IN_M3);
+    add_input(bounds, "k:mod-m4", "k:m-m4-label", "k:m-m4-click", "M4", MacroModule::IN_M4);
+    add_input(bounds, "k:mod-m5", "k:m-m5-label", "k:m-m5-click", "M5", MacroModule::IN_M5);
+    add_input(bounds, "k:mod-m6", "k:m-m6-label", "k:m-m6-click", "M6", MacroModule::IN_M6);
 
     // footer
 
-    addChild(haken_device_label = createLabel<TipLabel>(
-        Vec(28.f, box.size.y - 13.f), S::NotConnected, &style::haken_label, 200.f));
-
+    addChild(haken_device_label = createLabel<TipLabel>(bounds["k:haken"], S::NotConnected, &S::haken_label));
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
     if (my_module) {
@@ -160,6 +134,16 @@ MacroUi::MacroUi(MacroModule *module) :
         }
     }
 }
+
+void MacroUi::add_input(::svg_query::BoundsIndex &bounds, const char *port_key, const char *label_key, const char *click_key, const char *label, int index)
+{
+    Vec pos{bounds[port_key].getCenter()};
+    addChild(Center(createThemedColorInput(pos, &module_svgs, my_module, index, S::InputColorKey, PORT_CORN)));
+    addChild(createLabel(bounds[label_key], label, &S::in_port_label));
+    if (my_module) { addChild(Center(createClickRegion(bounds[click_key], index, [=](int id, int mods) { my_module->set_modulation_target(id); })));}
+    addChild(createLight<TinySimpleLight<GreenLight>>(pos.minus(S::light_dx), my_module, index));
+}
+
 
 MacroUi::~MacroUi() {
     if (my_module) my_module->set_chem_ui(nullptr);

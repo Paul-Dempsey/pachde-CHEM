@@ -53,7 +53,7 @@ void SusUi::create_ui()
 
     y += S::PORT_DY;
     addChild(Center(createThemedColorInput(Vec(x , y), &module_svgs, my_module, SM::IN_MOD, S::InputColorKey, co_port)));
-    addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), InputLabel(), &S::in_port_label, 20));
+    addChild(createLabelCentered(Vec(x, y + S::PORT_LABEL_DY), InputLabel(), &S::in_port_label, 20));
 
     link_button = createThemedButton<LinkButton>(Vec(3.5f, box.size.y-ONEU), &module_svgs, "Core link");
     addChild(link = createIndicatorCentered(22.f,box.size.y-9.f, RampGray(G_50), "[connection]"));

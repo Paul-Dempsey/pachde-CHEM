@@ -61,9 +61,9 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     }
     addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
         Vec(258.f, 26.f), &module_svgs, my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL)));
-    addChild(createLabel(Vec(258.f, 42.f), "Phase", &S::control_label, 36));
+    addChild(createLabelCentered(Vec(258.f, 42.f), "Phase", &S::control_label, 36));
 
-    const float KX = 34.f;
+    const float KX = 32.f;
     x = KX;
     const float K_DX = 42.f;
     const float WL_DX = 50.f;
@@ -72,7 +72,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
     const float kdx[] { K_DX, K_DX, WL_DX, K_DX, IR_DX, 0.f};
     const char* labels[] { "Length", "Tuning", "Width", "Left", "Right", "IR" };
     for (int i = 0; i < 6; ++i) {
-        addChild(createLabel(Vec(x, 68.f), labels[i], &S::control_label, 30));
+        addChild(createLabelCentered(Vec(x, 68.f), labels[i], &S::control_label, 34));
         x += kdx[i];
     }
 
@@ -88,8 +88,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
             }
             x += kdx[j];
         }
-        ir_labels[i] = createLabel(Vec(142, y + 17.f), "", &ir_style, 150.f);
-        addChild(ir_labels[i]);
+        addChild(ir_labels[i] = createLabelCentered(Vec(142, y + 17.f), "", &ir_style, 150.f));
         x = KX;
         y += ROW_DY;
     }
@@ -139,7 +138,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
         auto wi = widget_info[iwi];
         addChild(Center(createThemedColorInput(Vec(x, y), &module_svgs, my_module, wi.input, S::InputColorKey, co_port)));
         addChild(createLight<TinySimpleLight<GreenLight>>(Vec(x - S::PORT_MOD_DX, y - S::PORT_MOD_DY), my_module, wi.light));
-        addChild(createLabel(Vec(x, y + S::PORT_LABEL_DY), port_name[i & 1], &S::in_port_label, 35.f));
+        addChild(createLabelCentered(Vec(x, y + S::PORT_LABEL_DY), port_name[i & 1], &S::in_port_label, 35.f));
         if (my_module) {
             addChild(Center(createClickRegion(x, y -click_dy, click_width, click_height, wi.param, [=](int id, int mods) { my_module->set_modulation_target(id); })));
         }

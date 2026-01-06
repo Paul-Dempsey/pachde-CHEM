@@ -94,6 +94,7 @@ struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
+    void onRemove() override;
     void onRandomize() override;
     void process(const ProcessArgs& args) override;
 };

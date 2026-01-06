@@ -4,6 +4,7 @@
 #include "services/colors.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/theme-button.hpp"
 #include "widgets/theme-knob.hpp"
 #include "widgets/label.hpp"
@@ -104,10 +105,6 @@ struct PostUi : ChemModuleWidget, IChemClient
     IChemHost* chem_host{nullptr};
     PostModule* my_module{nullptr};
 
-    TextLabel* effect_label;
-    TextLabel* top_knob_label;
-    TextLabel* mid_knob_label;
-
     LinkButton*   link_button{nullptr};
     TipLabel*     haken_device_label{nullptr};
     SmallSimpleLight<GreenLight>* mix_light;
@@ -120,6 +117,9 @@ struct PostUi : ChemModuleWidget, IChemClient
     bool connected();
     void glowing_knobs(bool glow);
     void center_knobs();
+
+    void add_knob(::svg_query::BoundsIndex& bounds, const char* knob_key, const char * label_key, const char * label, int index);
+    void add_input(::svg_query::BoundsIndex &bounds, const char* port_key, const char* label_key, const char* click_key, const char* label, int index);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

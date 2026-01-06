@@ -18,6 +18,8 @@ PresetModule::PresetModule()
 }
 
 PresetModule::~PresetModule(){
+    auto broker = MidiDeviceBroker::get();
+    broker->unRegisterDeviceHolder(&midi_device);
     midi_device.unsubscribe(this);
     midi_in.clear();
     if (chem_host) {
@@ -142,6 +144,12 @@ void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDev
 
 // Module
 
+void PresetModule::onRemove() {
+    if (chem_ui) {
+        chem_ui = nullptr;
+    }
+}
+
 void PresetModule::onRandomize()
 {
     if (chem_ui) {
@@ -153,24 +161,24 @@ void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
 
-    auto pui = ui();
-    if (pui) {
-        int idx = getParam(P_NAV).getValue();
-        if (pui->get_current_index() != idx) {
-            pui->set_current_index(idx);
-            pui->scroll_to_page_of_index(idx);
-        }
-    }
+    // auto pui = ui();
+    // if (pui) {
+    //     int idx = getParam(P_NAV).getValue();
+    //     if (pui->get_current_index() != idx) {
+    //         pui->set_current_index(idx);
+    //         pui->scroll_to_page_of_index(idx);
+    //     }
+    // }
 
-    auto input = getInput(IN_SELECT_PRESET);
-    if (input.isConnected()) {
-        if (select_preset_trigger.process(input.getVoltage(), .1f, .5f)) {
-            select_preset_trigger.reset();
-            if (pui) {
-                pui->send_preset(pui->get_current_index());
-            }
-        }
-    }
+    // auto input = getInput(IN_SELECT_PRESET);
+    // if (input.isConnected()) {
+    //     if (select_preset_trigger.process(input.getVoltage(), .1f, .5f)) {
+    //         select_preset_trigger.reset();
+    //         if (pui) {
+    //             pui->send_preset(pui->get_current_index());
+    //         }
+    //     }
+    // }
     if (((args.frame + id) % 80) == 0) {
         if (!search_query.empty() || any_filter(filters())) {
             getLight(L_FILTER).setBrightness(1.f);

@@ -20,10 +20,10 @@ struct LabelStyle {
     // float right_margin{0.f};
     // float top_margin{0.f};
     // float bottom_margin{0.f};
-    float baseline{INFINITY};
     HAlign halign{HAlign::Center};
     VAlign valign{VAlign::Middle};
     Orientation orientation{Orientation::Normal};
+    float baseline{INFINITY};
 
     LabelStyle() {}
     LabelStyle(const char * key) : key(key) {}
@@ -34,15 +34,19 @@ struct LabelStyle {
     LabelStyle(const char * key, const char * color_spec, float font_size = 12.f, bool bold = false)
         : key(key), color(parseColor(color_spec, colors::G50)), bold(bold), text_height(font_size) {}
 
-    LabelStyle(const char * key, HAlign align, float font_size, bool bold = false)
-        : key(key), bold(bold), text_height(font_size) {}
+    LabelStyle(const char * key, const char * color_spec, HAlign halign, float font_size = 12.f, bool bold = false)
+        : key(key), color(parseColor(color_spec, colors::G50)), bold(bold), text_height(font_size), halign(halign) {}
+
+    LabelStyle(const char * key, HAlign halign, float font_size, bool bold = false)
+        : key(key), bold(bold), text_height(font_size), halign(halign) {}
 
     LabelStyle(const char * key, HAlign halign, VAlign valign, float font_size, bool bold = false)
         : key(key), bold(bold), text_height(font_size), halign(halign), valign(valign) {}
 
     void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) {
+        if (!key || !*key) return;
         if (!theme->getFillColor(color, key, true)) {
-            color = colors::PortRed;
+            color = colors::Red;
         }
     }
 };
@@ -80,10 +84,12 @@ struct TextLabel : TransparentWidget, svg_theme::IThemed
         format = s;
     }
 
-    PackedColor get_color() { return format ? format->color : 0; }
+    PackedColor get_color() { return format ? format->color : colors::G50; }
     void set_color(PackedColor color) { if (format) format->color = color; }
+
     void set_text(const std::string& name) { text = name; }
     const std::string& get_text() { return text; }
+
     void glowing(bool glow) { bright = glow; }
 
     void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) override {
@@ -93,7 +99,6 @@ struct TextLabel : TransparentWidget, svg_theme::IThemed
     void draw_text(const DrawArgs& args) {
         auto font = ((format && format->bold)) ? GetPluginFontSemiBold() : GetPluginFontRegular();
         if (!FontOk(font)) return;
-
         if (format) {
             draw_oriented_text_box(
                 args.vg, box.zeroPos(), 0.f, 0.f, 0.f, 0.f,
@@ -103,7 +108,8 @@ struct TextLabel : TransparentWidget, svg_theme::IThemed
             );
         } else {
             draw_oriented_text_box(
-                args.vg, box.zeroPos(), 0.f, 0.f, 0.f, 0.f, text, font, 12.f, colors::Black,
+                args.vg, box.zeroPos(), 0.f, 0.f, 0.f, 0.f,
+                text, font, 12.f, colors::G50,
                 HAlign::Center, VAlign::Baseline, Orientation::Normal
             );
         }
@@ -111,7 +117,6 @@ struct TextLabel : TransparentWidget, svg_theme::IThemed
 
     void drawLayer(const DrawArgs& args, int layer) override {
         Base::drawLayer(args, layer);
-
         if (1 != layer) return;
         if (!bright) return;
         draw_text(args);
@@ -122,12 +127,9 @@ struct TextLabel : TransparentWidget, svg_theme::IThemed
         if (bright) return;
         draw_text(args);
     }
-
-
 };
 
-struct TipLabel : TextLabel
-{
+struct TipLabel : TextLabel {
     using Base = TextLabel;
 
     TipHolder* tip_holder;
@@ -140,8 +142,7 @@ struct TipLabel : TextLabel
         tip_holder = nullptr;
     }
 
-    void ensureTipHolder()
-    {
+    void ensureTipHolder() {
         if (!tip_holder) {
             tip_holder = new TipHolder();
         }
@@ -152,8 +153,7 @@ struct TipLabel : TextLabel
         return tip_holder->tip_text;
     }
 
-    void describe(std::string text)
-    {
+    void describe(std::string text) {
         ensureTipHolder();
         tip_holder->setText(text);
     }
@@ -167,8 +167,7 @@ struct TipLabel : TextLabel
         tip_holder->createTip();
     }
 
-    void onHover(const HoverEvent& e) override
-    {
+    void onHover(const HoverEvent& e) override {
         Base::onHover(e);
         e.consume(this);
     }
@@ -188,14 +187,12 @@ struct TipLabel : TextLabel
         destroyTip();
     }
 
-    void onDragEnd(const DragEndEvent& e) override
-    {
+    void onDragEnd(const DragEndEvent& e) override {
         Base::onDragEnd(e);
         destroyTip();
     }
 
-    void onButton(const ButtonEvent& e) override
-    {
+    void onButton(const ButtonEvent& e) override {
         Base::onButton(e);
         if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
             destroyTip();
@@ -210,7 +207,6 @@ struct TipLabel : TextLabel
     }
 
     virtual void appendContextMenu(ui::Menu* menu) {}
-
 };
 
 template <typename TLabel = TextLabel>
@@ -230,16 +226,39 @@ TLabel* createLabel(Vec(pos), const std::string& text, LabelStyle* format, float
     label->box.pos = pos;
     label->box.size.x = width;
     label->box.size.y = format->text_height;
+    label->text = text;
     return label;
 }
 
 template <typename TLabel = TextLabel>
+TLabel* createLabelCentered(Vec(pos), const std::string& text, LabelStyle* format, float width) {
+    auto label = new TLabel(format);
+    label->box.pos = pos;
+    label->box.pos.x -= width * .5f;
+    label->box.size.x = width;
+    label->box.size.y = format->text_height;
+    label->text = text;
+    return label;
+}
+template <typename TLabel = TextLabel>
+TLabel* createLabelRight(Vec(pos), const std::string& text, LabelStyle* format, float width) {
+    auto label = new TLabel(format);
+    label->box.pos = pos;
+    label->box.pos.x -= width;
+    label->box.size.x = width;
+    label->box.size.y = format->text_height;
+    label->text = text;
+    return label;
+}
+template <typename TLabel = TextLabel>
 TLabel* createLabel(Vec(pos), const std::string& text, float width, float text_height) {
     auto label = new TLabel(new LabelStyle);
+    label->own_format = true;
     label->box.pos = pos;
     label->box.size.x = width;
     label->box.size.y = text_height;
     label->format->text_height = text_height;
+    label->text = text;
     return label;
 }
 

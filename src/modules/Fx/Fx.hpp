@@ -1,9 +1,10 @@
-#pragma once
+ #pragma once
 #include "my-plugin.hpp"
 #include "chem.hpp"
 #include "services/colors.hpp"
 #include "services/em-midi-port.hpp"
 #include "services/ModuleBroker.hpp"
+#include "services/svg-query.hpp"
 #include "widgets/label.hpp"
 #include "widgets/selector-widget.hpp"
 #include "widgets/theme-button.hpp"
@@ -132,6 +133,9 @@ struct FxUi : ChemModuleWidget, IChemClient
     bool connected();
     void glowing_knobs(bool glow);
     void center_knobs();
+
+    void add_knob(::svg_query::BoundsIndex& bounds, const char* knob_key, const char * label_key, const char * label, int index);
+    void add_input(::svg_query::BoundsIndex& bounds, const char* port_key, const char * label_key, const char * click_key, const char * label, int index);
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }
