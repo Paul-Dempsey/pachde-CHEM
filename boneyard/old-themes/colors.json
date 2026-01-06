@@ -1,0 +1,39 @@
+[
+    {
+        "colors": {
+            "brand": "#f9a54b",
+            "rack-white": "#e6e6e6",
+            "rack-black": "#1f1f1f",
+            "dark-panel": "#1f1f1f",
+
+            "g0": "#000000", "g5": "#0d0d0d",
+            "g10": "#1a1a1a", "g15": "#262626",
+            "g20": "#333333", "g25": "#404040",
+            "g30": "#4d4d4d", "g35": "#595959",
+            "g40": "#666666", "g45": "#737373",
+            "g50": "#808080", "g55": "#8c8c8c",
+            "g60": "#999999", "g65": "#a6a6a6",
+            "g70": "#b2b2b2", "g75": "#bfbfbf",
+            "g80": "#cccccc", "g85": "#d9d9d9",
+            "g90": "#e5e5e5", "g95": "#f2f2f2",
+
+            "rack-BLACK": "#000000",
+            "rack-WHITE": "#ffffff",
+            "rack-RED": "#ed2c24",
+            "rack-ORANGE": "#f2b120",
+            "rack-YELLOW": "#ffd714",
+            "rack-GREEN": "#90c73e",
+            "rack-CYAN": "#22e6ef",
+            "rack-BLUE": "#29b2ef",
+            "rack-PURPLE": "#d52bed",
+            "rack-LIGHT_GRAY": "#e6e6e6",
+            "rack-DARK_GRAY": "#171717",
+
+            "fingerboard-red": "#c32222",
+            "white": "#ffffff",
+            "black": "#000",
+
+            "debug": "#80ff00"
+        }
+    }
+]
