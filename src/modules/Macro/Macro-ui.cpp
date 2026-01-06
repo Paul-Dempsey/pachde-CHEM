@@ -6,33 +6,17 @@
 #include "widgets/uniform-style.hpp"
 
 namespace S = pachde::style;
-
 using namespace svg_theme;
 using namespace pachde;
 using namespace widgetry;
 
-// -- Macro UI -----------------------------------
-
-bool MacroUi::connected()
-{
+bool MacroUi::connected() {
     if (!my_module) return false;
     if (!chem_host) return false;
     return true;
 }
 
 using MM = MacroModule;
-constexpr const float PANEL_WIDTH = 120.f;
-constexpr const float CENTER = PANEL_WIDTH * .5f;
-constexpr const float KNOB_CX = 25.f;
-constexpr const float KNOB_CY = 35.f;
-constexpr const float KNOB_TOP = KNOB_CY - 16.f;
-constexpr const float MACRO_DY = 41.5f;
-constexpr const float LABEL_LEFT = 45.f;
-constexpr const float LABEL_TOP = KNOB_CY;
-
-constexpr const float INPUT_DX = PANEL_WIDTH*.25f;
-constexpr const float INPUT_LEFT = CENTER - (1.5f*INPUT_DX);
-
 enum M { M1, M2, M3, M4, M5, M6, K_MODULATION };
 
 MacroUi::MacroUi(MacroModule *module) :
