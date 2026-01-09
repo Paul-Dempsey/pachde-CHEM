@@ -3,6 +3,7 @@
 #include "my-plugin.hpp"
 #include "chem-core.hpp"
 #include "services/colors.hpp"
+#include "services/ModuleBroker.hpp"
 #include "services/theme.hpp"
 #include "services/svg-theme.hpp"
 #include "widgets/themed-widgets.hpp"
@@ -97,6 +98,8 @@ void bind_host(TClientModule* client_module)
         auto host = client_module->find_expander_host();
         if (host) {
             host->register_chem_client(client_module);
+        } else {
+            ModuleBroker::get()->try_bind_client(client_module);
         }
         client_module->seek_host = false;
     }
