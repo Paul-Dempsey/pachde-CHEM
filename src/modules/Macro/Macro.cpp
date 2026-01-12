@@ -66,13 +66,6 @@ json_t* MacroModule::dataToJson()
     return root;
 }
 
-bool MacroModule::connected()
-{
-    if (!chem_host) return false;
-    auto conn = chem_host->host_connection(ChemDevice::Haken);
-    return conn && conn->identified();
-}
-
 // IChemClient
 ::rack::engine::Module* MacroModule::client_module() { return this; }
 std::string MacroModule::client_claim() { return device_claim; }

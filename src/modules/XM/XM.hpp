@@ -157,7 +157,7 @@ struct XMUi : ChemModuleWidget
     PackedColor get_header_text_color();
     void set_header_color(PackedColor color);
     void set_header_text_color(PackedColor color);
-    void set_header_text(std::string title);
+    void set_header_text(const std::string& title);
 
     // ChemModuleWidget
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-xm.svg"); }

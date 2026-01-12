@@ -34,7 +34,9 @@ struct OverlayMenu: Hamburger
 
         menu->addChild(createSubmenuItem("Title", ui->my_module ? ui->my_module->title : "<none>",
             [=](Menu *menu) {
-                menu->addChild(createThemedTextInput<TextInputMenu>(0, 0, 150, 0, ui->my_module ? ui->my_module->title : "<title>", [=](std::string text) { ui->set_title(text); }));
+                menu->addChild(createThemedTextInput<TextInputMenu>(0, 0, 150, 0,
+                    ui->my_module ? ui->my_module->title : "<title>",
+                    [=](const std::string& text) { ui->set_title(text); }));
             }));
 
         menu->addChild(createSubmenuItem("Background", "", [=](Menu* menu) {

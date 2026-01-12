@@ -173,7 +173,7 @@ struct PadEdit : OpaqueWidget
 
         y = 22.f;
         title_field = createThemedTextInput(15.f, y, 90.f, 14.f, ui->my_module ? ui->my_module->title : "",
-            [=](std::string text){ on_title_text_changed(text); },
+            [=](const std::string& text){ on_title_text_changed(text); },
             nullptr,
             "Module title");
         title_field->text_height = 12.f;
@@ -187,7 +187,7 @@ struct PadEdit : OpaqueWidget
         addChild(createLabel(Vec(3.5, y), "Name", &S::control_label_left, 28));
 
         name_field = createThemedTextInput(35.5f, y, 60.f, 14.f, "",
-            [=](std::string text){ on_name_text_changed(text); },
+            [=](const std::string& text){ on_name_text_changed(text); },
             nullptr,
             "Pad name");
         name_field->text_height = 12.f;

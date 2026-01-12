@@ -16,12 +16,12 @@ struct TextInput : TextField, IThemed
     ElementStyle text_style{"entry-text", "hsl(0, 0%, 85%)"};
     ElementStyle prompt_style{"entry-prompt", "hsla(0, 0%, 55%, 75%)"};
     ElementStyle selection_style{"entry-sel", "hsl(200, 50%, 40%)"};
-    std::function<void(std::string)> change_handler{nullptr};
-    std::function<void(std::string)> enter_handler{nullptr};
+    std::function<void(const std::string&)> change_handler{nullptr};
+    std::function<void(const std::string&)> enter_handler{nullptr};
     std::function<void(bool ctrl, bool shift)> tab_handler{nullptr};
 
-    void set_on_change(std::function<void(std::string)> handler) { change_handler = handler; }
-    void set_on_enter(std::function<void(std::string)> handler) { enter_handler = handler; }
+    void set_on_change(std::function<void(const std::string&)> handler) { change_handler = handler; }
+    void set_on_enter(std::function<void(const std::string&)> handler) { enter_handler = handler; }
     void set_on_tab(std::function<void(bool ctrl, bool shift)> handler) { tab_handler = handler; }
 
     TextInput();
@@ -63,8 +63,8 @@ struct MultiTextInput : TextField
         }
         Base::onSelectKey(e);
     }
-    void set_on_change(std::function<void(std::string)> handler) { change_handler = handler; }
-    void set_on_enter(std::function<void(std::string)> handler) { enter_handler = handler; }
+    void set_on_change(std::function<void(const std::string&)> handler) { change_handler = handler; }
+    void set_on_enter(std::function<void(const std::string&)> handler) { enter_handler = handler; }
 
 };
 
@@ -122,8 +122,26 @@ Tin* createThemedTextInput(
     if (height <= 0) height = 14.f;
     t->box.size = Vec(width, height);
     t->setText(content);
-    if (on_change) t->set_on_change(on_change);
-    if (on_enter) t->set_on_enter(on_enter);
+    t->set_on_change(on_change);
+    t->set_on_enter(on_enter);
+    if (placeholder) t->placeholder = placeholder;
+    return t;
+}
+
+template <typename Tin = TextInput>
+Tin* createThemedTextInput(
+    Rect box,
+    std::string content,
+    std::function<void(std::string)> on_change = nullptr,
+    std::function<void(std::string)> on_enter = nullptr,
+    const char* placeholder = nullptr
+    )
+{
+    Tin* t = new Tin;
+    t->box = box;
+    t->setText(content);
+    t->set_on_change(on_change);
+    t->set_on_enter(on_enter);
     if (placeholder) t->placeholder = placeholder;
     return t;
 }

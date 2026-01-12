@@ -6,6 +6,8 @@ using namespace ::rack;
 #include "services/midi-devices.hpp"
 #include "services/svg-theme.hpp"
 using namespace svg_theme;
+#include "services/misc.hpp"
+using namespace pachde;
 #include "tip-widget.hpp"
 
 namespace widgetry {
@@ -71,7 +73,8 @@ struct BasicMidiPicker : TipWidget
             bool mine = (0 == current_claim.compare(item_claim));
             //if (conn->input_device_id == -1) continue;
 
-            menu->addChild(createCheckMenuItem(conn->info.friendly(NameFormat::Long), "",
+            auto name = conn->info.friendly(NameFormat::Long);
+            menu->addChild(createCheckMenuItem(name, "",
                 [=](){ return mine; },
                 [=](){ device->connect(conn); }));
         }

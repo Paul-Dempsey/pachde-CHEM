@@ -11,22 +11,22 @@ namespace widgetry {
 struct ClickRegion : Widget, ILayoutHelp, IThemed
 {
     using Base = Widget;
-    int identifier;
-    int mods;
-    bool enabled;
+    int identifier{-1};
+    int mods{0};
+    bool enabled{true};
     bool hoverable{false};
     bool hovered{false};
-    ElementStyle hover_style{"click-hover", "hsla(0,0%,0%,0%)", "hsla(0, 0%, 65%, 100%)", .25f};
+    ElementStyle hover_style{"click-hover", "hsla(0,0,0,0)", "hsla(0, 0, .65, 1)", .25f};
 
     std::function<void(int, int)> handler;
 
-    ClickRegion(int id) :
-        identifier(id),
-        mods(0),
-        enabled(true)
-    {
-        box.size.x = 0;
-        box.size.y = 0;
+    ClickRegion() {
+        box.size.x = 12.f;
+        box.size.y = 12.f;
+    }
+    ClickRegion(int id) : identifier(id) {
+        box.size.x = 12.f;
+        box.size.y = 12.f;
     }
 
     void set_hover_key(const char* key) {

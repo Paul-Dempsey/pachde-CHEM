@@ -43,6 +43,9 @@ struct LabelStyle {
     LabelStyle(const char * key, HAlign halign, VAlign valign, float font_size, bool bold = false)
         : key(key), bold(bold), text_height(font_size), halign(halign), valign(valign) {}
 
+    LabelStyle(const char * key, HAlign halign, VAlign valign, PackedColor color, float font_size, bool bold = false)
+        : key(key), bold(bold), text_height(font_size), halign(halign), valign(valign) {}
+
     void applyTheme(std::shared_ptr<svg_theme::SvgTheme> theme) {
         if (!key || !*key) return;
         if (!theme->getFillColor(color, key, true)) {

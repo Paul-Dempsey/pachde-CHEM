@@ -11,7 +11,7 @@ std::string macro_number_to_string(uint8_t mn)
     return format_string("%d", mn);
 }
 
-uint8_t macro_number_from_string(std::string s)
+uint8_t macro_number_from_string(const std::string& s)
 {
     int n = 0;
     bool valid{true};
@@ -307,7 +307,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     y += SMALL_ROW_DY;
     title_entry = createThemedTextInput(7.5f, y, FULL_WIDTH, 14.f,
         ui->get_header_text(),
-        [=](std::string text){ ui->set_header_text(text); },
+        [=](const std::string& text){ ui->set_header_text(text); },
         nullptr,
         "module name");
     addChild(title_entry);
@@ -351,7 +351,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(createLabelRight(Vec(x - LABEL_OFFSET_DX, y), "Name", &r_label_style, 50.f));
     name_entry = createThemedTextInput(x, y, 90, 14,
         "",
-        [=](std::string s){ macro.name = s; },
+        [=](const std::string& s){ macro.name = s; },
         nullptr,
         "knob name");
     addChild(name_entry);
@@ -360,7 +360,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(createLabelRight(Vec(x - LABEL_OFFSET_DX, y), "Macro", &r_label_style, 60.f));
     addChild(macro_entry = createThemedTextInput(x, y, 65, 14,
         "",
-        [=](std::string s) { macro.macro_number = macro_number_from_string(s); },
+        [=](const std::string& s) { macro.macro_number = macro_number_from_string(s); },
         nullptr,
         "macro #"
         ));
@@ -860,7 +860,7 @@ void XMUi::set_header_text_color(PackedColor color)
     if (my_module) my_module->title_fg = color;
 }
 
-void XMUi::set_header_text(std::string title)
+void XMUi::set_header_text(const std::string& title)
 {
     this->title->set_text(title);
     if (my_module) my_module->title = title;

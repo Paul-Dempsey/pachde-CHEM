@@ -76,7 +76,7 @@ struct MacroModule : ChemModule, IChemClient, IDoMidi
     void do_message(PackedMidiMessage message) override;
     void update_from_em();
 
-    bool connected();
+    bool connected() { return host_connected(chem_host); }
 
     // IChemClient
     rack::engine::Module* client_module() override;

@@ -11,13 +11,13 @@ Blip::Blip()
     box.size.x = box.size.y = 16.f;
 }
 
-Blip::Blip(NVGcolor hole, NVGcolor rim, NVGcolor light)
+Blip::Blip(const NVGcolor& hole, const NVGcolor& rim, const NVGcolor& light)
 :   hole(hole),
     rim(rim),
     light(light),
     bright(0.f),
     step_bright(0.f),
-    radius(3.25f)
+    radius(1.5f)
 {
     box.size.x = box.size.y = 16.f;
 }
@@ -36,14 +36,11 @@ void Blip::drawLayer(const DrawArgs& args, int layer)
 {
     Base::drawLayer(args, layer);
     if (1 != layer) return;
-    //if (step_bright < 0.1f) return;
-    //if (rack::settings::rackBrightness >= .95f) return;
     auto actual_bright = step_bright * rack::settings::haloBrightness;
     if (actual_bright < 0.1f) return;
-    auto vg = args.vg;
     float cx = box.size.x * .5f;
     float cy = box.size.y * .5f;
-    CircularHalo(vg, cx, cy, radius, radius*3.f, nvgTransRGBAf(light, actual_bright));
+    CircularHalo(args.vg, cx, cy, radius, radius*3.f, nvgTransRGBAf(light, actual_bright));
 }
 
 void Blip::draw(const DrawArgs& args)
@@ -57,21 +54,19 @@ void Blip::draw(const DrawArgs& args)
     if (isColorVisible(hole)) {
         Circle(vg, cx, cy, radius - .25f, hole);
     }
-
     if (isColorVisible(rim)) {
         OpenCircle(vg, cx, cy, radius, rim, 0.5f);
     }
 
     if (isColorVisible(light) && (step_bright > 0.1f)) {
-        if (rack::settings::rackBrightness >= .95f) {
-            Circle(vg, cx, cy, radius - .25f, nvgTransRGBAf(light, step_bright));
-        }
+        Circle(vg, cx, cy, radius - .25f, nvgTransRGBAf(light, step_bright));
     }
+    CircularHalo(vg, cx, cy, radius, radius*3.f, nvgTransRGBAf(light, step_bright * rack::settings::haloBrightness));
 }
 
 Blip* createBlipCentered(
     float x, float y, const char * tip,
-    NVGcolor light, NVGcolor rim, NVGcolor hole
+    const NVGcolor& light, const NVGcolor& rim, const NVGcolor& hole
     )
 {
     auto w = new Blip(hole, rim, light);
@@ -84,7 +79,7 @@ Blip* createBlipCentered(
 
 Blip* createBlipCentered(
     Vec pos, const char * tip,
-    NVGcolor light, NVGcolor rim, NVGcolor hole
+    const NVGcolor& light, const NVGcolor& rim, const NVGcolor& hole
     )
 {
     auto w = new Blip(hole, rim, light);
