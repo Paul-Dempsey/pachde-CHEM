@@ -11,23 +11,24 @@ using namespace ::svg_query;
 namespace widgetry {
 
 struct DialogStyles {
-    LabelStyle* title_style{nullptr};
-    LabelStyle* center_label_style{nullptr};
-    LabelStyle* info_label_style{nullptr};
+    LabelStyle title{"dlg-title", HAlign::Left, VAlign::Top, colors::Black, 14.f, true};
+    LabelStyle section{"dlg-section", "hsl(42, .6, .8)", HAlign::Left, 14.f, true};
+    LabelStyle head{"dlg-heading", HAlign::Left, 14.f, true};
+    LabelStyle left{"dlg-label", HAlign::Left, 12.f, false};
+    LabelStyle center;
+    LabelStyle right{"dlg-label", HAlign::Right, 12.f, false};
+    LabelStyle info{"dlg-info", colors::PortCorn, 12.f, false};
+    LabelStyle note{"dlg-note", HAlign::Left, 9.f, false};
 
-    void createStyles(std::shared_ptr<svg_theme::SvgTheme> svg_theme) {
-        title_style = new LabelStyle("dlg-title", colors::Black, 14.f, true);
-        title_style->valign = VAlign::Top;
-        title_style->halign = HAlign::Left;
-
-        center_label_style = new LabelStyle("dlg-label");
-        center_label_style->halign = HAlign::Center;
-
-        info_label_style = new LabelStyle("dlg-info", colors::PortCorn, 12.f);
-
-        title_style->applyTheme(svg_theme);
-        center_label_style->applyTheme(svg_theme);
-        info_label_style->applyTheme(svg_theme);
+    void initStyles(std::shared_ptr<svg_theme::SvgTheme> svg_theme) {
+        title.applyTheme(svg_theme);
+        section.applyTheme(svg_theme);
+        head.applyTheme(svg_theme);
+        left.applyTheme(svg_theme);
+        center.applyTheme(svg_theme);
+        right.applyTheme(svg_theme);
+        info.applyTheme(svg_theme);
+        note.applyTheme(svg_theme);
     }
 };
 

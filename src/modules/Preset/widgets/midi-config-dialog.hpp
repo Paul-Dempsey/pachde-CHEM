@@ -4,6 +4,6 @@ using namespace ::rack;
 
 namespace widgetry {
 
-void show_preset_midi_configuration(ModuleWidget* source, std::shared_ptr<svg_theme::SvgTheme> svg_theme);
+void show_preset_midi_configuration(PresetUi* source, std::shared_ptr<svg_theme::SvgTheme> svg_theme);
 
 }

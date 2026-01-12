@@ -52,7 +52,7 @@ struct MidiInput : midi::Input
         message_count = 0;
     }
     void set_target(IDoMidi* out) { target = out; }
-    void set_logger(const std::string& source, MidiLog* logger);
+    void set_logger(const char* source, MidiLog* logger);
     void set_music_pass(bool pass_music) { music_pass_filter = pass_music; }
     void set_channel_reflect(bool reflect) { channel_reflect = reflect; }
     void enable(bool enabled = true);

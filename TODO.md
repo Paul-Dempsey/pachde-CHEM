@@ -5,7 +5,6 @@
 - MIDI-friendly control for navigating presets
   - How to simulate endless encoder on controllers without endless encoders (like NK2)?
 - Integrated MIDI mapping across CHEM features for MIDI controllers.
-- MPE+ to voltage module
 
 - 10.61 HakenMidi
   - New Pedal assignments
@@ -13,6 +12,11 @@
   - check for other new/deprecated features
 
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
+
+## Preset
+
+- Add trigger param for send
+- Keyboard graphic display for note config
 
 ## Core
 

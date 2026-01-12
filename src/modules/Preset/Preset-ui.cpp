@@ -66,6 +66,7 @@ void PresetUi::sort_presets(PresetOrder order) {
         if (current_id.valid()) {
             size_t index = tab.list.index_of_id(current_id);
             tab.current_index = index;
+            set_nav_param(index);
         }
         scroll_to_page_of_index(tab.current_index);
     }
@@ -165,6 +166,7 @@ void PresetUi::set_live_current() {
 void PresetUi::set_current_index(size_t index) {
     Tab& tab = active_tab();
     tab.current_index = clamp(index, 0, tab.count());
+    set_nav_param(tab.current_index);
 }
 
 bool PresetUi::host_available() {
@@ -214,7 +216,7 @@ void PresetUi::set_track_live(bool track) {
     }
 }
 
-void PresetUi::on_search_text_changed(std::string text) {
+void PresetUi::on_search_text_changed(const std::string& text) {
     if (my_module->search_incremental || text.empty()) {
         on_search_text_enter();
     }
@@ -234,6 +236,7 @@ void PresetUi::on_search_text_enter() {
     }
     tab.list.set_search_query(query, my_module->search_name, my_module->search_meta, my_module->search_anchor);
     tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    set_nav_param(tab.current_index);
     scroll_to_page_of_index(tab.current_index);
 }
 
@@ -253,6 +256,7 @@ void PresetUi::on_filter_change(FilterId filter, uint64_t state) {
     }
     tab.list.set_filter(filter, state);
     tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    set_nav_param(tab.current_index);
     scroll_to_page_of_index(tab.current_index);
 }
 
@@ -279,6 +283,7 @@ void PresetUi::clear_filters() {
     active_tab().list.no_filter();
 
     tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    set_nav_param(tab.current_index);
     scroll_to_page_of_index(tab.current_index);
 }
 
@@ -311,6 +316,7 @@ void PresetUi::set_tab(PresetTab tab_id, bool fetch) {
    }
 
     Tab& tab = active_tab();
+    set_nav_param(tab.current_index);
     if (fetch && (0 == tab.count()) && !start_delay.running() && host_available()) {
         load_presets(tab_id);
     }
@@ -465,6 +471,7 @@ void PresetUi::next_preset(bool ctrl, bool shift) {
             tab.current_index = 0;
         }
     }
+    set_nav_param(tab.current_index);
     send_preset(tab.current_index);
 }
 
@@ -488,5 +495,6 @@ void PresetUi::previous_preset(bool ctrl, bool shift) {
             tab.current_index = tab.count() - 1;
         }
     }
+    set_nav_param(tab.current_index);
     send_preset(tab.current_index);
 }

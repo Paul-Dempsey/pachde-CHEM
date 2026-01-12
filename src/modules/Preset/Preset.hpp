@@ -7,6 +7,7 @@
 #include "services/ModuleBroker.hpp"
 #include "widgets/widgets.hpp"
 #include "preset-common.hpp"
+#include "preset-midi.hpp"
 #include "preset-tab.hpp"
 #include "./widgets/filter-widget.hpp"
 #include "./widgets/preset-entry.hpp"
@@ -16,26 +17,35 @@ using namespace eaganmatrix;
 struct PresetUi;
 struct PresetModule;
 
-struct PresetMidiHandler: IDoMidi {
-    PresetModule* host{nullptr};
-    MidiLog * logger{nullptr};
-    void init(PresetModule* the_host) { host = the_host; }
-    void enable_logging(bool logging);
-    void do_message(PackedMidiMessage msg) override;
-};
-
 namespace S = pachde::style;
 constexpr const float PANEL_WIDTH = 360.f;
 constexpr const float RCENTER = PANEL_WIDTH - S::U1;
+constexpr const int ROWS = 20;
+constexpr const int COLS = 2;
+constexpr const int PAGE_CAPACITY = ROWS * COLS;
 
-struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
+inline ssize_t index_from_paged(uint8_t page, uint8_t offset) {
+    return (page * PAGE_CAPACITY) + offset;
+}
+
+inline ssize_t page_of_index(ssize_t index) {
+    if (index < 0) return 0;
+    return index / PAGE_CAPACITY;
+}
+
+inline ssize_t offset_of_index(ssize_t index) {
+    if (index < 0) return 0;
+    return index % PAGE_CAPACITY;
+}
+
+
+struct PresetModule : ChemModule, IChemClient, INavigateList
 {
     enum Params {
         P_NAV,
         NUM_PARAMS
     };
     enum Inputs {
-        IN_SELECT_PRESET,
         NUM_INPUTS
     };
     enum Outputs {
@@ -46,17 +56,9 @@ struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
         NUM_LIGHTS
     };
 
-    rack::dsp::SchmittTrigger select_preset_trigger;
-    //float last_nav{0.f};
+    PresetMidi preset_midi;
 
-    // MIDI input
-    MidiDeviceHolder midi_device;
-    std::string midi_device_claim;
-    MidiInput midi_in{ChemId::Preset};
-    PresetMidiHandler midi_handler;
-    MidiLog* midi_log{nullptr};
-
-    std::string device_claim;
+    std::string device_claim; // Core
     std::string search_query;
     PresetTab active_tab{PresetTab::System};
 
@@ -70,21 +72,28 @@ struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
     bool search_meta{true};
     bool search_anchor{false};
     bool search_incremental{true};
-    bool nav_input_relative{false};
-    bool log_midi{false};
 
     PresetModule();
     ~PresetModule();
 
     PresetUi* ui() { return reinterpret_cast<PresetUi*>(chem_ui); }
+    void set_nav_index(ssize_t index);
+    ssize_t get_nav_index();
 
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
 
     void clear_filters(PresetTab tab_id);
 
-    // IMidiDeviceHolder
-    void onMidiDeviceChange(const MidiDeviceHolder* source) override;
+    // INavigateList
+    NavUnit nav_unit{NavUnit::Index};
+    void nav_send() override;
+    //NavUnit nav_get_unit() override;
+    void nav_set_unit(NavUnit unit) override;
+    void nav_previous() override;
+    void nav_next() override;
+    void nav_item(uint8_t offset) override;
+    void nav_absolute(uint16_t offset) override;
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }
@@ -100,9 +109,6 @@ struct PresetModule : ChemModule, IChemClient, IMidiDeviceNotify
 };
 
 struct PresetMenu;
-constexpr const int ROWS = 20;
-constexpr const int COLS = 2;
-constexpr const int PAGE_CAPACITY = ROWS * COLS;
 
 struct Tab
 {
@@ -214,13 +220,14 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     void select_previous_preset();
     void select_next_preset();
 
-    void on_search_text_changed(std::string text);
+    void on_search_text_changed(const std::string& text);
     void on_search_text_enter();
     bool filtering();
     void clear_filters();
     void on_filter_change(FilterId id, uint64_t state);
 
     void configure_midi();
+    bool ready();
 
     // IChemClient
     ::rack::engine::Module* client_module() override { return my_module; }

@@ -2,8 +2,8 @@
 #include "services/svg-query.hpp"
 
 void PresetUi::set_nav_param(ssize_t index) {
-    if (my_module) {
-        my_module->getParam(PresetModule::P_NAV).setValue(index);
+    if (my_module && index >= 0) {
+        my_module->set_nav_index(index);
     }
 }
 
@@ -187,8 +187,13 @@ void PresetUi::hot_reload() {
     svg_query::hideElements(svg, "k:");
 }
 
-void PresetUi::step()
-{
+bool PresetUi::ready() {
+    if (!chem_host) return false;
+    if (start_delay.running()) return false;
+    return true;
+}
+
+void PresetUi::step() {
     Base::step();
     bind_host(my_module);
 
@@ -208,10 +213,17 @@ void PresetUi::step()
     if (filtering()) {
         filter_off_button->button_down = true;
     }
+    if (my_module) {
+        auto index = get_current_index();
+        auto nav = my_module->get_nav_index();
+        if ((index != -1) && (index != nav)) {
+            set_current_index(nav);
+            scroll_to_page_of_index(nav);
+        }
+    }
 }
 
-void PresetUi::draw(const DrawArgs &args)
-{
+void PresetUi::draw(const DrawArgs &args) {
     Base::draw(args);
     if (start_delay.running()) {
         FillRect(args.vg, 8.0f, PRESET_TOP, 324.f * start_delay.progress(), 3.f, fromPacked(page_label->get_color()));

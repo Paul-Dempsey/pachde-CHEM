@@ -146,21 +146,21 @@ void PresetEntry::draw(const DrawArgs &args)
 {
     auto vg = args.vg;
     if (live) {
-        FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, live_element.nvg_stroke_color(), Fit::Inside, live_element.width());
+        FittedBoxRect(vg, 0, 0, box.size.x + live_element.width(), box.size.y, live_element.nvg_stroke_color(), Fit::Inside, live_element.width());
     }
 
     if (hovered && valid()) {
         FillRect(vg, 0, 0, box.size.x, box.size.y, hover_element.nvg_color());
-        FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, hover_element.nvg_stroke_color(), Fit::Inside, hover_element.width());
+        FittedBoxRect(vg, 0, 0, box.size.x + hover_element.width(), box.size.y, hover_element.nvg_stroke_color(), Fit::Inside, hover_element.width());
     }
 
     Base::draw(args);
 
     if (current) {
         nvgBeginPath(vg);
-        nvgMoveTo(vg, -3.5f, box.size.y*.5f - 2.5f);
+        nvgMoveTo(vg, -4.f, box.size.y*.5f - 3.f);
         nvgLineTo(vg,   .5f, box.size.y*.5f);
-        nvgLineTo(vg, -3.5f, box.size.y*.5f + 2.5f);
+        nvgLineTo(vg, -4.f, box.size.y*.5f + 3.f);
         nvgClosePath(vg);
         nvgFillColor(vg, current_element.nvg_color());
         nvgFill(vg);

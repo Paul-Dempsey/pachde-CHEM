@@ -103,6 +103,7 @@ struct MidiDeviceHolder
     void connect(std::shared_ptr<MidiDeviceConnection> connection);
     void subscribe(IMidiDeviceNotify *client);
     void unsubscribe(IMidiDeviceNotify *client);
+    bool connected() { return connection && connection->identified(); }
     std::string device_name();
 };
 

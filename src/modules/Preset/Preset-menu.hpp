@@ -2,14 +2,30 @@
 #include "Preset.hpp"
 #include "widgets/menu-widgets.hpp"
 
-struct PresetMenu : Hamburger
-{
+struct PresetMenu : Hamburger {
     using Base = Hamburger;
 
     PresetUi* ui;
     PresetMenu() : ui(nullptr) { }
-
     void setUi(PresetUi* w) { ui = w; }
+
+    void onHoverKey(const HoverKeyEvent& e) override
+    {
+        switch (e.key) {
+            case GLFW_KEY_ENTER:
+            case GLFW_KEY_MENU:
+            if (e.action == GLFW_RELEASE) {
+                e.consume(this);
+                createContextMenu();
+                return;
+            }
+        }
+        Base::onHoverKey(e);
+    }
+};
+
+struct ActionsMenu : PresetMenu
+{
     void appendContextMenu(ui::Menu* menu) override {
         auto module = ui->my_module;
         menu->addChild(createMenuLabel<HamburgerTitle>("Preset Actions"));
@@ -55,27 +71,6 @@ struct PresetMenu : Hamburger
             [this](){ ui->set_live_current(); },
             !module
         ));
-
-        // menu->addChild(new MenuSeparator);
-        // menu->addChild(createCheckMenuItem("Nav preset input relative (bipolar)", "",
-        //     [module]() { return module->nav_input_relative; },
-        //     [module]() { module->nav_input_relative = module->nav_input_relative; },
-        //     !module
-        // ));
-    }
-
-    void onHoverKey(const HoverKeyEvent& e) override
-    {
-        switch (e.key) {
-            case GLFW_KEY_ENTER:
-            case GLFW_KEY_MENU:
-            if (e.action == GLFW_RELEASE) {
-                e.consume(this);
-                createContextMenu();
-                return;
-            }
-        }
-        Base::onHoverKey(e);
     }
 };
 

@@ -29,10 +29,9 @@ PresetUi::PresetUi(PresetModule *module) :
     ::svg_query::BoundsIndex bounds;
     svg_query::addBounds(panel->svg, "k:", bounds, true);
 
-    Rect r = bounds["k:search-edit"];
-    search_entry = createThemedTextInput(r.pos.x, r.pos.y, r.size.x, r.size.y, "",
-        [=](std::string text){ on_search_text_changed(text); },
-        [=](std::string text){ on_search_text_enter(); },
+    search_entry = createThemedTextInput(bounds["k:search-edit"], "",
+        [=](const std::string& text) { on_search_text_changed(text); },
+        [=](const std::string&) { on_search_text_enter(); },
         "preset search");
     addChild(search_entry);
 
@@ -90,7 +89,7 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(next);
 
-    menu = createWidgetCentered<PresetMenu>(bounds["k:action-menu"].getCenter());
+    menu = createWidgetCentered<ActionsMenu>(bounds["k:action-menu"].getCenter());
     menu->setUi(this);
     menu->describe("Preset actions menu");
     addChild(menu);
@@ -121,24 +120,22 @@ PresetUi::PresetUi(PresetModule *module) :
         }
     })));
 
-    // auto nav = createChemKnob<EndlessKnob>(bounds["k:nav-knob"].getCenter(), &module_svgs, my_module, PresetModule::P_NAV);
-    // nav->set_handler([=](){
-    //     Tab& tab = active_tab();
-    //     if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
-    //         chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
-    //     }
-    // });
-    // addChild(nav);
+    auto nav = createChemKnob<EndlessKnob>(bounds["k:nav-knob"].getCenter(), &module_svgs, my_module, PresetModule::P_NAV);
+    nav->set_handler([=](){
+        Tab& tab = active_tab();
+        if ((tab.current_index >= 0) && host_available() && (tab.list.count() > 0)) {
+            chem_host->request_preset(ChemId::Preset, tab.list.nth(tab.current_index)->id);
+        }
+    });
+    addChild(nav);
 
-    // addChild(Center(createThemedColorInput(bounds["k:in-select"].getCenter(), &module_svgs, my_module, PresetModule::IN_SELECT_PRESET, S::InputColorKey, PORT_CORN)));
-
-    // auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
-    // picker->describe("Preset Midi controller");
-    // if (my_module) {
-    //     picker->setDeviceHolder(&my_module->midi_device);
-    //     picker->set_configure_handler( [=](){ configure_midi(); });
-    // }
-    // addChild(picker);
+    auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
+    picker->describe("Preset Midi controller");
+    if (my_module) {
+        picker->setDeviceHolder(&my_module->preset_midi.midi_device);
+        picker->set_configure_handler( [=](){ configure_midi(); });
+    }
+    addChild(picker);
 
     if (my_module) {
         user_tab.list.init_filters(my_module->user_filters);
@@ -201,7 +198,6 @@ PresetUi::PresetUi(PresetModule *module) :
 
 PresetUi::~PresetUi()
 {
-    preset_grid.clear();
     if (my_module) my_module->set_chem_ui(nullptr);
     if (chem_host) {
         auto em = chem_host->host_matrix();
@@ -211,8 +207,6 @@ PresetUi::~PresetUi()
             ipl->unregister_preset_list_client(this);
         }
     }
-    user_tab.clear();
-    system_tab.clear();
 }
 
 void PresetUi::createScrews()

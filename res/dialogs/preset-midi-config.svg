@@ -1,13 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="220" height="208" viewBox="0 0 220 208" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+<svg width="280" height="208" viewBox="0 0 280 208" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
 <linearGradient id="pg" y2="100%" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#282828" />
     <stop offset="1" stop-color="#101010" />
 </linearGradient>
 <rect id="panel" fill="url(#pg)" width="100%" height="100%" />
 <rect id="mast" fill="#f9a806" width="100%" height="18"/>
-<rect id="k:close" fill="#f22" x="202" y="2" width="14" height="14" />
-<rect id="k:dlg-title" fill="#a0a0a0d0" x="7.5" y="3" width="180" height="14" />
-<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="218.5" height="206" />
+<rect id="k:close" fill="#f22" x="262" y="2" width="14" height="14" />
+<rect id="k:dlg-title" fill="#a0a0a0d0" x="7.5" y="3" width="200" height="14" />
 
+<circle id="k:valid" fill="#ddd" cx="140" cy="30" r="2.25" />
+<rect id="k:valid-label" fill="#aaa4" x="148" y="26" width="30" height="9"/>
+<circle id="k:learn" fill="#ddd" cx="240" cy="30" r="2.25" />
+<rect id="k:learn-label" fill="#aaa4" x="248" y="26" width="25" height="9"/>
+
+<g transform="translate(15, 38)">
+    <xcircle id="k:key-mode" fill="#bbb" cx="4" cy="6" r="4"/>
+    <rect id="k:key-label" fill="#bbb4" x="0" y="0" width="35" height="14"/>
+
+    <rect id="k:kchannel" fill="#aaa" x="0" y="20" width="12" height="12" />
+    <rect id="k:kchannel-info" fill="#bbb4" x="14" y="20" width="30" height="14" />
+
+    <rect id="k:kselect-label" fill="#bbb4" x="50" y="20" width="35" height="14"/>
+    <rect id="k:kselect-nn" fill="none" stroke="#bbb" x="88" y="20" width="25" height="14"/>
+
+    <rect id="k:kpage-label" fill="#bbb4" x="116" y="20" width="35" height="14"/>
+    <rect id="k:kpage-nn" fill="none" stroke="#bbb" x="154" y="20" width="25" height="14"/>
+
+    <rect id="k:kindex-label" fill="#bbb4" x="182" y="20" width="35" height="14"/>
+    <rect id="k:kindex-nn" fill="none" stroke="#bbb" x="220" y="20" width="25" height="14"/>
+
+    <rect id="k:kcursor-label" fill="#bbb4" x="12" y="44" width="34" height="14"/>
+
+    <rect id="k:kprev-label" fill="#bbb4" x="50" y="44" width="35" height="14" />
+    <rect id="k:kprev-nn" fill="none" stroke="#bbb" x="88" y="44" width="25" height="14"/>
+
+    <rect id="k:knext-label" fill="#bbb4" x="116" y="44" width="35" height="14" />
+    <rect id="k:knext-nn" fill="none" stroke="#bbb" x="154" y="44" width="25" height="14"/>
+
+    <rect id="k:krange-label" fill="#bbb4" x="12" y="68" width="34" height="14"/>
+
+    <rect id="k:kstart-label" fill="#bbb4" x="50" y="68" width="35" height="14"/>
+    <rect id="k:kstart-nn" fill="none" stroke="#bbb" x="88" y="68" width="25" height="14"/>
+
+    <path id="div" fill="none" stroke="#888" d="M 0,92 h 254" />
+</g>
+
+<g opacity="0" transform="translate(15,100)">
+    <circle id="k:cc-mode" fill="#bbb" cx="4" cy="6" r="4"/>
+    <rect id="k:cc-label" fill="#bbb4" x="12" y="0" width="30" height="14"/>
+    <text x="12" y="10" fill="#aaa">CC</text>
+</g>
+
+<rect id="k:conn" fill="#aaa4" x="115" y="186" width="150" height="9" />
+
+<g transform="translate(15, 182)">
+    <rect id="k:log" fill="#bbb" x="0" y="0" width="14" height="14"/>
+    <rect id="k:log-label" fill="#bbb4" x="17" y="0" width="60" height="14"/>
+</g>
+
+<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="277.5" height="206" />
 </svg>

@@ -108,7 +108,7 @@ void reflect_channels(PackedMidiMessage& source)
     midi_set_channel(source, 16 - channel);
 }
 
-void MidiInput::set_logger(const std::string& source, MidiLog* logger)
+void MidiInput::set_logger(const char *source, MidiLog* logger)
 {
     source_name = source;
     log = logger;

@@ -2,48 +2,98 @@
 #include "services/json-help.hpp"
 #include "services/rack-help.hpp"
 
-
-PresetModule::PresetModule()
+PresetModule::PresetModule() :
+    preset_midi(ChemId::Preset, ChemDevice::Preset)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     snap(configParam(P_NAV, 0, 1000, 0, "Navigate presets", ""));
-    configInput(IN_SELECT_PRESET, "Select preset trigger");
 
-    midi_device.init(ChemDevice::Preset, this);
-    midi_handler.init(this);
-    midi_in.set_target(&this->midi_handler);
-    // midi_in.set_logger("<P", midi_log);
-    auto broker = MidiDeviceBroker::get();
-    broker->registerDeviceHolder(&midi_device);
+    preset_midi.init(this);
 }
 
-PresetModule::~PresetModule(){
-    auto broker = MidiDeviceBroker::get();
-    broker->unRegisterDeviceHolder(&midi_device);
-    midi_device.unsubscribe(this);
-    midi_in.clear();
+PresetModule::~PresetModule() {
     if (chem_host) {
         chem_host->unregister_chem_client(this);
     }
 }
 
-void PresetModule::onMidiDeviceChange(const MidiDeviceHolder* source) {
-    if (source != &midi_device) return;
-    if (source) {
-        midi_device_claim = source->get_claim();
-    } else {
-        midi_device_claim.clear();
+void PresetModule::set_nav_index(ssize_t index) {
+    getParam(P_NAV).setValue(index);
+}
+
+ssize_t PresetModule::get_nav_index() {
+    return getParam(P_NAV).getValue();
+}
+
+// INavigateList
+void PresetModule::nav_send() {
+    if (!chem_ui) return;
+    ui()->send_preset(get_nav_index());
+}
+
+//NavUnit PresetModule::nav_get_unit() { return nav_unit; }
+
+void PresetModule::nav_set_unit(NavUnit unit) { nav_unit = unit; }
+
+void PresetModule::nav_previous() {
+    switch (nav_unit) {
+    case NavUnit::Page: {
+        ssize_t current = get_nav_index();
+        ssize_t offset = offset_of_index(current);
+        ssize_t page = page_of_index(current) - 1;
+        if (page < 0) {
+            page = offset = 0;
+        }
+        set_nav_index(index_from_paged(page, offset));
+    } break;
+
+    case NavUnit::Index: {
+        set_nav_index(std::max(ssize_t(0), get_nav_index() - 1));
+    } break;
     }
+}
+
+void PresetModule::nav_next() {
+    switch (nav_unit) {
+    case NavUnit::Page: {
+        ssize_t current = get_nav_index();
+        ssize_t page = page_of_index(current) + 1;
+        ssize_t index = index_from_paged(page, offset_of_index(current));
+        set_nav_index(index);
+    } break;
+
+    case NavUnit::Index: {
+        set_nav_index(get_nav_index() + 1);
+    } break;
+    }
+}
+
+void PresetModule::nav_item(uint8_t offset) {
+    switch (nav_unit) {
+    case NavUnit::Page: {
+        ssize_t current_offset = offset_of_index(get_nav_index());
+        ssize_t index = index_from_paged(offset, current_offset);
+        set_nav_index(index);
+    } break;
+
+    case NavUnit::Index:
+        ssize_t current = get_nav_index();
+        ssize_t index = index_from_paged(page_of_index(current), offset);
+        set_nav_index(index);
+        break;
+    }
+}
+
+void PresetModule::nav_absolute(uint16_t index) {
+    set_nav_index(index);
 }
 
 void PresetModule::dataFromJson(json_t *root)
 {
     ChemModule::dataFromJson(root);
+    preset_midi.fromJson(json_object_get(root, "preset-midi"));
+
     device_claim = get_json_string(root, "haken-device");
-    midi_device_claim = get_json_string(root, "midi-device");
-    midi_device.set_claim(midi_device_claim);
-    log_midi = get_json_bool(root, "midi-log", log_midi);
-    //nav_input_relative = get_json_bool(root, "nav-input-relative", nav_input_relative);
     track_live = get_json_bool(root, "track-live", track_live);
     keep_search_filters = get_json_bool(root,"keep-search", keep_search_filters);
     search_name = get_json_bool(root, "search-name", search_name);
@@ -81,9 +131,7 @@ json_t* PresetModule::dataToJson()
 {
     json_t* root = ChemModule::dataToJson();
     set_json(root, "haken-device", device_claim);
-    set_json(root, "midi-device", midi_device_claim);
-    set_json(root, "midi-log", log_midi);
-    //set_json(root, "nav-input-relative", nav_input_relative);
+    set_json(root, "preset-midi", preset_midi.toJson());
     set_json(root, "track-live", track_live);
     set_json(root, "keep-search", keep_search_filters);
     set_json(root, "search-name", search_name);
@@ -145,14 +193,12 @@ void PresetModule::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDev
 // Module
 
 void PresetModule::onRemove() {
-    if (chem_ui) {
-        chem_ui = nullptr;
-    }
+    chem_ui = nullptr;
 }
 
 void PresetModule::onRandomize()
 {
-    if (chem_ui) {
+    if (chem_ui && ui()->ready()) {
         ui()->send_random_preset();
     }
 }
@@ -160,25 +206,6 @@ void PresetModule::onRandomize()
 void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
-
-    // auto pui = ui();
-    // if (pui) {
-    //     int idx = getParam(P_NAV).getValue();
-    //     if (pui->get_current_index() != idx) {
-    //         pui->set_current_index(idx);
-    //         pui->scroll_to_page_of_index(idx);
-    //     }
-    // }
-
-    // auto input = getInput(IN_SELECT_PRESET);
-    // if (input.isConnected()) {
-    //     if (select_preset_trigger.process(input.getVoltage(), .1f, .5f)) {
-    //         select_preset_trigger.reset();
-    //         if (pui) {
-    //             pui->send_preset(pui->get_current_index());
-    //         }
-    //     }
-    // }
     if (((args.frame + id) % 80) == 0) {
         if (!search_query.empty() || any_filter(filters())) {
             getLight(L_FILTER).setBrightness(1.f);
@@ -186,27 +213,8 @@ void PresetModule::process(const ProcessArgs &args)
             getLight(L_FILTER).setBrightness(0.f);
         }
     }
-}
 
-void PresetMidiHandler::enable_logging(bool logging) {
-    if (logging) {
-        if (!logger) {
-            logger = new MidiLog;
-        }
-    } else {
-        auto log = logger;
-        logger = nullptr;
-        delete log;
-    }
-}
-
-void PresetMidiHandler::do_message(PackedMidiMessage msg)
-{
-    if (!host) return;
-    if (logger) {
-        logger->ensure_file();
-        logger->logMidi(IO_Direction::In, msg);
-    }
+    preset_midi.process(args.sampleTime);
 }
 
 Model *modelPreset = createModel<PresetModule, PresetUi>("chem-preset");
