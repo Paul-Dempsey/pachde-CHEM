@@ -6,11 +6,13 @@ To get started:
 
 1. You must have installed [VCV Rack](https://vcvrack.com/manual/)
 
-1. Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com/pachde-CHEM).
+1. Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com/plugins?query=pachde-chem).
    Make sure to subscribe to the entire plugin, not individual modules.
 
+   The library module listing page [here](https://library.vcvrack.com/pachde-CHEM) gives a better overview of the plugin and links, but (at this writing) doesn't provide the whole plugin subscription.
+
    Once subscribed, a red dot appears on the **Library** menu when you next start Rack, and where you can update.
-   CHEM will be downlaoded and installed (along with any other modules with updates).
+   CHEM will be downlaoded and installed (along with any other modules with updates or new subscriptions).
    A subscription is recommended so that you are automatically updated when CHEM is revised with new modules, features, and bug fixes.
 
 1. Read the [**Core**](./core.md#chem-core) module docs first to get set up.
