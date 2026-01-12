@@ -9,8 +9,6 @@ using namespace svg_theme;
 using namespace pachde;
 using namespace eaganmatrix;
 
-// -- Play UI -----------------------------------
-
 constexpr const ssize_t SSIZE_0 = 0;
 constexpr const float PRESETS_TOP = 32.f;
 constexpr const float PRESETS_LEFT = 12.f;
@@ -21,8 +19,7 @@ bool PlayUi::connected() {
     return true;
 }
 
-PlayUi::~PlayUi()
-{
+PlayUi::~PlayUi() {
     if (my_module) {
         my_module->set_chem_ui(nullptr);
     }
@@ -31,8 +28,7 @@ PlayUi::~PlayUi()
     }
 }
 
-void PlayUi::set_track_live(bool track)
-{
+void PlayUi::set_track_live(bool track) {
     if (!module) return;
     if (track == my_module->track_live) return;
     my_module->track_live = track;
@@ -50,8 +46,7 @@ void PlayUi::set_track_live(bool track)
     }
 }
 
-void PlayUi::presets_to_json(json_t * root)
-{
+void PlayUi::presets_to_json(json_t * root) {
     json_object_set_new(root, "haken-device", json_string(playlist_device.c_str()));
 
     auto jaru = json_array();
@@ -61,8 +56,7 @@ void PlayUi::presets_to_json(json_t * root)
     json_object_set_new(root, "presets", jaru);
 }
 
-void PlayUi::presets_from_json(json_t * root)
-{
+void PlayUi::presets_from_json(json_t * root) {
     auto j = json_object_get(root, "haken-device");
     if (j) {
         playlist_device = json_string_value(j);
@@ -80,8 +74,7 @@ void PlayUi::presets_from_json(json_t * root)
     }
 }
 
-void PlayUi::sort_presets(PresetOrder order)
-{
+void PlayUi::sort_presets(PresetOrder order) {
     PresetId id_restore;
     if (current_index >= 0) {
         id_restore = presets[current_index]->id;
@@ -98,8 +91,7 @@ void PlayUi::sort_presets(PresetOrder order)
     make_visible(current_index);
 }
 
-void PlayUi::add_live()
-{
+void PlayUi::add_live() {
     if (!live_preset) return;
     auto it = std::find_if(presets.cbegin(), presets.cend(), [this](std::shared_ptr<PresetInfo> p){
         return live_preset->id == p->id;
@@ -118,8 +110,12 @@ void PlayUi::add_live()
     }
 }
 
-void PlayUi::select_preset(PresetId id)
-{
+void PlayUi::select_index(ssize_t index) {
+    index = clamp(index, 0, preset_count());
+    select_preset(presets[index]->id);
+}
+
+void PlayUi::select_preset(PresetId id) {
     if (!id.valid()) return;
 
     auto haken = chem_host->host_haken();
@@ -128,20 +124,17 @@ void PlayUi::select_preset(PresetId id)
             haken->log->log_message("play", format_string("Selecting preset [%d:%d:%d]]", id.bank_hi(), id.bank_lo(), id.number()));
         }
         chem_host->request_preset(ChemId::Play, id);
-        //haken->select_preset(ChemId::Play, id);
     }
 }
 
-void PlayUi::select_random()
-{
+void PlayUi::select_random() {
     if (presets.empty()) return;
     ssize_t index = std::round(rack::random::uniform() * (preset_count() -1));
     scroll_to(index);
     select_preset(presets[index]->id);
 }
 
-void PlayUi::sync_to_current_index()
-{
+void PlayUi::sync_to_current_index() {
     current_preset = presets[current_index];
     auto wit = std::find_if(preset_widgets.begin(), preset_widgets.end(), [this](PresetWidget* pw){
         return pw->get_index() == current_index;
@@ -154,29 +147,25 @@ void PlayUi::sync_to_current_index()
     select_preset(current_preset->id);
 }
 
-void PlayUi::widgets_clear_current()
-{
+void PlayUi::widgets_clear_current() {
     for(auto wit = preset_widgets.begin(); wit != preset_widgets.end(); wit++) {
         (*wit)->set_current(false);
     }
 }
 
-void PlayUi::prev_preset()
-{
+void PlayUi::prev_preset() {
     if (--current_index < 0) {
         current_index = preset_count() - 1;
     }
     sync_to_current_index();
 }
 
-void PlayUi::next_preset()
-{
+void PlayUi::next_preset() {
     if (++current_index >= preset_count()) current_index = 0;
     sync_to_current_index();
 }
 
-void PlayUi::sync_to_presets()
-{
+void PlayUi::sync_to_presets() {
     scroll_top = 0;
     clear_selected();
     auto live_id = get_live_id();
@@ -195,15 +184,13 @@ void PlayUi::sync_to_presets()
     update_up_down();
 }
 
-void PlayUi::select_none()
-{
+void PlayUi::select_none() {
     if (selected.empty()) return;
     clear_selected();
     scroll_to(scroll_top);
 }
 
-void PlayUi::onConnectHost(IChemHost* host)
-{
+void PlayUi::onConnectHost(IChemHost* host) {
     chem_host = host;
     if (chem_host) {
         onPresetChange();
@@ -215,16 +202,14 @@ void PlayUi::onConnectHost(IChemHost* host)
     }
 }
 
-bool PlayUi::is_visible(ssize_t index)
-{
+bool PlayUi::is_visible(ssize_t index) {
     auto it = std::find_if(preset_widgets.begin(), preset_widgets.end(), [index](PresetWidget* pw) {
         return static_cast<ssize_t>(pw->get_index()) == index;
     });
     return it != preset_widgets.cend();
 }
 
-void PlayUi::update_live()
-{
+void PlayUi::update_live() {
     if (live_preset) {
         for (auto pw : preset_widgets) {
             if (pw->empty()) break;
@@ -237,8 +222,7 @@ void PlayUi::update_live()
     }
 }
 
-void PlayUi::update_up_down()
-{
+void PlayUi::update_up_down() {
     bool up{false}, down{false};
     if (presets.size() > PAGE_CAPACITY) {
         up = scroll_top > 0;
@@ -252,8 +236,7 @@ void PlayUi::update_up_down()
     page_label->set_text(format_string("%d of %d", page, total));
 }
 
-void PlayUi::page_up(bool ctrl, bool shift)
-{
+void PlayUi::page_up(bool ctrl, bool shift) {
     if (ctrl || presets.empty()) {
         scroll_to(0);
     } else {
@@ -261,8 +244,7 @@ void PlayUi::page_up(bool ctrl, bool shift)
     }
 }
 
-void PlayUi::page_down(bool ctrl, bool shift)
-{
+void PlayUi::page_down(bool ctrl, bool shift) {
     ssize_t last_page = (preset_count() / PAGE_CAPACITY) * PAGE_CAPACITY;
 
     if (ctrl) {
@@ -273,8 +255,7 @@ void PlayUi::page_down(bool ctrl, bool shift)
     }
 }
 
-void PlayUi::scroll_to(ssize_t pos)
-{
+void PlayUi::scroll_to(ssize_t pos) {
     assert(pos >= SSIZE_0);
 
     scroll_top = pos;
@@ -304,13 +285,11 @@ void PlayUi::scroll_to(ssize_t pos)
     update_up_down();
 }
 
-void PlayUi::make_visible(ssize_t index)
-{
+void PlayUi::make_visible(ssize_t index) {
     scroll_to_page_of_index(index);
 }
 
-void PlayUi::scroll_to_live()
-{
+void PlayUi::scroll_to_live() {
     if (!live_preset) return;
     auto id = live_preset->id;
     auto it = std::find_if(presets.cbegin(), presets.cend(), [id](const std::shared_ptr<PresetInfo>& p){
@@ -321,47 +300,39 @@ void PlayUi::scroll_to_live()
     }
 }
 
-void PlayUi::scroll_to_page_of_index(ssize_t index)
-{
+void PlayUi::scroll_to_page_of_index(ssize_t index) {
     scroll_to(page_index_of_index(index));
 }
 
-ssize_t PlayUi::page_index_of_index(ssize_t index)
-{
+ssize_t PlayUi::page_index_of_index(ssize_t index) {
     index = std::max(ssize_t(0), index);
     index = std::min(ssize_t(presets.size() - 1), index);
     return PAGE_CAPACITY * (index / PAGE_CAPACITY);
 }
 
-int PlayUi::first_selected()
-{
+int PlayUi::first_selected() {
     if (selected.empty()) return -1;
     return *selected.cbegin();
 }
-int PlayUi::last_selected()
-{
+int PlayUi::last_selected() {
     if (selected.empty()) return -1;
     return *(selected.cend()-1);
 }
-void PlayUi::select_item(int index)
-{
+void PlayUi::select_item(int index) {
     if (selected.cend() == std::find(selected.cbegin(), selected.cend(), index)) {
         selected.push_back(index);
         std::sort(selected.begin(), selected.end());
     }
 }
-void PlayUi::unselect_item(int index)
-{
+void PlayUi::unselect_item(int index) {
     auto it = std::find(selected.cbegin(), selected.cend(), index);
     if (it != selected.cend()) selected.erase(it);
 }
-const std::vector<int>& PlayUi::get_selected_indices()
-{
+const std::vector<int>& PlayUi::get_selected_indices() {
     return selected;
 }
 
-std::vector<std::shared_ptr<PresetInfo>> PlayUi::extract(const std::vector<int>& list)
-{
+std::vector<std::shared_ptr<PresetInfo>> PlayUi::extract(const std::vector<int>& list) {
     std::vector<std::shared_ptr<PresetInfo>> extracted;
     for (int index : list) {
         extracted.push_back(*(presets.begin() + index));
@@ -369,8 +340,7 @@ std::vector<std::shared_ptr<PresetInfo>> PlayUi::extract(const std::vector<int>&
     return extracted;
 }
 
-ssize_t PlayUi::index_of_id(PresetId id)
-{
+ssize_t PlayUi::index_of_id(PresetId id) {
     if (!id.valid()) return -1;
     auto key = id.key();
     auto it = std::find_if(presets.cbegin(), presets.cend(), [key](const std::shared_ptr<PresetInfo> p){ return key == p->id.key(); });
@@ -378,8 +348,7 @@ ssize_t PlayUi::index_of_id(PresetId id)
     return it - presets.cbegin();
 }
 
-void PlayUi::clone()
-{
+void PlayUi::clone() {
     auto list = get_selected_indices();
     auto count = list.size();
     auto extracted = extract(list);
@@ -396,8 +365,7 @@ void PlayUi::clone()
     set_modified(true);
 }
 
-void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetInfo>>& items)
-{
+void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetInfo>>& items) {
     auto rit = indices.crbegin();
     while (rit != indices.crend()) {
         auto it = items.begin() + *rit++;
@@ -405,8 +373,7 @@ void remove_items(std::vector<int>& indices, std::deque<std::shared_ptr<PresetIn
     }
 }
 
-void PlayUi::remove_selected()
-{
+void PlayUi::remove_selected() {
     if (selected.empty()) return;
     auto list = get_selected_indices();
     auto new_top = std::max(0, *list.cbegin()-1);
@@ -416,8 +383,7 @@ void PlayUi::remove_selected()
     set_modified(true);
 }
 
-void PlayUi::to_first()
-{
+void PlayUi::to_first() {
     if (selected.empty()) return;
     auto list = get_selected_indices();
     auto count = list.size();
@@ -436,8 +402,7 @@ void PlayUi::to_first()
     set_modified(true);
 }
 
-void PlayUi::to_last()
-{
+void PlayUi::to_last() {
     if (selected.empty()) return;
     auto list = get_selected_indices();
     auto count = list.size();
@@ -457,8 +422,7 @@ void PlayUi::to_last()
     set_modified(true);
 }
 
-void PlayUi::to_n(int dx)
-{
+void PlayUi::to_n(int dx) {
     if (selected.empty() || 0 == dx) return;
     if ((first_selected() + dx) < 0) return;
     if ((last_selected() + dx) > (preset_count()-1)) return;
@@ -500,18 +464,15 @@ void PlayUi::to_n(int dx)
     set_modified(true);
 }
 
-void PlayUi::to_up()
-{
+void PlayUi::to_up() {
     to_n(-1);
 }
 
-void PlayUi::to_down()
-{
+void PlayUi::to_down() {
     to_n(1);
 }
 
-void PlayUi::onPresetChange()
-{
+void PlayUi::onPresetChange() {
     if (my_module && my_module->batch_busy()) return;
 
     if (chem_host) {
@@ -553,8 +514,7 @@ void PlayUi::onPresetChange()
     }
 }
 
-void PlayUi::check_playlist_device()
-{
+void PlayUi::check_playlist_device() {
     if (!connected() || playlist_device.empty()) {
         warning_label->set_text("");
         pending_device_check = false;
@@ -605,8 +565,7 @@ struct PresetIdGenerator
     }
 };
 
-void PlayUi::fill(FillOptions which)
-{
+void PlayUi::fill(FillOptions which) {
     if (!chem_host || chem_host->host_busy()) return;
     auto ipl = chem_host->host_ipreset_list();
     if (!ipl) return;
@@ -662,20 +621,17 @@ void PlayUi::fill(FillOptions which)
     sync_to_presets();
 }
 
-void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection)
-{
+void PlayUi::onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) {
     onConnectionChangeUiImpl(this, device, connection);
     check_playlist_device();
 }
 
 // IPresetAction
-void PlayUi::onClearSelection()
-{
+void PlayUi::onClearSelection() {
     select_none();
 }
 
-void PlayUi::onSetSelection(PresetWidget* source, bool on)
-{
+void PlayUi::onSetSelection(PresetWidget* source, bool on) {
     auto index = source->get_index();
     if (on) {
         select_item(index);
@@ -685,8 +641,7 @@ void PlayUi::onSetSelection(PresetWidget* source, bool on)
     scroll_to(scroll_top);
 }
 
-void PlayUi::onDelete(PresetWidget* source)
-{
+void PlayUi::onDelete(PresetWidget* source) {
     clear_selected();
     auto index = source->get_index();
     selected.push_back(index);
@@ -697,8 +652,7 @@ void PlayUi::onDelete(PresetWidget* source)
     set_modified(true);
 }
 
-void PlayUi::onSetCurrrent(int index)
-{
+void PlayUi::onSetCurrrent(int index) {
     current_index = index;
     if (-1 == index) {
         current_preset = nullptr;
@@ -712,8 +666,7 @@ void PlayUi::onSetCurrrent(int index)
     }
 }
 
-void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e)
-{
+void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e) {
     if (!my_module || e.paths.empty()) return;
     std::string path;
     for (auto p : e.paths)
@@ -724,8 +677,7 @@ void PlayUi::onDropFile(const widget::Widget::PathDropEvent& e)
     load_playlist(path, true);
 }
 
-void PlayUi::onChoosePreset(PresetWidget* source)
-{
+void PlayUi::onChoosePreset(PresetWidget* source) {
     if (!connected()) return;
     auto id = source->get_preset_id();
     assert(id.valid());
@@ -744,8 +696,7 @@ void PlayUi::onChoosePreset(PresetWidget* source)
     }
 }
 
-PresetWidget* PlayUi::getDropTarget(Vec pos)
-{
+PresetWidget* PlayUi::getDropTarget(Vec pos) {
     if ((pos.y < PRESETS_TOP) || (pos.y > PRESETS_TOP + 314.f)) return nullptr;
     if ((pos.x < PRESETS_LEFT) || (pos.x > PRESETS_LEFT + 150.f)) return nullptr;
     for (auto pw : preset_widgets) {
@@ -757,8 +708,7 @@ PresetWidget* PlayUi::getDropTarget(Vec pos)
     return nullptr;
 }
 
-void PlayUi::onDropPreset(PresetWidget* target)
-{
+void PlayUi::onDropPreset(PresetWidget* target) {
     if (!target || selected.empty()) return;
     int target_index = target->get_index();
     if (-1 == target_index) {
@@ -820,24 +770,13 @@ void PlayUi::onDropPreset(PresetWidget* target)
     set_modified(true);
 }
 
-void PlayUi::onHoverKey(const HoverKeyEvent& e)
-{
-    Base::onHoverKey(e);
-}
-
-void PlayUi::onButton(const ButtonEvent &e)
-{
-    Base::onButton(e);
-}
-
-void PlayUi::onSelectKey(const SelectKeyEvent &e)
-{
+void PlayUi::onSelectKey(const SelectKeyEvent &e) {
     if (APP->event->getSelectedWidget() != this) {
         Base::onSelectKey(e);
         return;
     }
     auto mods = e.mods & RACK_MOD_MASK;
-    if ((e.action == GLFW_PRESS || e.action == GLFW_REPEAT)) {
+    if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
         switch (e.key) {
         case GLFW_KEY_ESCAPE:
             if (0 == mods) {
@@ -929,8 +868,7 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e)
     Base::onSelectKey(e);
 }
 
-void PlayUi::onHoverScroll(const HoverScrollEvent &e)
-{
+void PlayUi::onHoverScroll(const HoverScrollEvent &e) {
     if (in_rangef(e.pos.x, PRESETS_LEFT, PRESETS_LEFT + 150.f) && in_rangef(e.pos.y, PRESETS_TOP, 340.f)) {
         int delta = 5 * ((e.scrollDelta.y < 0) ? 1 : (e.scrollDelta.y > 0) ? -1 : 0);
         auto mods = APP->window->getMods();
@@ -947,23 +885,12 @@ void PlayUi::onHoverScroll(const HoverScrollEvent &e)
     Base::onHoverScroll(e);
 }
 
-void PlayUi::step()
-{
+void PlayUi::step() {
     Base::step();
     bind_host(my_module);
 
     if (pending_device_check) {
         check_playlist_device();
     }
-    //blip->set_brightness(modified ? 1 : 0);
 }
 
-void PlayUi::draw(const DrawArgs& args)
-{
-    Base::draw(args);
-// #ifdef LAYOUT_HELP
-//     if (hints) {
-//         Line(args.vg, RIGHT_MARGIN_CENTER, 0, RIGHT_MARGIN_CENTER, 380, nvgTransRGBAf(PORT_VIOLET, .5f), .5f);
-//     }
-// #endif
-}

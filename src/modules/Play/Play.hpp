@@ -21,10 +21,28 @@ struct PlayUi;
 
 struct PlayModule : ChemModule, IChemClient
 {
+    enum Params {
+        NUM_PARAMS
+    };
+    enum Inputs {
+        IN_PRESET_PREV,
+        IN_PRESET_NEXT,
+        IN_PRESET_SELECT,
+        NUM_INPUTS
+    };
+    enum Outputs {
+        NUM_OUTPUTS
+    };
+    enum Lights {
+        NUM_LIGHTS
+    };
+
     std::string device_claim;
 
     rack::dsp::SchmittTrigger prev_trigger;
     rack::dsp::SchmittTrigger next_trigger;
+    rack::dsp::SchmittTrigger select_triggers[16];
+    WallTimer throttle_preset;
 
     std::string playlist_folder;
     std::string playlist_file;
@@ -53,26 +71,10 @@ struct PlayModule : ChemModule, IChemClient
     void onPresetChange() override;
     void onConnectionChange(ChemDevice device, std::shared_ptr<MidiDeviceConnection> connection) override;
 
-    // ----  Rack  ------------------------------------------
-
-    enum Params {
-        NUM_PARAMS
-    };
-    enum Inputs {
-        IN_PRESET_PREV,
-        IN_PRESET_NEXT,
-        NUM_INPUTS
-    };
-    enum Outputs {
-        NUM_OUTPUTS
-    };
-    enum Lights {
-        NUM_LIGHTS
-    };
-
     void dataFromJson(json_t* root) override;
     json_t* dataToJson() override;
     void onRandomize() override;
+    void onPortChange(const PortChangeEvent& e) override;
     void process(const ProcessArgs& args) override;
 };
 
@@ -126,6 +128,7 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     virtual ~PlayUi();
 
     bool connected();
+    void select_index(ssize_t index);
     void select_preset(PresetId id);
     void select_random();
     void sync_to_current_index();
@@ -200,13 +203,10 @@ struct PlayUi : ChemModuleWidget, IChemClient, IPresetAction
     std::string panelFilename() override { return asset::plugin(pluginInstance, "res/panels/CHEM-play.svg"); }
     void setThemeName(const std::string& name, void * context) override;
 
-    void onHoverKey(const HoverKeyEvent& e) override;
-    void onButton(const ButtonEvent&e) override;
     void onSelectKey(const SelectKeyEvent &e) override;
     void onHoverScroll(const HoverScrollEvent & e) override;
 
     void step() override;
-    void draw(const DrawArgs& args) override;
     void appendContextMenu(Menu *menu) override;
 };
 
