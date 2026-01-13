@@ -104,6 +104,8 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
 
     addChild(em_status_label = createLabel(bounds["k:emstatus"], "", &status_style));
 
+    addChild(Center(createThemedParamButton<NoteParamButton>(bounds["k:play-note"].getCenter(), &module_svgs, my_module, CoreModule::P_MIDI_TEST)));
+
     const NVGcolor co_port = PORT_CORN;
     addChild(Center(createThemedColorInput(bounds["k:c1mut"].getCenter(), &module_svgs, my_module, CoreModule::IN_C1_MUTE_GATE, S::InputColorKey, co_port)));
     addChild(createLabel(bounds["k:c1mut-label"], "M1", &S::in_port_label));

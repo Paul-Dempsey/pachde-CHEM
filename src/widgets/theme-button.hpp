@@ -262,7 +262,10 @@ struct ECircleSvg {
     static std::string up() { return "res/widgets/edit-circle-up.svg"; }
     static std::string down() { return "res/widgets/edit-circle-down.svg"; }
 };
-
+struct NoteSvg {
+    static std::string up() { return "res/widgets/note.svg"; }
+    static std::string down() { return "res/widgets/note.svg"; }
+};
 using SmallRoundButton = TButton<SmallRoundButtonSvg>;
 using LargeRoundButton = TButton<LargeRoundButtonSvg>;
 using SquareButton = TButton<SquareButtonSvg>;
@@ -275,6 +278,7 @@ using Palette2Button = TButton<Palette2ButtonSvg>;
 using Palette3Button = TButton<Palette3ButtonSvg>;
 using ChicletButton = TButton<ChicletButtonSvg>;
 using EditButton = TButton<ECircleSvg>;
+using NoteParamButton = TParamButton<NoteSvg>;
 
 using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
 using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;

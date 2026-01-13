@@ -15,6 +15,7 @@
 #include "services/svg-query.hpp"
 #include "widgets/widgets.hpp"
 #include "wxyz.hpp"
+#include "test-midi.hpp"
 
 using namespace pachde;
 using namespace eaganmatrix;
@@ -87,6 +88,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
 
     // Music (Note) processing
     MusicMidiToCV mm_to_cv;
+    MidiPlayer player;
 
     SimpleSlewLimiter y_slew;
     SimpleSlewLimiter z_slew;
@@ -236,6 +238,7 @@ struct CoreModule : ChemModule, IChemHost, IMidiDeviceNotify, IHandleEmEvents, I
         P_Y_SLEW,
         P_Z_SLEW,
         P_EXTEND_SLEW,
+        P_MIDI_TEST,
         NUM_PARAMS
     };
     enum Inputs {

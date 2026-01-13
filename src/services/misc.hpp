@@ -63,6 +63,9 @@ public:
         if (interval <= 0.0) return 0.0f;
         return static_cast<float>((rack::system::getTime() - start_time) / interval);
     }
+    float elapsed() {
+        return static_cast<float>(rack::system::getTime() - start_time);
+    }
 
     void run() {
         assert(interval > 0.0);

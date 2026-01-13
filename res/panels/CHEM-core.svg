@@ -66,7 +66,9 @@
 <rect id="k:menu" fill="#a0a0a080" x="144" y="203" width="10" height="10" />
 
 <rect id="k:haken" fill="#f22" x="7.5" y="222" width="24" height="12"/>
+<rect id="k:play-note" fill="#a0a0a080" x="142" y="220" width="14" height="14"/>
 <rect id="k:haken-device" fill="#d0808080" x="7.5" y="235" width="150" height="12"/>
+
 <rect id="k:c1" fill="#f22" x="7.5" y="258" width="24" height="12"/>
 <rect id="k:c2" fill="#f22" x="7.5" y="294" width="24" height="12"/>
 <circle id="k:c1map" fill="#f22" cx="94" cy="265" r="8" />

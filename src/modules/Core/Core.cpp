@@ -43,6 +43,7 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     dp4(configParam(P_Y_SLEW, 0.f, 1.f, 0.f, "Y Slew", "%", 0.f, 100.f));
     dp4(configParam(P_Z_SLEW, 0.f, 1.f, 0.f, "Z Slew", "%", 0.f, 100.f));
     configSwitch(P_EXTEND_SLEW, 0.f, 1.f, 0.f, "Slew time", { "normal", "extended"});
+    configButton(P_MIDI_TEST, "Play test");
 
     configInput(IN_C1_MUTE_GATE, "MIDI 1 data block gate");
     configInput(IN_C2_MUTE_GATE, "MIDI 2 data block gate");
@@ -90,6 +91,8 @@ CoreModule::CoreModule() : modulation(this, ChemId::Core) {
     modulation.configure(-1, 1, cfg);
     chem_host = this;
     midi_relay.register_target(this);
+
+    player.init(&haken_midi_out, test_midi_data);
 
     system_presets = std::make_shared<PresetList>();
     user_presets = std::make_shared<PresetList>();
@@ -958,6 +961,13 @@ void CoreModule::process_params(const ProcessArgs &args)
         z_slew.configure(p, p);
     }
 
+    if (!disconnected && !host_busy() && getParamInt(getParam(P_MIDI_TEST))) {
+        if (!player.playing()) {
+            player.start(args);
+        }
+    }
+    getParam(P_MIDI_TEST).setValue(0.f);
+
     if (is_controller_1_connected()) {
         controller1_midi_in.set_channel_reflect(getParamInt(getParam(P_C1_CHANNEL_MAP)));
         controller1_midi_in.set_music_pass(getParamInt(getParam(P_C1_MUSIC_FILTER)));
@@ -1140,6 +1150,10 @@ void CoreModule::process(const ProcessArgs &args) {
     }
     if (0 == ((args.frame + id) % PROCESS_PARAM_INTERVAL)) {
         process_params(args);
+    }
+
+    if (player.playing()) {
+        player.process(args);
     }
 
 }
