@@ -14,7 +14,7 @@ struct MidiLearner : OpaqueWidget, ILearner, IThemed {
     uint8_t value{0xff};
     std::string value_text;
     LearnMode mode{LearnMode::Off};
-    PresetAction role{PresetAction::KeySelect};
+    KeyAction role{KeyAction::KeySelect};
     PresetMidi* midi_handler{nullptr};
     PackedColor co_normal{colors::G85};
     PackedColor co_active{parseColor("hsl(120, .8, .5)", colors::White)};
@@ -22,11 +22,11 @@ struct MidiLearner : OpaqueWidget, ILearner, IThemed {
     Widget* prev_widget{nullptr};
     Widget* next_widget{nullptr};
 
-    MidiLearner(Rect bounds, LearnMode mode, PresetAction role, PresetMidi* pm) :
+    MidiLearner(Rect bounds, LearnMode mode, KeyAction role, PresetMidi* pm) :
         mode(mode), role(role), midi_handler(pm)
     {
         box = bounds;
-        value = midi_handler->code[role];
+        value = midi_handler->key_code[role];
         update_text();
     }
     void update_text() { value_text = (0xFF == value) ? "" : noteFullName(value); }
@@ -39,7 +39,7 @@ struct MidiLearner : OpaqueWidget, ILearner, IThemed {
         }
     }
     void learn_value(LearnMode mode, uint8_t new_value) override {
-        midi_handler->code[role] = value = new_value;
+        midi_handler->key_code[role] = value = new_value;
         update_text();
     }
     void onButton( const ButtonEvent& e) override {
@@ -57,7 +57,7 @@ struct MidiLearner : OpaqueWidget, ILearner, IThemed {
         if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
             switch (e.key) {
             case GLFW_KEY_ESCAPE:
-                midi_handler->code[role] = value = UndefinedCode;
+                midi_handler->key_code[role] = value = UndefinedCode;
                 value_text = "";
                 e.consume(this);
                 break;

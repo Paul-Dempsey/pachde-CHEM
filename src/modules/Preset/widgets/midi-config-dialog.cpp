@@ -90,21 +90,21 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(createLabel(bounds["k:key-label"], "Note", &styles.section));
 
         auto channel_menu = createWidgetCentered<ChannelMenu>(bounds["k:kchannel"].getCenter());
-        channel_menu->poke = &midi_handler->channel;
+        channel_menu->poke = &midi_handler->key_channel;
         channel_menu->describe("Channel");
         addChild(channel_menu);
-        addChild(channel_info = createLabel(bounds["k:kchannel-info"], 0xFF == midi_handler->channel ? "[any]" : format_string("%d", midi_handler->channel), &styles.info));
+        addChild(channel_info = createLabel(bounds["k:kchannel-info"], 0xFF == midi_handler->key_channel ? "[any]" : format_string("%d", midi_handler->key_channel), &styles.info));
 
         addChild(createLabel(bounds["k:kselect-label"], "Select", &styles.right));
-        MidiLearner* learn_select = new MidiLearner(bounds["k:kselect-nn"], LearnMode::Note, PresetAction::KeySelect, midi_handler);
+        MidiLearner* learn_select = new MidiLearner(bounds["k:kselect-nn"], LearnMode::Note, KeyAction::KeySelect, midi_handler);
         addChild(learn_select);
 
         addChild(createLabel(bounds["k:kpage-label"], "Page", &styles.right));
-        MidiLearner* learn_page = new MidiLearner(bounds["k:kpage-nn"], LearnMode::Note, PresetAction::KeyPage, midi_handler);
+        MidiLearner* learn_page = new MidiLearner(bounds["k:kpage-nn"], LearnMode::Note, KeyAction::KeyPage, midi_handler);
         addChild(learn_page);
 
         addChild(createLabel(bounds["k:kindex-label"], "Index", &styles.right));
-        MidiLearner* learn_index = new MidiLearner(bounds["k:kindex-nn"], LearnMode::Note, PresetAction::KeyIndex, midi_handler);
+        MidiLearner* learn_index = new MidiLearner(bounds["k:kindex-nn"], LearnMode::Note, KeyAction::KeyIndex, midi_handler);
         addChild(learn_index);
 
         keys = new KeyboardWidget(bounds["k:keys"]);
@@ -115,15 +115,15 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(keys);
 
         addChild(createLabel(bounds["k:kprev-label"], "Prev", &styles.right));
-        MidiLearner* learn_prev = new MidiLearner(bounds["k:kprev-nn"], LearnMode::Note, PresetAction::KeyPrev, midi_handler);
+        MidiLearner* learn_prev = new MidiLearner(bounds["k:kprev-nn"], LearnMode::Note, KeyAction::KeyPrev, midi_handler);
         addChild(learn_prev);
 
         addChild(createLabel(bounds["k:knext-label"], "Next", &styles.right));
-        MidiLearner* learn_next = new MidiLearner(bounds["k:knext-nn"], LearnMode::Note, PresetAction::KeyNext, midi_handler);
+        MidiLearner* learn_next = new MidiLearner(bounds["k:knext-nn"], LearnMode::Note, KeyAction::KeyNext, midi_handler);
         addChild(learn_next);
 
         addChild(createLabel(bounds["k:kfirst-label"], "First", &styles.right));
-        MidiLearner* learn_start = new MidiLearner(bounds["k:kfirst-nn"], LearnMode::Note, PresetAction::KeyFirst, midi_handler);
+        MidiLearner* learn_start = new MidiLearner(bounds["k:kfirst-nn"], LearnMode::Note, KeyAction::KeyFirst, midi_handler);
         addChild(learn_start);
 
         // tab order
@@ -158,7 +158,7 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
 
         log_check->latched = midi_handler->is_logging();
         log_check->sync_frame();
-        channel_info->set_text(0xFF == midi_handler->channel ? "[any]" : format_string("%d", midi_handler->channel));
+        channel_info->set_text(0xFF == midi_handler->key_channel ? "[any]" : format_string("%d", midi_handler->key_channel));
         valid_blip->set_light_color(fromPacked(midi_handler->is_valid_configuration() ? colors::PortGreen : colors::Red));
         valid_blip->set_brightness(1.f);
         learn_blip->set_brightness(midi_handler->student ? 1.f : 0.f);
@@ -167,23 +167,23 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         for (int i = 0; i < 12; i++) {
             nc[i] = whole_note(i) ? colors::White : colors::Black;
         }
-        if (UndefinedCode != midi_handler->code[KeySelect]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeySelect])] = co_select;
+        if (UndefinedCode != midi_handler->key_code[KeySelect]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeySelect])] = co_select;
         }
-        if (UndefinedCode != midi_handler->code[KeyPage]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeyPage])] = co_page;
+        if (UndefinedCode != midi_handler->key_code[KeyPage]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeyPage])] = co_page;
         }
-        if (UndefinedCode != midi_handler->code[KeyIndex]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeyIndex])] = co_index;
+        if (UndefinedCode != midi_handler->key_code[KeyIndex]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeyIndex])] = co_index;
         }
-        if (UndefinedCode != midi_handler->code[KeyPrev]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeyPrev])] = co_prev;
+        if (UndefinedCode != midi_handler->key_code[KeyPrev]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeyPrev])] = co_prev;
         }
-        if (UndefinedCode != midi_handler->code[KeyNext]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeyNext])] = co_next;
+        if (UndefinedCode != midi_handler->key_code[KeyNext]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeyNext])] = co_next;
         }
-        if (UndefinedCode != midi_handler->code[KeyFirst]) {
-            nc[eNoteFromNoteNumber(midi_handler->code[KeyFirst])] = co_first;
+        if (UndefinedCode != midi_handler->key_code[KeyFirst]) {
+            nc[eNoteFromNoteNumber(midi_handler->key_code[KeyFirst])] = co_first;
         }
         for (int i = 0; i < 12; i++) {
             keys->set_color(static_cast<eNote>(i), nc[i]);

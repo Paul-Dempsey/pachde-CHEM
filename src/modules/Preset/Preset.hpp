@@ -43,6 +43,7 @@ struct PresetModule : ChemModule, IChemClient, INavigateList
     enum Params {
         P_NAV,
         P_SELECT,
+        P_MUTE_KEY_NAV,
         NUM_PARAMS
     };
     enum Inputs {
@@ -155,6 +156,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     PresetMenu* menu{nullptr};
     std::vector<FilterButton*> filter_buttons;
     StateButton * filter_off_button{nullptr};
+
+    Blip* key_nav_blip{nullptr};
 
     LabelStyle tab_style{"tab-label", HAlign::Right, 16.f};
     LabelStyle current_tab_style{"tab-label-hi", HAlign::Right, 16.f, true};

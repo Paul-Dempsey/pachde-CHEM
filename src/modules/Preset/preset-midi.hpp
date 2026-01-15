@@ -25,19 +25,13 @@ struct INavigateList {
     virtual void nav_absolute(uint16_t offset) = 0;
 };
 
-enum PresetAction {
+enum KeyAction {
     KeySelect, // send current preset note on
     KeyPage,   // prev/next/index sets page
     KeyIndex,  // prev/next/index sets index
     KeyPrev,   // decrement page/index
     KeyNext,   // increment page/index
     KeyFirst,  // absolute index
-    // CcSelect,  // send current preset cc > 0 (127)
-    // CcPage,
-    // CcIndex,
-    // CcPrev,
-    // CcNext,
-    // CcFirst,
     Size
 };
 
@@ -52,22 +46,18 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
     MidiInput midi_in;
     MidiLog* midi_log{nullptr};
 
-    uint8_t channel{UndefinedCode}; // 0xFF == any
-    uint8_t code[PresetAction::Size]{
+    // keys config
+    bool key_mute{false};
+    bool key_paging{false};
+    uint8_t key_channel{UndefinedCode}; // 0xFF == any
+    uint8_t key_code[KeyAction::Size] {
         UndefinedCode, // KeySelect
         UndefinedCode, // KeyPage
         UndefinedCode, // KeyIndex
         UndefinedCode, // KeyPrev
         UndefinedCode, // KeyNext
         UndefinedCode, // KeyFirst
-        // UndefinedCode,
-        // UndefinedCode,
-        // UndefinedCode,
-        // UndefinedCode,
-        // UndefinedCode,
-        // UndefinedCode
     };
-    bool page_mode{false};
 
     LearnMode learn{LearnMode::Off};
     ILearner* student{nullptr};
@@ -81,21 +71,25 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
     json_t* toJson();
 
     std::string connection_name();
+    bool some_configuration();
     bool is_valid_configuration();
+    void reset_keyboard();
+    void mute_keys(bool mute) { key_mute = mute; }
+    bool key_muted() { return key_mute; }
     void set_student(ILearner* client);
     void start_learning(LearnMode what);
     void stop_learning();
     void enable_logging(bool logging);
     bool is_logging();
     bool is_connected() { return midi_device.connected(); }
-    void do_keyboard_cursor(PackedMidiMessage msg);
-    void do_keyboard_range(PackedMidiMessage msg);
     void learn_keyboard(PackedMidiMessage msg);
+    void learn_cc(PackedMidiMessage msg);
 
     void process(float sampleTime);
 
     // IMidiDeviceHolder
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
+    void do_key(PackedMidiMessage msg);
     void do_message(PackedMidiMessage msg) override;
 };

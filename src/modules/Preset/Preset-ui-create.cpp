@@ -129,10 +129,15 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(nav);
 
+    addChild(Center(createThemedParamButton<DotParamButton>(bounds["k:nav-mute"].getCenter(), &module_svgs, my_module, PresetModule::P_MUTE_KEY_NAV)));
     addChild(Center(createThemedParamButton<DotParamButton>(bounds["k:nav-sel"].getCenter(), &module_svgs, my_module, PresetModule::P_SELECT)));
+    Rect r = bounds["k:nav-blip"];
+    key_nav_blip = createBlipCentered(r.getCenter(), "", COLOR_NONE);
+    key_nav_blip->set_radius(r.getWidth() * .5f);
+    addChild(key_nav_blip);
 
     auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
-    picker->describe("Preset Midi controller");
+    picker->describe("Midi Navigation");
     if (my_module) {
         picker->setDeviceHolder(&my_module->preset_midi.midi_device);
         picker->set_configure_handler( [=](){ configure_midi(); });

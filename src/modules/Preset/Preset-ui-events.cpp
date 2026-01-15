@@ -205,6 +205,7 @@ void PresetUi::step() {
         }
     }
 
+
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available()) {
         set_tab(active_tab_id, true);
@@ -219,6 +220,23 @@ void PresetUi::step() {
         if ((index != -1) && (index != nav)) {
             set_current_index(nav);
             scroll_to_page_of_index(tab.current_index);
+        }
+
+        // key nav indicator
+        if (my_module->preset_midi.key_muted()) {
+            key_nav_blip->set_light_color(red_light);
+            key_nav_blip->set_brightness(1.f);
+            key_nav_blip->describe("MIDI Keyboard nav: muted");
+        }
+        else if (my_module->preset_midi.some_configuration()) {
+            bool ok = my_module->preset_midi.is_valid_configuration();
+            key_nav_blip->set_light_color(ok ? green_light : yellow_light);
+            key_nav_blip->describe(ok ? "MIDI Keyboard nav: enabled": "Keyboard nav: bad configuration");
+            key_nav_blip->set_brightness(1.f);
+        } else {
+            key_nav_blip->set_brightness(0.f);
+            key_nav_blip->set_light_color(no_light);
+            key_nav_blip->describe("MIDI Keyboard nav: not configured");
         }
     }
 }

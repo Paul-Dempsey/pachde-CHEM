@@ -7,6 +7,7 @@ PresetModule::PresetModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     snap(configParam(P_NAV, 0, 1000, 0, "Navigate presets", ""));
+    configSwitch(P_MUTE_KEY_NAV, 0.f, 1.f, 0.f, "Mute Keyboard nav", {"unmuted", "muted"});
     configButton(P_SELECT, "Select preset");
     preset_midi.init(this);
 }
@@ -214,6 +215,7 @@ void PresetModule::process(const ProcessArgs &args)
         }
     }
     if (((args.frame + id) % 80) == 0) {
+        preset_midi.mute_keys(getParamInt(getParam(P_MUTE_KEY_NAV)));
 
         if (!search_query.empty() || any_filter(filters())) {
             getLight(L_FILTER).setBrightness(1.f);
