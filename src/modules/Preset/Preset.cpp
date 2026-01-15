@@ -7,7 +7,7 @@ PresetModule::PresetModule() :
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     snap(configParam(P_NAV, 0, 1000, 0, "Navigate presets", ""));
-
+    configButton(P_SELECT, "Select preset");
     preset_midi.init(this);
 }
 
@@ -206,7 +206,15 @@ void PresetModule::onRandomize()
 void PresetModule::process(const ProcessArgs &args)
 {
     ChemModule::process(args);
+
+    if (chem_ui && ui()->ready() && !chem_host->host_busy()) {
+        if (getParamInt(getParam(P_SELECT))) {
+            ui()->send_preset(get_nav_index());
+            getParam(P_SELECT).setValue(0);
+        }
+    }
     if (((args.frame + id) % 80) == 0) {
+
         if (!search_query.empty() || any_filter(filters())) {
             getLight(L_FILTER).setBrightness(1.f);
         } else {

@@ -162,10 +162,10 @@ void PresetUi::set_live_current() {
         }
     }
 }
-
 void PresetUi::set_current_index(size_t index) {
+
     Tab& tab = active_tab();
-    tab.current_index = clamp(index, 0, tab.count());
+    tab.current_index = clamp(index, 0, std::max(ssize_t(0), ssize_t(tab.count())-1));
     set_nav_param(tab.current_index);
 }
 
@@ -256,6 +256,9 @@ void PresetUi::on_filter_change(FilterId filter, uint64_t state) {
     }
     tab.list.set_filter(filter, state);
     tab.current_index = tab.list.index_of_id(current_id.valid() ? current_id : track_id);
+    if (tab.current_index < 0) {
+        tab.current_index = 0;
+    }
     set_nav_param(tab.current_index);
     scroll_to_page_of_index(tab.current_index);
 }

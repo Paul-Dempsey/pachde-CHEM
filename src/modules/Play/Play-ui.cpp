@@ -786,8 +786,7 @@ void PlayUi::onSelectKey(const SelectKeyEvent &e) {
             return;
 
         case GLFW_KEY_ENTER:
-            if (current_index < 0) {
-            } else if (e.action != GLFW_REPEAT) {
+            if (current_index >= 0 && (e.action != GLFW_REPEAT)) {
                 current_preset = presets[current_index];
                 select_preset(current_preset->id);
             }

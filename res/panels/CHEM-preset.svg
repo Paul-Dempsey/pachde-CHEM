@@ -116,7 +116,8 @@
   <rect id="k:state" fill="#aae8" x="339" y="252" width="14" height="14"/>
   <path id="d3--div" fill="none" stroke="#8c8c8c" stroke-width="0.5" d="M334,270 h 22" />
 
-  <circle id="k:nav-knob" fill="#f22" cx="346" cy="310" r="12" />
+  <circle id="k:nav-knob" fill="#f22" cx="346" cy="308" r="12" />
+  <circle id="k:nav-sel" fill="#2ff" cx="352" cy="319" r="4" />
   <circle id="k:midi" fill="#f22" cx="346" cy="334" r="13" />
 
   <rect id="k:help" fill="#aae8" x="30" y="180" width="280" height="14"/>

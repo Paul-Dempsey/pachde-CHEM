@@ -165,3 +165,10 @@ warning = #e7e745
 xm-edit = hsl(60,.80,.75) stroke hsl(60,.80,.75) width .85
 xm-placeholder = hsl(0,0,.55) stroke hsl(0,0,.55) width .25
 x = #000
+
+co-select = #f8b10d
+co-page   = #7bf80d
+co-index  = #07dccb
+co-prev   = #3f67f5
+co-next   = #f80ddd
+co-first  = #f80d24

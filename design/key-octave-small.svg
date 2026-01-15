@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100" height="80" viewBox="0 0 100 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+<g id="white-hit-rects">
+    <rect id="fh1" x="0"    y="0" width="8.3" height="48"/>
+    <rect id="gh1" x="16.7" y="0" width="8.3" height="48"/>
+    <rect id="ah1" x="33.3" y="0" width="8.3" height="48"/>
+    <rect id="bh1" x="50"   y="0" width="8.3" height="48"/>
+    <rect id="ch1" x="58.3" y="0" width="8.3" height="48"/>
+    <rect id="dh1" x="75"   y="0" width="8.3" height="48"/>
+    <rect id="eh1" x="91.6" y="0" width="8.3" height="48"/>
+
+    <rect id="fh2" x="0"    y="48" width="14.6" height="32"/>
+    <rect id="gh2" x="14.6" y="48" width="14.6" height="32"/>
+    <rect id="ah2" x="29.1" y="48" width="14.6" height="32"/>
+    <rect id="bh2" x="43.7" y="48" width="14.6" height="32"/>
+    <rect id="ch2" x="58.3" y="48" width="14.6" height="32"/>
+    <rect id="dh2" x="72.2" y="48" width="14.6" height="32"/>
+    <rect id="eh2" x="86.1" y="48" width="14.6" height="32"/>
+</g>
+<g opacity="1" stroke-opacity="1" stroke="#000" stroke-width=".65" >
+    <path id="F"  fill="#ffffff" d="m 0,0 h 8.33 v 48 h 6.27 v 32 h -14.6 z" />
+    <rect id="Fs" fill="#000000" x="8.33" y="0" width="8.3" height="48"/>
+    <path id="G"  fill="#ffffff" d="m 14.6,48 h 2.1 v -48 h 8.3 v 48 h 4.1 v 32 h -14.5 z" />
+    <rect id="Ab" fill="#000000" x="25" y="0" width="8.3" height="48"/>
+    <path id="A"  fill="#ffffff" d="m 29.1,48 h 4.2 v -48 h 8.3 v 48 h 2.1 v 32 h -14.6 z" />
+    <rect id="Bb" fill="#000000" x="41.6" y="0" width="8.3" height="48"/>
+    <path id="B"  fill="#ffffff" d="m 43.7,48 h 6.3 v -48 h 7.9 v 80 h -14.2 z" />
+    <path id="C"  fill="#ffffff" d="m 58.3,0 h 8.3 v 48 h 5.6 v 32 h -13.9" />
+    <rect id="Cs" fill="#000000" x="66.6" y="0" width="8.3" height="48"/>
+    <path id="D"  fill="#ffffff" d="m 72.2,48 h 2.8 v -48 h 8.3 v 48 h 2.8 v 32 h -13.9 z" />
+    <rect id="Eb" fill="#000000" x="83.3" y="0" width="8.3" height="48"/>
+    <path id="E"  fill="#ffffff" d="m 86.1,48 h 5.5 v -48 h 8.3 v 80 h -13.8 z" />
+</g>
+</svg>

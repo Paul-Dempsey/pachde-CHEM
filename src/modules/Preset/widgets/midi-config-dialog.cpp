@@ -1,6 +1,7 @@
 #include "my-plugin.hpp"
 #include "../Preset.hpp"
 #include "services/colors.hpp"
+using namespace packed_color;
 #include "services/midi-note.hpp"
 #include "services/svg-query.hpp"
 #include "services/svg-theme.hpp"
@@ -15,6 +16,7 @@ using namespace svg_theme;
 #include "widgets/label.hpp"
 #include "widgets/menu-widgets.hpp"
 #include "widgets/option-widget.hpp"
+#include "widgets/keys.hpp"
 #include "midi-learn.hpp"
 
 namespace widgetry {
@@ -36,11 +38,28 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
     //std::vector<OptionWidget*> key_options;
     CheckButton* log_check{nullptr};
     TextLabel* channel_info{nullptr};
+    KeyboardWidget* keys{nullptr};
+    PackedColor co_select;
+    PackedColor co_page;
+    PackedColor co_index;
+    PackedColor co_prev;
+    PackedColor co_next;
+    PackedColor co_first;
+
     ConfigPresetMidi(ModuleWidget* source, ILoadSvg* svg_loader) :
         Base(source, svg_loader)
     {}
 
     void set_midi_handler(PresetMidi* midi) { midi_handler = midi; }
+
+    void init_colors(std::shared_ptr<svg_theme::SvgTheme> svg_theme) {
+        if (!svg_theme->getFillColor(co_select, "co-select",  true)) { co_select = parseColor("#f8b10d", colors::NoColor); }
+        if (!svg_theme->getFillColor(co_page,   "co-page",    true)) { co_page   = parseColor("#7bf80d", colors::NoColor); }
+        if (!svg_theme->getFillColor(co_index,  "co-index",   true)) { co_index  = parseColor("#07dccb", colors::NoColor); }
+        if (!svg_theme->getFillColor(co_prev,   "co-prev",    true)) { co_prev   = parseColor("#3f67f5", colors::NoColor); }
+        if (!svg_theme->getFillColor(co_next,   "co-next",    true)) { co_next   = parseColor("#f80ddd", colors::NoColor); }
+        if (!svg_theme->getFillColor(co_first,  "co-first",   true)) { co_first  = parseColor("#f80d24", colors::NoColor); }
+    }
 
     void create_ui(std::shared_ptr<svg_theme::SvgTheme> svg_theme) {
         auto layout = Base::get_svg();
@@ -48,6 +67,7 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         styles.note.key = "dlg-label";
         styles.info.halign = HAlign::Right;
         styles.initStyles(svg_theme);
+        init_colors(svg_theme);
         ::svg_query::BoundsIndex bounds;
         svg_query::addBounds(layout, "k:", bounds, true);
 
@@ -87,7 +107,12 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         MidiLearner* learn_index = new MidiLearner(bounds["k:kindex-nn"], LearnMode::Note, PresetAction::KeyIndex, midi_handler);
         addChild(learn_index);
 
-        addChild(createLabel(bounds["k:kcursor-label"], "Cursor", &styles.head));
+        keys = new KeyboardWidget(bounds["k:keys"]);
+        // Consider: clicking assigned key un-assigns it
+        // keys->set_handler([=](eNote note){
+        //     keys->set_color(note, packed_color::opaque(random::u32()));
+        // });
+        addChild(keys);
 
         addChild(createLabel(bounds["k:kprev-label"], "Prev", &styles.right));
         MidiLearner* learn_prev = new MidiLearner(bounds["k:kprev-nn"], LearnMode::Note, PresetAction::KeyPrev, midi_handler);
@@ -97,9 +122,8 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         MidiLearner* learn_next = new MidiLearner(bounds["k:knext-nn"], LearnMode::Note, PresetAction::KeyNext, midi_handler);
         addChild(learn_next);
 
-        addChild(createLabel(bounds["k:krange-label"], "Range", &styles.head));
-        addChild(createLabel(bounds["k:kstart-label"], "First", &styles.right));
-        MidiLearner* learn_start = new MidiLearner(bounds["k:kstart-nn"], LearnMode::Note, PresetAction::KeyFirst, midi_handler);
+        addChild(createLabel(bounds["k:kfirst-label"], "First", &styles.right));
+        MidiLearner* learn_start = new MidiLearner(bounds["k:kfirst-nn"], LearnMode::Note, PresetAction::KeyFirst, midi_handler);
         addChild(learn_start);
 
         // tab order
@@ -120,6 +144,7 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         log_check = createThemedButton<CheckButton>(bounds["k:log"].pos, &my_svgs);
         log_check->set_sticky(true);
         log_check->latched = midi_handler->is_logging();
+        log_check->sync_frame();
         log_check->setHandler([=](bool, bool){
             midi_handler->enable_logging(!midi_handler->is_logging());
         });
@@ -130,11 +155,39 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
 
     void step() override {
         Base::step();
+
         log_check->latched = midi_handler->is_logging();
+        log_check->sync_frame();
         channel_info->set_text(0xFF == midi_handler->channel ? "[any]" : format_string("%d", midi_handler->channel));
         valid_blip->set_light_color(fromPacked(midi_handler->is_valid_configuration() ? colors::PortGreen : colors::Red));
         valid_blip->set_brightness(1.f);
         learn_blip->set_brightness(midi_handler->student ? 1.f : 0.f);
+
+        PackedColor nc[12];
+        for (int i = 0; i < 12; i++) {
+            nc[i] = whole_note(i) ? colors::White : colors::Black;
+        }
+        if (UndefinedCode != midi_handler->code[KeySelect]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeySelect])] = co_select;
+        }
+        if (UndefinedCode != midi_handler->code[KeyPage]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeyPage])] = co_page;
+        }
+        if (UndefinedCode != midi_handler->code[KeyIndex]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeyIndex])] = co_index;
+        }
+        if (UndefinedCode != midi_handler->code[KeyPrev]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeyPrev])] = co_prev;
+        }
+        if (UndefinedCode != midi_handler->code[KeyNext]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeyNext])] = co_next;
+        }
+        if (UndefinedCode != midi_handler->code[KeyFirst]) {
+            nc[eNoteFromNoteNumber(midi_handler->code[KeyFirst])] = co_first;
+        }
+        for (int i = 0; i < 12; i++) {
+            keys->set_color(static_cast<eNote>(i), nc[i]);
+        }
     }
 };
 

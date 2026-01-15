@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="144" height="150" viewBox="0 0 144 150" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+
+<g transform="translate(0,0)" stroke-opacity="1" stroke="#000" stroke-width="1" >
+    <path id="F" fill="#fff" d="M0,0 h12 v90 h9 v60 h-21 z" />
+    <rect id="Fs" fill="#000" x="12" y="" width="12" height="90" />
+    <path id="G" fill="#fff" d="M21,90 h3 v-90 h12 v90 h6 v60 h-21 z" />
+    <rect id="Ab" fill="#00" x="36" y="" width="12" height="90" />
+    <path id="A" fill="#fff" d="M42,90 h6 v-90 h12 v90 h3 v60 h-21 z" />
+    <rect id="Bb" fill="#000" x="60" y="" width="12" height="90" />
+    <path id="B" fill="#fff" d="M63,90 h9 v-90 h11.5 v150 h-20.5 z" />
+
+    <path id="C" fill="#fff" d="M84,0 h12 v90 h8 v60 h-20" z/>
+    <rect id="Cs" fill="#000" x="96" y="" width="12" height="90" />
+    <path id="D" fill="#fff" d="M104,90 h4 v-90 h12 v90 h4 v60 h-20 z" />
+    <rect id="Eb" fill="#000" x="120" y="" width="12" height="90" />
+    <path id="E" fill="#fff" d="M124,90 h8 v-90 h12 v150 h-20 z" />
+
+</g>
+<g id="white-hit-rects" opacity="0" >
+    <rect id="fh1" fill="#b535b5" x="0" y="0" width="12" height="90"/>
+    <rect id="gh1" fill="#b535b5" x="24" y="0" width="12" height="90"/>
+    <rect id="ah1" fill="#b535b5" x="48" y="0" width="12" height="90"/>
+    <rect id="bh1" fill="#b535b5" x="72" y="0" width="12" height="90"/>
+    <rect id="ch1" fill="#b535b5" x="84" y="0" width="12" height="90"/>
+    <rect id="dh1" fill="#b535b5" x="108" y="0" width="12" height="90"/>
+    <rect id="eh1" fill="#b535b5" x="132" y="0" width="12" height="90"/>
+
+    <rect id="fh2" fill="#b535b5" x="0" y="90" width="21" height="60"/>
+    <rect id="gh2" fill="#b535b5" x="21" y="90" width="21" height="60"/>
+    <rect id="ah2" fill="#b535b5" x="42" y="90" width="21" height="90"/>
+    <rect id="bh2" fill="#b535b5" x="63" y="90" width="21" height="90"/>
+    <rect id="ch2" fill="#b535b5" x="84" y="90" width="20" height="90"/>
+    <rect id="dh2" fill="#b535b5" x="104" y="90" width="20" height="90"/>
+    <rect id="eh2" fill="#b535b5" x="124" y="90" width="20" height="90"/>
+</g>
+
+</svg>

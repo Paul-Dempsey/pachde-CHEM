@@ -2,8 +2,8 @@
 #include "services/svg-query.hpp"
 
 void PresetUi::set_nav_param(ssize_t index) {
-    if (my_module && index >= 0) {
-        my_module->set_nav_index(index);
+    if (my_module) {
+        my_module->set_nav_index(std::max(ssize_t(0), index));
     }
 }
 
@@ -218,7 +218,7 @@ void PresetUi::step() {
         auto nav = my_module->get_nav_index();
         if ((index != -1) && (index != nav)) {
             set_current_index(nav);
-            scroll_to_page_of_index(nav);
+            scroll_to_page_of_index(tab.current_index);
         }
     }
 }

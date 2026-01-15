@@ -38,11 +38,11 @@ inline ssize_t offset_of_index(ssize_t index) {
     return index % PAGE_CAPACITY;
 }
 
-
 struct PresetModule : ChemModule, IChemClient, INavigateList
 {
     enum Params {
         P_NAV,
+        P_SELECT,
         NUM_PARAMS
     };
     enum Inputs {

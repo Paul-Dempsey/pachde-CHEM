@@ -5,9 +5,9 @@ using namespace ::rack;
 
 namespace pachde {
 
-enum Note { C, Cs, D, Eb, E, F, Fs, G, Ab, A, Bb, B };
+enum eNote { F, Fs, G, Ab, A, Bb, B, C, Cs, D, Eb, E };
 
-inline Note fromU8(uint8_t nn) { return static_cast<Note>(nn % 12); }
+inline eNote eNoteFromNoteNumber(uint8_t nn) { return static_cast<eNote>((nn + 7) % 12); }
 
 struct MidiNote {
     uint8_t nn;
@@ -23,15 +23,15 @@ struct MidiNote {
     };
 #endif
     const char * display_note[12] = {
-        "C", "C#","D","Eb","E", "F", "F#", "G", "Ab","A", "Bb", "B"
+        "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab","A", "Bb", "B"
     };
 
     MidiNote(uint8_t nn) : nn(nn) {}
-    MidiNote(Note note, uint8_t octave) : nn(octave * 12 + uint8_t(note)) {}
+    MidiNote(eNote note, uint8_t octave) : nn(uint8_t(note) + (octave * 12)) {}
     int octave() { return nn / 12; }
-    void set_octave(uint8_t octave) { nn = octave * 12 + note(); }
-    Note note() { return fromU8(nn); }
-    const char * name() { return display_note[note()]; }
+    void set_octave(uint8_t octave) { nn = (octave * 12) + (nn % 12); }
+    eNote note() { return eNoteFromNoteNumber(nn); }
+    const char * name() { return display_note[nn % 12]; }
     std::string full_name() { return format_string("%s%d", name(), octave()); }
 
  #ifdef UNICODE_NOTE

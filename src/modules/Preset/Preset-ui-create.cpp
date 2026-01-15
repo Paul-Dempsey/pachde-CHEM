@@ -129,6 +129,8 @@ PresetUi::PresetUi(PresetModule *module) :
     });
     addChild(nav);
 
+    addChild(Center(createThemedParamButton<DotParamButton>(bounds["k:nav-sel"].getCenter(), &module_svgs, my_module, PresetModule::P_SELECT)));
+
     auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
     picker->describe("Preset Midi controller");
     if (my_module) {
