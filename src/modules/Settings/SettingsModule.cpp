@@ -8,6 +8,9 @@ using namespace pachde;
 SettingsModule::SettingsModule() :
     in_mat_poke(false)
 {
+    rounding_port.init(0, EmccPortConfig{PortKind::CC, 1, Haken::ccRoundRate, true, P_ROUND_RATE});
+    audio_in_port.init(0, EmccPortConfig{PortKind::CC, 1, Haken::ccAudIn, true, P_AUDIO_IN});
+
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
 
     std::vector<std::string> off_on{"off", "on"};
