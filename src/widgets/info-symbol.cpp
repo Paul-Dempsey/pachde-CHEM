@@ -45,6 +45,7 @@ void InfoSymbol::draw(const DrawArgs &args) {
 
     // glyph
     const NVGcolor& co = hovered ? RampGray(G_95) : plain_color;
+
     Circle(vg, 7.5, 4.5, 1., co);
 
     nvgBeginPath(vg);

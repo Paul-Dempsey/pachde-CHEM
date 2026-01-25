@@ -148,7 +148,7 @@ PlayUi::PlayUi(PlayModule *module) :
     addChild(page_label = createLabelCentered(Vec(RIGHT_MARGIN_CENTER, 35.f), "1 of 1", &page_style, 35.f));
 
     auto heart = createThemedButton<HeartButton>(Vec(ONEU, 342.f), &module_svgs, "Add to playlist");
-    heart->setHandler([this](bool c, bool s){
+    heart->set_handler([this](bool c, bool s){
         add_live();
     });
     addChild(heart);
@@ -164,7 +164,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     up_button = createWidgetCentered<UpButton>(Vec(RIGHT_MARGIN_CENTER, 52.f));
     up_button->describe("Page up");
-    up_button->setHandler([this](bool c, bool s){
+    up_button->set_handler([this](bool c, bool s){
         page_up(c, s);
     });
     up_button->applyTheme(theme);
@@ -172,7 +172,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     down_button = createWidgetCentered<DownButton>(Vec(RIGHT_MARGIN_CENTER, 67.f));
     down_button->describe("Page down");
-    down_button->setHandler([this](bool c, bool s){
+    down_button->set_handler([this](bool c, bool s){
         page_down(c, s);
     });
     down_button->applyTheme(theme);
@@ -180,13 +180,13 @@ PlayUi::PlayUi(PlayModule *module) :
 
     auto prev = createWidgetCentered<PrevButton>(Vec(RIGHT_MARGIN_CENTER - 9.5f, 98.f));
     prev->describe("Select previous preset");
-    prev->setHandler([this](bool c, bool s){ prev_preset(); });
+    prev->set_handler([this](bool c, bool s){ prev_preset(); });
     prev->applyTheme(theme);
     addChild(prev);
 
     auto next = createWidgetCentered<NextButton>(Vec(RIGHT_MARGIN_CENTER + 9.f, 98.f));
     next->describe("Select next preset");
-    next->setHandler([this](bool c, bool s){ next_preset(); });
+    next->set_handler([this](bool c, bool s){ next_preset(); });
     next->applyTheme(theme);
     addChild(next);
 
@@ -204,7 +204,7 @@ PlayUi::PlayUi(PlayModule *module) :
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y-ONEU), &module_svgs, "Core link");
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

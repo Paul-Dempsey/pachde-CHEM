@@ -1,6 +1,7 @@
 @theme = Mellow
 
 brand = #f9a54b
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 checked = #93f963ff
@@ -33,7 +34,7 @@ dlg-label = #e6e6e6
 dlg-title = #000
 dot-face-dn = [ hsl(41, .353, .6), hsl(41, .382, .2)]
 dot-face-up = [ hsl(41, .353, .65), hsl(41, .382, .3)]
-dot-ring = stroke #202020
+dot-ring = #202020 stroke none
 dytext = #f2d855ff
 e-punch = #312307 stroke none
 e-rim = [ hsl(41, 30%, 70%), hsl(41, 58%, 1%) ] stroke none

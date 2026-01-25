@@ -64,7 +64,6 @@ SOURCES += src/widgets/pic.cpp
 SOURCES += src/widgets/selector-widget.cpp
 SOURCES += src/widgets/slider-widget.cpp
 SOURCES += src/widgets/slider-h-widget.cpp
-SOURCES += src/widgets/tab-header.cpp
 SOURCES += src/widgets/text-input.cpp
 SOURCES += src/widgets/themed-widgets.cpp
 SOURCES += src/widgets/uniform-style.cpp
@@ -118,6 +117,7 @@ SOURCES += src/modules/Preset/preset-tab.cpp
 SOURCES += src/modules/Preset/preset-midi.cpp
 SOURCES += src/modules/Preset/widgets/filter-widget.cpp
 SOURCES += src/modules/Preset/widgets/midi-config-dialog.cpp
+SOURCES += src/modules/Preset/widgets/midi-learn.cpp
 SOURCES += src/modules/Preset/widgets/preset-entry.cpp
 
 SOURCES += src/modules/XM-shared/macro-data.cpp

@@ -168,7 +168,7 @@ struct PadEdit : OpaqueWidget
 
         TextButton* close = createWidget<TextButton>(Vec(box.size.x - 20.f, 5.f));
         close->set_text("x");
-        close->setHandler([=](bool, bool){ ui->edit_mode(false); });
+        close->set_handler([=](bool, bool){ ui->edit_mode(false); });
         addChild(close);
 
         y = 22.f;
@@ -198,7 +198,7 @@ struct PadEdit : OpaqueWidget
         // compile / test / clear buttons
 
         name_palette = Center(createThemedButton<Palette1Button>(Vec(CENTER - PALETTE_DX,y), &ui->module_svgs, "Text color"));
-        name_palette->setHandler([=](bool,bool) {
+        name_palette->set_handler([=](bool,bool) {
             ui::Menu* menu = createMenu();
             auto picker = new ColorPickerMenu();
             picker->set_color(ui->get_pad_text_color());
@@ -210,7 +210,7 @@ struct PadEdit : OpaqueWidget
         addChild(name_palette);
 
         pad_palette = Center(createThemedButton<Palette2Button>(Vec(CENTER + PALETTE_DX,y), &ui->module_svgs, "Pad color"));
-        pad_palette->setHandler([=](bool,bool) {
+        pad_palette->set_handler([=](bool,bool) {
             ui::Menu* menu = createMenu();
             auto picker = new ColorPickerMenu();
             picker->set_color(ui->get_pad_color());
@@ -242,19 +242,19 @@ struct PadEdit : OpaqueWidget
         float x = CENTER - 28.f;
         auto btn = Center(createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Clear"));
         btn->latched = false;
-        btn->setHandler([=](bool,bool) { clear_pad(); });
+        btn->set_handler([=](bool,bool) { clear_pad(); });
         addChild(btn);
         addChild(createLabelCentered(Vec(x,y + 8.f), "clear", &mini_label_style, 25));
 
         x = CENTER;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Compile definition to MIDI");
-        btn->setHandler([=](bool,bool){ commit(true); });
+        btn->set_handler([=](bool,bool){ commit(true); });
         addChild(Center(btn));
         addChild(createLabelCentered(Vec(x,y + 8.f), "compile", &mini_label_style, 34));
 
         x = CENTER + 28.f;
         btn = createThemedButton<SquareButton>(Vec(x,y), &ui->module_svgs, "Send MIDI (test)");
-        btn->setHandler([=](bool,bool){ send_pad(); });
+        btn->set_handler([=](bool,bool){ send_pad(); });
         addChild(Center(btn));
         addChild(createLabelCentered(Vec(x,y + 8.f), "send", &mini_label_style, 25));
 
@@ -328,7 +328,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
     edit_button = Center(createThemedButton<EditButton>(Vec(box.size.x*.5, EDIT_CY), &module_svgs, "Edit (F2)"));
     edit_button->set_sticky(true);
     if (my_module) {
-        edit_button->setHandler([=](bool c, bool s){ edit_mode(!my_module->editing); });
+        edit_button->set_handler([=](bool c, bool s){ edit_mode(!my_module->editing); });
     }
     addChild(edit_button);
 
@@ -359,7 +359,7 @@ MidiPadUi::MidiPadUi(MidiPadModule *module) :
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

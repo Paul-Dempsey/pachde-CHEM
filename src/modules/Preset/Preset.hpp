@@ -12,6 +12,11 @@
 #include "./widgets/filter-widget.hpp"
 #include "./widgets/preset-entry.hpp"
 
+// NAV_ENDLESS encoder "works", but the tooltip and value entry are wrong/not usable.
+// This could be fixed with a specialized ParamQuantity, but not seeing the value
+// The param is also less useful as an automation target.
+//#define NAV_ENDLESS
+
 using namespace pachde;
 using namespace eaganmatrix;
 struct PresetUi;
@@ -23,20 +28,6 @@ constexpr const float RCENTER = PANEL_WIDTH - S::U1;
 constexpr const int ROWS = 20;
 constexpr const int COLS = 2;
 constexpr const int PAGE_CAPACITY = ROWS * COLS;
-
-inline ssize_t index_from_paged(uint8_t page, uint8_t offset) {
-    return (page * PAGE_CAPACITY) + offset;
-}
-
-inline ssize_t page_of_index(ssize_t index) {
-    if (index < 0) return 0;
-    return index / PAGE_CAPACITY;
-}
-
-inline ssize_t offset_of_index(ssize_t index) {
-    if (index < 0) return 0;
-    return index % PAGE_CAPACITY;
-}
 
 struct PresetModule : ChemModule, IChemClient, INavigateList
 {
@@ -58,7 +49,10 @@ struct PresetModule : ChemModule, IChemClient, INavigateList
     };
 
     PresetMidi preset_midi;
-
+#ifdef NAV_ENDLESS
+    ssize_t actual_nav_index{-1};
+    float last_nav{0};
+#endif
     std::string device_claim; // Core
     std::string search_query;
     PresetTab active_tab{PresetTab::System};
@@ -87,14 +81,11 @@ struct PresetModule : ChemModule, IChemClient, INavigateList
     void clear_filters(PresetTab tab_id);
 
     // INavigateList
-    NavUnit nav_unit{NavUnit::Index};
     void nav_send() override;
-    //NavUnit nav_get_unit() override;
-    void nav_set_unit(NavUnit unit) override;
-    void nav_previous() override;
-    void nav_next() override;
-    void nav_item(uint8_t offset) override;
-    void nav_absolute(uint16_t offset) override;
+    ssize_t nav_get_index() override;
+    void nav_set_index(ssize_t index) override;
+    ssize_t nav_get_page_size() override;
+    ssize_t nav_get_size() override;
 
     // IChemClient
     rack::engine::Module* client_module() override { return this; }

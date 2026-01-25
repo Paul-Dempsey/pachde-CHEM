@@ -88,7 +88,7 @@ void PreModule::update_from_em()
 
 void PreModule::do_message(PackedMidiMessage message)
 {
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (Haken::ctlChg1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Pre) == message.bytes.tag) return;
     if (!chem_host || chem_host->host_busy()) return;
 

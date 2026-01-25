@@ -45,7 +45,7 @@ struct TButton : SvgButton
         tip_holder->setText(text);
     }
 
-    void setHandler(std::function<void(bool,bool)> callback) {
+    void set_handler(std::function<void(bool,bool)> callback) {
         handler = callback;
     }
 
@@ -202,10 +202,14 @@ TPButton * createThemedParamLightButton(math::Vec pos, ILoadSvg* loader, rack::e
 }
 
 struct SmallRoundButtonSvg {
+    static std::string up() { return "res/widgets/round-button-small-up.svg"; }
+    static std::string down() { return "res/widgets/round-button-small-down.svg"; }
+};
+
+struct MediumRoundButtonSvg {
     static std::string up() { return "res/widgets/round-push-up.svg"; }
     static std::string down() { return "res/widgets/round-push-down.svg"; }
 };
-
 struct LargeRoundButtonSvg {
     static std::string up() { return "res/widgets/round-push-lg-up.svg"; }
     static std::string down() { return "res/widgets/round-push-lg-down.svg"; }
@@ -266,25 +270,32 @@ struct NoteSvg {
     static std::string up() { return "res/widgets/note.svg"; }
     static std::string down() { return "res/widgets/note.svg"; }
 };
-using SmallRoundButton = TButton<SmallRoundButtonSvg>;
-using LargeRoundButton = TButton<LargeRoundButtonSvg>;
-using SquareButton = TButton<SquareButtonSvg>;
-using LinkButton = TButton<LinkButtonSvg>;
-using HeartButton = TButton<HeartButtonSvg>;
+struct QuestionSvg {
+    static std::string up() { return "res/widgets/question-mark.svg"; }
+    static std::string down() { return "res/widgets/question-mark.svg"; }
+};
 using CheckButton = TButton<CheckButtonSvg>;
+using ChicletButton = TButton<ChicletButtonSvg>;
 using DotButton = TButton<DotButtonSvg>;
+using EditButton = TButton<ECircleSvg>;
+using HeartButton = TButton<HeartButtonSvg>;
+using LargeRoundButton = TButton<LargeRoundButtonSvg>;
+using LinkButton = TButton<LinkButtonSvg>;
+using MediumRoundButton = TButton<MediumRoundButtonSvg>;
 using Palette1Button = TButton<Palette1ButtonSvg>;
 using Palette2Button = TButton<Palette2ButtonSvg>;
 using Palette3Button = TButton<Palette3ButtonSvg>;
-using ChicletButton = TButton<ChicletButtonSvg>;
-using EditButton = TButton<ECircleSvg>;
-using NoteParamButton = TParamButton<NoteSvg>;
+using QuestionButton = TButton<QuestionSvg>;
+using SmallRoundButton = TButton<SmallRoundButtonSvg>;
+using SquareButton = TButton<SquareButtonSvg>;
 
-using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
-using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
-using DotParamButton = TParamButton<DotButtonSvg>;
-using SurfaceDirectionParamButton = TParamButton<SurfaceDirectionButtonSvg>;
 using CheckParamButton = TParamButton<CheckButtonSvg>;
 using ChicletParamButton = TParamButton<ChicletButtonSvg>;
+using DotParamButton = TParamButton<DotButtonSvg>;
+using LargeRoundParamButton = TParamButton<LargeRoundButtonSvg>;
+using MediumRoundParamButton = TParamButton<MediumRoundButtonSvg>;
+using NoteParamButton = TParamButton<NoteSvg>;
+using SmallRoundParamButton = TParamButton<SmallRoundButtonSvg>;
+using SurfaceDirectionParamButton = TParamButton<SurfaceDirectionButtonSvg>;
 
 }

@@ -110,7 +110,7 @@ PreUi::PreUi(PreModule *module) :
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

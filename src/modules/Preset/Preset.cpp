@@ -1,12 +1,19 @@
 #include "Preset.hpp"
 #include "services/json-help.hpp"
 #include "services/rack-help.hpp"
-
 PresetModule::PresetModule() :
     preset_midi(ChemId::Preset, ChemDevice::Preset)
 {
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
+#ifdef NAV_ENDLESS
+    auto pq = configParam(P_NAV, -INFINITY, INFINITY, 0.f, "Navigate presets", "");
+    //pq->snapEnabled = true;
+    pq->smoothEnabled = false;
+    pq->smoothEnabled = false;
+    pq->randomizeEnabled = false;
+#else
     snap(configParam(P_NAV, 0, 1000, 0, "Navigate presets", ""));
+#endif
     configSwitch(P_MUTE_KEY_NAV, 0.f, 1.f, 0.f, "Mute Keyboard nav", {"unmuted", "muted"});
     configButton(P_SELECT, "Select preset");
     preset_midi.init(this);
@@ -19,11 +26,19 @@ PresetModule::~PresetModule() {
 }
 
 void PresetModule::set_nav_index(ssize_t index) {
+#ifdef NAV_ENDLESS
+    actual_nav_index = index;
+#else
     getParam(P_NAV).setValue(index);
+#endif
 }
 
 ssize_t PresetModule::get_nav_index() {
+#ifdef NAV_ENDLESS
+    return actual_nav_index;
+#else
     return getParam(P_NAV).getValue();
+#endif
 }
 
 // INavigateList
@@ -31,62 +46,18 @@ void PresetModule::nav_send() {
     if (!chem_ui) return;
     ui()->send_preset(get_nav_index());
 }
-
-//NavUnit PresetModule::nav_get_unit() { return nav_unit; }
-
-void PresetModule::nav_set_unit(NavUnit unit) { nav_unit = unit; }
-
-void PresetModule::nav_previous() {
-    switch (nav_unit) {
-    case NavUnit::Page: {
-        ssize_t current = get_nav_index();
-        ssize_t offset = offset_of_index(current);
-        ssize_t page = page_of_index(current) - 1;
-        if (page < 0) {
-            page = offset = 0;
-        }
-        set_nav_index(index_from_paged(page, offset));
-    } break;
-
-    case NavUnit::Index: {
-        set_nav_index(std::max(ssize_t(0), get_nav_index() - 1));
-    } break;
-    }
+ssize_t PresetModule::nav_get_index() {
+    return get_nav_index();
 }
-
-void PresetModule::nav_next() {
-    switch (nav_unit) {
-    case NavUnit::Page: {
-        ssize_t current = get_nav_index();
-        ssize_t page = page_of_index(current) + 1;
-        ssize_t index = index_from_paged(page, offset_of_index(current));
-        set_nav_index(index);
-    } break;
-
-    case NavUnit::Index: {
-        set_nav_index(get_nav_index() + 1);
-    } break;
-    }
-}
-
-void PresetModule::nav_item(uint8_t offset) {
-    switch (nav_unit) {
-    case NavUnit::Page: {
-        ssize_t current_offset = offset_of_index(get_nav_index());
-        ssize_t index = index_from_paged(offset, current_offset);
-        set_nav_index(index);
-    } break;
-
-    case NavUnit::Index:
-        ssize_t current = get_nav_index();
-        ssize_t index = index_from_paged(page_of_index(current), offset);
-        set_nav_index(index);
-        break;
-    }
-}
-
-void PresetModule::nav_absolute(uint16_t index) {
+void PresetModule::nav_set_index(ssize_t index) {
     set_nav_index(index);
+}
+ssize_t PresetModule::nav_get_page_size() {
+    return PAGE_CAPACITY;
+}
+ssize_t PresetModule::nav_get_size() {
+    if (!chem_ui) return 0;
+    return ui()->active_tab().count();
 }
 
 void PresetModule::dataFromJson(json_t *root)
@@ -102,7 +73,11 @@ void PresetModule::dataFromJson(json_t *root)
     search_anchor = get_json_bool(root, "search-anchored", search_anchor);
     search_incremental = get_json_bool(root, "search-incremental", search_incremental);
     active_tab = PresetTab(get_json_int(root, "tab", int(PresetTab::System)));
-
+#ifdef NAV_ENDLESS
+    actual_nav_index = get_json_int(root, "nav-index", -1);
+    getParam(P_NAV).setValue(0.f);
+    last_nav = 0.f;
+#endif
     if (keep_search_filters) {
         auto jar = json_object_get(root, "user-filters");
         if (jar) {
@@ -141,6 +116,10 @@ json_t* PresetModule::dataToJson()
     set_json(root, "search-incremental", search_incremental);
     set_json_int(root, "tab", int(active_tab));
 
+#ifdef NAV_ENDLESS
+    set_json_int(root, "nav-index", actual_nav_index);
+#endif
+
     if (keep_search_filters) {
         auto jar = json_array();
         for (int i = 0; i < 5; ++i) {
@@ -169,7 +148,7 @@ void PresetModule::clear_filters(PresetTab tab_id)
 {
     switch (tab_id) {
     case PresetTab::User: std::memset(user_filters, 0, sizeof(user_filters)); return;
-    case PresetTab::System:std::memset(system_filters, 0, sizeof(system_filters)); return;
+    case PresetTab::System: std::memset(system_filters, 0, sizeof(system_filters)); return;
     default: break;
     }
 }
@@ -214,7 +193,25 @@ void PresetModule::process(const ProcessArgs &args)
             getParam(P_SELECT).setValue(0);
         }
     }
+#ifdef NAV_ENDLESS
+    if (((args.frame + id) % 180) == 0) {
+        auto pq = getParamQuantity(P_NAV);
+        auto p = pq->getValue();
+        int n = static_cast<int>(std::abs(p - last_nav) * 1000.f);
+        if (n) {
+            if (last_nav < p) {
+                actual_nav_index += n;
+            } else if (last_nav > p) {
+                actual_nav_index -= n;
+            }
+            pq->setValue(0.f);
+            last_nav = 0.f;
+        }
+    }
+#endif
+
     if (((args.frame + id) % 80) == 0) {
+
         preset_midi.mute_keys(getParamInt(getParam(P_MUTE_KEY_NAV)));
 
         if (!search_query.empty() || any_filter(filters())) {

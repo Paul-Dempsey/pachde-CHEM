@@ -100,7 +100,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
 
     auto set_preset_button = Center(createThemedButton<ChicletButton>(Vec(15.f, 36.f), &module_svgs, "Select overlay preset"));
     if (my_module) {
-        set_preset_button->setHandler([=](bool c, bool f) {
+        set_preset_button->set_handler([=](bool c, bool f) {
             if (!chem_host) return;
             //auto haken = chem_host->host_haken();
             if (my_module->overlay_preset) {
@@ -117,7 +117,7 @@ OverlayUi::OverlayUi(OverlayModule *module) :
     link->setFill(false);
 
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

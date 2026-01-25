@@ -1,5 +1,6 @@
 @theme = Ice
 brand = #f9a54b
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -31,7 +32,7 @@ dlg-label = #e6e6e6
 dlg-title = #000
 dot-face-dn = [ hsl(200, .6, .655), hsl(200, .6, .349) ]
 dot-face-up = [ hsl(200, .7, .8), hsl(200, 58.2, .178) ]
-dot-ring = stroke #202020
+dot-ring = #202020 stroke none
 dytext = #e9e862
 e-punch = #032638 stroke none
 e-rim = [ hsl(200, 30%, 70%), hsl(200, 58%, 1%) ] stroke none

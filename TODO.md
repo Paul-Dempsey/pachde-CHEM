@@ -3,12 +3,16 @@
 ## General
 
 - MIDI-friendly control for navigating presets
-  - How to simulate endless encoder on controllers without endless encoders (like NK2)?
-- Integrated MIDI mapping across CHEM features for MIDI controllers.
+  - keyboard working
+  - consider relative mode: center rather than first for variable size steps
+  - implement cc
+  - save/load controller configurations independent of module preset
+    which includes too much info, like the connection
 
-- 10.61 HakenMidi
+- 10.6x HakenMidi
   - New Pedal assignments
-  - New ccs for Y and Z
+  - New Y and Z ccs
+  - MPE on all channels `MLegacyCh1out` -- affects WXYZ
   - check for other new/deprecated features
 
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
@@ -20,6 +24,7 @@
 
 ## Core
 
+- Revisit mpe_channels for new ability to send MPE on ch 1 `MLegacyCh1out`
 - Bug: rounding lights aren't always same as Continuum
 
 ## After release

@@ -81,8 +81,8 @@ inline bool is_note_cc(uint8_t cc)
 inline bool is_music_message(PackedMidiMessage msg)
 {
     switch (msg.bytes.status_byte) {
-    case Haken::ccStat1:
-    case Haken::ccStat2:
+    case Haken::ctlChg1:
+    case Haken::ctlChg2:
         return is_note_cc(midi_cc(msg));
 
     // no program change
@@ -91,7 +91,7 @@ inline bool is_music_message(PackedMidiMessage msg)
     case Haken::progChg16:
 
     // no ch16 cc
-    case Haken::ccStat16:
+    case Haken::ctlChg16:
         return false;
 
     default:

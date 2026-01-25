@@ -131,7 +131,7 @@ struct ConvoUi : ChemModuleWidget, IChemClient
     LabelStyle heading_style{"ctl-label-hi", HAlign::Left, 14.f, true};
     LabelStyle ir_style{"dytext", HAlign::Center, 12.f, false};
 
-    SmallRoundParamButton* extend_button;
+    MediumRoundParamButton* extend_button;
 
     int last_convo;
     float last_type;

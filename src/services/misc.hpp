@@ -51,20 +51,11 @@ public:
 
     void stop() { start_time = 0.0; }
     bool stopped() { return start_time <= 0.0; }
-    bool running() { return !stopped(); }
+    bool running() { return start_time > 0.0; }
 
     void set_interval(double interval) {
         assert(interval > 0.0);
         this->interval = interval;
-    }
-
-    // 0..1
-    float progress() {
-        if (interval <= 0.0) return 0.0f;
-        return static_cast<float>((rack::system::getTime() - start_time) / interval);
-    }
-    float elapsed() {
-        return static_cast<float>(rack::system::getTime() - start_time);
     }
 
     void run() {
@@ -78,11 +69,20 @@ public:
         run();
     }
 
+    // 0..1
+    float progress() {
+        if (interval <= 0.0) return 0.0f;
+        return static_cast<float>((rack::system::getTime() - start_time) / interval);
+    }
+    float elapsed() {
+        return static_cast<float>(rack::system::getTime() - start_time);
+    }
+
     // For one-shots: return true when interval has elapsed.
     // Call run() or start() to begin a new interval
     bool finished() { return (rack::system::getTime() - start_time) >= interval; }
 
-    // For periodic intervals: returns true once when time passes the interval and resets.
+    // For periodic intervals: returns true exactly once when time has passes the interval, and resets.
     bool lap()
     {
         auto current = rack::system::getTime();

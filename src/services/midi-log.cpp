@@ -151,7 +151,7 @@ void MidiLog::logMidi(IO_Direction dir, PackedMidiMessage m)
             bytes = format_buffer(buffer, 256, "ch%0-2d Note off %d %d\n", 1+channel, m.bytes.data1, m.bytes.data2);
         } break;
 
-        case Haken::ccStat: {
+        case Haken::ctlChg: {
             auto cc = midi_cc(m);
             switch (channel) {
                 case Haken::ch1:

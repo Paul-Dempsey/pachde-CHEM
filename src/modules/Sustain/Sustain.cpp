@@ -46,7 +46,7 @@ json_t* SusModule::dataToJson()
 void SusModule::do_message(PackedMidiMessage message)
 {
     if (!connected()) return;
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (Haken::ctlChg1 != message.bytes.status_byte) return;
     if (as_u8(chem_id) == midi_tag(message)) return;
     if (my_cc == midi_cc(message)) {
         modulation.set_em_and_param_low(P_VALUE, midi_cc_value(message), true);

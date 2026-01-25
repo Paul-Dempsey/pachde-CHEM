@@ -128,7 +128,7 @@ void FxModule::do_message(PackedMidiMessage message)
     if (!chem_host || chem_host->host_busy()) return;
 
     switch (message.bytes.status_byte) {
-    case Haken::ccStat1: {
+    case Haken::ctlChg1: {
         in_mat_poke = false;
 
         int param = -1;
@@ -163,7 +163,7 @@ void FxModule::do_message(PackedMidiMessage message)
         }
         break;
 
-    case Haken::ccStat16:
+    case Haken::ctlChg16:
         if (Haken::ccStream == midi_cc(message)) {
             in_mat_poke = Haken::s_Mat_Poke == midi_cc_value(message);
         }

@@ -188,7 +188,7 @@ void ConvoModule::do_message(PackedMidiMessage message)
     if (!chem_host) return;
     auto em = chem_host->host_matrix();
     if (!em) return;
-    if (Haken::ccStat16 == message.bytes.status_byte) {
+    if (Haken::ctlChg16 == message.bytes.status_byte) {
         bool was = in_conv_stream || in_conv_poke;
         if (Haken::ccStream == midi_cc(message)) {
             auto cc_value = midi_cc_value(message);

@@ -1,11 +1,24 @@
 #include "wxyz.hpp"
 #include "em/wrap-HakenMidi.hpp"
 
-void MusicMidiToCV::do_message(PackedMidiMessage msg) {
+void MusicMidiToCV::silence(){
+    memset(fracXYZ, 0, sizeof(fracXYZ));
+    memset(w, 0, sizeof(w));
+    memset(nn, 0, sizeof(nn));
+    memset(y, 0, sizeof(y));
+    memset(z, 0, sizeof(z));
+    memset(bend, 0, sizeof(bend));
+}
+
+void MusicMidiToCV::do_message(PackedMidiMessage msg)
+{
     uint8_t channel = midi_channel(msg);
     uint8_t status = midi_status(msg);
 
-    if (Haken::ch16 == channel) return;
+    if (mpe_channels) {
+        if ((0 == channel) || (Haken::ch16 == channel)) return;
+        channel--;
+    }
 
     switch (status) {
     case MidiStatus_NoteOn:
@@ -44,6 +57,7 @@ void MusicMidiToCV::do_message(PackedMidiMessage msg) {
     case MidiStatus_NoteOff:
         w[channel] = 0;
         if (zero_xyz) {
+            fracXYZ[channel] = 0;
             nn[channel] = 0;
             bend[channel] = 0;
             y[channel] = 0;
@@ -51,5 +65,4 @@ void MusicMidiToCV::do_message(PackedMidiMessage msg) {
         }
         break;
     }
-
 }

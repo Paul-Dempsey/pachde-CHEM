@@ -1,6 +1,7 @@
 @theme = Gray
 
 brand = #f9a54b
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -34,7 +35,7 @@ dlg-section = hsl(42, .6, .8)
 dlg-title = #000
 dot-face-dn = [ #404040, #d0d0d0 ]
 dot-face-up = [ #dfdfdf, #404040 ]
-dot-ring = stroke #202020
+dot-ring = #202020 stroke none
 dytext = #a7c7f7ff
 e-punch = #111 stroke none
 e-rim = [ #7d7d7d, #242424] stroke none

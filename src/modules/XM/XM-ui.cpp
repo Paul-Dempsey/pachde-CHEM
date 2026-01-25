@@ -295,7 +295,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
 
     TextButton* close = createWidget<TextButton>(Vec(box.size.x - 14.f, 1.5f));
     close->set_text("x");
-    close->setHandler([=](bool, bool){ ui->set_edit_mode(false); });
+    close->set_handler([=](bool, bool){ ui->set_edit_mode(false); });
     addChild(close);
 
     float x, y;
@@ -314,7 +314,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
 
     y += SMALL_ROW_DY;
     palette_fg = Center(createThemedButton<Palette1Button>(Vec(me_CENTER - PALETTE_DX, y + 6.f), &ui->module_svgs, "Text color"));
-    palette_fg->setHandler([=](bool,bool) {
+    palette_fg->set_handler([=](bool,bool) {
         ui::Menu* menu = createMenu();
         auto picker = new ColorPickerMenu();
         picker->set_color(ui->get_header_text_color());
@@ -326,7 +326,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     addChild(palette_fg);
 
     palette_bg = Center(createThemedButton<Palette2Button>(Vec(me_CENTER + PALETTE_DX, y + 6.f), &ui->module_svgs, "Background color"));
-    palette_bg->setHandler([=](bool,bool) {
+    palette_bg->set_handler([=](bool,bool) {
         ui::Menu* menu = createMenu();
         auto picker = new ColorPickerMenu();
         picker->set_color(ui->get_header_color());
@@ -375,7 +375,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     add_input_port = createWidget<PlusMinusButton>(Vec(x,y));
     add_input_port->applyTheme(theme);
     add_input_port->set_plus(!macro.cv_port);
-    add_input_port->setHandler([=](bool, bool) {
+    add_input_port->set_handler([=](bool, bool) {
         macro.cv_port = add_input_port->plus;
     });
     addChild(add_input_port);
@@ -385,7 +385,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     add_modulation = createWidget<PlusMinusButton>(Vec(x,y));
     add_modulation->applyTheme(theme);
     add_modulation->set_plus(!macro.modulation);
-    add_modulation->setHandler([=](bool, bool) {
+    add_modulation->set_handler([=](bool, bool) {
         macro.modulation = add_modulation->plus;
     });
     addChild(add_modulation);
@@ -436,7 +436,7 @@ void MacroEdit::create_ui(int knob_index, std::shared_ptr<SvgTheme> theme)
     y += ROW_DY + 8.f;
     x = LEFT_AXIS;
     auto resetButton = Center(createThemedButton<DotButton>(Vec(x,y+ 7.f), &ui->module_svgs, "Reset"));
-    resetButton->setHandler([=](bool,bool) { macro.clear(); update_from_macro(); });
+    resetButton->set_handler([=](bool,bool) { macro.clear(); update_from_macro(); });
     addChild(resetButton);
     addChild(createLabel(Vec(x + 10.f, y), "Reset", &S::control_label_left, 60));
 

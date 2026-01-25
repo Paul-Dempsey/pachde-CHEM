@@ -42,7 +42,7 @@ FxUi::FxUi(FxModule *module) :
     addChild(mix_light = createLightCentered<SmallSimpleLight<GreenLight>>(pos.plus(Vec(22.f, -9.f)), my_module, fx::L_MIX));
     applyLightTheme<SmallSimpleLight<GreenLight>>(mix_light, theme);
 
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, SmallSimpleLight<RedLight>>(
         bounds["k:effect-off"].getCenter(), &module_svgs, my_module, fx::P_DISABLE, fx::L_DISABLE)));
     addChild(createLabel(bounds["k:off-label"], "Fx Off", &S::control_label));
 
@@ -71,7 +71,7 @@ FxUi::FxUi(FxModule *module) :
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
 
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

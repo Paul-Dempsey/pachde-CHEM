@@ -50,7 +50,7 @@ void KineticUi::create_ui()
     link_button = createThemedButton<LinkButton>(Vec(1.5f, box.size.y-ONEU), theme_engine, theme, "Core link");
 
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

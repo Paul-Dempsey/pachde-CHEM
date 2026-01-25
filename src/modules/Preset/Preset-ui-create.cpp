@@ -56,7 +56,7 @@ PresetUi::PresetUi(PresetModule *module) :
     up_button = createWidgetCentered<UpButton>(bounds["k:up"].getCenter());
     up_button->describe("Page up");
     up_button->applyTheme(theme);
-    up_button->setHandler([this](bool c, bool s){
+    up_button->set_handler([this](bool c, bool s){
         page_up(c,s);
         APP->event->setSelectedWidget(this);
     });
@@ -65,7 +65,7 @@ PresetUi::PresetUi(PresetModule *module) :
     down_button = createWidgetCentered<DownButton>(bounds["k:down"].getCenter());
     down_button->describe("Page down");
     down_button->applyTheme(theme);
-    down_button->setHandler([this](bool c, bool s){
+    down_button->set_handler([this](bool c, bool s){
         page_down(c,s);
         APP->event->setSelectedWidget(this);
     });
@@ -74,7 +74,7 @@ PresetUi::PresetUi(PresetModule *module) :
     auto prev = createWidgetCentered<PrevButton>(bounds["k:prev"].getCenter());
     prev->describe("Select previous preset");
     prev->applyTheme(theme);
-    prev->setHandler([this](bool c, bool s) {
+    prev->set_handler([this](bool c, bool s) {
         previous_preset(c,s);
         APP->event->setSelectedWidget(this);
     });
@@ -83,7 +83,7 @@ PresetUi::PresetUi(PresetModule *module) :
     auto next = createWidgetCentered<NextButton>(bounds["k:next"].getCenter());
     next->describe("Select next preset");
     next->applyTheme(theme);
-    next->setHandler([this](bool c, bool s){
+    next->set_handler([this](bool c, bool s){
         next_preset(c,s);
         APP->event->setSelectedWidget(this);
     });
@@ -171,7 +171,7 @@ PresetUi::PresetUi(PresetModule *module) :
     // footer
     link_button = createThemedButton<LinkButton>(Vec(15.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

@@ -9,33 +9,50 @@ using namespace ::rack;
 using namespace pachde;
 struct PresetModule;
 
+inline ssize_t index_from_paged(uint8_t page, uint8_t offset, ssize_t page_size) {
+    return (page * page_size) + offset;
+}
+inline ssize_t page_of_index(ssize_t index, ssize_t page_size) {
+    if (index < 0) return 0;
+    return index / page_size;
+}
+inline ssize_t offset_of_index(ssize_t index, ssize_t page_size) {
+    if (index < 0) return 0;
+    return index % page_size;
+}
+
 enum LearnMode { Off, Note, Cc };
+
 struct ILearner {
-    virtual void learn_value(LearnMode mode, uint8_t value) = 0;
+    virtual void learn_value(LearnMode mode, PackedMidiMessage msg) = 0;
 };
 
 enum NavUnit { Page, Index};
+
 struct INavigateList {
     virtual void nav_send() = 0;
-    //virtual NavUnit nav_get_unit() = 0;
-    virtual void nav_set_unit(NavUnit unit) = 0;
-    virtual void nav_previous() = 0;
-    virtual void nav_next() = 0;
-    virtual void nav_item(uint8_t offset) = 0;
-    virtual void nav_absolute(uint16_t offset) = 0;
+    virtual ssize_t nav_get_index() = 0;
+    virtual void nav_set_index(ssize_t index) = 0;
+    virtual ssize_t nav_get_page_size() = 0;
+    virtual ssize_t nav_get_size() = 0; // current count of items
 };
 
 enum KeyAction {
-    KeySelect, // send current preset note on
+    KeySelect, // send current preset (note on)
     KeyPage,   // prev/next/index sets page
     KeyIndex,  // prev/next/index sets index
     KeyPrev,   // decrement page/index
     KeyNext,   // increment page/index
-    KeyFirst,  // absolute index
+    KeyFirst,  // offset from page
     Size
 };
-
-constexpr const uint8_t UndefinedCode = 0xFF;
+enum ccAction {
+    ccSelect,
+    ccPage,
+    ccIndex
+};
+constexpr const uint8_t UndefinedCode{0xFF};
+constexpr const uint8_t AnyChannel{UndefinedCode};
 
 struct PresetMidi: IDoMidi, IMidiDeviceNotify {
 
@@ -59,6 +76,18 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
         UndefinedCode, // KeyFirst
     };
 
+    // cc config
+    uint8_t cc_channel{UndefinedCode};
+    uint8_t cc_current_page{0};
+    uint8_t cc_select_value{0};
+    enum SelectMode { Trigger, Toggle, Passing };
+
+    uint8_t cc_code[3] {
+        60, // UndefinedCode, // ccSelect
+        16, // UndefinedCode, // ccPage
+        17  // UndefinedCode, // ccIndex
+    };
+
     LearnMode learn{LearnMode::Off};
     ILearner* student{nullptr};
 
@@ -71,8 +100,8 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
     json_t* toJson();
 
     std::string connection_name();
-    bool some_configuration();
-    bool is_valid_configuration();
+    bool some_key_configuration();
+    bool is_valid_key_configuration();
     void reset_keyboard();
     void mute_keys(bool mute) { key_mute = mute; }
     bool key_muted() { return key_mute; }
@@ -91,5 +120,6 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
     void onMidiDeviceChange(const MidiDeviceHolder* source) override;
 
     void do_key(PackedMidiMessage msg);
+    void do_cc(PackedMidiMessage msg);
     void do_message(PackedMidiMessage msg) override;
 };

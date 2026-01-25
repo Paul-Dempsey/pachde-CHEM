@@ -775,6 +775,7 @@ void CoreModule::dataFromJson(json_t *root) {
     enable_logging(get_json_bool(root, "log-midi", false));
     glow_knobs = get_json_bool(root, "glow-knobs", glow_knobs);
     mm_to_cv.zero_xyz = get_json_bool(root, "zero-xyz", mm_to_cv.zero_xyz);
+    mm_to_cv.set_mpe_channels(get_json_bool(root, "mpe-channels", mm_to_cv.mpe_channels));
 }
 
 json_t* CoreModule::dataToJson() {
@@ -785,6 +786,7 @@ json_t* CoreModule::dataToJson() {
     set_json(root, "log-midi", is_logging());
     set_json(root, "glow-knobs", glow_knobs);
     set_json(root, "zero-xyz", mm_to_cv.zero_xyz);
+    set_json(root, "mpe-channels", mm_to_cv.mpe_channels);
     return root;
 }
 
@@ -840,7 +842,7 @@ void CoreModule::do_message(PackedMidiMessage message) {
 
     mm_to_cv.do_message(message);
 
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (Haken::ctlChg1 != message.bytes.status_byte) return;
     if (host_busy()) return;
 
     uint8_t cc = midi_cc(message);
@@ -936,7 +938,7 @@ void CoreModule::onPortChange(const PortChangeEvent &e)
 
     if (e.connecting) {
         //++music_outs;
-        getOutput(e.portId).setChannels(16);
+        getOutput(e.portId).setChannels(mm_to_cv.mpe_channels ? 14 : 16);
     } else {
         //--music_outs;
         //assert(music_outs >= 0);
@@ -1046,6 +1048,13 @@ void CoreModule::process_gather(const ProcessArgs &args) {
     }
 }
 
+void set_channels_for_mpe(bool mpe, Output& output) {
+    int channels = mpe ? 14 : 16;
+    if (output.getChannels() != channels) {
+        output.setChannels(channels);
+    }
+}
+
 void CoreModule::process(const ProcessArgs &args) {
     //DO NOT ChemModule::process(args);
 
@@ -1079,44 +1088,53 @@ void CoreModule::process(const ProcessArgs &args) {
     controller2_midi_in.dispatch(sample_time);
     haken_midi_in.dispatch(0.f);
 
+    int n_channels = mm_to_cv.mpe_channels ? 14 : 16;
     if (getOutput(OUT_W).isConnected()) {
-        for (uint8_t channel = 0; channel < 16; channel++) {
-            getOutput(OUT_W).setVoltage(10.f * mm_to_cv.w[channel], channel);
+        Output& out = getOutput(OUT_W);
+        set_channels_for_mpe(mm_to_cv.mpe_channels, out);
+        for (uint8_t channel = 0; channel < n_channels; channel++) {
+            out.setVoltage(10.f * mm_to_cv.w[channel], channel);
         }
     }
 
     if (getOutput(OUT_X).isConnected()) {
-        for (uint8_t channel = 0; channel < 16; channel++) {
+        Output& out = getOutput(OUT_X);
+        set_channels_for_mpe(mm_to_cv.mpe_channels, out);
+        for (uint8_t channel = 0; channel < n_channels; channel++) {
             uint8_t nn = mm_to_cv.nn[channel];
             float v = nn ? ((double)nn + mm_to_cv.bend[channel] - 60.0) / 12.0 : 0.f;
-            getOutput(OUT_X).setVoltage(v, channel);
+            out.setVoltage(v, channel);
         }
     }
 
     if (getOutput(OUT_Y).isConnected()) {
+        Output& out = getOutput(OUT_Y);
+        set_channels_for_mpe(mm_to_cv.mpe_channels, out);
         if (y_slew.slewing()) {
-            for (uint8_t channel = 0; channel < 16; channel++) {
+            for (uint8_t channel = 0; channel < n_channels; channel++) {
                 float sample(unipolar_14_to_rack(mm_to_cv.y[channel]));
-                float last{getOutput(OUT_Y).getVoltage(channel)};
-                getOutput(OUT_Y).setVoltage(y_slew.next(sample, last, args.sampleTime), channel);
+                float last{out.getVoltage(channel)};
+                out.setVoltage(y_slew.next(sample, last, args.sampleTime), channel);
             }
         } else {
-            for (uint8_t channel = 0; channel < 16; channel++) {
-                getOutput(OUT_Y).setVoltage(unipolar_14_to_rack(mm_to_cv.y[channel]), channel);
+            for (uint8_t channel = 0; channel < n_channels; channel++) {
+                out.setVoltage(unipolar_14_to_rack(mm_to_cv.y[channel]), channel);
             }
         }
     }
 
     if (getOutput(OUT_Z).isConnected()) {
+        Output& out = getOutput(OUT_Z);
+        set_channels_for_mpe(mm_to_cv.mpe_channels, out);
         if (z_slew.slewing()) {
-            for (uint8_t channel = 0; channel < 16; channel++) {
+            for (uint8_t channel = 0; channel < n_channels; channel++) {
                 float sample {unipolar_14_to_rack(mm_to_cv.z[channel])};
-                float prev {getOutput(OUT_Z).getVoltage(channel)};
-                getOutput(OUT_Z).setVoltage(z_slew.next(sample, prev, args.sampleTime), channel);
+                float prev {out.getVoltage(channel)};
+                out.setVoltage(z_slew.next(sample, prev, args.sampleTime), channel);
             }
         } else {
-            for (uint8_t channel = 0; channel < 16; channel++) {
-                getOutput(OUT_Z).setVoltage(unipolar_14_to_rack(mm_to_cv.z[channel]), channel);
+            for (uint8_t channel = 0; channel < n_channels; channel++) {
+                out.setVoltage(unipolar_14_to_rack(mm_to_cv.z[channel]), channel);
             }
         }
     }

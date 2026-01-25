@@ -60,7 +60,7 @@ void MacroUsageBuilder::do_message(PackedMidiMessage msg)
     if (as_u8(ChemId::Haken) != msg.bytes.tag) return;
 
     switch (msg.bytes.status_byte) {
-    case Haken::ccStat1:
+    case Haken::ctlChg1:
         in_form_poke = false;
         form_id = 0xff;
         break;
@@ -110,7 +110,7 @@ void MacroUsageBuilder::do_message(PackedMidiMessage msg)
         }
         break;
 
-    case Haken::ccStat16:
+    case Haken::ctlChg16:
         switch (midi_cc(msg)) {
         case Haken::ccDInfo:
             switch (midi_cc_value(msg)) {

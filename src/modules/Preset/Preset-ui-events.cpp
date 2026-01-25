@@ -228,8 +228,8 @@ void PresetUi::step() {
             key_nav_blip->set_brightness(1.f);
             key_nav_blip->describe("MIDI Keyboard nav: muted");
         }
-        else if (my_module->preset_midi.some_configuration()) {
-            bool ok = my_module->preset_midi.is_valid_configuration();
+        else if (my_module->preset_midi.some_key_configuration()) {
+            bool ok = my_module->preset_midi.is_valid_key_configuration();
             key_nav_blip->set_light_color(ok ? green_light : yellow_light);
             key_nav_blip->describe(ok ? "MIDI Keyboard nav: enabled": "Keyboard nav: bad configuration");
             key_nav_blip->set_brightness(1.f);

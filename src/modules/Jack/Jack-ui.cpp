@@ -121,7 +121,7 @@ JackUi::JackUi(JackModule *module) :
     link->setFill(false);
 
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

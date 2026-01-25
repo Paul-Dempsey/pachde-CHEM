@@ -59,7 +59,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
         }
         addChild(tracks[p] = createTrackWidget(knobs[p]));
     }
-    addChild(extend_button = Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<RedLight>>(
+    addChild(extend_button = Center(createThemedParamLightButton<MediumRoundParamButton, SmallSimpleLight<RedLight>>(
         Vec(258.f, 26.f), &module_svgs, my_module, CM::P_PHASE_CANCEL, CM::L_PHASE_CANCEL)));
     addChild(createLabelCentered(Vec(258.f, 42.f), "Phase", &S::control_label, 36));
 
@@ -157,7 +157,7 @@ ConvoUi::ConvoUi(ConvoModule *module) :
 
     link_button = createThemedButton<LinkButton>(Vec(12.f, box.size.y - S::U1), &module_svgs, "Core link");
     if (my_module) {
-        link_button->setHandler([=](bool ctrl, bool shift) {
+        link_button->set_handler([=](bool ctrl, bool shift) {
             ModuleBroker::get()->addHostPickerMenu(createMenu(), my_module);
         });
     }

@@ -41,7 +41,7 @@ void ConvolutionParams::do_message(PackedMidiMessage msg)
         }
         break;
 
-    case Haken::ccStat16:
+    case Haken::ctlChg16:
         if (Haken::ccStream == midi_cc(msg)) {
             stream_counter = 0;
             auto cc_value = midi_cc_value(msg);

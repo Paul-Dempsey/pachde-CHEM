@@ -1,6 +1,7 @@
 @theme = Dark
 
 brand = #f9a54b
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -31,9 +32,9 @@ dlg-heading = #dbdbdb
 dlg-info = hsl(216, .5, .8)
 dlg-label = #e6e6e6
 dlg-title = #000
-dot-face-dn = opacity 1 [ #404040, #d0d0d0 ]
-dot-face-up = opacity 1 [ #dfdfdf, #404040 ]
-dot-ring = stroke #202020
+dot-face-dn = [ #404040, #d0d0d0 ]
+dot-face-up = [ #dfdfdf, #404040 ]
+dot-ring = #202020 stroke none
 dytext = #5d8ed7
 e-punch = #111 stroke none
 e-rim = [ #7d7d7d, #242424] stroke none

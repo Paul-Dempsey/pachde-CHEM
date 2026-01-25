@@ -236,7 +236,7 @@ void XMModule::do_message(PackedMidiMessage message)
 
     if (!overlay) { return; }
     if (!overlay->overlay_preset_connected()) { return; }
-    if (Haken::ccStat1 != message.bytes.status_byte) { return; }
+    if (Haken::ctlChg1 != message.bytes.status_byte) { return; }
     auto em = chem_host->host_matrix();
     if (!em) { return; }
 

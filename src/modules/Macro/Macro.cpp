@@ -100,7 +100,7 @@ void MacroModule::do_message(PackedMidiMessage message)
     if (em_batch.busy()) return;
     if (!chem_host || chem_host->host_busy()) return;
 
-    if (Haken::ccStat1 != message.bytes.status_byte) return;
+    if (Haken::ctlChg1 != message.bytes.status_byte) return;
     if (as_u8(ChemId::Macro) == midi_tag(message)) return;
 
     auto cc = midi_cc(message);

@@ -79,7 +79,7 @@ struct DrawButtonBase: OpaqueWidget, IThemed
         tip_holder->setText(text);
     }
 
-    void setHandler(std::function<void(bool,bool)> callback) {
+    void set_handler(std::function<void(bool,bool)> callback) {
         handler = callback;
     }
 

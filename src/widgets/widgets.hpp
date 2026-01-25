@@ -26,7 +26,7 @@
 #include "slider-widget.hpp"
 #include "spinner.hpp"
 #include "symbol-set.hpp"
-#include "tab-header.hpp"
+//#include "tab-header.hpp"
 #include "text-button.hpp"
 #include "text-input.hpp"
 #include "theme-button.hpp"

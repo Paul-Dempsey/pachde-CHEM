@@ -1,6 +1,7 @@
 @theme = High Contrast
 
 brand = #f9a54b
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #f9a54b
@@ -34,7 +35,7 @@ dlg-label = #f0f0f0
 dlg-info  = hsl(216, .5, .8)
 dot-face-dn = opacity 1 [ #404040, #d0d0d0 ]
 dot-face-up = opacity 1 [ #dfdfdf, #404040 ]
-dot-ring = stroke #202020
+dot-ring = #202020 stroke none
 dytext = #69a2f7ff
 e-punch = #000
 e-rim = [ #7d7d7d, #242424] stroke none

@@ -86,14 +86,14 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     auto prev = createWidgetCentered<PrevButton>(pos);
     if (my_module) {
         prev->describe("Select previous preset");
-        prev->setHandler([this](bool, bool){ my_module->prev_preset(); });
+        prev->set_handler([this](bool, bool){ my_module->prev_preset(); });
     }
     addChild(prev);
 
     auto next = createWidgetCentered<NextButton>(bounds["k:next"].getCenter());
     if (my_module) {
         next->describe("Select next preset");
-        next->setHandler([this](bool, bool){ my_module->next_preset(); });
+        next->set_handler([this](bool, bool){ my_module->next_preset(); });
     }
     addChild(next);
 
@@ -116,7 +116,7 @@ CoreModuleWidget::CoreModuleWidget(CoreModule *module) :
     addChild(createLabel(bounds["k:ok-label"], "OK", &S::out_port_label));
     addChild(Center(createThemedColorOutput(bounds["k:ok"].getCenter(), &module_svgs, my_module, CoreModule::OUT_READY, "ready-ring", PORT_MAGENTA)));
 
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, SmallSimpleLight<GreenLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, SmallSimpleLight<GreenLight>>(
         bounds["k:extend-slew"].getCenter(), &module_svgs, my_module, CoreModule::P_EXTEND_SLEW, CoreModule::L_EXTEND_SLEW)));
 
     addChild(createLabel(bounds["k:w-label"], "W", &S::out_port_label));
@@ -163,27 +163,27 @@ void CoreModuleWidget::createMidiPickers(::svg_query::BoundsIndex& bounds)
     text = (my_module) ? my_module->device_name(ChemDevice::Midi1) : "";
     addChild(controller1_device_label = createLabel(bounds["k:c1-device"], text, &midi_style));
 
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c1map"].getCenter(), &module_svgs, my_module, CoreModule::P_C1_CHANNEL_MAP, CoreModule::L_C1_CHANNEL_MAP)));
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c1fil"].getCenter(), &module_svgs, my_module, CoreModule::P_C1_MUSIC_FILTER, CoreModule::L_C1_MUSIC_FILTER)));
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<RedLight>>(
         bounds["k:c1off"].getCenter(), &module_svgs, my_module, CoreModule::P_C1_MUTE, CoreModule::L_C1_MUTE)));
 
     controller2_picker = createMidiPicker(bounds["k:c2"].pos, "MIDI controller #2", &my_module->controller2, &my_module->haken_device);
     text = (my_module) ? my_module->device_name(ChemDevice::Midi2) : "";
     addChild(controller2_device_label = createLabel(bounds["k:c2-device"], text, &midi_style));
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c2map"].getCenter(), &module_svgs, my_module, CoreModule::P_C2_CHANNEL_MAP, CoreModule::L_C2_CHANNEL_MAP)));
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<GreenLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<GreenLight>>(
         bounds["k:c2fil"].getCenter(), &module_svgs, my_module, CoreModule::P_C2_MUSIC_FILTER, CoreModule::L_C2_MUSIC_FILTER)));
-    addChild(Center(createThemedParamLightButton<SmallRoundParamButton, TinySimpleLight<RedLight>>(
+    addChild(Center(createThemedParamLightButton<MediumRoundParamButton, TinySimpleLight<RedLight>>(
         bounds["k:c2off"].getCenter(), &module_svgs, my_module, CoreModule::P_C2_MUTE, CoreModule::L_C2_MUTE)));
 
-    auto w = Center(createThemedButton<SmallRoundButton>(bounds["k:reset"].getCenter(), &module_svgs,
+    auto w = Center(createThemedButton<MediumRoundButton>(bounds["k:reset"].getCenter(), &module_svgs,
         "Reset MIDI\n(" RACK_MOD_CTRL_NAME "+Click to clear)"));
     if (my_module) {
-        w->setHandler([=](bool ctrl, bool) {
+        w->set_handler([=](bool ctrl, bool) {
             if (ctrl) {
                 auto broker = MidiDeviceBroker::get();
                 assert(broker);
@@ -239,7 +239,7 @@ void CoreModuleWidget::create_stop_button()
         auto layout = module_svgs.loadSvg(panelFilename());
         stop_button->box = svg_query::elementBounds(layout, "k:stop-scan");
         stop_button->set_text("stop scan");
-        stop_button->setHandler([=](bool, bool){
+        stop_button->set_handler([=](bool, bool){
             my_module->stop_scan = true;
             remove_stop_button();
             em_status_label->set_text("Preset scan stopped");
@@ -758,10 +758,18 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
         my_module->disconnected ? false : busy
     ));
 
+    menu->addChild(new MenuSeparator);
+
     menu->addChild(createCheckMenuItem("Zero XYZ on Note off", "",
         [my_module](){ return my_module->mm_to_cv.zero_xyz; },
         [my_module](){ my_module->mm_to_cv.zero_xyz = !my_module->mm_to_cv.zero_xyz; }
     ));
+    // REVIEW: new FW feature allows ch1 MPE
+    menu->addChild(createCheckMenuItem("MPE channels (2-15) only", "",
+        [my_module](){ return my_module->mm_to_cv.mpe_channels; },
+        [my_module](){ my_module->mm_to_cv.mpe_channels = !my_module->mm_to_cv.mpe_channels; }
+    ));
+    menu->addChild(createMenuItem("Silence WYXZ", "", [=](){ my_module->mm_to_cv.silence(); }));
 
     menu->addChild(new MenuSeparator);
 

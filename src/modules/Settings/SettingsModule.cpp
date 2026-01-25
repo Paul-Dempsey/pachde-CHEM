@@ -5,6 +5,8 @@
 #include "em/wrap-HakenMidi.hpp"
 using namespace pachde;
 
+#define DEFAULTROUTE (Haken::bSurfaceTrad + Haken::bSurfaceDsp + Haken::bSurfaceCvc + Haken::bMidiInTrad + Haken::bMidiInDsp + Haken::bMidiInCvc)
+
 SettingsModule::SettingsModule() :
     in_mat_poke(false)
 {
@@ -95,7 +97,7 @@ SettingsModule::SettingsModule() :
 
     configTuningParam(this, P_TUNING);
 
-    configParam(P_MIDI_ROUTING, 0.f, Haken::defaultRoute, Haken::defaultRoute, "MIDI Routing");
+    configParam(P_MIDI_ROUTING, 0.f, DEFAULTROUTE, DEFAULTROUTE, "MIDI Routing");
     configSwitch(P_MIDI_DSP,     0.f, 1.f, 1.f, "Route Midi to DSP",     off_on);
     configSwitch(P_MIDI_CVC,     0.f, 1.f, 1.f, "Route Midi to CVC",     off_on);
     configSwitch(P_MIDI_MIDI,    0.f, 1.f, 1.f, "Route Midi to MIDI",    off_on);
@@ -251,7 +253,7 @@ void SettingsModule::do_message(PackedMidiMessage message)
 
     uint8_t value;
     switch (message.bytes.status_byte) {
-    case Haken::ccStat1: {
+    case Haken::ctlChg1: {
         in_mat_poke = false;
         switch (midi_cc(message)) {
         case Haken::ccFineTune:
@@ -324,7 +326,7 @@ void SettingsModule::do_message(PackedMidiMessage message)
         }
         break;
 
-    case Haken::ccStat16:
+    case Haken::ctlChg16:
         switch (midi_cc(message)) {
         case Haken::ccStream:
             in_mat_poke = (Haken::s_Mat_Poke == midi_cc_value(message));

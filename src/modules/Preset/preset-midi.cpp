@@ -79,35 +79,41 @@ std::string PresetMidi::connection_name() {
         : "[no connection]";
 }
 
-bool PresetMidi::some_configuration() {
+inline bool defined(uint8_t code) { return UndefinedCode != code; }
+inline bool undefined(uint8_t code) { return UndefinedCode == code; }
+
+bool PresetMidi::some_key_configuration() {
     uint8_t* pc = &key_code[0];
     uint8_t* lim = pc + KeyAction::Size;
-    while ((UndefinedCode == *pc) && (pc < lim)) {
+    while (undefined(*pc) && (pc < lim)) {
         pc++;
     }
     return pc != lim;
 }
 
-bool PresetMidi::is_valid_configuration() {
-    if (UndefinedCode == key_code[KeyAction::KeySelect]) {
+bool PresetMidi::is_valid_key_configuration() {
+    if (undefined(key_code[KeyAction::KeySelect])) {
         return false;
     }
+
     if (key_code[KeyAction::KeyPrev] == key_code[KeyAction::KeyNext]) {
         return false;
     }
-    if (   (UndefinedCode == key_code[KeyAction::KeyPrev])
-        && (UndefinedCode == key_code[KeyAction::KeyNext])
-        && (UndefinedCode == key_code[KeyAction::KeyFirst])
+
+    if (   undefined(key_code[KeyAction::KeyPrev])
+        && undefined(key_code[KeyAction::KeyNext])
+        && undefined(key_code[KeyAction::KeyFirst])
     ) {
         return false;
     }
-    if (UndefinedCode != key_code[KeyAction::KeyFirst]) {
-        if (   (key_code[KeyAction::KeyFirst] == key_code[KeyAction::KeySelect])
-            || (key_code[KeyAction::KeyFirst] == key_code[KeyAction::KeyPage])
-            || (key_code[KeyAction::KeyFirst] == key_code[KeyAction::KeyIndex])
-            || (key_code[KeyAction::KeyFirst] == key_code[KeyAction::KeyPrev])
-            || (key_code[KeyAction::KeyFirst] == key_code[KeyAction::KeyNext])
-        ) return false;
+
+    auto first_code = key_code[KeyAction::KeyFirst];
+    if (defined(first_code)) {
+        for (int i = KeyAction::KeySelect; i < KeyAction::KeyFirst; i++) {
+            if (defined(key_code[i]) && (first_code <= key_code[i])) {
+                return false;
+            }
+        }
     }
 
     return true;
@@ -157,20 +163,44 @@ void PresetMidi::process(float sample_time) {
 void PresetMidi::learn_keyboard(PackedMidiMessage msg) {
     if (!student || (Haken::keyOn != midi_status(msg))) return;
 
-    const uint8_t msg_channel{midi_channel(msg)};
-    if ((UndefinedCode == key_channel) || (msg_channel == key_channel)) {
-        uint8_t note = midi_note(msg);
-        student->learn_value(learn, note);
+    if (undefined(key_channel) || (midi_channel(msg) == key_channel)) {
+        student->learn_value(learn, msg);
     }
 }
 
 void PresetMidi::learn_cc(PackedMidiMessage msg) {
+    if (!student || (Haken::ctlChg != midi_status(msg))) return;
+    if (undefined(cc_channel) || (midi_channel(msg) == cc_channel)) {
+        student->learn_value(learn, msg);
+    }
+}
+
+void do_page(INavigateList* client, ssize_t page_dx) {
+    if (0 == page_dx) return;
+    ssize_t index = client->nav_get_index();
+    ssize_t page_size = client->nav_get_page_size();
+    ssize_t page = page_of_index(index, page_size);
+    ssize_t offset = offset_of_index(index, page_size);
+    page += page_dx;
+    if (page >= 0) {
+        // if (page_dx > 0) {
+        //     ssize_t total = client->nav_get_size();
+        //     if (total <= 0) return;
+        //     auto last_page = page_of_index(total - 1);
+        //     if (page > last_page) return;
+        // }
+        index = index_from_paged(page, offset, page_size);
+        if (index < client->nav_get_size()) {
+            client->nav_set_index(index);
+        }
+    }
 }
 
 void PresetMidi::do_key(PackedMidiMessage msg) {
+    assert (client);
     assert(!key_mute);
     assert(midi_status(msg) == Haken::keyOn);
-    assert(is_valid_configuration());
+    assert(is_valid_key_configuration());
 
     uint8_t note = midi_note(msg);
     if (note == key_code[KeyAction::KeySelect]) {
@@ -180,28 +210,24 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     }
 
     if (note == key_code[KeyAction::KeyPage]) {
-        if ((note == key_code[KeyAction::KeyIndex]) || (UndefinedCode == key_code[KeyAction::KeyIndex])) {
+        if ((note == key_code[KeyAction::KeyIndex]) || undefined(key_code[KeyAction::KeyIndex])) {
             // toggling
-            if (is_logging()) midi_log->log_message("PresetMidi", "Toggle mode");
             key_paging = !key_paging;
-            client->nav_set_unit(key_paging ? NavUnit::Page : NavUnit::Index);
+            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Page" : "Toggle mode to Index");
         } else {
             if (is_logging()) midi_log->log_message("PresetMidi", "Page mode");
-            client->nav_set_unit(NavUnit::Page);
             key_paging = true;
         }
         return;
     }
 
     if (note == key_code[KeyAction::KeyIndex]) {
-        if (note == key_code[KeyAction::KeyPage]  || (UndefinedCode == key_code[KeyAction::KeyPage])) {
+        if (note == key_code[KeyAction::KeyPage] || undefined(key_code[KeyAction::KeyPage])) {
             // toggling
-            if (is_logging()) midi_log->log_message("PresetMidi", "Toggle mode");
             key_paging = !key_paging;
-            client->nav_set_unit(key_paging ? NavUnit::Page : NavUnit::Index);
+            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Ppage" : "Toggle mode to Index");
         } else {
             if (is_logging()) midi_log->log_message("PresetMidi", "Index mode");
-            client->nav_set_unit(NavUnit::Index);
             key_paging = false;
         }
         return;
@@ -209,21 +235,78 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
 
     if (note == key_code[KeyAction::KeyPrev]) {
         if (is_logging()) midi_log->log_message("PresetMidi", "Prev");
-        client->nav_previous();
+        ssize_t index = client->nav_get_index();
+        if (key_paging) {
+            do_page(client, -1);
+        }
+        else if (--index >= 0) {
+            client->nav_set_index(index);
+        }
         return;
     }
 
     if (note == key_code[KeyAction::KeyNext]) {
         if (is_logging()) midi_log->log_message("PresetMidi", "Next");
-        client->nav_next();
+        ssize_t index = client->nav_get_index();
+        if (key_paging) {
+            do_page(client, 1);
+        } else {
+            index++;
+            if (index < client->nav_get_size()) {
+                client->nav_set_index(index);
+            }
+        }
         return;
     }
 
-    if ((UndefinedCode != key_code[KeyAction::KeyFirst])
-        && (note >= key_code[KeyAction::KeyFirst])
-    ) {
-        if (is_logging()) midi_log->log_message("PresetMidi", format_string("Index %d", note - key_code[KeyAction::KeyFirst]));
-        client->nav_item(note - key_code[KeyAction::KeyFirst]);
+    auto first_code = key_code[KeyAction::KeyFirst];
+    if (defined(first_code) && (note >= first_code)) {
+        ssize_t increment = note - first_code;
+        if (is_logging()) midi_log->log_message("PresetMidi", format_string("Index %d", increment));
+        if (key_paging) {
+            do_page(client, increment);
+        } else {
+            ssize_t page_size = client->nav_get_page_size();
+            ssize_t index = client->nav_get_index();
+            ssize_t page = page_of_index(index, page_size);
+            index = std::min(index_from_paged(page, increment, page_size), client->nav_get_size()-1);
+            client->nav_set_index(index);
+        }
+    }
+}
+
+void PresetMidi::do_cc(PackedMidiMessage msg)
+{
+    assert (client);
+    const uint8_t cc = midi_cc(msg);
+    if ((cc == cc_code[ccAction::ccSelect]) && (0 != midi_cc_value(msg))) {
+        client->nav_send();
+    }
+    else if (cc == cc_code[ccAction::ccPage]) {
+        ssize_t total = client->nav_get_size();
+        if (total <= 0) return;
+        ssize_t page_size = client->nav_get_page_size();
+        ssize_t max_page = total/page_size;
+        if (max_page) {
+            ssize_t increment = 127/(1 + max_page);
+            cc_current_page = std::min(static_cast<ssize_t>(midi_cc_value(msg)/increment), max_page);
+        } else {
+            cc_current_page = 0;
+        }
+        ssize_t index = client->nav_get_index();
+        ssize_t offset = offset_of_index(index, page_size);
+        index = index_from_paged(cc_current_page, offset, page_size);
+        index = clamp(index, 0, total - 1);
+        client->nav_set_index(index);
+    }
+    else if (cc == cc_code[ccAction::ccIndex]) {
+        ssize_t total = client->nav_get_size();
+        if (total <= 0) return;
+        ssize_t page_size = client->nav_get_page_size();
+        ssize_t offset = std::min(static_cast<ssize_t>(midi_cc_value(msg))/3, page_size-1);
+        ssize_t index = index_from_paged(cc_current_page, offset, page_size);
+        index = clamp(index, 0, total - 1);
+        client->nav_set_index(index);
     }
 }
 
@@ -232,11 +315,20 @@ void PresetMidi::do_message(PackedMidiMessage msg)
     if (!client) return;
     switch (learn) {
     case LearnMode::Off: {
-        if (key_mute) return;
-        if (!((UndefinedCode == key_channel) || (midi_channel(msg) == key_channel))) return;
-        if (midi_status(msg) != Haken::keyOn) return;
-        if (!is_valid_configuration()) return;
-        do_key(msg);
+        if (!key_mute) {
+            if ((midi_status(msg) == Haken::keyOn)
+                && ((AnyChannel == key_channel) || (midi_channel(msg) == key_channel))
+                && is_valid_key_configuration()
+            ) {
+                do_key(msg);
+                return;
+            }
+        }
+        if ((midi_status(msg) == Haken::ctlChg)
+            && ((AnyChannel == cc_channel) || (midi_channel(msg) == cc_channel))
+        ) {
+            do_cc(msg);
+        }
     } break;
 
     case LearnMode::Note:

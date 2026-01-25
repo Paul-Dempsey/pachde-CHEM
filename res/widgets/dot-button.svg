@@ -11,7 +11,7 @@
     </linearGradient>
   </defs>
   <g>
-    <circle id="dot-ring" fill="none" stroke="#202020" stroke-width=".25" cx="4" cy="4" r="3.25" />
-    <circle id="dot-face-up" fill="url(#gface)" stroke-width=".25" cx="4" cy="4" r="3.15" />
+    <circle id="dot-ring" fill="202020" cx="4" cy="4" r="3.5" />
+    <circle id="dot-face-up" fill="url(#gface)" stroke-width=".25" cx="4" cy="4" r="3.25" />
   </g>
 </svg>

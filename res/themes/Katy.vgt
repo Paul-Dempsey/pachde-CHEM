@@ -1,5 +1,6 @@
 @theme = Katy
 brand = #810047
+blank = #363b54
 c1-in = #e744be
 c2-in = #e744be
 CHEM = #810047
@@ -32,7 +33,7 @@ dlg-label = #0d0d0d
 dlg-title = #000
 dot-face-dn = [ hsl(327, .85, .38), hsl(327, .85, .75)]
 dot-face-up = [ hsl(327, .85, .85), hsl(327, .85, .425)]
-dot-ring = stroke #810047
+dot-ring = #810047 stroke none
 dytext = #052d68
 e-punch = hsl(327, .535, .48) stroke none
 e-rim = [ hsl(327, 30%, 70%), hsl(327, 58%, 1%) ] stroke none
