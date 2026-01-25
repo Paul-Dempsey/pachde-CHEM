@@ -21,13 +21,19 @@ inline ssize_t offset_of_index(ssize_t index, ssize_t page_size) {
     return index % page_size;
 }
 
+constexpr const uint8_t UndefinedCode{0xFF};
+constexpr const uint8_t AnyChannel{UndefinedCode};
+inline bool defined(uint8_t code) { return UndefinedCode != code; }
+inline bool undefined(uint8_t code) { return UndefinedCode == code; }
+
 enum LearnMode { Off, Note, Cc };
+enum class ControllerType { Unknown, Toggle, Momentary, Continuous, Endless };
+const char * controller_type_name(ControllerType ct);
+ControllerType parse(const char * text);
 
 struct ILearner {
     virtual void learn_value(LearnMode mode, PackedMidiMessage msg) = 0;
 };
-
-enum NavUnit { Page, Index};
 
 struct INavigateList {
     virtual void nav_send() = 0;
@@ -46,13 +52,37 @@ enum KeyAction {
     KeyFirst,  // offset from page
     Size
 };
-enum ccAction {
-    ccSelect,
-    ccPage,
-    ccIndex
+enum class ccAction {
+    Unknown,
+    Select,
+    Page,
+    Index
+    // ToggleMode,
+    // PageMode,
+    // IndexMode,
+    // Prev,
+    // Next
 };
-constexpr const uint8_t UndefinedCode{0xFF};
-constexpr const uint8_t AnyChannel{UndefinedCode};
+
+struct CcControl {
+    uint8_t cc{UndefinedCode};
+    uint8_t last_value{UndefinedCode};
+    uint8_t base_value{UndefinedCode};
+    ccAction role{ccAction::Unknown};
+    ControllerType kind{ControllerType::Unknown};
+
+    void init(const CcControl& source) {
+        cc         = source.cc;
+        last_value = source.last_value;
+        base_value = source.base_value;
+        role       = source.role;
+        kind       = source.kind;
+    }
+    void fromJson(json_t* root);
+    json_t* to_json() const;
+
+    void clear();
+};
 
 struct PresetMidi: IDoMidi, IMidiDeviceNotify {
 
@@ -78,16 +108,10 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
 
     // cc config
     uint8_t cc_channel{UndefinedCode};
-    uint8_t cc_current_page{0};
-    uint8_t cc_select_value{0};
-    enum SelectMode { Trigger, Toggle, Passing };
+    uint8_t cc_current_page{UndefinedCode};
+    std::vector<CcControl> cc_control;
 
-    uint8_t cc_code[3] {
-        60, // UndefinedCode, // ccSelect
-        16, // UndefinedCode, // ccPage
-        17  // UndefinedCode, // ccIndex
-    };
-
+    // learning
     LearnMode learn{LearnMode::Off};
     ILearner* student{nullptr};
 

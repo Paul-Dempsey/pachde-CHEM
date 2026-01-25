@@ -3,6 +3,57 @@
 #include "em/wrap-HakenMidi.hpp"
 #include "services/json-help.hpp"
 
+const char * controller_type_name(ControllerType ct) {
+    switch (ct) {
+    default:
+    case ControllerType::Unknown:    return "";
+    case ControllerType::Toggle:     return "Toggle";
+    case ControllerType::Momentary:  return "Momentary";
+    case ControllerType::Continuous: return "Continuous";
+    case ControllerType::Endless:    return "Endless";
+    }
+}
+
+ControllerType parse(const char * text) {
+    if (!text || !*text) return ControllerType::Unknown;
+    switch (*text) {
+    case 'T': case 't': return ControllerType::Toggle;
+    case 'M': case 'm': return ControllerType::Momentary;
+    case 'F': case 'f':
+    case 'C': case 'c': return ControllerType::Continuous;
+    case 'R': case 'r':
+    case 'E': case 'e': return ControllerType::Endless ;
+    default: return ControllerType::Unknown;
+    }
+}
+
+void CcControl::fromJson(json_t *root) {
+    role = static_cast<ccAction>(get_json_int(root, "role", 0));
+    kind = static_cast<ControllerType>(get_json_int(root, "kind", 0));
+    cc = get_json_int(root, "cc", UndefinedCode);
+    base_value = get_json_int(root, "base", UndefinedCode);
+}
+
+json_t *CcControl::to_json() const {
+    json_t* j = json_object();
+    set_json_int(j, "role", static_cast<int>(role));
+    set_json_int(j, "kind", static_cast<int>(kind));
+    set_json_int(j, "cc", cc);
+    set_json_int(j, "base", cc);
+    return j;
+}
+
+void CcControl::clear()
+{
+    cc = last_value = base_value = UndefinedCode;
+    role = ccAction::Unknown;
+    kind = ControllerType::Unknown;
+}
+
+//
+// PresetMidi
+//
+
 PresetMidi::~PresetMidi() {
     midi_in.clear();
     auto broker = MidiDeviceBroker::get();
@@ -29,12 +80,28 @@ void PresetMidi::fromJson(json_t *root) {
     midi_device_claim = get_json_string(root, "midi-device");
     midi_device.set_claim(midi_device_claim);
     enable_logging(get_json_bool(root, "midi-log", is_logging()));
+    // key
+    key_channel = get_json_int(root, "key-channel", key_channel);
     key_code[KeyAction::KeySelect] = get_json_int(root, "key-select", key_code[KeyAction::KeySelect]);
     key_code[KeyAction::KeyPage]   = get_json_int(root, "key-page",   key_code[KeyAction::KeyPage]);
     key_code[KeyAction::KeyIndex]  = get_json_int(root, "key-index",  key_code[KeyAction::KeyIndex]);
     key_code[KeyAction::KeyPrev]   = get_json_int(root, "key-prev",   key_code[KeyAction::KeyPrev]);
     key_code[KeyAction::KeyNext]   = get_json_int(root, "key-next",   key_code[KeyAction::KeyNext]);
     key_code[KeyAction::KeyFirst]  = get_json_int(root, "key-first",  key_code[KeyAction::KeyFirst]);
+    // cc
+    cc_channel = get_json_int(root, "cc-channel", cc_channel);
+    auto jar = json_object_get(root, "cc_nav");
+    if (jar) {
+        CcControl ctl;
+        json_t* ji;
+        size_t index;
+        json_array_foreach(jar, index, ji) {
+            ctl.fromJson(ji);
+            if (ctl.role != ccAction::Unknown) {
+                cc_control.push_back(ctl);
+            }
+        }
+    }
 }
 
 json_t *PresetMidi::toJson()
@@ -42,12 +109,26 @@ json_t *PresetMidi::toJson()
     json_t* root = json_object();
     set_json(root, "midi-device", midi_device_claim);
     set_json(root, "midi-log", is_logging());
+    // key
+    set_json_int(root, "key-channel", key_channel);
     set_json_int(root, "key-select", key_code[KeyAction::KeySelect]);
     set_json_int(root, "key-page",   key_code[KeyAction::KeyPage]);
     set_json_int(root, "key-index",  key_code[KeyAction::KeyIndex]);
     set_json_int(root, "key-prev",   key_code[KeyAction::KeyPrev]);
     set_json_int(root, "key-next",   key_code[KeyAction::KeyNext]);
     set_json_int(root, "key-first",  key_code[KeyAction::KeyFirst]);
+
+    // cc
+    set_json_int(root, "cc-channel", cc_channel);
+    if (!cc_control.empty()) {
+        auto jar = json_array();
+        for (const CcControl& ctl: cc_control) {
+            if (ctl.role != ccAction::Unknown) {
+                json_array_append_new(jar, ctl.to_json());
+            }
+        }
+        json_object_set_new(root, "cc_nav", jar);
+    }
     return root;
 }
 
@@ -78,9 +159,6 @@ std::string PresetMidi::connection_name() {
         ? midi_device.connection->info.friendly(NameFormat::Short)
         : "[no connection]";
 }
-
-inline bool defined(uint8_t code) { return UndefinedCode != code; }
-inline bool undefined(uint8_t code) { return UndefinedCode == code; }
 
 bool PresetMidi::some_key_configuration() {
     uint8_t* pc = &key_code[0];
@@ -279,34 +357,69 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
 {
     assert (client);
     const uint8_t cc = midi_cc(msg);
-    if ((cc == cc_code[ccAction::ccSelect]) && (0 != midi_cc_value(msg))) {
-        client->nav_send();
-    }
-    else if (cc == cc_code[ccAction::ccPage]) {
-        ssize_t total = client->nav_get_size();
-        if (total <= 0) return;
-        ssize_t page_size = client->nav_get_page_size();
-        ssize_t max_page = total/page_size;
-        if (max_page) {
-            ssize_t increment = 127/(1 + max_page);
-            cc_current_page = std::min(static_cast<ssize_t>(midi_cc_value(msg)/increment), max_page);
-        } else {
-            cc_current_page = 0;
+    auto it = std::find_if(cc_control.begin(), cc_control.end(), [cc](CcControl& ctl){
+        return ctl.cc == cc;
+    });
+    if (it != cc_control.end()) {
+        auto new_value = midi_cc_value(msg);
+        switch ((*it).role) {
+        case ccAction::Unknown: break;
+
+        case ccAction::Select:
+            switch ((*it).kind) {
+            case ControllerType::Unknown:
+                assert(false);
+                break;
+
+            case ControllerType::Toggle:
+                client->nav_send();
+                break;
+
+            case ControllerType::Momentary:
+                if (new_value != (*it).base_value) {
+                    client->nav_send();
+                }
+                break;
+
+            case ControllerType::Continuous:
+            case ControllerType::Endless:
+                if ((((*it).last_value < 64) && (new_value >= 64))
+                || (((*it).last_value >= 64) && (new_value < 64))) {
+                    client->nav_send();
+                }
+                break;
+            }
+            (*it).last_value = new_value;
+            break;
+
+        case ccAction::Page: {
+            ssize_t total = client->nav_get_size();
+            if (total <= 0) return;
+            ssize_t page_size = client->nav_get_page_size();
+            ssize_t max_page = total/page_size;
+            if (max_page) {
+                ssize_t increment = 127/(1 + max_page);
+                cc_current_page = std::min(static_cast<ssize_t>(midi_cc_value(msg)/increment), max_page);
+            } else {
+                cc_current_page = 0;
+            }
+            ssize_t index = client->nav_get_index();
+            ssize_t offset = offset_of_index(index, page_size);
+            index = index_from_paged(cc_current_page, offset, page_size);
+            index = clamp(index, 0, total - 1);
+            client->nav_set_index(index);
+        } break;
+
+        case ccAction::Index:{
+            ssize_t total = client->nav_get_size();
+            if (total <= 0) return;
+            ssize_t page_size = client->nav_get_page_size();
+            ssize_t offset = std::min(static_cast<ssize_t>(midi_cc_value(msg))/3, page_size-1);
+            ssize_t index = index_from_paged(cc_current_page, offset, page_size);
+            index = clamp(index, 0, total - 1);
+            client->nav_set_index(index);
+        } break;
         }
-        ssize_t index = client->nav_get_index();
-        ssize_t offset = offset_of_index(index, page_size);
-        index = index_from_paged(cc_current_page, offset, page_size);
-        index = clamp(index, 0, total - 1);
-        client->nav_set_index(index);
-    }
-    else if (cc == cc_code[ccAction::ccIndex]) {
-        ssize_t total = client->nav_get_size();
-        if (total <= 0) return;
-        ssize_t page_size = client->nav_get_page_size();
-        ssize_t offset = std::min(static_cast<ssize_t>(midi_cc_value(msg))/3, page_size-1);
-        ssize_t index = index_from_paged(cc_current_page, offset, page_size);
-        index = clamp(index, 0, total - 1);
-        client->nav_set_index(index);
     }
 }
 
@@ -324,7 +437,8 @@ void PresetMidi::do_message(PackedMidiMessage msg)
                 return;
             }
         }
-        if ((midi_status(msg) == Haken::ctlChg)
+        if (!cc_control.empty()
+            && (midi_status(msg) == Haken::ctlChg)
             && ((AnyChannel == cc_channel) || (midi_channel(msg) == cc_channel))
         ) {
             do_cc(msg);
@@ -342,3 +456,4 @@ void PresetMidi::do_message(PackedMidiMessage msg)
         break;
     }
 }
+

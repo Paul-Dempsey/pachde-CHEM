@@ -39,9 +39,6 @@ struct MidiLearnerBase  : OpaqueWidget, ILearner, IThemed {
 
 };
 
-enum class ControllerType { Unknown, Toggle, Momentary, Continuous, Endless };
-const char * controller_type_name(ControllerType ct);
-
 constexpr const PackedMidiMessage INVALID_MSG{0xFFFFFFFF};
 constexpr const float LEARN_TIME{5.f};
 
@@ -86,7 +83,7 @@ struct LearnMidiNote : MidiLearnerBase {
     KeyAction role{KeyAction::KeySelect};
 
     LearnMidiNote(Rect bounds, KeyAction role, PresetMidi* pm);
-    void update_text() { value_text = (0xFF == value) ? "" : noteFullName(value); }
+    void update_text();
     void learn_value(LearnMode mode, PackedMidiMessage msg) override;
     void reset() override;
     void draw(const DrawArgs& args) override;
@@ -94,9 +91,20 @@ struct LearnMidiNote : MidiLearnerBase {
 
 struct LearnMidiCcSelect : MidiLearnerBase {
     using Base = MidiLearnerBase;
+
+    CcControl action;
+    std::string cc_text;
+    WallTimer clock;
+    int message_count{0};
+
     LearnMidiCcSelect(Rect bounds, PresetMidi* pm);
+
+    void init(const CcControl& ctl);
+    void start_listen(uint8_t code);
+    void update_text();
     void learn_value(LearnMode mode, PackedMidiMessage msg) override;
     void reset() override;
+    void step() override;
     void draw(const DrawArgs& args) override;
 };
 

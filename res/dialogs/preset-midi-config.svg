@@ -58,8 +58,10 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
     <rect id="k:cc-channel" fill="#aaa" x="88" y="0" width="12" height="12" />
     <rect id="k:cc-channel-info" fill="#bbb4" x="102" y="0" width="25" height="14" />
 
-    <rect id="k:cc-select-label" fill="#bbb4" x="0" y="20" width="40" height="12"/>
-    <text x="0" y="30" fill="#bbb" font-size="12" >Select</text>
+    <rect id="k:cc-select-label" fill="#bbb4" x="45" y="20" width="40" height="12"/>
+    <text x="45" y="30" fill="#bbb" font-size="12" >Select</text>
+    <rect id="k:cc-select" fill="none" stroke="#bbb" x="88" y="20" width="25" height="14"/>
+    <rect id="p:cc-seltype--blank" fill="#363b54" x="116" y="20" width="50" height="12"/>
 </g>
 
 <path id="div" fill="none" stroke="#888" d="M 5.5,242 h 268" />

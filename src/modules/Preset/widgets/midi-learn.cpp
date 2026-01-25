@@ -39,17 +39,6 @@ void draw_learning_frame(
     nvgStroke(vg);
 }
 
-const char * controller_type_name(ControllerType ct) {
-    switch (ct) {
-    default:
-    case ControllerType::Unknown:    return "";
-    case ControllerType::Toggle:     return "Toggle";
-    case ControllerType::Momentary:  return "Momentary";
-    case ControllerType::Continuous: return "Continuous";
-    case ControllerType::Endless:    return "Endless";
-    }
-}
-
 void MidiLearnerBase::applyTheme(std::shared_ptr<SvgTheme> theme) {
     if (!theme->getFillColor(co_normal, "learn", true)) {
         co_normal = colors::G65;
@@ -234,6 +223,10 @@ LearnMidiNote::LearnMidiNote(Rect bounds, KeyAction role, PresetMidi *pm) :
     update_text();
 }
 
+void LearnMidiNote::update_text() {
+    value_text = undefined(value) ? "" : noteFullName(value);
+}
+
 void LearnMidiNote::learn_value(LearnMode mode, PackedMidiMessage msg) {
     midi_handler->key_code[role] = value = midi_note(msg);
     update_text();
@@ -247,10 +240,7 @@ void LearnMidiNote::reset() {
 void LearnMidiNote::draw(const DrawArgs &args) {
     auto vg = args.vg;
 
-    std::string text = value_text;
-    if (!active && text.empty()) {
-        text = "unset";
-    }
+    std::string text = (!active && value_text.empty()) ? "unset" : value_text;
     if (!text.empty()) {
         draw_text_box(vg, 0, 0, box.size.x, box.size.y,
             0.f,0.f,0.f,0.f, // no margins
@@ -267,25 +257,90 @@ void LearnMidiNote::draw(const DrawArgs &args) {
 
 LearnMidiCcSelect::LearnMidiCcSelect(Rect bounds, PresetMidi *pm) {
     box = bounds;
+    mode = LearnMode::Cc;
     midi_handler = pm;
+    action.role = ccAction::Select;
+    update_text();
+}
 
+void LearnMidiCcSelect::update_text() {
+    cc_text = defined(action.cc) ? format_string("cc%d", action.cc) : "";
+}
+
+void LearnMidiCcSelect::init(const CcControl &ctl) {
+    action.init(ctl);
+    update_text();
+}
+
+void LearnMidiCcSelect::start_listen(uint8_t code)
+{
+    action.cc = code;
+    clock.start(.25f);
+    message_count = 1;
+    update_text();
 }
 
 void LearnMidiCcSelect::learn_value(LearnMode mode, PackedMidiMessage msg) {
+    assert(Haken::ctlChg == midi_status(msg));
+    auto msg_cc = midi_cc(msg);
+    action.last_value = midi_cc_value(msg);
+    if (defined(action.cc) && (msg_cc == action.cc)) {
+        message_count++;
+        return;
+    }
+    start_listen(msg_cc);
 }
 
 void LearnMidiCcSelect::reset() {
-    midi_handler->cc_code[ccAction::ccSelect] = UndefinedCode;
+    clock.stop();
+    action.clear();
+    cc_text.clear();
+    message_count = 0;
+    auto it = std::find_if(
+        midi_handler->cc_control.begin(), midi_handler->cc_control.end(),
+        [](CcControl& ctl) { return ctl.role = ccAction::Select; }
+    );
+    if (it != midi_handler->cc_control.end()) {
+        midi_handler->cc_control.erase(it);
+    }
+}
+
+void LearnMidiCcSelect::step() {
+    if (clock.running() && clock.finished()) {
+        clock.stop();
+        assert(message_count > 0);
+        if (1 == message_count) {
+            action.kind = ControllerType::Toggle;
+            action.base_value = action.last_value;
+        } else if (2 == message_count) {
+            action.kind = ControllerType::Momentary;
+            action.base_value = action.last_value;
+        } else {
+            action.kind = ControllerType::Continuous;
+            action.base_value = 64;
+        }
+        auto it = std::find_if(
+            midi_handler->cc_control.begin(), midi_handler->cc_control.end(),
+            [](CcControl& ctl) { return ctl.role = ccAction::Select; }
+        );
+        if (it != midi_handler->cc_control.end()) {
+            it->init(action);
+        } else {
+            midi_handler->cc_control.push_back(action);
+        }
+    }
 }
 
 void LearnMidiCcSelect::draw(const DrawArgs &args) {
-    //auto vg = args.vg;
-    if (active) {
-
-    } else {
-
+    auto vg = args.vg;
+    std::string text = (!active && cc_text.empty()) ? "unset" : cc_text;
+    if (!text.empty()) {
+        draw_text_box(vg, 0, 0, box.size.x, box.size.y,
+            0.f,0.f,0.f,0.f, // no margins
+            text, GetPluginFontSemiBold(), 10.f,
+            active ? co_active : co_normal, HAlign::Center, VAlign::Middle
+        );
     }
     draw_learning_frame(args, box, active, midi_handler->is_connected(), co_active, co_normal);
-
 }
 }

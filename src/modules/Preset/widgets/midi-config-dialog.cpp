@@ -66,6 +66,10 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
     LearnMidiNote* learn_prev{nullptr};
     LearnMidiNote* learn_next{nullptr};
     LearnMidiNote* learn_start{nullptr};
+
+    LearnMidiCcSelect* learn_cc_select{nullptr};
+    TextLabel* cc_select_type{nullptr};
+
     LearnMidiControlType* learn_cc{nullptr};
     ControllerType last_controller_type{ControllerType::Unknown};
     TextLabel* cctype_info{nullptr};
@@ -162,6 +166,25 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(channel_menu);
         addChild(cc_channel_info = createLabel(bounds["k:cc-channel-info"], "", &styles.info)); //0xFF == midi_handler->key_channel ? "[any]" : format_string("%d", midi_handler->key_channel), &styles.info));
 
+        addChild(createLabel(bounds["k:cc-select-label"], "Select", &styles.right));
+        addChild(learn_cc_select = new LearnMidiCcSelect(bounds["k:cc-select"], midi_handler));
+        addChild(cc_select_type = createLabel(bounds["p:cc-seltype--blank"], "", &info_center));
+
+        for (const CcControl& ctl: midi_handler->cc_control) {
+            switch (ctl.role) {
+                case ccAction::Unknown: assert(false);
+                case ccAction::Select:
+                    learn_cc_select->init(ctl);
+                    break;
+                case ccAction::Page:
+                    //TODO
+                    break;
+                case ccAction::Index:
+                    //TODO
+                    break;
+            }
+        }
+
         // Check
         info = createWidgetCentered<InfoSymbol>(bounds["k:cc-test-info"].getCenter());
         info->describe(CHECK_INFO);
@@ -179,19 +202,22 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(Center(reset_test));
 
         // tab order
-        learn_select->next_widget = learn_page;
-        learn_page->next_widget   = learn_index;
-        learn_index->next_widget  = learn_prev;
-        learn_prev->next_widget   = learn_next;
-        learn_next->next_widget   = learn_start;
-        learn_start->next_widget  = learn_select;
+        learn_select->next_widget    = learn_page;
+        learn_page->next_widget      = learn_index;
+        learn_index->next_widget     = learn_prev;
+        learn_prev->next_widget      = learn_next;
+        learn_next->next_widget      = learn_start;
+        learn_start->next_widget     = learn_cc_select;
+        learn_cc_select->next_widget = learn_select;
+
         // shift + tab order
-        learn_select->prev_widget = learn_start;
-        learn_page->prev_widget   = learn_select;
-        learn_index->prev_widget  = learn_page;
-        learn_prev->prev_widget   = learn_index;
-        learn_next->prev_widget   = learn_prev;
-        learn_start->prev_widget  = learn_next;
+        learn_select->prev_widget    = learn_cc_select;
+        learn_page->prev_widget      = learn_select;
+        learn_index->prev_widget     = learn_page;
+        learn_prev->prev_widget      = learn_index;
+        learn_next->prev_widget      = learn_prev;
+        learn_start->prev_widget     = learn_next;
+        learn_cc_select->prev_widget = learn_start;
 
         // Logging
         log_check = createThemedButton<CheckButton>(bounds["k:log"].pos, &my_svgs);
@@ -223,6 +249,12 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
 
         learn_blip->set_brightness(midi_handler->student ? 1.f : 0.f);
 
+        if (learn_cc_select->action.kind != ControllerType::Unknown) {
+            cc_select_type->set_text(controller_type_name(learn_cc_select->action.kind));
+        } else {
+            cc_select_type->set_text("");
+        }
+
         if (request_test) {
             request_test = false;
             learn_cc->reset();
@@ -235,7 +267,6 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         } else {
             cc_time->set_text("");
         }
-
         if (last_controller_type != learn_cc->controller_type) {
             last_controller_type = learn_cc->controller_type;
             cctype_info->set_text(controller_type_name(last_controller_type));
@@ -305,7 +336,7 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         if (learn_cc->msg_count) {
             auto vg = args.vg;
             auto t = format_string("%d [%c%c%c]", learn_cc->msg_count, learn_cc->ztoa ? '<':'-', learn_cc->atoz ? '>':'-', learn_cc->interior  ? 'i':'-');
-            draw_text_box(vg, 218, 170, 60, 14, 0,0,0,0, t, GetPluginFontRegular(), 10, colors::PortYellow, HAlign::Center, VAlign::Middle);
+            draw_text_box(vg, 218, 250, 60, 14, 0,0,0,0, t, GetPluginFontRegular(), 10, colors::PortYellow, HAlign::Center, VAlign::Middle);
         }
     }
 };
