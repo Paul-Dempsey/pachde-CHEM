@@ -78,6 +78,8 @@ void PresetModule::dataFromJson(json_t *root)
     getParam(P_NAV).setValue(0.f);
     last_nav = 0.f;
 #endif
+    nav_include_loopback = get_json_bool(root, "nav-loopback", nav_include_loopback);
+
     if (keep_search_filters) {
         auto jar = json_object_get(root, "user-filters");
         if (jar) {
@@ -119,6 +121,7 @@ json_t* PresetModule::dataToJson()
 #ifdef NAV_ENDLESS
     set_json_int(root, "nav-index", actual_nav_index);
 #endif
+    set_json(root, "nav-loopback", nav_include_loopback);
 
     if (keep_search_filters) {
         auto jar = json_array();

@@ -11,6 +11,7 @@ using namespace pachde;
 #include "tip-widget.hpp"
 
 namespace widgetry {
+
 struct BasicMidiPicker : TipWidget
 {
     BasicMidiPicker & operator=(const BasicMidiPicker &) = delete;
@@ -20,6 +21,7 @@ struct BasicMidiPicker : TipWidget
     widget::SvgWidget* sw{nullptr};
     MidiDeviceHolder* device{nullptr};
     std::function<void()> handle_configure{nullptr};
+    bool * include_loopback{nullptr};
 
     BasicMidiPicker() {
         fb = new widget::FramebufferWidget;
@@ -31,6 +33,7 @@ struct BasicMidiPicker : TipWidget
     void set_configure_handler(std::function<void()> handler) {
         handle_configure = handler;
     }
+    void set_loopback(bool * pb) { include_loopback = pb; }
     void setDeviceHolder(MidiDeviceHolder * holder) {
         assert(holder);
         device = holder;
@@ -58,13 +61,22 @@ struct BasicMidiPicker : TipWidget
         broker->sync();
 
         menu->addChild(createMenuLabel<HamburgerTitle>("MIDI controller"));
-        menu->addChild(createMenuItem("Reset (none)", "", [=](){ device->clear(); }));
 
         if (handle_configure) {
             menu->addChild(createMenuItem("Configure...", "", [=](){ handle_configure(); }));
         }
 
+        if (include_loopback) {
+            menu->addChild(createCheckMenuItem("Include loopback", "",
+                [=](){ return *include_loopback; },
+                [=](){ *include_loopback = !*include_loopback; }
+            ));
+        }
+
+        menu->addChild(createMenuItem("Reset (none)", "", [=](){ device->clear(); }));
+
         menu->addChild(new MenuSeparator);
+
         auto current_claim = device->get_claim();
         auto connections = EnumerateMidiConnections(false);
         for (auto it = connections.cbegin(); it != connections.cend(); ++it) {
@@ -72,7 +84,11 @@ struct BasicMidiPicker : TipWidget
             auto item_claim = conn->info.claim();
             bool mine = (0 == current_claim.compare(item_claim));
             //if (conn->input_device_id == -1) continue;
-
+            if (include_loopback && !*include_loopback) {
+                if (8 == common_prefix_length("Loopback", conn->info.input_device_name)) {
+                    continue;
+                }
+            }
             auto name = conn->info.friendly(NameFormat::Long);
             menu->addChild(createCheckMenuItem(name, "",
                 [=](){ return mine; },

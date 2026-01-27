@@ -46,7 +46,6 @@ json_t *CcControl::to_json() const {
 void CcControl::clear()
 {
     cc = last_value = base_value = UndefinedCode;
-    role = ccAction::Unknown;
     kind = ControllerType::Unknown;
 }
 
@@ -82,9 +81,9 @@ void PresetMidi::fromJson(json_t *root) {
     enable_logging(get_json_bool(root, "midi-log", is_logging()));
     // key
     key_channel = get_json_int(root, "key-channel", key_channel);
-    key_code[KeyAction::KeySelect] = get_json_int(root, "key-select", key_code[KeyAction::KeySelect]);
-    key_code[KeyAction::KeyPage]   = get_json_int(root, "key-page",   key_code[KeyAction::KeyPage]);
-    key_code[KeyAction::KeyIndex]  = get_json_int(root, "key-index",  key_code[KeyAction::KeyIndex]);
+    key_code[KeyAction::KeySend]   = get_json_int(root, "key-send",   key_code[KeyAction::KeySend]);
+    key_code[KeyAction::KeyPaging] = get_json_int(root, "key-paging", key_code[KeyAction::KeyPaging]);
+    key_code[KeyAction::KeyCursor] = get_json_int(root, "key-cursor", key_code[KeyAction::KeyCursor]);
     key_code[KeyAction::KeyPrev]   = get_json_int(root, "key-prev",   key_code[KeyAction::KeyPrev]);
     key_code[KeyAction::KeyNext]   = get_json_int(root, "key-next",   key_code[KeyAction::KeyNext]);
     key_code[KeyAction::KeyFirst]  = get_json_int(root, "key-first",  key_code[KeyAction::KeyFirst]);
@@ -111,12 +110,12 @@ json_t *PresetMidi::toJson()
     set_json(root, "midi-log", is_logging());
     // key
     set_json_int(root, "key-channel", key_channel);
-    set_json_int(root, "key-select", key_code[KeyAction::KeySelect]);
-    set_json_int(root, "key-page",   key_code[KeyAction::KeyPage]);
-    set_json_int(root, "key-index",  key_code[KeyAction::KeyIndex]);
-    set_json_int(root, "key-prev",   key_code[KeyAction::KeyPrev]);
-    set_json_int(root, "key-next",   key_code[KeyAction::KeyNext]);
-    set_json_int(root, "key-first",  key_code[KeyAction::KeyFirst]);
+    set_json_int(root, "key-send",    key_code[KeyAction::KeySend]);
+    set_json_int(root, "key-paging",  key_code[KeyAction::KeyPaging]);
+    set_json_int(root, "key-cursor",  key_code[KeyAction::KeyCursor]);
+    set_json_int(root, "key-prev",    key_code[KeyAction::KeyPrev]);
+    set_json_int(root, "key-next",    key_code[KeyAction::KeyNext]);
+    set_json_int(root, "key-first",   key_code[KeyAction::KeyFirst]);
 
     // cc
     set_json_int(root, "cc-channel", cc_channel);
@@ -170,7 +169,7 @@ bool PresetMidi::some_key_configuration() {
 }
 
 bool PresetMidi::is_valid_key_configuration() {
-    if (undefined(key_code[KeyAction::KeySelect])) {
+    if (undefined(key_code[KeyAction::KeySend])) {
         return false;
     }
 
@@ -187,7 +186,7 @@ bool PresetMidi::is_valid_key_configuration() {
 
     auto first_code = key_code[KeyAction::KeyFirst];
     if (defined(first_code)) {
-        for (int i = KeyAction::KeySelect; i < KeyAction::KeyFirst; i++) {
+        for (int i = KeyAction::KeySend; i < KeyAction::KeyFirst; i++) {
             if (defined(key_code[i]) && (first_code <= key_code[i])) {
                 return false;
             }
@@ -281,31 +280,31 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     assert(is_valid_key_configuration());
 
     uint8_t note = midi_note(msg);
-    if (note == key_code[KeyAction::KeySelect]) {
+    if (note == key_code[KeyAction::KeySend]) {
         if (is_logging()) midi_log->log_message("PresetMidi", "send()");
         client->nav_send();
         return;
     }
 
-    if (note == key_code[KeyAction::KeyPage]) {
-        if ((note == key_code[KeyAction::KeyIndex]) || undefined(key_code[KeyAction::KeyIndex])) {
+    if (note == key_code[KeyAction::KeyPaging]) {
+        if ((note == key_code[KeyAction::KeyCursor]) || undefined(key_code[KeyAction::KeyCursor])) {
             // toggling
             key_paging = !key_paging;
-            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Page" : "Toggle mode to Index");
+            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Paging" : "Toggle mode to Cursor");
         } else {
-            if (is_logging()) midi_log->log_message("PresetMidi", "Page mode");
+            if (is_logging()) midi_log->log_message("PresetMidi", "Paging mode");
             key_paging = true;
         }
         return;
     }
 
-    if (note == key_code[KeyAction::KeyIndex]) {
-        if (note == key_code[KeyAction::KeyPage] || undefined(key_code[KeyAction::KeyPage])) {
+    if (note == key_code[KeyAction::KeyCursor]) {
+        if (note == key_code[KeyAction::KeyPaging] || undefined(key_code[KeyAction::KeyPaging])) {
             // toggling
             key_paging = !key_paging;
-            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Ppage" : "Toggle mode to Index");
+            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Paging" : "Toggle mode to Cursor");
         } else {
-            if (is_logging()) midi_log->log_message("PresetMidi", "Index mode");
+            if (is_logging()) midi_log->log_message("PresetMidi", "Cursor mode");
             key_paging = false;
         }
         return;
@@ -365,7 +364,7 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
         switch ((*it).role) {
         case ccAction::Unknown: break;
 
-        case ccAction::Select:
+        case ccAction::Send:
             switch ((*it).kind) {
             case ControllerType::Unknown:
                 assert(false);
@@ -410,7 +409,7 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
             client->nav_set_index(index);
         } break;
 
-        case ccAction::Index:{
+        case ccAction::Item:{
             ssize_t total = client->nav_get_size();
             if (total <= 0) return;
             ssize_t page_size = client->nav_get_page_size();
@@ -418,6 +417,15 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
             ssize_t index = index_from_paged(cc_current_page, offset, page_size);
             index = clamp(index, 0, total - 1);
             client->nav_set_index(index);
+        } break;
+
+        case ccAction::Toggle: {
+        } break;
+
+        case ccAction::Prev: {
+        } break;
+
+        case ccAction::Next: {
         } break;
         }
     }

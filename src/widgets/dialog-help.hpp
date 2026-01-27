@@ -13,7 +13,7 @@ namespace widgetry {
 struct DialogStyles {
     LabelStyle title{"dlg-title", HAlign::Left, VAlign::Top, colors::Black, 14.f, true};
     LabelStyle section{"dlg-section", "hsl(42, .6, .8)", HAlign::Left, 14.f, true};
-    LabelStyle head{"dlg-heading", HAlign::Left, 14.f, true};
+    LabelStyle head{"dlg-heading", HAlign::Center, 12.f, true};
     LabelStyle left{"dlg-label", HAlign::Left, 12.f, false};
     LabelStyle center;
     LabelStyle right{"dlg-label", HAlign::Right, 12.f, false};

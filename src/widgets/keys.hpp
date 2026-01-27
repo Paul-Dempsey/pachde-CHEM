@@ -94,6 +94,8 @@ struct KeyboardWidget : OpaqueWidget {
         Base::onButton(e);
     }
 
+    inline bool colored(const NVGcolor& co) { return co.r > 0.f || co.g > 0.f || co.b > 0.f; }
+
     void draw(const DrawArgs& args) override {
         auto vg = args.vg;
         NVGcolor black = BLACK;
@@ -131,19 +133,29 @@ struct KeyboardWidget : OpaqueWidget {
         // black keys
         x = bw;
         FillRect(vg, x, 0.f, bw, h, key_color[eNote::Cs]);
-        //FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Inside, sw);
+        if (colored(key_color[eNote::Cs])) {
+            FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Outside, sw);
+        }
         x += 2*bw;
         FillRect(vg, x, 0.f, bw, h, key_color[eNote::Eb]);
-        //FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Inside, sw);
+        if (colored(key_color[eNote::Eb])) {
+            FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Outside, sw);
+        }
         x += 3*bw;
         FillRect(vg, x, 0.f, bw, h, key_color[eNote::Fs]);
-        //FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Inside, sw);
+        if (colored(key_color[eNote::Fs])) {
+            FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Outside, sw);
+        }
         x += 2*bw;
         FillRect(vg, x, 0.f, bw, h, key_color[eNote::Ab]);
-        //FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Inside, sw);
+        if (colored(key_color[eNote::Ab])) {
+            FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Outside, sw);
+        }
         x += 2*bw;
         FillRect(vg, x, 0.f, bw, h, key_color[eNote::Bb]);
-        //FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Inside, sw);
+        if (colored(key_color[eNote::Bb])) {
+            FittedBoxRect(vg, x, 0.f, bw, h, black, Fit::Outside, sw);
+        }
 
         FittedBoxRect(vg, 0, 0, box.size.x, box.size.y, black, Fit::Outside, .35);
    }

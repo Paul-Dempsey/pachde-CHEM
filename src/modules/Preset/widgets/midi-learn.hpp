@@ -39,6 +39,7 @@ struct MidiLearnerBase  : OpaqueWidget, ILearner, IThemed {
 
 };
 
+#ifdef MIDI_CHECK
 constexpr const PackedMidiMessage INVALID_MSG{0xFFFFFFFF};
 constexpr const float LEARN_TIME{5.f};
 
@@ -74,13 +75,14 @@ struct LearnMidiControlType : MidiLearnerBase {
     void step() override;
     void draw(const DrawArgs& args) override;
 };
+#endif
 
 struct LearnMidiNote : MidiLearnerBase {
     using Base = MidiLearnerBase;
 
     uint8_t value{0xff};
     std::string value_text;
-    KeyAction role{KeyAction::KeySelect};
+    KeyAction role{KeyAction::KeySend};
 
     LearnMidiNote(Rect bounds, KeyAction role, PresetMidi* pm);
     void update_text();
@@ -89,7 +91,7 @@ struct LearnMidiNote : MidiLearnerBase {
     void draw(const DrawArgs& args) override;
 };
 
-struct LearnMidiCcSelect : MidiLearnerBase {
+struct LearnMidiCc : MidiLearnerBase {
     using Base = MidiLearnerBase;
 
     CcControl action;
@@ -97,9 +99,14 @@ struct LearnMidiCcSelect : MidiLearnerBase {
     WallTimer clock;
     int message_count{0};
 
-    LearnMidiCcSelect(Rect bounds, PresetMidi* pm);
+    std::function<void(ControllerType)> on_set_controller_type{nullptr};
+
+    LearnMidiCc(Rect bounds, ccAction role, PresetMidi* pm);
 
     void init(const CcControl& ctl);
+    void set_controller_type_handler(std::function<void(ControllerType)> on_ct) {
+        on_set_controller_type = on_ct;
+    }
     void start_listen(uint8_t code);
     void update_text();
     void learn_value(LearnMode mode, PackedMidiMessage msg) override;

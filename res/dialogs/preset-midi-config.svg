@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="280" height="300" viewBox="0 0 280 300"
-font-family="Hanken Grotesk" font-size="12"
+<svg width="290" height="272" viewBox="0 0 290 272"
+font-family="Hanken Grotesk" font-size="10"
 version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
 <linearGradient id="pg" y2="100%" gradientUnits="userSpaceOnUse">
     <stop offset="0" stop-color="#282828" />
@@ -8,84 +8,114 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
 </linearGradient>
 <rect id="panel" fill="url(#pg)" width="100%" height="100%" />
 <rect id="mast" fill="#f9a806" width="100%" height="18"/>
-<circle id="k:help" fill="#f22" cx="250" cy="9.5" r="8" />
-<rect id="k:close" fill="#f22" x="262" y="2" width="14" height="14" />
+<circle id="k:help" fill="#f22" cx="260" cy="9.5" r="8" />
+<rect id="k:close" fill="#f22" x="272" y="2" width="14" height="14" />
 <rect id="k:dlg-title" fill="#a0a0a0d0" x="7.5" y="3" width="200" height="14" />
-<circle id="k:valid" fill="#ddd"   cx="208" cy="30" r="2.25" />
-<rect id="k:valid-label" fill="#aaa4" x="214" y="26" width="15" height="9"/>
-<circle id="k:learn" fill="#ddd" cx="240" cy="30" r="2.25" />
-<rect id="k:learn-label" fill="#aaa4" x="246" y="26" width="25" height="9"/>
 
-<g transform="translate(15, 24)">
-    <rect id="k:key-label" fill="#bbb4" x="0" y="0" width="70" height="14"/>
-    <text x="0" y="12" font-size="14" fill="#f9a806">Keyboard</text>
+<circle id="k:valid" fill="#ddd"   cx="218" cy="30" r="2.25" />
+<rect id="k:valid-label" fill="#aaa4" x="224" y="26" width="15" height="9"/>
+<circle id="k:learn" fill="#ddd" cx="250" cy="30" r="2.25" />
+<rect id="k:learn-label" fill="#aaa4" x="256" y="26" width="25" height="9"/>
 
-    <rect id="k:kchannel" fill="#aaa" x="88" y="0" width="12" height="12" />
-    <rect id="k:kchannel-info" fill="#bbb4" x="102" y="0" width="25" height="14" />
+<g transform="translate(7.5, 24)">
+    <rect id="k:key-label" fill="#bbb4" x="0" y="0" width="60" height="14"/>
+    <text x="0" y="12" font-size="12" fill="#f9a806">Keyboard</text>
 
-    <rect id="k:keys" fill="#fff" x="5" y="26" width="36" height="24" />
+    <rect id="k:kchannel" fill="#aaa" x="65" y="0" width="12" height="12" />
+    <rect id="k:kchannel-info" fill="#bbb4" x="80" y="0" width="25" height="12" />
 
-    <rect id="k:kselect-label" fill="#bbb4" x="50" y="20" width="35" height="14"/>
-    <rect id="k:kselect-nn" fill="none" stroke="#bbb" x="88" y="20" width="25" height="14"/>
-    <circle id="co-select" fill="#f8b10d" cx="117" cy="27" r="1.75"/>
+    <rect id="k:keys" fill="#fff" x="130" y="-2" width="48" height="20" />
 
-    <rect id="k:kpage-label" fill="#bbb4" x="116" y="20" width="35" height="14"/>
-    <rect id="k:kpage-nn" fill="none" stroke="#bbb" x="154" y="20" width="25" height="14"/>
-    <circle id="co-page" fill="#7bf80d" cx="183" cy="27" r="1.75"/>
+    <rect id="k:ksend-label" fill="#bbb4" x="3" y="26" width="26" height="12"/>
+    <text x="3" y="36" fill="#bbb" >Send</text>
+    <rect id="co-send" fill="#f8cf5d" x="30" y="28" width="2.5" height="10"/>
+    <rect id="k:ksend-nn" fill="none" stroke="#bbb" x="34" y="26" width="25" height="14"/>
 
-    <rect id="k:kindex-label" fill="#bbb4" x="182" y="20" width="35" height="14"/>
-    <rect id="k:kindex-nn" fill="none" stroke="#bbb" x="220" y="20" width="25" height="14"/>
-    <circle id="co-index" fill="#07dccb" cx="249" cy="27" r="1.75"/>
+    <rect id="k:kpaging-label" fill="#bbb4" x="94" y="26" width="30" height="12"/>
+    <text x="94" y="36" fill="#bbb" >Paging</text>
+    <rect id="co-paging" fill="#4ef94e" x="126" y="28" width="2.5" height="10"/>
+    <rect id="k:kpaging-nn" fill="none" stroke="#bbb" x="130" y="26" width="25" height="14"/>
 
-    <rect id="k:kprev-label" fill="#bbb4" x="50" y="44" width="35" height="14" />
-    <rect id="k:kprev-nn" fill="none" stroke="#bbb" x="88" y="44" width="25" height="14"/>
-    <circle id="co-prev" fill="#3f67f5" cx="117" cy="51" r="1.75"/>
+    <rect id="k:kcursor-label" fill="#bbb4" x="168" y="26" width="33" height="12"/>
+    <text fill="#bbb" x="168" y="36" >Cursor*</text>
+    <rect id="co-cursor" fill="#48def9" x="204" y="28" width="2.5" height="10"/>
+    <rect id="k:kcursor-nn" fill="none" stroke="#bbb" x="208" y="26" width="25" height="14"/>
 
-    <rect id="k:knext-label" fill="#bbb4" x="116" y="44" width="35" height="14" />
-    <rect id="k:knext-nn" fill="none" stroke="#bbb" x="154" y="44" width="25" height="14"/>
-    <circle id="co-next" fill="#f80ddd" cx="183" cy="51" r="1.75"/>
+    <path id="tie" fill="none" stroke="#f9a806" stroke-width=".4" d="M 90,40 v6 h148 v-6" />
 
-    <rect id="k:kfirst-label" fill="#bbb4" x="182" y="44" width="35" height="14"/>
-    <rect id="k:kfirst-nn" fill="none" stroke="#bbb" x="220" y="44" width="25" height="14"/>
-    <circle id="co-first" fill="#f80d24" cx="249" cy="51" r="1.75"/>
+    <rect id="k:kprev-label" fill="#bbb4" x="30" y="54" width="24" height="12" />
+    <text fill="#bbb" x="30" y="64" >Prev</text>
+    <rect id="co-prev" fill="#f77481" x="54" y="56" width="2.5" height="10"/>
+    <rect id="k:kprev-nn" fill="none" stroke="#bbb" x="58" y="54" width="25" height="14"/>
+
+    <rect id="k:knext-label" fill="#bbb4" x="100" y="54" width="25" height="12" />
+    <text fill="#bbb" x="100" y="64" >Next</text>
+    <rect id="co-next" fill="#f2fa56" x="126" y="56" width="2.5" height="10"/>
+    <rect id="k:knext-nn" fill="none" stroke="#bbb" x="130" y="54" width="25" height="14"/>
+
+    <rect id="k:kfirst-label" fill="#bbb4" x="174" y="54" width="28" height="12"/>
+    <text fill="#bbb" x="174" y="64" >First*</text>
+    <rect id="co-first" fill="#aa68f9" x="202" y="56" width="2.5" height="10"/>
+    <rect id="k:kfirst-nn" fill="none" stroke="#bbb" x="206" y="54" width="25" height="14"/>
 </g>
 
-<path id="div" fill="none" stroke="#888" d="M 5.5,92 h 268" />
+<path id="div" fill="none" stroke="#888" stroke-width=".75" d="M 5.5,106 h 278" />
 
-<g transform="translate(15,100)">
-    <rect id="k:cc-label" fill="#bbb4" x="0" y="0" width="70" height="14"/>
-    <text x="0" y="10" fill="#f9a806" font-size="14" >Controller</text>
-    <rect id="k:cc-channel" fill="#aaa" x="88" y="0" width="12" height="12" />
-    <rect id="k:cc-channel-info" fill="#bbb4" x="102" y="0" width="25" height="14" />
+<g transform="translate(7.5,114)">
+    <rect id="k:cc-label" fill="#bbb4" x="0" y="0" width="60" height="14"/>
+    <text fill="#f9a806" font-size="12" x="0" y="10">Controller</text>
+    <rect id="k:cc-channel" fill="#aaa" x="65" y="0" width="12" height="12" />
+    <rect id="k:cc-channel-info" fill="#bbb4" x="80" y="0" width="25" height="14" />
 
-    <rect id="k:cc-select-label" fill="#bbb4" x="45" y="20" width="40" height="12"/>
-    <text x="45" y="30" fill="#bbb" font-size="12" >Select</text>
-    <rect id="k:cc-select" fill="none" stroke="#bbb" x="88" y="20" width="25" height="14"/>
-    <rect id="p:cc-seltype--blank" fill="#363b54" x="116" y="20" width="50" height="12"/>
+    <rect id="k:cc-send-label" fill="#bbb4" x="122" y="0" width="26" height="12"/>
+    <text fill="#bbb" x="122" y="10" >Send</text>
+    <rect id="k:cc-send" fill="none" stroke="#bbb" x="150" y="0" width="25" height="14"/>
+    <rect id="k:cc-sendtype" fill="#bbb4" x="178" y="0" width="50" height="12"/>
 </g>
 
-<path id="div" fill="none" stroke="#888" d="M 5.5,242 h 268" />
+<g transform="translate(40,136)">
+    <xrect fill="none" stroke="#f9a806" stroke-width=".25" x="0" y="0" width="85" height="98"/>
+    <rect id="k:buttons-label" fill="#bbb4" x="0" y="0" width="85" height="12" />
+    <text fill="#eee" font-size="10" x="22" y="10">buttons</text>
 
-<g transform="translate(15,250)">
-    <circle id="k:cc-test-info" fill="#f22" cx="3.5" cy="7" r="7.5"/>
-    <rect id="k:cc-test-label" fill="#bbb4" x="10" y="0" width="35" height="12"/>
-    <text fill="#bbb" x="10" y="10">Test</text>
-    <rect id="k:cc-test" fill="none" stroke="#bbb" x="53" y="0" width="25" height="14"/>
-    <rect id="p:cc-type--blank" fill="#363b54" x="81" y="0" width="50" height="12"/>
-    <text fill="#5671e8" x="81" y="10" font-size="12">encoder</text>
-    <rect id="p:cc-min--blank" fill="#363b54" x="135" y="0" width="24" height="12"/>
-    <text fill="#5671e8" x="135" y="10" font-size="12">127</text>
-    <rect id="p:cc-max--blank" fill="#363b54" x="165" y="0" width="24" height="12"/>
-    <path id="div" stroke="#bbb" stroke-width="1" d="M159,6 h 6"/>
-    <circle id="k:test-reset" fill="#f22" cx="205" cy="6" r="6" />
-    <rect id="k:test-time" fill="#bbb4" x="215" y="0" width="20" height="12" />
-    <text fill="#5671e8" x="215" y="10" font-size="12">5.0</text>
+    <rect id="k:cc-toggle-label" fill="#bbb4" x="-24" y="20" width="68" height="12" />
+    <text fill="#bbb" x="-24" y="30" font-size="10">Paging/Cursor</text>
+    <rect id="k:cc-toggle" fill="none" stroke="#bbb" x="45" y="20" width="25" height="14"/>
+
+
+    <rect id="k:cc-prev-label" fill="#bbb4" x="15" y="46" width="25" height="12" />
+    <text fill="#bbb" x="15" y="56" font-size="10">Prev</text>
+    <rect id="k:cc-prev" fill="none" stroke="#bbb" x="45" y="46" width="25" height="14"/>
+
+    <rect id="k:cc-next-label" fill="#bbb4" x="15" y="72" width="25" height="12" />
+    <text fill="#bbb" x="15" y="82" font-size="10">Next</text>
+    <rect id="k:cc-next" fill="none" stroke="#bbb" x="45" y="72" width="25" height="14"/>
 </g>
 
-<rect id="k:conn" fill="#aaa4" x="115" y="280" width="150" height="9" />
-<g transform="translate(15, 275)">
+<path id="div" fill="none" stroke="#888" stroke-width=".5" d="M 15,136 h 260" />
+<path id="div" stroke="#888" stroke-width=".5" d="M 145,136 v98"/>
+<path id="div" fill="none" stroke="#888" stroke-width=".5" d="M 15,150 h 260" />
+
+<g transform="translate(166,136)">
+    <xrect fill="none" stroke="#f9a806" stroke-width=".25" x="0" y="0" width="85" height="98"/>
+    <rect id="k:knobs-faders-label" fill="#bbb4" x="0" y="0" width="85" height="12" />
+    <text fill="#eee" font-size="10" x="10" y="10">knobs | faders</text>
+
+    <rect id="k:cc-page-label" fill="#bbb4" x="10" y="26" width="25" height="12" />
+    <text fill="#bbb" x="10" y="36" font-size="10">Page</text>
+    <rect id="k:cc-page" fill="none" stroke="#bbb" x="40" y="26" width="25" height="14"/>
+
+    <rect id="k:cc-item-label" fill="#bbb4" x="10" y="52" width="25" height="12" />
+    <text fill="#bbb" x="10" y="62" font-size="10">Item</text>
+    <rect id="k:cc-item" fill="none" stroke="#bbb" x="40" y="52" width="25" height="14"/>
+</g>
+
+<path id="div" fill="none" stroke="#888" stroke-width=".75" d="M 5.5,236 h 278" />
+
+<g transform="translate(15, 245)">
     <rect id="k:log" fill="#bbb" x="0" y="0" width="14" height="14"/>
     <rect id="k:log-label" fill="#bbb4" x="17" y="0" width="60" height="14"/>
+    <rect id="k:conn" fill="#aaa4" x="105" y="5" width="160" height="9" />
 </g>
-<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="277.5" height="298" />
+<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="288" height="270" />
 </svg>

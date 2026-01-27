@@ -44,9 +44,9 @@ struct INavigateList {
 };
 
 enum KeyAction {
-    KeySelect, // send current preset (note on)
-    KeyPage,   // prev/next/index sets page
-    KeyIndex,  // prev/next/index sets index
+    KeySend,   // send current preset (note on)
+    KeyPaging, // prev/next/index sets page
+    KeyCursor, // prev/next/index sets index
     KeyPrev,   // decrement page/index
     KeyNext,   // increment page/index
     KeyFirst,  // offset from page
@@ -54,14 +54,12 @@ enum KeyAction {
 };
 enum class ccAction {
     Unknown,
-    Select,
+    Send,
     Page,
-    Index
-    // ToggleMode,
-    // PageMode,
-    // IndexMode,
-    // Prev,
-    // Next
+    Item,
+    Toggle,
+    Prev,
+    Next
 };
 
 struct CcControl {

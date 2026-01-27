@@ -6,6 +6,7 @@
   - keyboard working
   - consider relative mode: center rather than first for variable size steps
   - implement cc
+  - keyboard and cc auto-repeat prev/next
   - save/load controller configurations independent of module preset
     which includes too much info, like the connection
 
@@ -16,11 +17,6 @@
   - check for other new/deprecated features
 
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
-
-## Preset
-
-- Add trigger param for send
-- Keyboard graphic display for note config
 
 ## Core
 

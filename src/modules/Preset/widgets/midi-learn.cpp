@@ -94,6 +94,7 @@ void MidiLearnerBase::onDeselect(const DeselectEvent &e){
     Base::onDeselect(e);
 }
 
+#ifdef MIDI_CHECK
 //
 // LearnMidiControlType
 //
@@ -208,16 +209,15 @@ void LearnMidiControlType::draw(const DrawArgs &args) {
     }
     draw_learning_frame(args, box, active, midi_handler->is_connected(), co_active, co_normal);
 }
+#endif
 
 //
 // LearnMidiNote
 //
 
-LearnMidiNote::LearnMidiNote(Rect bounds, KeyAction role, PresetMidi *pm) :
-    role(role)
-{
+LearnMidiNote::LearnMidiNote(Rect bounds, KeyAction role, PresetMidi *pm) : role(role) {
     box = bounds;
-    this->mode = LearnMode::Note;
+    mode = LearnMode::Note;
     midi_handler = pm;
     value = midi_handler->key_code[role];
     update_text();
@@ -252,27 +252,27 @@ void LearnMidiNote::draw(const DrawArgs &args) {
 }
 
 //
-// LearnMidiCcSelect
+// LearnMidiCc
 //
 
-LearnMidiCcSelect::LearnMidiCcSelect(Rect bounds, PresetMidi *pm) {
+LearnMidiCc::LearnMidiCc(Rect bounds, ccAction role, PresetMidi *pm) {
     box = bounds;
     mode = LearnMode::Cc;
+    action.role = role;
     midi_handler = pm;
-    action.role = ccAction::Select;
     update_text();
 }
 
-void LearnMidiCcSelect::update_text() {
+void LearnMidiCc::update_text() {
     cc_text = defined(action.cc) ? format_string("cc%d", action.cc) : "";
 }
 
-void LearnMidiCcSelect::init(const CcControl &ctl) {
+void LearnMidiCc::init(const CcControl &ctl) {
     action.init(ctl);
     update_text();
 }
 
-void LearnMidiCcSelect::start_listen(uint8_t code)
+void LearnMidiCc::start_listen(uint8_t code)
 {
     action.cc = code;
     clock.start(.25f);
@@ -280,7 +280,7 @@ void LearnMidiCcSelect::start_listen(uint8_t code)
     update_text();
 }
 
-void LearnMidiCcSelect::learn_value(LearnMode mode, PackedMidiMessage msg) {
+void LearnMidiCc::learn_value(LearnMode mode, PackedMidiMessage msg) {
     assert(Haken::ctlChg == midi_status(msg));
     auto msg_cc = midi_cc(msg);
     action.last_value = midi_cc_value(msg);
@@ -291,37 +291,48 @@ void LearnMidiCcSelect::learn_value(LearnMode mode, PackedMidiMessage msg) {
     start_listen(msg_cc);
 }
 
-void LearnMidiCcSelect::reset() {
+void LearnMidiCc::reset() {
     clock.stop();
     action.clear();
     cc_text.clear();
     message_count = 0;
     auto it = std::find_if(
         midi_handler->cc_control.begin(), midi_handler->cc_control.end(),
-        [](CcControl& ctl) { return ctl.role = ccAction::Select; }
+        [=](const CcControl& ctl) { return ctl.role == action.role; }
     );
     if (it != midi_handler->cc_control.end()) {
         midi_handler->cc_control.erase(it);
     }
 }
 
-void LearnMidiCcSelect::step() {
+void LearnMidiCc::step() {
     if (clock.running() && clock.finished()) {
         clock.stop();
-        assert(message_count > 0);
-        if (1 == message_count) {
+        switch (message_count) {
+        case 0:
+            action.kind = ControllerType::Unknown;
+            action.base_value = UndefinedCode;
+            break;
+        case 1:
             action.kind = ControllerType::Toggle;
             action.base_value = action.last_value;
-        } else if (2 == message_count) {
+            break;
+        case 2:
             action.kind = ControllerType::Momentary;
             action.base_value = action.last_value;
-        } else {
+            break;
+        default:
             action.kind = ControllerType::Continuous;
             action.base_value = 64;
+            break;
         }
+        if (on_set_controller_type) {
+            on_set_controller_type(action.kind);
+        }
+
         auto it = std::find_if(
             midi_handler->cc_control.begin(), midi_handler->cc_control.end(),
-            [](CcControl& ctl) { return ctl.role = ccAction::Select; }
+            [=](const CcControl& ctl) { return ctl.role == action.role; }
         );
         if (it != midi_handler->cc_control.end()) {
             it->init(action);
@@ -331,7 +342,7 @@ void LearnMidiCcSelect::step() {
     }
 }
 
-void LearnMidiCcSelect::draw(const DrawArgs &args) {
+void LearnMidiCc::draw(const DrawArgs &args) {
     auto vg = args.vg;
     std::string text = (!active && cc_text.empty()) ? "unset" : cc_text;
     if (!text.empty()) {

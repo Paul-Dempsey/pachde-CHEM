@@ -139,6 +139,7 @@ PresetUi::PresetUi(PresetModule *module) :
     auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
     picker->describe("Midi Navigation");
     if (my_module) {
+        picker->set_loopback(&my_module->nav_include_loopback);
         picker->setDeviceHolder(&my_module->preset_midi.midi_device);
         picker->set_configure_handler( [=](){ configure_midi(); });
     }

@@ -67,6 +67,7 @@ struct PresetModule : ChemModule, IChemClient, INavigateList
     bool search_meta{true};
     bool search_anchor{false};
     bool search_incremental{true};
+    bool nav_include_loopback{false};
 
     PresetModule();
     ~PresetModule();
