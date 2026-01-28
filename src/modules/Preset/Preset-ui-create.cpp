@@ -136,12 +136,23 @@ PresetUi::PresetUi(PresetModule *module) :
     key_nav_blip->set_radius(r.getWidth() * .5f);
     addChild(key_nav_blip);
 
+    r = bounds["k:key-page-blip"];
+    key_page_blip = createBlipCentered(r.getCenter(), "", COLOR_NONE);
+    key_page_blip->set_radius(r.getWidth() * .5f);
+    addChild(key_page_blip);
+
+    r = bounds["k:cc-page-blip"];
+    cc_page_blip = createBlipCentered(r.getCenter(), "", COLOR_NONE);
+    cc_page_blip->set_radius(r.getWidth() * .5f);
+    addChild(cc_page_blip);
+
     auto picker = Center(createThemedWidget<BasicMidiPicker>(bounds["k:midi"].getCenter(), &module_svgs));
     picker->describe("Midi Navigation");
     if (my_module) {
         picker->set_loopback(&my_module->nav_include_loopback);
         picker->setDeviceHolder(&my_module->preset_midi.midi_device);
         picker->set_configure_handler( [=](){ configure_midi(); });
+        picker->configuration_title = "Configure Midi navigation...";
     }
     addChild(picker);
 

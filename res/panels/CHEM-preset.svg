@@ -118,9 +118,14 @@
 
   <circle id="k:nav-knob" fill="#f22" cx="346" cy="284" r="12" />
   <circle id="k:nav-sel" fill="#2ff" cx="355" cy="295" r="4" />
+
+  <circle id="k:midi" fill="#f22" cx="346" cy="325" r="13" />
+  <circle id="k:key-page-blip" fill="#2ff" cx="340" cy="342" r="2.25" />
+  <circle id="k:cc-page-blip" fill="#2ff" cx="352" cy="342" r="2.25" />
+
   <circle id="k:nav-mute" fill="#2ff" cx="340" cy="352" r="4" />
   <circle id="k:nav-blip" fill="#2ff" cx="352" cy="352" r="2.25" />
-  <circle id="k:midi" fill="#f22" cx="346" cy="334" r="13" />
+
   <rect id="k:help" fill="#aae8" x="30" y="180" width="280" height="14"/>
   <rect id="k:live" fill="#aae8" x="220" y="367" width="125" height="10"/>
 

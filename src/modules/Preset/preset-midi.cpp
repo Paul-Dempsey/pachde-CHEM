@@ -14,7 +14,7 @@ const char * controller_type_name(ControllerType ct) {
     }
 }
 
-ControllerType parse(const char * text) {
+ControllerType parse_controller_type(const char * text) {
     if (!text || !*text) return ControllerType::Unknown;
     switch (*text) {
     case 'T': case 't': return ControllerType::Toggle;
@@ -29,7 +29,7 @@ ControllerType parse(const char * text) {
 
 void CcControl::fromJson(json_t *root) {
     role = static_cast<ccAction>(get_json_int(root, "role", 0));
-    kind = static_cast<ControllerType>(get_json_int(root, "kind", 0));
+    kind = parse_controller_type(get_json_cstring(root, "kind", ""));
     cc = get_json_int(root, "cc", UndefinedCode);
     base_value = get_json_int(root, "base", UndefinedCode);
 }
@@ -37,14 +37,13 @@ void CcControl::fromJson(json_t *root) {
 json_t *CcControl::to_json() const {
     json_t* j = json_object();
     set_json_int(j, "role", static_cast<int>(role));
-    set_json_int(j, "kind", static_cast<int>(kind));
+    set_json(j, "kind", controller_type_name(kind));
     set_json_int(j, "cc", cc);
-    set_json_int(j, "base", cc);
+    set_json_int(j, "base", base_value);
     return j;
 }
 
-void CcControl::clear()
-{
+void CcControl::reset() {
     cc = last_value = base_value = UndefinedCode;
     kind = ControllerType::Unknown;
 }
@@ -103,8 +102,7 @@ void PresetMidi::fromJson(json_t *root) {
     }
 }
 
-json_t *PresetMidi::toJson()
-{
+json_t *PresetMidi::toJson() {
     json_t* root = json_object();
     set_json(root, "midi-device", midi_device_claim);
     set_json(root, "midi-log", is_logging());
@@ -172,18 +170,15 @@ bool PresetMidi::is_valid_key_configuration() {
     if (undefined(key_code[KeyAction::KeySend])) {
         return false;
     }
-
     if (key_code[KeyAction::KeyPrev] == key_code[KeyAction::KeyNext]) {
         return false;
     }
-
     if (   undefined(key_code[KeyAction::KeyPrev])
         && undefined(key_code[KeyAction::KeyNext])
         && undefined(key_code[KeyAction::KeyFirst])
     ) {
         return false;
     }
-
     auto first_code = key_code[KeyAction::KeyFirst];
     if (defined(first_code)) {
         for (int i = KeyAction::KeySend; i < KeyAction::KeyFirst; i++) {
@@ -192,13 +187,47 @@ bool PresetMidi::is_valid_key_configuration() {
             }
         }
     }
-
     return true;
 }
 
 void PresetMidi::reset_keyboard() {
     key_channel = UndefinedCode;
+    key_page_mode = false;
     memset(key_code, UndefinedCode, KeyAction::Size);
+}
+
+void PresetMidi::reset_controller() {
+    cc_channel = UndefinedCode;
+    cc_page_mode = false;
+    cc_control.clear();
+}
+
+bool PresetMidi::is_valid_cc_configuration() {
+    if (cc_control.empty()) return false;
+    bool send{false};
+    bool toggle{false};
+    bool prev{false};
+    bool next{false};
+    bool page{false};
+    bool item{false};
+    for (const CcControl& ctl : cc_control) {
+        switch (ctl.role) {
+        case ccAction::Unknown: return false;
+        case ccAction::Send: send = defined(ctl.cc); break;
+        case ccAction::Page: page = defined(ctl.cc); break;
+        case ccAction::Item: item = defined(ctl.cc); break;
+        case ccAction::Toggle: toggle = defined(ctl.cc); break;
+        case ccAction::Prev: prev = defined(ctl.cc); break;
+        case ccAction::Next: next = defined(ctl.cc); break;
+        }
+    }
+    if (!send) return false;
+    if (toggle && prev && next) {
+        cc_page_config = true;
+        return true;
+    }
+    if (page && item) return true;
+    return false;
 }
 
 void PresetMidi::set_student(ILearner *client) {
@@ -289,11 +318,11 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     if (note == key_code[KeyAction::KeyPaging]) {
         if ((note == key_code[KeyAction::KeyCursor]) || undefined(key_code[KeyAction::KeyCursor])) {
             // toggling
-            key_paging = !key_paging;
-            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Paging" : "Toggle mode to Cursor");
+            key_page_mode = !key_page_mode;
+            if (is_logging()) midi_log->log_message("PresetMidi", key_page_mode ? "Toggle mode to Paging" : "Toggle mode to Cursor");
         } else {
             if (is_logging()) midi_log->log_message("PresetMidi", "Paging mode");
-            key_paging = true;
+            key_page_mode = true;
         }
         return;
     }
@@ -301,35 +330,36 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     if (note == key_code[KeyAction::KeyCursor]) {
         if (note == key_code[KeyAction::KeyPaging] || undefined(key_code[KeyAction::KeyPaging])) {
             // toggling
-            key_paging = !key_paging;
-            if (is_logging()) midi_log->log_message("PresetMidi", key_paging ? "Toggle mode to Paging" : "Toggle mode to Cursor");
+            key_page_mode = !key_page_mode;
+            if (is_logging()) midi_log->log_message("PresetMidi", key_page_mode ? "Toggle mode to Paging" : "Toggle mode to Cursor");
         } else {
             if (is_logging()) midi_log->log_message("PresetMidi", "Cursor mode");
-            key_paging = false;
+            key_page_mode = false;
         }
         return;
     }
 
     if (note == key_code[KeyAction::KeyPrev]) {
         if (is_logging()) midi_log->log_message("PresetMidi", "Prev");
-        ssize_t index = client->nav_get_index();
-        if (key_paging) {
+        if (key_page_mode) {
             do_page(client, -1);
         }
-        else if (--index >= 0) {
-            client->nav_set_index(index);
+        else {
+            ssize_t index = client->nav_get_index();
+            if (--index >= 0) {
+                client->nav_set_index(index);
+            }
         }
         return;
     }
 
     if (note == key_code[KeyAction::KeyNext]) {
         if (is_logging()) midi_log->log_message("PresetMidi", "Next");
-        ssize_t index = client->nav_get_index();
-        if (key_paging) {
+        if (key_page_mode) {
             do_page(client, 1);
         } else {
-            index++;
-            if (index < client->nav_get_size()) {
+            ssize_t index = client->nav_get_index();
+            if (++index < client->nav_get_size()) {
                 client->nav_set_index(index);
             }
         }
@@ -340,7 +370,7 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     if (defined(first_code) && (note >= first_code)) {
         ssize_t increment = note - first_code;
         if (is_logging()) midi_log->log_message("PresetMidi", format_string("Index %d", increment));
-        if (key_paging) {
+        if (key_page_mode) {
             do_page(client, increment);
         } else {
             ssize_t page_size = client->nav_get_page_size();
@@ -352,6 +382,23 @@ void PresetMidi::do_key(PackedMidiMessage msg) {
     }
 }
 
+bool control_triggered(CcControl& ctl, uint8_t new_value) {
+    switch (ctl.kind) {
+    case ControllerType::Unknown:
+        assert(false);
+        return false;
+    case ControllerType::Toggle:
+        return true;
+    case ControllerType::Momentary:
+        return new_value != ctl.base_value;
+    case ControllerType::Continuous:
+    case ControllerType::Endless:
+        return (((ctl.last_value < 64) && (new_value >= 64))
+            || ((ctl.last_value >= 64) && (new_value < 64)));
+    }
+    return false;
+}
+
 void PresetMidi::do_cc(PackedMidiMessage msg)
 {
     assert (client);
@@ -361,34 +408,13 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
     });
     if (it != cc_control.end()) {
         auto new_value = midi_cc_value(msg);
+
         switch ((*it).role) {
         case ccAction::Unknown: break;
-
         case ccAction::Send:
-            switch ((*it).kind) {
-            case ControllerType::Unknown:
-                assert(false);
-                break;
-
-            case ControllerType::Toggle:
+            if (control_triggered(*it, new_value)) {
                 client->nav_send();
-                break;
-
-            case ControllerType::Momentary:
-                if (new_value != (*it).base_value) {
-                    client->nav_send();
-                }
-                break;
-
-            case ControllerType::Continuous:
-            case ControllerType::Endless:
-                if ((((*it).last_value < 64) && (new_value >= 64))
-                || (((*it).last_value >= 64) && (new_value < 64))) {
-                    client->nav_send();
-                }
-                break;
             }
-            (*it).last_value = new_value;
             break;
 
         case ccAction::Page: {
@@ -396,38 +422,63 @@ void PresetMidi::do_cc(PackedMidiMessage msg)
             if (total <= 0) return;
             ssize_t page_size = client->nav_get_page_size();
             ssize_t max_page = total/page_size;
+            ssize_t page{0};
             if (max_page) {
                 ssize_t increment = 127/(1 + max_page);
-                cc_current_page = std::min(static_cast<ssize_t>(midi_cc_value(msg)/increment), max_page);
-            } else {
-                cc_current_page = 0;
+                page = std::min(static_cast<ssize_t>(midi_cc_value(msg)/increment), max_page);
             }
             ssize_t index = client->nav_get_index();
             ssize_t offset = offset_of_index(index, page_size);
-            index = index_from_paged(cc_current_page, offset, page_size);
+            index = index_from_paged(page, offset, page_size);
             index = clamp(index, 0, total - 1);
             client->nav_set_index(index);
         } break;
 
-        case ccAction::Item:{
+        case ccAction::Item: {
             ssize_t total = client->nav_get_size();
             if (total <= 0) return;
             ssize_t page_size = client->nav_get_page_size();
+            ssize_t index = client->nav_get_index();
+            ssize_t page = page_of_index(index, page_size);
             ssize_t offset = std::min(static_cast<ssize_t>(midi_cc_value(msg))/3, page_size-1);
-            ssize_t index = index_from_paged(cc_current_page, offset, page_size);
+            index = index_from_paged(page, offset, page_size);
             index = clamp(index, 0, total - 1);
             client->nav_set_index(index);
         } break;
 
         case ccAction::Toggle: {
+            if (control_triggered(*it, new_value)) {
+                cc_page_mode = !cc_page_mode;
+            }
         } break;
 
         case ccAction::Prev: {
+            if (control_triggered(*it, new_value)) {
+                if (cc_page_mode) {
+                    do_page(client, -1);
+                } else {
+                    ssize_t index = client->nav_get_index();
+                    if (--index >= 0) {
+                        client->nav_set_index(index);
+                    }
+                }
+            }
         } break;
 
         case ccAction::Next: {
+            if (control_triggered(*it, new_value)) {
+                if (cc_page_mode) {
+                    do_page(client, 1);
+                } else {
+                    ssize_t index = client->nav_get_index();
+                    if (++index < client->nav_get_size()) {
+                        client->nav_set_index(index);
+                    }
+                }
+            }
         } break;
         }
+        (*it).last_value = new_value;
     }
 }
 

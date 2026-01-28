@@ -205,7 +205,6 @@ void PresetUi::step() {
         }
     }
 
-
     Tab& tab = active_tab();
     if (tab.list.empty() && host_available()) {
         set_tab(active_tab_id, true);
@@ -222,21 +221,47 @@ void PresetUi::step() {
             scroll_to_page_of_index(tab.current_index);
         }
 
-        // key nav indicator
-        if (my_module->preset_midi.key_muted()) {
+        PresetMidi& pm{my_module->preset_midi};
+        if (pm.key_muted()) {
             key_nav_blip->set_light_color(red_light);
             key_nav_blip->set_brightness(1.f);
-            key_nav_blip->describe("MIDI Keyboard nav: muted");
+            key_nav_blip->describe("Midi Keyboard nav: muted");
+            key_page_blip->set_light_color(yellow_light);
         }
-        else if (my_module->preset_midi.some_key_configuration()) {
-            bool ok = my_module->preset_midi.is_valid_key_configuration();
+        else if (pm.some_key_configuration()) {
+            bool ok = pm.is_valid_key_configuration();
             key_nav_blip->set_light_color(ok ? green_light : yellow_light);
-            key_nav_blip->describe(ok ? "MIDI Keyboard nav: enabled": "Keyboard nav: bad configuration");
+            key_nav_blip->describe(ok ? "Midi Keyboard nav: enabled": "Midi Keyboard nav: bad configuration");
             key_nav_blip->set_brightness(1.f);
+            key_page_blip->set_light_color(pm.key_paging() ?  green_light : blue_light);
+            key_page_blip->describe(pm.key_paging() ? "Midi Keyboard page mode" : "Midi Keyboard cursor mode");
+            key_page_blip->set_brightness(1.f);
         } else {
             key_nav_blip->set_brightness(0.f);
             key_nav_blip->set_light_color(no_light);
-            key_nav_blip->describe("MIDI Keyboard nav: not configured");
+            std::string none{"Midi Keyboard nav: not configured"};
+            key_nav_blip->describe(none);
+            key_page_blip->describe(none);
+            key_page_blip->set_brightness(0.f);
+        }
+        if (pm.some_cc_configuration()) {
+            bool ok = pm.is_valid_cc_configuration();
+            if (ok) {
+                if (pm.is_cc_paging_configuration()) {
+                    cc_page_blip->set_light_color(pm.cc_paging() ? green_light : blue_light);
+                    cc_page_blip->set_brightness(1.f);
+                    cc_page_blip->describe(pm.cc_paging() ? "Midi Controller nav: Page mode" : "Midi Controller nav: Cursor mode");
+                } else {
+                    cc_page_blip->describe("Midi Controller nav: un-paged");
+                    cc_page_blip->set_brightness(0.f);
+                }
+            } else {
+                cc_page_blip->describe("Midi Controller nav: bad configuration");
+                cc_page_blip->set_brightness(0.f);
+            }
+        } else {
+            cc_page_blip->describe("Midi Controller nav: not configured");
+            cc_page_blip->set_brightness(0.f);
         }
     }
 }

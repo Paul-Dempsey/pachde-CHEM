@@ -48,7 +48,8 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
     LabelStyle info_left{"dlg-info", HAlign::Left, VAlign::Middle, colors::PortCorn, 12.f, false};
     PresetMidi* midi_handler{nullptr};
     Blip* learn_blip{nullptr};
-    Blip* valid_blip{nullptr};
+    Blip* key_valid_blip{nullptr};
+    Blip* cc_valid_blip{nullptr};
     CheckButton* log_check{nullptr};
 
     // KEYBOARD
@@ -130,16 +131,18 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
             addChild(help_btn);
         }
 
-        Rect r = bounds["k:valid"];
-        addChild(valid_blip = createWidgetCentered<Blip>(r.getCenter()));
-        valid_blip->set_radius(r.size.x * .5);
-        addChild(createLabel(bounds["k:valid-label"], "ok", &styles.note));
+        Rect r = bounds["k:key-valid"];
+        addChild(key_valid_blip = createWidgetCentered<Blip>(r.getCenter()));
+        key_valid_blip->set_radius(r.size.x * .5);
+        addChild(createLabel(bounds["k:key-valid-label"], "ok", &styles.note));
 
         r = bounds["k:learn"];
         addChild(learn_blip = createWidgetCentered<Blip>(r.getCenter()));
         learn_blip->set_radius(r.size.x * .5);
         learn_blip->set_light_color(fromPacked(parseColor("hsl(120, .8, .5)", colors::PortGreen)));
         addChild(createLabel(bounds["k:learn-label"], "learn", &styles.note));
+
+        // Keyboard
 
         addChild(createLabel(bounds["k:key-label"], "Keyboard", &styles.section));
 
@@ -164,6 +167,18 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(learn_next  = new LearnMidiNote(bounds["k:knext-nn"],   KeyAction::KeyNext,   midi_handler));
         addChild(learn_start = new LearnMidiNote(bounds["k:kfirst-nn"],  KeyAction::KeyFirst,  midi_handler));
 
+        auto reset_button = createThemedButton<SmallRoundButton>(bounds["k:kreset"].getCenter(), &my_svgs, "Reset Keyboard");
+        reset_button->set_handler([=](bool,bool){
+            midi_handler->reset_keyboard();
+            learn_send->reset();
+            learn_page->reset();
+            learn_index->reset();
+            learn_prev->reset();
+            learn_next->reset();
+            learn_start->reset();
+        });
+        addChild(Center(reset_button));
+
         // CONTROLLER
 
         addChild(createLabel(bounds["k:cc-label"], "Controller", &styles.section));
@@ -174,11 +189,17 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(channel_menu);
         addChild(cc_channel_info = createLabel(bounds["k:cc-channel-info"], "", &info_left));
         addChild(cc_send_type = createLabel(bounds["k:cc-sendtype"], "", &styles.info));
+
+        r = bounds["k:cc-valid"];
+        addChild(cc_valid_blip = createWidgetCentered<Blip>(r.getCenter()));
+        cc_valid_blip->set_radius(r.size.x * .5);
+        addChild(createLabel(bounds["k:cc-valid-label"], "ok", &styles.note));
+
         addChild(createLabel(bounds["k:buttons-label"],      "buttons", &styles.head));
         addChild(createLabel(bounds["k:knobs-faders-label"], "knobs | faders", &styles.head));
         addChild(createLabel(bounds["k:cc-send-label"],   "Send", &styles.left));
         addChild(createLabel(bounds["k:cc-toggle-label"], "Paging/Cursor", &styles.left));
-        addChild(createLabel(bounds["k:cc-prev-label"],   "Prev", &styles.left));
+        addChild(createLabel(bounds["k:cc-prev-label"],   "Previous", &styles.left));
         addChild(createLabel(bounds["k:cc-next-label"],   "Next", &styles.left));
         addChild(createLabel(bounds["k:cc-page-label"],   "Page", &styles.left));
         addChild(createLabel(bounds["k:cc-item-label"],   "Item", &styles.left));
@@ -188,6 +209,18 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
         addChild(learn_cc_next   = new LearnMidiCc(bounds["k:cc-next"],   ccAction::Next,   midi_handler));
         addChild(learn_cc_page   = new LearnMidiCc(bounds["k:cc-page"],   ccAction::Page,   midi_handler));
         addChild(learn_cc_item   = new LearnMidiCc(bounds["k:cc-item"],   ccAction::Item,   midi_handler));
+
+        reset_button = createThemedButton<SmallRoundButton>(bounds["k:cc-reset"].getCenter(), &my_svgs, "Reset Controller");
+        reset_button->set_handler([=](bool,bool) {
+            midi_handler->reset_controller();
+            learn_cc_send->reset();
+            learn_cc_toggle->reset();
+            learn_cc_prev->reset();
+            learn_cc_next->reset();
+            learn_cc_page->reset();
+            learn_cc_item->reset();
+        });
+        addChild(Center(reset_button));
 
         learn_cc_send->set_controller_type_handler (
             [=](ControllerType ct) {
@@ -287,8 +320,18 @@ struct ConfigPresetMidi : SvgDialog<DialogSvg> {
 
         channel_info->set_text(0xFF == midi_handler->key_channel ? "any" : format_string("%d", midi_handler->key_channel));
         cc_channel_info->set_text(0xFF == midi_handler->cc_channel ?  "any" : format_string("%d", midi_handler->cc_channel));
-        valid_blip->set_light_color(fromPacked(midi_handler->is_valid_key_configuration() ? colors::PortGreen : colors::Red));
-        valid_blip->set_brightness(1.f);
+        if (midi_handler->some_key_configuration()) {
+            key_valid_blip->set_light_color(fromPacked(midi_handler->is_valid_key_configuration() ? colors::PortGreen : colors::Red));
+            key_valid_blip->set_brightness(1.f);
+        } else {
+            key_valid_blip->set_brightness(0.f);
+        }
+        if (midi_handler->some_cc_configuration()) {
+            cc_valid_blip->set_light_color(fromPacked(midi_handler->is_valid_cc_configuration() ? colors::PortGreen : colors::Red));
+            cc_valid_blip->set_brightness(1.f);
+        } else {
+            cc_valid_blip->set_brightness(0.f);
+        }
 
         learn_blip->set_brightness(midi_handler->student ? 1.f : 0.f);
 

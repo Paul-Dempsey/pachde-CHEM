@@ -293,7 +293,7 @@ void LearnMidiCc::learn_value(LearnMode mode, PackedMidiMessage msg) {
 
 void LearnMidiCc::reset() {
     clock.stop();
-    action.clear();
+    action.reset();
     cc_text.clear();
     message_count = 0;
     auto it = std::find_if(

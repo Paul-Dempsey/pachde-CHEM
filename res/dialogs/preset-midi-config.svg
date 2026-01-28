@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="290" height="272" viewBox="0 0 290 272"
+<svg width="290" height="256" viewBox="0 0 290 256"
 font-family="Hanken Grotesk" font-size="10"
 version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
 <linearGradient id="pg" y2="100%" gradientUnits="userSpaceOnUse">
@@ -12,9 +12,7 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
 <rect id="k:close" fill="#f22" x="272" y="2" width="14" height="14" />
 <rect id="k:dlg-title" fill="#a0a0a0d0" x="7.5" y="3" width="200" height="14" />
 
-<circle id="k:valid" fill="#ddd"   cx="218" cy="30" r="2.25" />
-<rect id="k:valid-label" fill="#aaa4" x="224" y="26" width="15" height="9"/>
-<circle id="k:learn" fill="#ddd" cx="250" cy="30" r="2.25" />
+<circle id="k:learn" fill="#ddd" cx="250" cy="31" r="2.25" />
 <rect id="k:learn-label" fill="#aaa4" x="256" y="26" width="25" height="9"/>
 
 <g transform="translate(7.5, 24)">
@@ -22,7 +20,10 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
     <text x="0" y="12" font-size="12" fill="#f9a806">Keyboard</text>
 
     <rect id="k:kchannel" fill="#aaa" x="65" y="0" width="12" height="12" />
-    <rect id="k:kchannel-info" fill="#bbb4" x="80" y="0" width="25" height="12" />
+    <rect id="k:kchannel-info" fill="#bbb4" x="80" y="0" width="20" height="12" />
+
+    <circle id="k:key-valid" fill="#ddd"   cx="106" cy="7" r="2.25" />
+    <rect id="k:key-valid-label" fill="#aaa4" x="110" y="2" width="15" height="9"/>
 
     <rect id="k:keys" fill="#fff" x="130" y="-2" width="48" height="20" />
 
@@ -41,7 +42,7 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
     <rect id="co-cursor" fill="#48def9" x="204" y="28" width="2.5" height="10"/>
     <rect id="k:kcursor-nn" fill="none" stroke="#bbb" x="208" y="26" width="25" height="14"/>
 
-    <path id="tie" fill="none" stroke="#f9a806" stroke-width=".4" d="M 90,40 v6 h148 v-6" />
+    <circle id="k:kreset" fill="#f22" cx="260" cy="46" r="8"/>
 
     <rect id="k:kprev-label" fill="#bbb4" x="30" y="54" width="24" height="12" />
     <text fill="#bbb" x="30" y="64" >Prev</text>
@@ -65,57 +66,59 @@ version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/20
     <rect id="k:cc-label" fill="#bbb4" x="0" y="0" width="60" height="14"/>
     <text fill="#f9a806" font-size="12" x="0" y="10">Controller</text>
     <rect id="k:cc-channel" fill="#aaa" x="65" y="0" width="12" height="12" />
-    <rect id="k:cc-channel-info" fill="#bbb4" x="80" y="0" width="25" height="14" />
+    <rect id="k:cc-channel-info" fill="#bbb4" x="80" y="0" width="20" height="14" />
+    <circle id="k:cc-valid" fill="#ddd"   cx="106" cy="7" r="2.25" />
+    <rect id="k:cc-valid-label" fill="#aaa4" x="110" y="2" width="15" height="9"/>
 
-    <rect id="k:cc-send-label" fill="#bbb4" x="122" y="0" width="26" height="12"/>
-    <text fill="#bbb" x="122" y="10" >Send</text>
-    <rect id="k:cc-send" fill="none" stroke="#bbb" x="150" y="0" width="25" height="14"/>
-    <rect id="k:cc-sendtype" fill="#bbb4" x="178" y="0" width="50" height="12"/>
+    <rect id="k:cc-send-label" fill="#bbb4" x="128" y="0" width="26" height="12"/>
+    <text fill="#bbb" x="128" y="10" >Send</text>
+    <rect id="k:cc-send" fill="none" stroke="#bbb" x="156" y="0" width="25" height="14"/>
+    <rect id="k:cc-sendtype" fill="#bbb4" x="184" y="0" width="50" height="12"/>
+
+    <circle id="k:cc-reset" fill="#f22" cx="260" cy="8" r="8"/>
 </g>
 
-<g transform="translate(40,136)">
-    <xrect fill="none" stroke="#f9a806" stroke-width=".25" x="0" y="0" width="85" height="98"/>
-    <rect id="k:buttons-label" fill="#bbb4" x="0" y="0" width="85" height="12" />
-    <text fill="#eee" font-size="10" x="22" y="10">buttons</text>
+<g transform="translate(7.5,136)">
+    <xrect opacity=".4" width="130" height="95" />
+    <rect id="k:buttons-label" fill="#bbb4" x="0" y="0" width="130" height="12" />
+    <text fill="#eee" text-anchor="middle" font-size="10" x="65" y="10">buttons</text>
 
-    <rect id="k:cc-toggle-label" fill="#bbb4" x="-24" y="20" width="68" height="12" />
-    <text fill="#bbb" x="-24" y="30" font-size="10">Paging/Cursor</text>
-    <rect id="k:cc-toggle" fill="none" stroke="#bbb" x="45" y="20" width="25" height="14"/>
+    <rect id="k:cc-toggle-label" fill="#bbb4" x="18" y="24" width="65" height="12" />
+    <text fill="#bbb" x="18" y="34" font-size="10">Paging/Cursor</text>
+    <rect id="k:cc-toggle" fill="none" stroke="#bbb" x="85" y="24" width="25" height="14"/>
 
+    <rect id="k:cc-prev-label" fill="#bbb4" x="42" y="46" width="42" height="12" />
+    <text fill="#bbb" x="42" y="56" font-size="10">Previous</text>
+    <rect id="k:cc-prev" fill="none" stroke="#bbb" x="85" y="46" width="25" height="14"/>
 
-    <rect id="k:cc-prev-label" fill="#bbb4" x="15" y="46" width="25" height="12" />
-    <text fill="#bbb" x="15" y="56" font-size="10">Prev</text>
-    <rect id="k:cc-prev" fill="none" stroke="#bbb" x="45" y="46" width="25" height="14"/>
-
-    <rect id="k:cc-next-label" fill="#bbb4" x="15" y="72" width="25" height="12" />
-    <text fill="#bbb" x="15" y="82" font-size="10">Next</text>
-    <rect id="k:cc-next" fill="none" stroke="#bbb" x="45" y="72" width="25" height="14"/>
+    <rect id="k:cc-next-label" fill="#bbb4" x="60" y="68" width="24" height="12" />
+    <text fill="#bbb" x="60" y="78" font-size="10">Next</text>
+    <rect id="k:cc-next" fill="none" stroke="#bbb" x="85" y="68" width="25" height="14"/>
 </g>
 
-<path id="div" fill="none" stroke="#888" stroke-width=".5" d="M 15,136 h 260" />
-<path id="div" stroke="#888" stroke-width=".5" d="M 145,136 v98"/>
-<path id="div" fill="none" stroke="#888" stroke-width=".5" d="M 15,150 h 260" />
+<path id="div" stroke="#888" stroke-width=".5" d="M 144,136 v92"/>
+<path id="div" fill="none" stroke="#888" stroke-width=".5" d="M 7.5,150 h 274" />
 
-<g transform="translate(166,136)">
-    <xrect fill="none" stroke="#f9a806" stroke-width=".25" x="0" y="0" width="85" height="98"/>
-    <rect id="k:knobs-faders-label" fill="#bbb4" x="0" y="0" width="85" height="12" />
-    <text fill="#eee" font-size="10" x="10" y="10">knobs | faders</text>
+<g transform="translate(150,136)">
+    <xrect opacity=".4" width="130" height="95" />
+    <rect id="k:knobs-faders-label" fill="#bbb4" x="0" y="0" width="130" height="12" />
+    <text fill="#eee" text-anchor="middle" font-size="10" x="60" y="10">knobs | faders</text>
 
-    <rect id="k:cc-page-label" fill="#bbb4" x="10" y="26" width="25" height="12" />
-    <text fill="#bbb" x="10" y="36" font-size="10">Page</text>
-    <rect id="k:cc-page" fill="none" stroke="#bbb" x="40" y="26" width="25" height="14"/>
+    <rect id="k:cc-page-label" fill="#bbb4" x="33" y="28" width="25" height="12" />
+    <text fill="#bbb" x="33" y="38" font-size="10">Page</text>
+    <rect id="k:cc-page" fill="none" stroke="#bbb" x="60" y="28" width="25" height="14"/>
 
-    <rect id="k:cc-item-label" fill="#bbb4" x="10" y="52" width="25" height="12" />
-    <text fill="#bbb" x="10" y="62" font-size="10">Item</text>
-    <rect id="k:cc-item" fill="none" stroke="#bbb" x="40" y="52" width="25" height="14"/>
+    <rect id="k:cc-item-label" fill="#bbb4" x="33" y="50" width="25" height="12" />
+    <text fill="#bbb" x="33" y="60" font-size="10">Item</text>
+    <rect id="k:cc-item" fill="none" stroke="#bbb" x="60" y="50" width="25" height="14"/>
 </g>
 
-<path id="div" fill="none" stroke="#888" stroke-width=".75" d="M 5.5,236 h 278" />
+<path id="div" fill="none" stroke="#888" stroke-width=".75" d="M 5.5,230 h 278" />
 
-<g transform="translate(15, 245)">
+<g transform="translate(15, 235)">
     <rect id="k:log" fill="#bbb" x="0" y="0" width="14" height="14"/>
     <rect id="k:log-label" fill="#bbb4" x="17" y="0" width="60" height="14"/>
     <rect id="k:conn" fill="#aaa4" x="105" y="5" width="160" height="9" />
 </g>
-<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="288" height="270" />
+<rect id="dlg-border" fill="none" stroke="#c5c5c5" stroke-width="1.5" x=".75" y=".75" width="288" height="254" />
 </svg>

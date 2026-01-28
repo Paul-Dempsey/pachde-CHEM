@@ -21,6 +21,7 @@ struct BasicMidiPicker : TipWidget
     widget::SvgWidget* sw{nullptr};
     MidiDeviceHolder* device{nullptr};
     std::function<void()> handle_configure{nullptr};
+    std::string configuration_title;
     bool * include_loopback{nullptr};
 
     BasicMidiPicker() {
@@ -60,10 +61,13 @@ struct BasicMidiPicker : TipWidget
         auto broker = MidiDeviceBroker::get();
         broker->sync();
 
-        menu->addChild(createMenuLabel<HamburgerTitle>("MIDI controller"));
+        menu->addChild(createMenuLabel<HamburgerTitle>("Midi controller"));
 
         if (handle_configure) {
-            menu->addChild(createMenuItem("Configure...", "", [=](){ handle_configure(); }));
+            menu->addChild(createMenuItem(
+                configuration_title.empty() ? "Configure..." : configuration_title, "",
+                [=](){ handle_configure(); }));
+            menu->addChild(new MenuSeparator);
         }
 
         if (include_loopback) {

@@ -14,7 +14,7 @@ struct TipHolder
         destroyTip();
     }
 
-    void setText(std::string text) {
+    void setText(const std::string& text) {
         tip_text = text;
         if (tip) {
             tip->onChange(widget::Widget::ChangeEvent{});
@@ -58,7 +58,7 @@ struct TipWidget : ::rack::widget::Widget
         }
     }
 
-    void describe(std::string text) {
+    void describe(const std::string& text) {
         ensureTipHolder();
         tip_holder->setText(text);
     }

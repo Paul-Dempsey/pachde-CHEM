@@ -150,6 +150,8 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
     StateButton * filter_off_button{nullptr};
 
     Blip* key_nav_blip{nullptr};
+    Blip* key_page_blip{nullptr};
+    Blip* cc_page_blip{nullptr};
 
     LabelStyle tab_style{"tab-label", HAlign::Right, 16.f};
     LabelStyle current_tab_style{"tab-label-hi", HAlign::Right, 16.f, true};

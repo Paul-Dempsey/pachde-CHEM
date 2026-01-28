@@ -29,7 +29,7 @@ inline bool undefined(uint8_t code) { return UndefinedCode == code; }
 enum LearnMode { Off, Note, Cc };
 enum class ControllerType { Unknown, Toggle, Momentary, Continuous, Endless };
 const char * controller_type_name(ControllerType ct);
-ControllerType parse(const char * text);
+ControllerType parse_controller_type(const char * text);
 
 struct ILearner {
     virtual void learn_value(LearnMode mode, PackedMidiMessage msg) = 0;
@@ -78,8 +78,7 @@ struct CcControl {
     }
     void fromJson(json_t* root);
     json_t* to_json() const;
-
-    void clear();
+    void reset();
 };
 
 struct PresetMidi: IDoMidi, IMidiDeviceNotify {
@@ -93,7 +92,7 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
 
     // keys config
     bool key_mute{false};
-    bool key_paging{false};
+    bool key_page_mode{false};
     uint8_t key_channel{UndefinedCode}; // 0xFF == any
     uint8_t key_code[KeyAction::Size] {
         UndefinedCode, // KeySelect
@@ -106,7 +105,8 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
 
     // cc config
     uint8_t cc_channel{UndefinedCode};
-    uint8_t cc_current_page{UndefinedCode};
+    bool cc_page_mode{false};
+    bool cc_page_config{false};
     std::vector<CcControl> cc_control;
 
     // learning
@@ -122,19 +122,29 @@ struct PresetMidi: IDoMidi, IMidiDeviceNotify {
     json_t* toJson();
 
     std::string connection_name();
+    bool is_connected() { return midi_device.connected(); }
+
     bool some_key_configuration();
     bool is_valid_key_configuration();
     void reset_keyboard();
     void mute_keys(bool mute) { key_mute = mute; }
     bool key_muted() { return key_mute; }
+    bool key_paging() { return key_page_mode; }
+
     void set_student(ILearner* client);
     void start_learning(LearnMode what);
     void stop_learning();
-    void enable_logging(bool logging);
-    bool is_logging();
-    bool is_connected() { return midi_device.connected(); }
     void learn_keyboard(PackedMidiMessage msg);
     void learn_cc(PackedMidiMessage msg);
+
+    void enable_logging(bool logging);
+    bool is_logging();
+    bool cc_paging() { return cc_page_mode; }
+
+    void reset_controller();
+    bool some_cc_configuration() { return !cc_control.empty(); }
+    bool is_valid_cc_configuration();
+    bool is_cc_paging_configuration() { return cc_page_config; }
 
     void process(float sampleTime);
 
