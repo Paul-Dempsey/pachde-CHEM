@@ -10,7 +10,7 @@ PlayModule::PlayModule()
     config(Params::NUM_PARAMS, Inputs::NUM_INPUTS, Outputs::NUM_OUTPUTS, Lights::NUM_LIGHTS);
     configInput(IN_PRESET_PREV, "Previous trigger");
     configInput(IN_PRESET_NEXT, "Next trigger");
-    configInput(IN_PRESET_SELECT, "Select preset poly trigger");
+    configInput(IN_PRESET_SELECT, "Select preset poly trigger (experimental)");
 }
 
 void PlayModule::update_mru(std::string path)

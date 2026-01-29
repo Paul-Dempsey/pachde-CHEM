@@ -2,13 +2,7 @@
 
 ## General
 
-- MIDI-friendly control for navigating presets
-  - keyboard working
-  - consider relative mode: center rather than first for variable size steps
-  - implement cc
-  - keyboard and cc auto-repeat prev/next
-  - save/load controller configurations independent of module preset
-    which includes too much info, like the connection
+- Update Preset scan images for 2.03 Core/Preset
 
 - 10.6x HakenMidi
   - New Pedal assignments
@@ -18,14 +12,24 @@
 
 - Document CHEM-kv.txt, Midilog, and all files in plugin folder.
 
+## Preset
+
+- keyboard and cc auto-repeat prev/next
+- save/load controller configurations independent of module preset
+  which includes too much info, like the connection
+
+## Play
+
+- Document poly triggers
+
+- Midi nav? That was complicated enough for Preset, but not sure how it would work for both. Managing focus would be tricky, so probably best if each have disjoint controls configured.
+
 ## Core
 
-- Revisit mpe_channels for new ability to send MPE on ch 1 `MLegacyCh1out`
+- Revisit mpe_channels for new ability to do MPE on ch 1 `MLegacyCh1out`
+  This should be done when we add support for CH1out in Settings.
+
 - Bug: rounding lights aren't always same as Continuum
-
-## After release
-
-- Update svg_theme project to sync with all the improvements from CHEM/pachde1.
 
 ## Ideas
 

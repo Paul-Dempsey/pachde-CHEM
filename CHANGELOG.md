@@ -2,13 +2,25 @@
 
 ## 2.0.3
 
-- HakenMidi.h 10.61
-  - Remove obsolete MIDI rate
+- **Core**
+  - WXYZ output
+  - Midi test (♪ button)
 
-- Import ui improvements from pachde1
+- **Preset** - Navigation and selection using an external Midi controller
+
+- **Play** - Experimental poly trigger for preset selection
+
+- **Settings** - Fix Rounding control bug
+
+- HakenMidi.h 10.65
+  - Remove obsolete MIDI rate
+  - New firmware features NYI. These will come in a future CHEM update.
+
+- Import UI improvements from pachde1
   - ColorPicker
   - improved theme system
   - menu widgets
+  - dialogs
 
 ## 2.0.2
 

@@ -62,21 +62,23 @@ The "hamburger" menu on the right is the *Preset Actions* menu.
 
 ## Right-side controls
 
-The controls on the right side of the module are:
+The controls down the right side of the module are:
 
-| Control | Description |
-| -- | -- |
-|**Page Up**| Ctrl+Click to go to page 1. |
-|**Page Down**| Ctrl+Click to go to the last page. |
-|**Previous preset**| Load the Previous preset, relative to the *current* preset (the one with the yellow arrow). If no *current* preset has been set, this is relative to the *live* preset. |
-|**Next preset** | Load the Next preset, relative to *current*. |
-|**Preset Actions** menu | General menu for the module. Don't forget there's also the usual Right click module menu for managing the theme. |
-|**Category** filter | Select which preset Categories are shown in the tab. |
-|**Type** filter | Select which preset Types are shown in the tab. These are things such as **Atonal**, **Bowed**, **Brass**.  |
-|**Character** filter | Select which preset Characters are shown in the tab. These are attributes such as **Acoustic**, **Nature**, **Metallic**. |
-|**Matrix** filter | Select which preset Matrix componentsattributes are shown in the tab. These include **BiqBank**, **HarMan**, and **OSC Jenny** |
-|**Setting** filter | Select which preset Setting are shown in the tab. These include **Rounding** and **Touch Area**. |
-|**Clear filters** | Clear all metadata filters and any search text. |
+| Widget | Control | Description |
+| -- | -- | -- |
+| ![Page up button](./widgets/page-up.svg) | **Page Up** | Ctrl+Click to go to page 1. |
+| ![Page up button](./widgets/page-down.svg) | **Page Down** | Ctrl+Click to go to the last page. |
+| ![Previous button](./widgets/prev.svg) | **Previous preset** | Load the Previous preset, relative to the _current_ preset (the one with the yellow arrow). If no _current_ preset has been set, this is relative to the _live_ preset. |
+| ![Next button](./widgets/next.svg) | **Next preset** | Load the Next preset, relative to _current_. |
+| ![Hamburger menu](./widgets/hamburger.svg) | **Preset Actions** menu | General menu for the module. Don't forget there's also the usual Right click module menu for managing the theme. |
+| ![Category button](./widgets/category-button.svg) | **Category** filter | Select which preset Categories are shown in the tab. |
+| ![Type button](./widgets/type-button.svg) | **Type** filter | Select which preset Types are shown in the tab. These are things such as **Atonal**, **Bowed**, **Brass**.  |
+| ![Character button](./widgets/character-button.svg) | **Character** filter | Select which preset Characters are shown in the tab. These are attributes such as **Acoustic**, **Nature**, **Metallic**. |
+| ![Matrix button](./widgets/matrix-button.svg) | **Matrix** filter | Select which preset Matrix componentsattributes are shown in the tab. These include **BiqBank**, **HarMan**, and **OSC Jenny** |
+| ![Setting button](./widgets/gear-button.svg) | **Setting** filter | Select which preset Setting are shown in the tab. These include **Rounding** and **Touch Area**. |
+| ![Clear filters button](./widgets/filtered-button.svg) | **Clear filters** | Clear all metadata filters and any search text. |
+
+The remaining buttons are for [Alternate Preset Navigation](./preset-nav.md).
 
 ## Filtering
 
