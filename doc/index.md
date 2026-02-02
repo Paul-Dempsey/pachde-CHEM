@@ -34,7 +34,7 @@ The VCV Rack Community _Getting Started_ threads are a great resource for learni
 > I am currently not disabling or removing features for Osmose or specific firmware versions.
 > Instead, I hope that these issues get fixed by Expressive E or Haken Audio in software updates.
 
-The [VCV Community](https://community.vcvrack.com) forum is a good place to learn about VCV Rack and talk about #d CHEM. VCV also has a Discord server.
+The [VCV Community](https://community.vcvrack.com) forum is a good place to learn about VCV Rack and talk about #d CHEM. VCV also on Discord [Invitation to VCV](https://discordapp.com/invite/wxa89Mh).
 
 CHEM is on Discord, too. Here's the invite tot he CHEM channel: [Invitation to CHEM](https://discord.gg/xz6muYZdxw).
 
