@@ -83,12 +83,17 @@ If you haven't saved any User presets on your Osmose yet, you can go ahead and s
 A full preset database for the Osmose takes almost an hour.
 
 For Haken instruments, the Quick scan is fastest but captures less detail.
-On Osmose, Quick scan is not available becuase EE removed that function in  firmware updates.
+On Osmose, Quick scan is not available because EE removed that function in  firmware updates.
 Please send Expressive E a support request to ask for that functionality back.
 A complete System scan can take an hour.
 
 Some presets make sound as soon as they are loaded, so you may hear sound output during a full scan.
 The Drone presets on the Continuum and EMM will play briefly.
+
+> **Note** For Haken instruments, there are occasionally problems with scanning a full database the first time (seems more prevalent on Mac). The issue leads to an empty preset database and a VCV crash.
+> This can be prevented by first doing a Quick Scan to generate a basic preset datbase.
+> If you run into this issue, open the Rack user folder, and under `pachde-chem` delete the .json files that store the preset databases.
+> Restart Rack, and this time first do a Quick Scan, then do a full scan after the Quick Scan completes.
 
 A scan in progress looks something like this (here, on Osmose):
 

@@ -6,7 +6,7 @@ Each XM is linked to an Overlay. For the details on how Overlay and XM work toge
 
 Unlike the typical Rack module with a fixed purpose for each control, XM is dynamic and requires you to configure each macro.
 
-When first added to Rack, XM doesn't look like much becuase it hasn't been configured yet:
+When first added to Rack, XM doesn't look like much because it hasn't been configured yet:
 
 ![New XM Module](./image/xm.png)
 

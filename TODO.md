@@ -14,7 +14,7 @@
 
 ## Preset
 
-- keyboard and cc auto-repeat prev/next
+- keyboard and cc auto-repeat prev/next?
 - save/load controller configurations independent of module preset
   which includes too much info, like the connection
 
@@ -22,9 +22,11 @@
 
 - Document poly triggers
 
-- Midi nav? That was complicated enough for Preset, but not sure how it would work for both. Managing focus would be tricky, so probably best if each have disjoint controls configured.
+- Midi nav? That was complicated enough for Preset, but not sure how it would work for both. Managing focus would be tricky, so probably best if each have disjoint controls configured?
 
 ## Core
+
+- Full scan for Haken devices could present a progress bar.
 
 - Revisit mpe_channels for new ability to do MPE on ch 1 `MLegacyCh1out`
   This should be done when we add support for CH1out in Settings.

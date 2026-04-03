@@ -12,7 +12,7 @@ Subscribe to the plugin at [CHEM - VCV Rack Library](https://library.vcvrack.com
 
 To get started, be sure to read the [Documentation](./doc/index.md#pachde-chem).
 
-CHEM is on Discord, too. Here's the invite: [Invitation to CHEM](https://discord.gg/xz6muYZdxw).
+CHEM announcements, discussion and support can be found on the VCV Rack Community forum. CHEM is on Discord, too. Here's the invite: [Invitation to CHEM](https://discord.gg/xz6muYZdxw). For support, Facebook doesn't work well, so I prefer the Rack Community forum, the **chem** channel on Discord, or email.
 
 **#d CHEM** is the successor to **HC One**, which targeted EaganMatrix firmware 10.09.
 
