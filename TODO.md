@@ -2,15 +2,13 @@
 
 ## General
 
-- Update Preset scan images for 2.03 Core/Preset
-
-- 10.6x HakenMidi
+- 10.6+ HakenMidi
   - New Pedal assignments
   - New Y and Z ccs
   - MPE on all channels `MLegacyCh1out` -- affects WXYZ
   - check for other new/deprecated features
 
-- Document CHEM-kv.txt, Midilog, and all files in plugin folder.
+- Document Midilog, and all files in plugin folder.
 
 ## Preset
 

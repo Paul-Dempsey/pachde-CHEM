@@ -36,7 +36,7 @@ The VCV Rack Community _Getting Started_ threads are a great resource for learni
 
 The [VCV Community](https://community.vcvrack.com) forum is a good place to learn about VCV Rack and talk about #d CHEM. VCV also on Discord [Invitation to VCV](https://discordapp.com/invite/wxa89Mh).
 
-CHEM is on Discord, too. Here's the invite tot he CHEM channel: [Invitation to CHEM](https://discord.gg/xz6muYZdxw).
+CHEM is on Discord, too. Here's the invite to the CHEM channel: [Invitation to CHEM](https://discord.gg/xz6muYZdxw).
 
 ## Module Index
 
@@ -127,6 +127,45 @@ Choose **Hot-reload themes** in the right click menu or press F5 after clicking 
 ## Lights Down
 
 For when the lights are down, choose **Glowing knobs** in the right click menu for the knobs to stay bright.
+
+## Files stored in the Rack User folder
+
+CHEM stores plugin-wide settings, preset databases, and MIDI logs in VCV Rack User folder.
+For CHEM diagnostics or emergency repair, you may need to manage these files manually.
+
+To open this folder, in VCV Rack choose **Help/Open User Folder**, then open the `pachde-CHEM` folder.
+
+| File | Description |
+| -- | -- |
+| CHEM-kv.txt | Plugin-wide settings. |
+| _device_-user.json | User presets database for _device_. |
+| _device_-system.json | System presets database for _device_. |
+| `midilog-1.txt` | Numbered midi log. When Midi logging is enabled in the Core module. Used for debugging, diagnostics, and curiosity. CHEM Midi logging is Eagan-Matrix aware, so better than generic MIDI for diagnosing Midi issues with EM instruments. |
+
+### CHEM-kv.txt
+
+CHEM stores persistent patch-independent settings in `CHEM-kv.txt` in the `pachde-CHEM` folder under the VCV Rack User folder.
+
+| Plugin&#xa0;Setting | Type | Description |
+| -- | -- | -- |
+| `browser-logo` | bool | Whether CHEM shows a logo overlay in the Rack module browser |
+| `midi-rate` | seconds (float) | MIDI processing is throttled to no faster than `midi-rate`. |
+| `show-screws` | bool | Whether CHEM modules show screws on the module panel. |
+
+The remaining settings tune the timing thresholds used in the Preset scanning process.
+The scan setting names are of the form `preset-` _phase_ (`-em`|`-osmose`). The units are all seconds.
+
+The `-em` settings are used for instruments from Haken Audio, and `-osmose` settings are for the Expressive E Osmose instruments. The Osmose requires longer times for preset selection than Haken devices due to the different way that presets are stored in device memory.
+
+When scanning, CHEM sends a request to load a preset.
+When the device loads a preset, it sends the definition of the preset, including it's name, metadata, and all it's EM details.
+On all devices, we must wait for the preset to "settle" before we can request the next preset.
+
+| Phase | Description |
+| -- | -- |
+| `start` | Amount of time to allow for a preset to begin after sending a request. If this timeout expires, we can assume there is no preset in that slot. |
+| `respond` | Amount of time to allow for complete loading of the preset details. |
+| `settle` | Settle time after a preset has loaded before requesting the next preset. |
 
 ## Development builds
 
