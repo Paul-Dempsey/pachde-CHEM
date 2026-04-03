@@ -1,6 +1,7 @@
 #include "hcl.hpp"
 #include "chem-id.hpp"
 #include "services/misc.hpp"
+#include "services/rack-em-convert.hpp"
 
 namespace pachde {
 /*

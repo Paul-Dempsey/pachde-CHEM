@@ -1,5 +1,7 @@
 #include "EaganMatrix.hpp"
 #include "services/misc.hpp"
+#include "services/rack-em-convert.hpp"
+
 using namespace pachde;
 
 namespace eaganmatrix {
@@ -95,7 +97,7 @@ bool EaganMatrix::is_surface()
     switch (hardware) {
     case Haken::hw_fL: case Haken::hw_hL: case Haken::hw_fC: case Haken::hw_hC:
     case Haken::hw_Mini:
-    case Haken::hw_s22: case Haken::hw_s46: case Haken::hw_s70:
+    case Haken::hw_s21: case Haken::hw_s46: case Haken::hw_s70:
         return true;
     default:
         break;

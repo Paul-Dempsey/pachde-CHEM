@@ -6,6 +6,12 @@ using namespace Haken;
 
 namespace pachde {
 
+// inv_ #defines removed from HakenMidi.h (better because the #defines lacked precision).
+constexpr const double inv_max14 = 1.0 / (double)Haken::max14;
+constexpr const double inv_zero14 = 1.0 / (double)Haken::zero14;
+constexpr const double inv_bendOffset = 1.0 / (double)Haken::bendOffset;
+constexpr const double inv_extBendOffset = 1.0 / (double)Haken::extBendOffset;
+
 inline float unipolar_7_to_rack(uint8_t value) {
     return (double)value / 127.0 * 10.0;
 }

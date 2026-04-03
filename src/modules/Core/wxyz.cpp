@@ -1,5 +1,7 @@
 #include "wxyz.hpp"
 #include "em/wrap-HakenMidi.hpp"
+#include "services/rack-em-convert.hpp"
+using namespace pachde;
 
 void MusicMidiToCV::silence(){
     memset(fracXYZ, 0, sizeof(fracXYZ));

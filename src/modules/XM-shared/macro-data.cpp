@@ -1,5 +1,6 @@
 #include "macro-data.hpp"
 #include "services/json-help.hpp"
+#include "services/rack-em-convert.hpp"
 
 namespace pachde {
 
