@@ -169,7 +169,7 @@ struct PresetUi : ChemModuleWidget, IChemClient, IHandleEmEvents, IPresetListCli
 
     bool other_user_gather{false};
     bool other_system_gather{false};
-
+    bool in_preset_list_changed{false};
     std::vector<PresetEntry*> preset_grid;
 
     PresetUi(PresetModule *module);

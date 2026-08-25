@@ -17,6 +17,8 @@ void no_preset(TipLabel* label) {
 }
 
 void PresetUi::on_list_changed(eaganmatrix::PresetTab which) {
+    if (in_preset_list_changed) return;
+    in_preset_list_changed = true;
     Tab& tab = get_tab(which);
     std::shared_ptr<PresetList> ppl{nullptr};
     if (chem_host) {
@@ -33,6 +35,7 @@ void PresetUi::on_list_changed(eaganmatrix::PresetTab which) {
     update_help();
     onPresetChange();
     if (!my_module->track_live) scroll_to_live();
+    in_preset_list_changed = false;
 }
 
 bool PresetUi::load_presets(PresetTab which) {
