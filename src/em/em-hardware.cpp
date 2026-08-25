@@ -48,7 +48,7 @@ const char * HardwareName(uint8_t hardware)
     case Haken::hw_hC: return "Half (Classic)";
     case Haken::hw_Mini: return "ContinuuMini";
     case Haken::hw_o49: return "Osmose";
-    case Haken::hw_s21: return "Slim 22";
+    case Haken::hw_s21: return "Slim 21";
     case Haken::hw_s46: return "Slim 46";
     case Haken::hw_s70: return "Slim 70";
     case Haken::hw_E2x: return "EaganMatrix Module";
