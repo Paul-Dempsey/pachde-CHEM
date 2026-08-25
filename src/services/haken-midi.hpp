@@ -39,6 +39,7 @@ struct HakenMidi
     void request_configuration(ChemId tag);
     void request_archive_0(ChemId tag);
     void request_con_text(ChemId tag);
+    void mat_refresh(ChemId tag);
     void request_updates(ChemId tag);
     void request_user(ChemId tag);
     void request_system(ChemId tag);

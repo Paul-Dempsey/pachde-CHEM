@@ -136,6 +136,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
         if (task.ready(args.sampleTime)) {
             if (core->is_haken_connected()) {
                 core->log_message("CoreStart", "Request Updates");
+                core->haken_midi.mat_refresh(ChemId::Core);
                 core->haken_midi.request_updates(ChemId::Core);
                 core->haken_midi_out.dispatch(DISPATCH_NOW);
                 queue.pop_front();

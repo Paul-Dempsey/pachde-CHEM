@@ -136,6 +136,14 @@ void HakenMidi::request_con_text(ChemId tag) {
     send_message(Tag(MakeCC(Haken::ch16, Haken::ccTask, Haken::contTxtToMidi), tag));
 }
 
+void HakenMidi::mat_refresh(ChemId tag)
+{
+    if (log) {
+        log->log_message(">>H", "---- MatRefresh");
+    }
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccMatOp, Haken::matRefresh), tag));
+}
+
 void HakenMidi::request_updates(ChemId tag)
 {
     if (log) {
