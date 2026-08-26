@@ -107,7 +107,7 @@ void ChemStartupTasks::process(const rack::Module::ProcessArgs& args)
             case ChemTask::State::Untried:
                 if (core->is_haken_connected()) {
                     core->log_message("CoreStart", "Heartbeat");
-                    core->haken_midi.editor_present(ChemId::Core);
+                    core->haken_midi.front_end_present(ChemId::Core);
                     core->haken_midi_out.dispatch(DISPATCH_NOW);
                     task.start();
                 }
@@ -217,7 +217,7 @@ void RecurringChemTasks::process(const rack::Module::ProcessArgs& args)
             heart.complete();
         } else {
             core->log_message("Core", "Task Heartbeat");
-            core->haken_midi.editor_present(ChemId::Core);
+            core->haken_midi.front_end_present(ChemId::Core);
             heart.start();
         }
     }

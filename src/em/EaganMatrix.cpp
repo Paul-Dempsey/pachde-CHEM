@@ -356,7 +356,8 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
         && (cc <= Haken::ccCVCLow) // highest cc included in a preset
         && (cc != Haken::ccBankH) // exclude id
         && (cc != Haken::ccBankL) // exclude id
-        && (cc != Haken::ccLoopDetect) // exclude loop detect
+        && (cc != Haken::ccLB) // exclude loop detect
+        && (cc != 82) // pre-1077 ccLoopdetect
     ) {
         hash_midi(preset_hasher, msg);
     }
@@ -514,18 +515,18 @@ void EaganMatrix::onChannel16CC(PackedMidiMessage msg)
         }
         break;
 
-    case Haken::ccEdState:
+    case Haken::ccLedAesState: // was ccEdState:
         notifyLED(value & Haken::sLedBits);
         break;
 
-    case Haken::ccEditorReply:
+    case Haken::ccPong: // was ccEditorReply:
         if (pending_EditorReply) {
             notifyEditorReply(value);
             pending_EditorReply = false;
         }
         break;
 
-    case Haken::ccEditor:
+    case Haken:: ccPing: // was ccEditor:
         pending_EditorReply = true;
         break;
     }

@@ -818,7 +818,7 @@ void CoreMenu::appendContextMenu(ui::Menu* menu)
         menu->addChild(new MenuSeparator);
 
         menu->addChild(createMenuItem("Editor Hello", "", [my_module]() {
-            my_module->haken_midi.editor_present(ChemId::Core);
+            my_module->haken_midi.front_end_present(ChemId::Core);
         }));
         menu->addChild(createMenuItem("ConText", "", [my_module]() {
             my_module->haken_midi.request_con_text(ChemId::Core);

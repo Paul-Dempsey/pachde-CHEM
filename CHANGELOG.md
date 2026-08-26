@@ -1,5 +1,10 @@
 # CHEM Change Log
 
+## 2.04
+
+- Fix crash on empty preset list file
+- 1077: send matRefresh for full preset data on updates
+
 ## 2.0.3
 
 - **Core**

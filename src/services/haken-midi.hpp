@@ -35,7 +35,7 @@ struct HakenMidi
 
     void select_preset(ChemId tag, eaganmatrix::PresetId id);
     void extended_macro(ChemId tag, uint8_t macro, uint16_t value);
-    void editor_present(ChemId tag);
+    void front_end_present(ChemId tag);
     void request_configuration(ChemId tag);
     void request_archive_0(ChemId tag);
     void request_con_text(ChemId tag);

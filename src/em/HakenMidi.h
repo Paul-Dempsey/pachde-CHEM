@@ -1,5 +1,5 @@
 // Haken Audio Midi Protocol by Lippold Haken, (C) Copyright 1999-2026.
-// These definitions are used by the Haken Editor, as well as third-party EaganMatrix Overlays.
+// These definitions are used by the Haken Editor, as well as third-party FrontEnds.
 // In this file, "tx" means transmitted by DSP, "rx" means received by DSP.	
 
 #ifndef HAKENMIDI_H
@@ -10,27 +10,27 @@
 //  Line#	  Topic											  Midi Channels
 //	  36	Overview
 //	  65	Status Bytes    Definitions for Continuum		(all)
-//   174	SSL_ch1_ch2     List of all cc on ch1/ch2       (ch1/ch2)
-//	 199	SSL_ch16        List of all cc on ch16		    (ch16)
-//   229    SSL_streams		List of all stream names		(ch16)
-//   238    SSL_Form_Poke	List of all id in s_Form_Poke	(ch16)
-//   258    SSL_Mat_Poke	List of all id in s_Mat_Poke	(ch16)
-//   282	SSL_ccTask		List of values for ccTask		(ch16)
-//   310	SSL_ccDInfo		List of values for ccDinfo		(ch16)
-//   330	SSL_ccMatVal	List of values for ccMatVal     (ch16)
-//   347	SSL_ccMatOp		List of values for ccMatOp		(ch16)
-//	 367	Preset Select   Preset Load and Store			(ch2/ch16)
-//	 480	Note cc         For Encoding Surface Activity	(ch2..ch16)
-//	 509	Macro cc        Macros i..vi and 14' m7..m90	(ch1 and ch2)
-//	 552	Global cc       Absolute ch1/ch16 Relative ch2	(ch1/ch16 and ch2)
-//	 601	Setup cc        General Configuration			(ch16)
-//	1057	ccStream        Select a stream					(ch16 "sData" follow)
-//	1136	s_Form_Poke     Formula Configuration stream	(ch16 "sData" pairs: id,value)
-//	1337	s_Mat_Poke      Matrix  Configuration stream	(ch16 "sData" pairs: id,value)
-//	1649	s_Kinet_Poke    Kinetic Properties stream		(ch16 "sData" pairs: id,value)
-//	1704	s_BiqSin_Poke   BiqSin  Properties stream		(ch16 "sData" pairs: id,value)
-//	1767	s_Conv_Poke     Convolution Config stream 		(ch16 "sData" pairs: id,value)
-//	1811	Thick Continuum config strip locations
+//   175	SSL_ch1_ch2     List of all cc on ch1/ch2       (ch1/ch2)
+//	 200	SSL_ch16        List of all cc on ch16		    (ch16)
+//   230    SSL_streams		List of all stream names		(ch16)
+//   239    SSL_Form_Poke	List of all id in s_Form_Poke	(ch16)
+//   259    SSL_Mat_Poke	List of all id in s_Mat_Poke	(ch16)
+//   283	SSL_ccTask		List of values for ccTask		(ch16)
+//   311	SSL_ccDInfo		List of values for ccDinfo		(ch16)
+//   331	SSL_ccMatVal	List of values for ccMatVal     (ch16)
+//   348	SSL_ccMatOp		List of values for ccMatOp		(ch16)
+//	 368	Preset Select   Preset Load and Store			(ch2/ch16)
+//	 487	Note cc         For Encoding Surface Activity	(ch2..ch16)
+//	 516	Macro cc        Macros i..vi and 14' m7..m90	(ch1 and ch2)
+//	 559	Global cc       Absolute ch1/ch16 Relative ch2	(ch1/ch16 and ch2)
+//	 607	Setup cc        General Configuration			(ch16)
+//	1068	ccStream        Select a stream					(ch16 "sData" follow)
+//	1147	s_Form_Poke     Formula Configuration stream	(ch16 "sData" pairs: id,value)
+//	1348	s_Mat_Poke      Matrix  Configuration stream	(ch16 "sData" pairs: id,value)
+//	1661	s_Kinet_Poke    Kinetic Properties stream		(ch16 "sData" pairs: id,value)
+//	1716	s_BiqSin_Poke   BiqSin  Properties stream		(ch16 "sData" pairs: id,value)
+//	1779	s_Conv_Poke     Convolution Config stream 		(ch16 "sData" pairs: id,value)
+//	1824	Thick Continuum config strip locations
 
 
 // Overview of Haken Audio Midi Protocol:
@@ -44,7 +44,7 @@
 //			Bn 74 yy		(4) Y 7' (optionally preceded by cc86 for 14')
 //			8n nn 127		(5) start note at pitch of nn + immediately preceding X bend
 //			9n nn 127		(6) end of note (not sent until end of sustain/sostenuto if active)
-//		Channel 1 for Absolute 7-bit Control (general use) and 14-bit Macros (for EaganMatrix Overlays)
+//		Channel 1 for Absolute 7-bit Control (general use) and 14-bit Macros (for FrontEnds)
 //							0xB0 is "ctlChg1"
 //			B0 cc# value	(1) Absolute 7' controllers and 7' macros
 //							(2)  m7-m48 14' controllers (lsb in preceding "ccFracIM48" cc86)
@@ -93,6 +93,7 @@ enum {
 	polyKeyPres 	= 0xA0,		// polyphonic key pressure (2 data bytes) meaning depends on channel;
 								// channel 1 uses standard Midi definition, repurposed on other channels.
 								// Channel bits = 0000 rx:    MPE ch1 Z, used by rechannelMidiKeyboard()
+		lbData			= 0xA1,	// Channel bits = 0001 tx&rx: 14' loopback detect pattern	10.78
 		dData00			= 0xA8,	// Channel bits = 1000 rx:    two memory download bytes 0xxxxxxx 0yyyyyyy
 		dData01			= 0xA9,	// Channel bits = 1001 rx:    two memory download bytes 1xxxxxxx 0yyyyyyy
 		dData10			= 0xAA,	// Channel bits = 1010 rx:    two memory download bytes 0xxxxxxx 1yyyyyyy
@@ -127,8 +128,8 @@ enum {
 	MidiTimingCode	= 0xF1,		// Midi Time Code quarter-frame message (together with Time Code SysEx)
 	SongPosPtr 		= 0xF2,		// 2 bytes of data follow
 	SongSelect 		= 0xF3,		// 1 byte of data follows
-	//				= 0xF4,		//
-	//				= 0xF5,		//
+	mData			= 0xF4,		// [undefined/reserved] internal use: route Music Data		10.73
+	oData			= 0xF5,		// [undefined/reserved] internal use: route Other Data		10.73
 	TuneRequest	 	= 0xF6,		// no data follows
 	SysExEnd 		= 0xF7,		// end system exclusive; see also s_StreamEnd 				 5.40 [BPK]
 	TimingCk 		= 0xF8,		// Midi Clock: message 1 of 4 (real time, 24 per quarter note, no data)
@@ -185,7 +186,7 @@ enum {
 			 /* ch1/ch2 cc64  */   "Sus Stretch Sos HpLevel LineLevel Sos2 Actuatn "					  \
 			 /* ch1/ch2 cc71  */     "(71) (72) (73) "													  \
 			 /* ch1/ch2 cc74  */   "ccY "																  \
-			 /* ch1/ch2 cc75  */     "(75) min1 max1 min2 max2 (80) (81) LpDetect "						  \
+			 /* ch1/ch2 cc75  */     "(75) min1 max1 min2 max2 (80) (81) (82) "							  \
 			 /* ch1/ch2 cc83  */   "EqTilt EqFrq EqMix FracIM48 Frac MSpL MSpH ThrDrv AtkCut "			  \
 			 /* ch1/ch2 cc92  */   "RatMkp CoThMix (94) Reci5 Reci6 FracM49M90 NrpnL NrpnH RpnL RpnH "	  \
 			 /* ch1/ch2 cc102 */     "m31/m73 m32/m74 m33/m75 m34/m76 m35/m77 m36/m78 m37/m79 m38/m80 "   \
@@ -211,16 +212,16 @@ enum {
 			   /* ch 16 cc39  */     "(39) Row Col MatDecLo MatDecHi MatVal MatOp Neighbor ModMatInd "    \
 			   /* ch 16 cc48  */     "ModMatVal (49) (50) Grid (52) (53) CreaArch CreaArchFin "			  \
 			   /* ch 16 cc56  */     "Stream AnlysSlot (58) MiniMicro_LB (60) (61) (62) (63) "			  \
-			   /* ch 16 cc64  */   "[64] [65] [66] [HpLevel] [LineLevel] [Sos2] [Actuatn] "				  \
+			   /* ch 16 cc64  */   "[Sus] [Stretch] [Sos] [HpLevel] [LineLevel] [Sos2] [Actuatn] "		  \
 			   /* ch 16 cc71  */     "PolyTrad PolyDsp PolyCvc "										  \
 			   /* ch 16 cc74  */   "ccY "																  \
-			   /* ch 16 cc75  */     "Test Min1 Max1 Min2 Max2 NHyst (81) LpDetect "					  \
+			   /* ch 16 cc75  */     "Test Min1 Max1 Min2 Max2 NHyst (81) (82) "						  \
 			   /* ch 16 cc83  */   "[EqTilt] [EqFrq] [EqMix] [FracIM48] Frac [MSpL] [MSpH] [ThrDrv] "	  \
 			   /* ch 16 cc91  */   "[AtkCut] [RatMkp] [CoThMix] (94) [Reci5] [Reci6] [FracM49M90] "		  \
 			   /* ch 16 cc98  */   "NrpnL NrpnH RpnL RpnH "												  \
 			   /* ch 16 cc102 */     "VersHi VersLo CVCHi CVCMed CVCLo RxSNBN (108) Task "				  \
-			   /* ch 16 cc110 */     "DInfo LedAes Store txSNBN UsgDisp LogDump Editor (117) "			  \
-			   /* ch 16 cc118 */     "EdReply ArcCnt "													  \
+			   /* ch 16 cc110 */     "DInfo LedAesState Store txSNBN UsgDisp LogDump Ping (117) "		  \
+			   /* ch 16 cc118 */     "Pong ArcCnt "														  \
 			   /* ch 16 cc120 */   "SoundOff "															  \
 			   /* ch 16 cc121 */     "(121) CRC0 CRC1 CRC2 CRC3 CRC4 "									  \
 			   /* ch 16 cc127 */   "MPE "
@@ -260,10 +261,10 @@ enum {
 	#define SSL_Mat_Poke	       /* see s_Mat_Poke section below for definitions of these id */		  \
 			/* stream 20 id 0   */ "(0) SplitMode NoteMode ReciCol1 ReciCol2 OkIncComp "				  \
 			/* stream 20 id 6   */ "Prio SwTogInst OctBtn Reverse RoundMode OkExpPoly Action "			  \
-			/* stream 20 id 13  */ "Aes3 BigFontPop RecircDisab CompOpt MinY MaxY MinZ MaxZ "			  \
+			/* stream 20 id 13  */ "Aes3 (14) RecircDisab CompOpt MinY MaxY MinZ MaxZ "					  \
 			/* stream 20 id 21  */ "OutEnc1 OutEnc2 OutMin1 OutMax1 OutMin2 OutMax2 "					  \
 			/* stream 20 id 27  */ "MastCol1 MastCol2 MastCol3 MastCol4 MastCol5 MastCol6 (33) (34) "     \
-			/* stream 20 id 35  */ "Program Routing legacyCh1Out (38) Poly BendRange "					  \
+			/* stream 20 id 35  */ "Program Routing LegacyCh1 OctY Poly BendRange "						  \
 			/* stream 20 id 41  */ "Yencode Zlegacy Zencode MiddleC SplitPoint MonoFunc (47) "			  \
 			/* stream 20 id 48  */ "MonoInterv (49) (50) (51) Pedal1 Pedal2 JackShift (55) "		      \
 			/* stream 20 id 56  */ "PreservSurf PreservPed PreservEncod ConfigToMidi TArea MiniI2C "	  \
@@ -274,8 +275,8 @@ enum {
 			/* stream 20 id 87  */ "(87) (88) (89) (90) BankA BankB BankC BankBcm1 BankAcm1 "			  \
 			/* stream 20 id 96  */ "BankBcm2 BankAcm2 BankParamB BankParamA "							  \
 			/* stream 20 id 100 */ "SgTyp1 SgTyp2 SgTyp3 SgTyp4 SgTyp5 TimeSel RowTyp1 RowTyp2 "	      \
-			/* stream 20 id 108 */ "AliasDelay (109) (110) (111) (112) (113) (114) (115) (116) "	      \
-			/* stream 20 id 117 */ "(117) (118) (119) (120) (121) (122) (123) (124) "					  \
+			/* stream 20 id 108 */ "AliasDelay ShortAudioQ Forbid102 (111) (112) (113) (114) "			  \
+			/* stream 20 id 115 */ "(115) (116) (117) (118) (119) (120) (121) (122) (123) (124) "		  \
 			/* stream 20 id 125 */ "Atten FromAnlys ToAnlys "
 
 
@@ -289,21 +290,21 @@ enum {
 			/* ccTask value 20  */ "endDataDownload midiLoopback contTxtToMidi tenSecsOld begTxDsp "      \
 			/* ccTask value 25  */ "endTxDsp doneTxDsp txDspFail doUpdF2 createLed testBegin testErr "    \
 			/* ccTask value 32  */ "userToMidi manualUpdate doResetCalib doRefineCalib "		          \
-			/* ccTask value 36  */ "debugAllFing 37nop 38nop sysToMidi "	                              \
+			/* ccTask value 36  */ "debugTAreaAllF 37nop 38nop sysToMidi "	                              \
 			/* ccTask value 40  */ "endSysNames doFactCalib doUpdate1 burnUser489 rebootUpdF1 "	          \
 			/* ccTask value 45  */ "surfAlign addTrim delTrim resetTrim beginSysNames anlysToMidi "		  \
-			/* ccTask value 51  */ "storeFactSetup decPreset incPreset beginUserNames endUserNames "	  \
+			/* ccTask value 51  */ "storeTopo decPreset incPreset beginUserNames endUserNames "			  \
 			/* ccTask value 56  */ "clearTopo preEraseUpdF1 preEraseUpdF2 preEraseDone remakeSRMahl "     \
 			/* ccTask value 61  */ "doneFactProg failFactProg usbTxNoAck rxOver txOver rxSynErr "		  \
 			/* ccTask value 67  */ "rxBitErr sensComm nanErr ceeSeq burnUserMini doMidiLog0	doMidiLog1 "  \
 			/* ccTask value 74  */ "doMidiLog2 doMidiLog3 burnRecovery489 77nop burnRecovMini "           \
 			/* ccTask value 79  */ "loadsToMidi defFirstTuning defGrid2 defGrid3 defGrid4 defGrid5 "      \
-			/* ccTask value 85  */ "defGrid6 defGrid7 defLastTuning numDecMat numIncMat mendDisco "	      \
+			/* ccTask value 85  */ "defGrid6 defGrid7 defLastTuning (88) (89) mendDisco "	              \
 			/* ccTask value 91  */ "rebootRecov stageUp stageDown stageDok1 stageDok2 stageDok3 "		  \
 			/* ccTask value 97  */ "stageDfail1 stageDfail2 stageDfail3 rebootFinaliz gridToFlash "		  \
 			/* ccTask value 102 */ "mendDivided startUpdF2 doneSRMahl pullConv pullSSet "                 \
-			/* ccTask value 107 */ "(107) (108) (109) (110) (111) (112) (113) (114) "	                  \
-			/* ccTask value 115 */ "Empty1 Empty2 Empty3 Empty4 Empty5 Empty6 Empty7 Empty8 "             \
+			/* ccTask value 107 */ "decrMat incrMat decrMat001 incrMat001 decrMat0001 incrMat001 (113) "  \
+			/* ccTask value 114 */ "(114) Empty1 Empty2 Empty3 Empty4 Empty5 Empty6 Empty7 Empty8 "       \
 			/* ccTask value 123 */ "burnUser593 burnRecov593 dnTrim upTrim rebootUser "
 
 
@@ -365,11 +366,17 @@ enum {
 
 
 // ---------------------------------------- Preset Load and Store ----------------------------------------
-// Midi order for preset load:	   (on ch2 or ch16)
+// Midi order for preset load:	   (on ch2 for to-continuum, or ch16 for from-continuum)
 //	 ccBankH category; ccBankL presetHi; progChg presetLo	   (presetLo/Hi are preset# within category)
 // Midi order for preset store:	   (on ch16)
 //	 ccBankH category; ccBankL presetHi; ccStore presetLo									10.33
-
+// Note: When a preset is selected inside a Haken device, the Haken device transmits:  (on ch16)
+//   ccBankH 126; ccBankL MSB; progChg LSB
+//   This MSB/LSB value meaning:
+//			0 		  for current preset edit buffer
+//			1..128 	  for user presets
+//			129..~788 for all system presets in alphabetical order intended for the Haken Editor to use.
+//					  (If you are picking by category this value may not have much logical order.)
 	ccBankH			= 0,		// category select; ccBankL and progChg follow.				 9.70 [COVID19]
 								// Aliased (same function) on ch2 and ch16.					 9.95
 								// Categories 0..91 are for "general use,"
@@ -553,12 +560,11 @@ enum {
 // For all controllers assignable to pedals (including 7' and 14' controllers), see routine pedVal7().
 // NB: Saved preset files have these on ch16, but usually these are on ch1.  More details:
 //	   Except when loading presets, Continuums ignore these incoming on ch16.
-//     Continuums transmit these on ch16 for "private" communication to Editor/Overlay, or saving presets.
-// NB: Editor and/or Overlays should always accept these incoming on ch16 as well as incoming on ch1.
-//	   Editor and/or Overlays should always transmit these on ch1.
-// Example: EaganMatrix hardware rx ccOctShift on ch1, but tx ch16 for Editor or Overlay display. That way,
-//     any daisy-chained EaganMatrix sees shifted notes but not ch16 ccOctShift, avoiding double-shift.
-// NB: ch1 also has cc82 ccLoopDetect, a random pattern for loopback detect (defined for ch16 below).
+//     Continuums tx these ch16 for "private" communication to FrontEnd (overlay/Editor), or preset save.
+// NB: FrontEnd (Editor or Overlays) should always accept these rx ch16 as well as rx ch1.
+//	   FrontEnd should always transmit these on ch1.
+// Example: EaganMatrix hardware rx ccOctShift on ch1, but tx ch16 for FrontEnd (overlay/Editor) display.
+//     So any daisy-chained EaganMatrix sees shifted notes but not ch16 ccOctShift, avoiding double-shift.
 	ccOctShift		= 8,		// octave ped (isTri/isSwitch): 60=normal, 48/72=oct dn/up	 7.75 [JoshuaT]
 								// rx ch1, tx ch16	(see also idOctBtn)						10.63
 	ccMonoSwitch	= 9,		// mono footswitch, enable mono interval  					 1.71
@@ -600,7 +606,7 @@ enum {
 
 // ---------------------------------------- General Setup cc: ch16 ----------------------------------------
 	ccDataH			= 6,		// data entry  tx: MPE bend range, MPE+ params				 7.39 [Fruita]
-	ccFormSel		= 34,		// select a formula for Editor/Overlay display and/or modification
+	ccFormSel		= 34,		// select a formula for FontEnd display and/or modification
 	ccFormCopy		= 35,		// formula to copy into currently selected; 0 primary to secondary
 	    cpyA = 1 /*matA*/, cpyW = 45 /*matW*/, cpyX, cpyXnn, cpyY, cpyZ, cpy0p1,
 	ccMacrUses		= 36,		// request list of formulas using specified macro (via s_MacrUses)
@@ -754,14 +760,15 @@ enum {
 		matDisBit 		= 64, 	// bit set if matrix point disabled 						 8.10
 	ccMatOp			= 45,		// matrix operation
 		// 				= 0..101 avail
-		matRedRefresh	= 102,	// rx: single reduced info matrix update; tx: at update end	10.72
+		matRedRefresh	= 102,	// rx: send reduced matrix update, then same as matRefresh 	10.72
+								// tx: at end of reduced update (reverting to matRefresh)	10.74 [SB26]
 		matClrBankA		= 103,	// rx: clear all items in BankA's matrix columns			10.59
 		matClrBankB		= 104,	// rx: clear all items in BankB's matrix columns			10.59
 		matClrBankC		= 105,	// rx: clear all items in BankC's matrix columns			10.59
 		colFloat		= 106,	// rx: Show column value (via s_Float)						 8.61 [DanielB]
 		noFloat			= 107,	// rx: Hide debug value (no s_Float)						 8.10
 		formFloat		= 108,	// rx: Show formula value (s_Float)							 8.10
-		matNoRefresh	= 109,	// rx: no auto-refresh (til matRefresh) tx: refresh proxy	10.66
+		matNoRefresh	= 109,	// rx: no auto-refresh for edits; tx: refresh prox			10.66
 		nyqDis			= 110,	// tx: Delay nyquist filter disabled						 5.41
 		nyqOff			= 111,	// tx: Delay nyquist filter not in use						 5.41
 		nyqOn			= 112,	// tx: Delay nyquist filter is in use
@@ -776,7 +783,8 @@ enum {
 		matTogMute		= 121,	// rx: toggle mute on ccRow,ccCol matrix point				 8.10
 		matSetMute		= 122,	// rx: set mute on ccRow,ccCol matrix point 				10.33
 		matClrMute		= 123,	// rx: clear mute on ccRow,ccCol matrix point 				10.33
-		matRefresh		= 124,	// rx: retransmit matrix/current formula/text tx: final item transmitted
+		matRefresh		= 124,	// rx: send matrix/formula/text now and when edited
+								// tx: at end of sending an update							10.74 [SB26]
 		matClear		= 125,	// rx,tx: clear matrix (tx to Editor at new preset load)
 		matStart		= 126,	// rx,tx: matrix data follows
 		matSelPos		= 127,	// rx: user mouseup in matrix, select it;
@@ -794,10 +802,9 @@ enum {
 		lastUserTuning 	= 87,
 		userTuningGrids = lastUserTuning - firstUserTuning + 1,
 	ccAnlysSlot		= 57,		// specify analysis slot number, follows s_AnlysName		10.41
-	ccLB			= 59,		// loopback detect: only sent, never received;				 9.08 [COVID19]
-								// one of two loopback detect mechanisms, see also ccLoopDetect
-	ccLoopDetect	= 82,		// random pattern for loopback detect (ch16 *and* ch1);		 8.62 [RoanMtn]
-								// one of two loopback detect mechanisms, see also ccLB
+	ccLB			= 59,		// loopback detect: only tx, never rx (unless loopback);	 9.08 [COVID19]
+								// sent at start of tx matrix definition to avoid disaster if loopback;
+								// one of two loopback detect mechanisms, see also lbData
 	ccCreaArch		= 54,		// creating user preset group (data = user preset #0..127)	10.56
 								// (see related cfCreateArch16..cfCreateArch1)
 	ccCreaArchFin	= 55,		// last in user preset group (data = user preset #0..127)	10.56
@@ -895,7 +902,7 @@ enum {
 		manualUpdate	= 33,	// tx: old preset requires manual update 					 6.20
 		doResetCalib	= 34,	// rx: replace at-rest sensor levels						 6.38
 		doRefineCalib	= 35,	// rx: incorporate new at-rest								 6.38
-		debugAllFing	= 36,	// rx: tx All Fingers (if used by preset) on ch polyTrad+1	10.72
+		debugTAreaAllF	= 36,	// rx: tx Touch Area or All Fingers on ch polyTrad+1		10.73
 		//				= 37,	//     retired one-third midi transmission rate
 		//				= 38,	//     retired one-twentieth midi transmission rate
 		sysToMidi		= 39,	// rx: request sysPreset names to Midi, then current config	 6.19
@@ -911,7 +918,7 @@ enum {
 		resetTrim		= 48,	// rx: remove all Pitch Trim data  							 7.57
 		beginSysNames	= 49,	// tx: begin list of system presets 			 			 9.70
 		anlysToMidi		= 50,	// rx: request all s_AnlysName (subset of userToMidi)		10.43
-		storeFactSetup	= 51,	// rx: store factory setup state (including SN)
+		storeTopo		= 51,	// rx: store topology (and set SN if appropriate)
 		decPreset		= 52,	// rx: go to prev sysPreset									 8.59 [SuprBth]
 		incPreset		= 53,	// rx: go to next sysPreset									 8.59 [SuprBth]
 		beginUserNames	= 54,	// tx: begin list of analysis and uPreset names				 7.78 10.41
@@ -932,10 +939,10 @@ enum {
 		nanErr			= 69,	// tx: output has nan										 8.50
 		ceeSeq			= 70,	// tx: multi-dsp comm glitch								 8.50
 		burnUserMini	= 71,	// rx: done Mini/Micro firmware download, write flash		10.42
-		doMidiLog0		= 72,	// rx: end scrolling ascii log via Midi						 7.40 8.81
-		doMidiLog1		= 73,	// rx: dsp1 scrolling ascii log via Midi					 7.40 8.81
-		doMidiLog2		= 74,	// rx: dsp2 scrolling ascii log via Midi 					 7.40 8.81
-		doMidiLog3		= 75,	// rx: dsp3 scrolling ascii log via Midi 					 7.40 8.81
+		doMidiLog0		= 72,	// rx: end scrolling ascii "hardware log" via Midi			 7.40 8.81
+		doMidiLog1		= 73,	// rx: dsp1 scrolling ascii "hardware log" via Midi			 7.40 8.81
+		doMidiLog2		= 74,	// rx: dsp2 scrolling ascii "hardware log" via Midi 		 7.40 8.81
+		doMidiLog3		= 75,	// rx: dsp3 scrolling ascii "hardware log" via Midi 		 7.40 8.81
 		burnRecovery489 = 76,	// rx: done recovery firm 2x6x download, write flash
 		//				= 77,	//     retired recovery firm 1x3x 
 		burnRecoveryMini= 78,	// rx: done recovery firm Mini/Micro download, write flash	10.42
@@ -943,8 +950,8 @@ enum {
 		defFirstTuning	= 80,	// rx: begin first user tuning grid; ccDataL data follows 
 			// 80..87 are for defining user tuning grids					 
 		defLastTuning 	= 87,	// rx: begin last  user tuning grid; ccDataL data follows 
-		numDecMat		= 88,	// rx: decrement numeric matrix point						 9.70
-		numIncMat		= 89,	// rx: increment numeric matrix point						 9.70
+		//				= 88,	//
+		//				= 89,	//
 		mendDisco		= 90,	// rx: mend discontinuity at note (Sensor Map)				 9.74
 		rebootRecov		= 91,	// rx: reboot in Recovery Mode, no delay					 9.81
 		stageUp			= 92,	// rx: upload monolithic update	       (Osmose-specific)	 9.82
@@ -958,12 +965,12 @@ enum {
 		doneSRMahl		= 104,	// tx: done with remakeSRMahl								10.43
 		pullConv		= 105,	// internal: get convolution data (DSP593 tx dsp1, rx dsp2)	10.39
 		pullSSet		= 106,	// internal: get spectral set     (DSP593 tx dsp1, rx dsp2)	10.39
-		//				= 107,	// 		(retired rx for old demo assortment machinery)
-		//				= 108,	//  	(retired rx for old demo assortment machinery)
-		//				= 109,	//  	(retired rx for old demo assortment machinery)
-		//				= 110,	//  	(retired rx for old demo assortment machinery)
-		//				= 111,	//  	(retired rx for old demo assortment machinery)
-		//				= 112,	//  	(retired rx for old demo assortment machinery)
+		decrMat			= 107,	// rx: decrement numeric matrix point by 1 or .01			 9.70
+		incrMat			= 108,	// rx: increment numeric matrix point by 1 or .01			 9.70
+		decrMat001		= 109,	// rx: decrement numeric matrix point by .001				10.76
+		incrMat001		= 110,	// rx: increment numeric matrix point by .001				10.76
+		decrMat0001		= 111,	// rx: decrement numeric matrix point by .0001				10.76
+		incrMat0001		= 112,	// rx: increment numeric matrix point by .0001				10.76
 		//				= 113,	//  	(retired rx for old demo assortment machinery)
 		//				= 114,	//  	(retired rx for old demo assortment machinery)
 		Empty1			= 115,	// rx: Empty to first set-of-16 user presets.				 9.70 [COVID19]
@@ -972,7 +979,7 @@ enum {
 		burnUser593 	= 123,	// rx: done firmware 8x download, write flash (if crc ok)
 		burnRecovery593 = 124,	// rx: done recovery firm 8x download, write flash
 		dnTrim			= 125,	// rx: decrease pitch trim value nearest to finger by 1		10.53 [Paris]
-		upTrim			= 126,	// rx: increase pitch trim value  nearest to fingerby 1		10.53 [Paris]
+		upTrim			= 126,	// rx: increase pitch trim value  nearest to finger by 1	10.53 [Paris]
 		rebootUser		= 127,	// rx: reboot in User (normal) Mode, no delay				10.33
 	ccDInfo			= 110,		// for Continuum Editor: additional info for download
 		// NB: ccTask not stored within an "archive" (preset in .mid file); but some ccDInfo are.
@@ -1001,7 +1008,7 @@ enum {
 		finalizing		= 125,	// tx: left msg "finalizing flash"
 		//				= 126,	// tx: left msg "initializing" [no longer used, except in old archives]
 		//				= 127,	// tx: center msg "Profile. Please wait." [no longer used]
-	ccEdState		= 111,		// Continuum state info (to Editor) 						 3.47
+	ccLedAesState		= 111,	// tx: LED and AES state info, sent after rx ccPing			 3.47
 		sLedBits		= 0x0f,	// select led color bits
 		  ledOff		  = 0,	// led color
 		  ledBlue		  = 1,	// led color
@@ -1025,7 +1032,8 @@ enum {
 	ccRxSNBN 		= 113,		// rx: Response to ccTxSNBN									 3.26
 								// for private use only; sets poly, multi-split, and Midi special encoding:
 								// high channel numbers, assume bend 96, default y z cc
-	cc_txUsg_rxDis  = 114, 		// tx: Processing usage; value is 32*dsp# + 4%units (0-25)	 9.08 [COVID19]
+	cc_txUsg_rxDis  = 114, 		// tx: Processing usage; value is 32*dsp# + 4%units (0-25);	 9.08 [COVID19]
+								//	   this is transmitted after rx ccPing
 								// rx: Haken Audio internal utility sensor data mode, values below
 		utTrigger		= 1,	// rx: utility asking for sensor scan data (tx s_UtilData)	10.59 [BahiaH]
 		utRaw			= 2,	// rx: set utTrigger data mode "Raw Sensors"			(tx s_UtilMinMax)
@@ -1035,8 +1043,11 @@ enum {
 		utBarZ			= 6,	// rx: set utTrigger data mode "Intermediate and Final" (null s_UtilMinMax)
 		utTrigger2		= 127,	// rx: utility asking for secondary data   (tx s_UtilData)	10.59
 	//				= 115		// retired log dump											10.56 [BahiaH]
-	ccEditor 		= 116,		// rx: Continuum Editor is out there 						 3.33
-	ccEditorReply	= 118,		// tx: Respond to ccEditor 1/,1/doubleSR,3/ProcPow,1/SNBN,1/edCvcMatrix
+	ccPing 		= 116,			// rx: first part of ping-pong handshake; 				 	 3.33
+								//     handshakes required throughout data downloads, else optional.
+	//			= 117,
+	ccPong		= 118,			// tx: response to ccPing 1/,1/doubleSR,3/ProcPow,1/SNBN,1/edCvcMatrix
+								// NB: ccLedAesState and cc_txUsg_rxDis are also sent in response to ccPing
 		edsCvcMatrix	= 0,	// bit 0: cvc determined by EaganMatrix						 5.20 7.44
 		edsSNBN			= 1,	// bit 1: SNBN private bit for one special customer
 		edsProcPow		= 2,	// bits 2-4: 3-bit procPowMult: 1..6=1x..6x, 7=8x			 7.82
@@ -1112,9 +1123,9 @@ enum {
 		s_MacrUses		= 18,	// Response to ccMacrUses (from Continuum to Editor):
 								// list of formulas (values matA.._matV) that use ccMacrUses macro
 		s_Form_Poke		= 19,	// Formula Configuration poke					(id,value pairs)
-								// >> see s_Form_Poke section below for id assignments		10.32
+		  sFP = s_Form_Poke,	// >> see s_Form_Poke section below for id assignments		10.32
 		s_Mat_Poke		= 20,	// Matrix Configuration poke					(id,value pairs)
-								// >> see s_Mat_Poke section below for id assignments		10.32
+		  sMP = s_Mat_Poke,		// >> see s_Mat_Poke section below for id assignments		10.32
 		s_Graph_Poke	= 21,	// Graph poke     (id 0..47, value 0..96)		(id,value pairs)
 		s_GraphO1_Poke	= 22,	// First Offset Graph poke	(0..47,0..96)		(id,value pairs)
 		s_GraphO2_Poke	= 23,	// Second Offset Graph poke	(0..47,0..96)		(id,value pairs)
@@ -1242,10 +1253,10 @@ enum {
 		cRelative		= 3,	// for formula's X and Y components only
 		cReleaseF		= 3,	// for formula's Z component only 							 8.20
 		cReleaseP		= 4,	// for formula's Z component only 							 8.21
-		cContinuousNT	= 4,	// for formula's X component only - no trim	X				10.36
-		cInitialNT		= 5,	// for formula's X component only - no trim	X				10.36
-		cDerivativeNT	= 6,	// for formula's X component only - no trim	X				10.36
-		cRelativeNT		= 7,	// for formula's X component only - no trim	X				10.36
+		cContinuousNT	= 4,	// for formula's X component only - no trim graph applied	10.36
+		cInitialNT		= 5,	// for formula's X component only - no trim graph applied	10.36
+		cDerivativeNT	= 6,	// for formula's X component only - no trim graph applied	10.36
+		cRelativeNT		= 7,	// for formula's X component only - no trim graph applied	10.36
 	idNegBegZ		= 23,		// true for -idVBegZ; no effect until idVBegZ received
 	idVBegZ			= 58,		// beginning Z (vertical)   0..100; with idNegBegZ -1..1 in 0.01 steps
 	idNegEndZ		= 25,		// true for -idVEndZ; no effect until idVEndZ received
@@ -1400,9 +1411,9 @@ enum {
 		MNoNote			= 3,	// do not output keyOn,keyOff,bends -- for CVC+Midi control of Voyager
 		MMidC			= 4,	// nn 60 and static velocity all notes (Moog Theremin)		 7.84
 		MAnnounce		= 5,	// private SNBN use for one special customer
-	idLegacyCh1out	= 37,		// legacy ch1 output options								10.66
-		LCh1note		= 1,	// legacy note output starting on ch1						10.66
-		LCh1knob		= 2,	// legacy knob controller output on ch1						10.67
+	idLegacy		= 37,		// legacy options											10.66
+		LCh1note		= 1,	// legacy note i/o starting on ch1 (pre-MPE style)			10.75
+		LCh1knob		= 2,	// legacy knob controller output on ch1 (so 10.09 sees it)	10.75
 	// Touch Area and Split
 	idTArea		 	= 60, 		// nn center of Touch Area; < nnLowFull if disabled			 7.76
 		nnTWid			= 2,	// +/- width of tarea area (unless extended by split SplitTArea)
@@ -1420,6 +1431,7 @@ enum {
 	// Transpose and Rounding
 	idMiddleC 		= 44,		// middle C transpose; nnMiddleC = normal, 59 = sound half step lower
 	idOctBtn		= 8,		// octave button (Oct+/Oct-): 60=normal, 48/72=oct dn/up	10.63
+	idOctY			= 38,		// octave shift via finger's initial Y						10.78
 	idReverse		= 9,		// true to reverse pitches
 	idRoundMode		= 10,		// rounding mode
 		rNormal			= 0,	// normal rounding
@@ -1452,6 +1464,7 @@ enum {
 	// Pedals - ch1 Output
 	idOutEnc1		= 21,		// pedal 1 cc for ch1 pedal output, 0 = off					10.59
 	idOutEnc2		= 22,		// pedal 2 cc for ch1 pedal output, 0 = off
+		cc74alias		= 124,	// for internal use: alias for cc74
 	idOutMin1		= 23,		// start of pedal 1 range to transmit on ch1				10.59
 	idOutMax1		= 24,		// end of pedal 1 range to transmit on ch1
 	idOutMin2 		= 25,		// start of pedal 2 range to transmit on ch1				10.59
@@ -1623,8 +1636,8 @@ enum {
 		rt2SubTap		= 2,	// idRowTyp2: Mono Mix Submix, Mono Mix Tap3+Tap4
 		rt2Aud			= 3,	// idRowTyp2: Audio L and R 
 		rt2AudTap		= 4,	// idRowTyp2: Mono Mix Audio, Mono Mix Tap3+Tap4
-	// Midi and Global Options - for all presets
-	idAction		= 12,		// select global options Action								 4.33
+	// Midi and Global Settings - for all presets
+	idAction		= 12,		// select global settings Action							 4.33
 		ActnMiniClassic = 0,	// pre-CF600 or ContinuuMini/EaganMatrixMicro
 		ActnMedium		= 1,	// medium action (thresholds same as Classic)
 		ActnLight		= 2, 	// light action
@@ -1633,17 +1646,16 @@ enum {
 		AEShouse		= 1,	// use aes3 house clock (aesrx clock) for xmit, if aesrx available
 		AES48k 			= 2,	// aestx at 48k clock rate, internally clocked
 		AES108k			= 3,	// this can't be user-configured; for multi-dsp only  		 5.55
+	idShortAudioQ	= 109,		// true = short audio queues (only on E2x)					10.74
+	idForbid102		= 110,		// true = override auto-detection of AS102 sensors			10.75
 	idMiniI2C		= 61,		// true = Mini Ped/Ext jack for i2c; false = for pedal		10.61
 	idPrsvSurf		= 56,		// true = preserve surface processing (round, split, mono, etc)
 	idPrsvPed		= 57,		// true = preserve Pedal assignments (Ped1/2,jackShift,min,max)
 	idPrsvEnc		= 58,		// true = preserve encoding (Bend, Ycc, Zcc, routing, cvc) 	 6.16 10.33
-	idBigFontPop	= 14,		// true for large popup menu font in Editor					 7.21 10.33
 	idAtten			= 125,		// tx: synonym for ccAtten for transmit to Editor			10.63
 	// Copy additive analyses from one location to another.
 	idFromAnlys		= 126,		// source additive analysis slot#
 	idToAnlys		= 127,		// destination additive analysis slot#						10.34
-	// Session options - active until power cycle
-	idCfgOut		= 59,		// true = output config to Midi whenever it changes			 5.40
 
 
 	// ---------------------------------- s_Kinet_Poke id Assignments -----------------------------------

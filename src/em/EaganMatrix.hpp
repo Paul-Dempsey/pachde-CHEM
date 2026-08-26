@@ -139,8 +139,8 @@ struct EaganMatrix
     ConvolutionParams& get_convolution() { return convolution; }
 
     // simple cc value retreival
-    uint8_t get_led() { return ch16.cc[Haken::ccEdState] & Haken::sLedBits; }
-    uint8_t get_aes_detect() { return ((ch16.cc[Haken::ccEdState] & Haken::sAesBits) >> Haken::sAesShift); }
+    uint8_t get_led() { return ch16.cc[Haken::ccLedAesState] & Haken::sLedBits; }
+    uint8_t get_aes_detect() { return ((ch16.cc[Haken::ccLedAesState] & Haken::sAesBits) >> Haken::sAesShift); }
     uint8_t get_actuation() { return ch16.cc[Haken::ccActuation]; }
     uint8_t get_traditional_polyphony() { return ch16.cc[Haken::ccPolyTrad]; }
     uint8_t get_dsp_polyphony() { return ch16.cc[Haken::ccPolyDsp]; }
@@ -264,10 +264,10 @@ struct EaganMatrix
     bool is_keep_surface_processing() { return mat[Haken::idPrsvSurf]; }
     bool is_keep_pedals() { return mat[Haken::idPrsvPed]; }
     bool is_keep_midi_encoding() { return mat[Haken::idPrsvEnc]; }
-    bool is_big_popup_font() { return mat[Haken::idBigFontPop]; }
+    //unused by CHEM: bool is_big_popup_font() { return mat[Haken::idBigFontPop]; }
     uint8_t get_from_analysis_slot() { return mat[Haken::idFromAnlys]; }
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }
-    bool is_transmit_updates() { return mat[Haken::idCfgOut]; }
+    //obsolete/unused by CHEM: bool is_transmit_updates() { return mat[Haken::idCfgOut]; }
 
     std::vector<IHandleEmEvents*> clients;
     void clearClients() { clients.clear(); }

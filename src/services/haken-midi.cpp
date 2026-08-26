@@ -105,11 +105,11 @@ void HakenMidi::extended_macro(ChemId tag, uint8_t macro, uint16_t value)
     send_message(Tag(MakeCC(Haken::ch1, macro_msb_cc(macro), value >> 7), tag));
 }
 
-void HakenMidi::editor_present(ChemId tag) {
+void HakenMidi::front_end_present(ChemId tag) {
     if (log) {
-        log->log_message(">>H", "---- EditorPresent");
+        log->log_message(">>H", "---- Ping"); // was EditorPresent
     }
-    send_message(Tag(MakeCC(Haken::ch16, Haken::ccEditor, tick_tock ? 85 : 42), tag));
+    send_message(Tag(MakeCC(Haken::ch16, Haken::ccPing, tick_tock ? 85 : 42), tag));
     tick_tock = !tick_tock;
 }
 
