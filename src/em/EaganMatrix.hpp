@@ -268,6 +268,7 @@ struct EaganMatrix
     uint8_t get_from_analysis_slot() { return mat[Haken::idFromAnlys]; }
     uint8_t get_to_analysis_slot() { return mat[Haken::idToAnlys]; }
     //obsolete/unused by CHEM: bool is_transmit_updates() { return mat[Haken::idCfgOut]; }
+    bool is_oct_y() { return mat[Haken::idOctY]; }
 
     std::vector<IHandleEmEvents*> clients;
     void clearClients() { clients.clear(); }

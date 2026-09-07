@@ -1,12 +1,12 @@
 // Haken Audio Midi Protocol by Lippold Haken, (C) Copyright 1999-2026.
 // These definitions are used by the Haken Editor, as well as third-party FrontEnds.
-// In this file, "tx" means transmitted by DSP, "rx" means received by DSP.	
+// In this file, "tx" means transmitted by DSP, "rx" means received by DSP.
 
 #ifndef HAKENMIDI_H
 #define HAKENMIDI_H
 
 // Table of Contents
-// 
+//
 //  Line#	  Topic											  Midi Channels
 //	  36	Overview
 //	  65	Status Bytes    Definitions for Continuum		(all)
@@ -119,7 +119,7 @@ enum {
 								// we sometimes send additional 7 bits with preceding ccFracXYZ
 		bendMax		= 0x3fff,	// max for encoding 14-bit normal Midi PitchWheel
 		extBendMax 	= 0x1fffff,	// max for encoding 21-bit extended Midi PitchWheel using ccFracXYZ
-		bendOffset 	= 0x2000,	// offset for encoding 14-bit normal Midi PitchWheel 
+		bendOffset 	= 0x2000,	// offset for encoding 14-bit normal Midi PitchWheel
 		extBendOffset=0x100000,	// offset for encoding 21-bit extended PitchWheel (using ccFracXYZ)
 
 	// Midi System Messages.
@@ -143,7 +143,7 @@ enum {
 
 	// Masks.
 	realTimeMask 	= 0xF8,		// real-time Midi bytes have these bits set
-	statFlag 		= 0x80,		// top bit of status nybble indicating a status byte   
+	statFlag 		= 0x80,		// top bit of status nybble indicating a status byte
 	statMask 		= 0xF0,		// status nybble
 	chanMask 		= 0x0F,		// channel nybble
 
@@ -173,7 +173,7 @@ enum {
 
 
 // -------------------------------------- List of all cc on ch1/ch2 ---------------------------------------
-// Space-separated list of names of Continuum cc on ch1/ch2.  
+// Space-separated list of names of Continuum cc on ch1/ch2.
 	#define SSL_ch1_ch2            /* see sections below for definitions of these cc */					  \
 			 /* ch1/ch2 cc0   */   "BankH Mod Breath Undef Foot (5) DataH Vol OctShift MonoSw FineTune "  \
 			 /* ch1/ch2 cc11  */   "Express i ii iii iv v vi Post AudIn Reci1 Reci2 Reci3 Reci4 "		  \
@@ -228,7 +228,7 @@ enum {
 
 
 // ----------------------------------------- List of all Streams -----------------------------------------
-// Space-separated list of all stream names, selected by cc56.         
+// Space-separated list of all stream names, selected by cc56.
 	#define SSL_streams		   	   /* see "ccStream" section below for stream formats */				  \
 			 /*  streams  0- 8 */  "Name ConText Graph GraphO1 GraphO2 GraphT0 GraphT1 Log UpdF2 "		  \
 			 /*  streams  9-17 */  "retiredDemoA Float Kinetic BiqSin Sys Conv Thumbnail MacroH MacroL "  \
@@ -325,7 +325,7 @@ enum {
 		   /* ccDInfo value 106 */ "creaArch6 creaArch7 creaArch8 creaArch9 creaArc10 creaArch11 "        \
 		   /* ccDInfo value 112 */ "creaArch12 creaArch13 creaArch14 creaArch15 creaArch16 "              \
 		   /* ccDInfo value 117 */ "(117) inProgress archNop recordArch retrvArch (122) archEof "         \
-		   /* ccDInfo value 124 */ "archToFile finalizing (126) (127) "	
+		   /* ccDInfo value 124 */ "archToFile finalizing (126) (127) "
 
 
 // ----------------------------------- List of all values for ccMatVal -----------------------------------
@@ -382,12 +382,12 @@ enum {
 								// Categories 0..91 are for "general use,"
 								//      including local preset selection.
 								// Categories 126, 127 are for Editor and program interfaces.
-								// 
+								//
 		catUser 		= 0,	// Category# for User Preset Slots; System Presets categories are 1..91
 								// 	NB: Preset numbers start from 1 for internal "catpre" encoding
 								// 		(offset 1 from progChg2/progChg16/ccStore Midi encoding)
-								// 
-								// Categories 1..91 and associated category tags: 
+								//
+								// Categories 1..91 and associated category tags:
 								// All of these are used by the Editor's preset lister;
 								// different subsets are used by the local menu systems of
 								// the Mini (29m2x), EaganMatrix Module (E2x), and Slim Continuum.
@@ -407,22 +407,22 @@ enum {
 								   "WB WI WO " 					/* tags for cat89 - cat91 */
 		#define SSL_MainCat_Cont_E2x  "UP ST WI VO KY CL OT PE PT PR DO MD CV UT "
 		#define SSL_MainCat_29m2x_u2x "UP ST WI VO KY CL OT PE PT DO MD CV UT "
-								//   MainType			 SubType			 
-								//  CL : Classic		AT : Atonal			 
-								//  CV : CVC			BA : Bass			 
-								//  DO : Drone			BO : Bowed			 
-								//  KY : Keyboard		BR : Brass			 
-								//  MD : Midi			DP : Demo Preset	 
-								//  OT : Other			EP : Elec Piano		 
-								//  PE : Percussion		FL : Flute			 
-								//  PR : Processor		LE : Lead			 
-								//  PT : Perc Tuned		OR : Organ			 
-								//  ST : Strings		PA : Pad			 
-								//  UT : Utility		PL : Plucked		 
-								//  VO : Vocal 			RD : Reed Double	 
-								//  WI : Winds			RS : Reed Single	 
-								// 						SU : Struck			 
-								// 
+								//   MainType			 SubType
+								//  CL : Classic		AT : Atonal
+								//  CV : CVC			BA : Bass
+								//  DO : Drone			BO : Bowed
+								//  KY : Keyboard		BR : Brass
+								//  MD : Midi			DP : Demo Preset
+								//  OT : Other			EP : Elec Piano
+								//  PE : Percussion		FL : Flute
+								//  PR : Processor		LE : Lead
+								//  PT : Perc Tuned		OR : Organ
+								//  ST : Strings		PA : Pad
+								//  UT : Utility		PL : Plucked
+								//  VO : Vocal 			RD : Reed Double
+								//  WI : Winds			RS : Reed Single
+								// 						SU : Struck
+								//
 								//   Character ............................................
 								// 	AC : Acoustic	    EN : Ensemble	   RV : Reverberant
 								// 	AG : Aggressive     EV : Evolving	   SD : Snd Design
@@ -434,11 +434,11 @@ enum {
 								// 	CN : Clean		    LP : Looping	   SY : Synthetic
 								// 	DA : Dark		    LY : Layered	   WA : Warm
 								// 	DI : Digital	    MO : Morphing      WO : Woody
-								// 	DT : Distorted	    MT : Metallic   
+								// 	DT : Distorted	    MT : Metallic
 								// 	DY : Dry		    NA : Nature
 								// 	EC : Echo		    NO : Noise
 								// 	EL : Electric	    RN : Random
-								// 
+								//
 								// 	 EaganMatrix .....................	    Setting
 								// 	AD : Additive		HM : HarMan		   C1 : Channel 1
 								// 	BB : BiqBank		KI : Kinetic	   MI : Mono Interval
@@ -447,10 +447,10 @@ enum {
 								// 	CM : Cutoff Mod		OP : Osc Phase	   SP : Split Voice
 								// 	DF : Delay Formula	OS : Osc DSF	   SV : Single Voice
 								// 	DM : Delay Micro	SB : SineBank	   TA : Touch Area
-								// 	DS : Delay Sum		SS : SineSpray		 
-								// 	DV : Delay Voice	WB : WaveBank	
+								// 	DS : Delay Sum		SS : SineSpray
+								// 	DV : Delay Voice	WB : WaveBank
 								// 	EM : Ext Midi Clk
-								// 
+								//
 		catEdBuf 		= 126, 	// Category# for Midi tx and rx, not used internally: Preset Edit Buffer
 								// 	NB: Internally, catUser with userPreset0 is used instead
 								//  NB: Tx to Editor for highlighted preset slot encoded as follows:
@@ -461,9 +461,9 @@ enum {
 								//      it means preset opened from disk, not stored in local presets.
 								//      For userPreset1..UserPreset128 Editor uses catUser;
 								//		for system presets Editor uses catSSlot.
-								// 
+								//
 		catSSlot 		= 127,	// Category# for tx/rx, not used internally: System Preset Slot "sysSlot"
-								// 
+								//
 	ccBankL			= 32,		// optional preset# MSB; follows ccBankH
 								// Aliased (same function) on ch2 and ch16.					 9.95
 //  progChg2  (defined above)	// ch2:  preset load LSB; follows ccBankH and ccBankL.		 9.94
@@ -486,7 +486,7 @@ enum {
 
 // -------------------------------------- Note cc: All MPE Channels --------------------------------------
 // See MPE+ web page for more discussion of Continuum's note encoding.
-// (1) Do not use Key Velocity “MPE Strike Value”; instead use a sequence of values that preserve 
+// (1) Do not use Key Velocity ï¿½MPE Strike Valueï¿½; instead use a sequence of values that preserve
 //     details of the attack trajectory. MPE+ always has Midi Key Velocity at 127.
 // (2) Notes may start at any pitch; the initial pitch of an MPE+ note is Midi Note Number
 //     plus preceding bend. Encourage performers to learn to play without "rounding";
@@ -516,29 +516,29 @@ enum {
 // ------------------------------------- Macros i..vi and 14' m7..m90 -------------------------------------
 	// Continuum MPE+ 14' macros incorporate preceding cc86 (ccFracIM48) or cc97 (ccFracM49M90) for low 7'.
 	// Avoids Midi 14' glitch because cc86 and cc97 values not applied until subsequent macro cc arrives.
-	// 
+	//
 	// i..vi    are  0..1 (see "max14"  0x3F80) and are *optionally* 14' preceded by cc86 ccFracIM48,
 	// m7..m48  are -1..1 (see "zero14" 0x2000) and are   *always*   14' preceded by cc86 ccFracIM48,
 	// m49..m90 are -1..1 (see "zero14" 0x2000) and are   *always*   14' preceded by cc97 ccFracM49M90.
-	// 
+	//
 	// NB: *Identical* cc for macros m7..m48 and m49..m90 are differentiated by preceding cc86 *or* cc97.
-	// 
+	//
 	// Examples: (see cc definitions below)
 	//	   (1) ch1 cc86 108, ch1 cc42 57 ==> m9  = -0.09619 = (0x1CEC-0x2000)/0x2000
 	//	   (2) ch1 cc97 108, ch1 cc42 57 ==> m51 = -0.09619 = (0x1CEC-0x2000)/0x2000
 	//	   (3)               ch1 cc14 57 ==> iii =  0.45    =  0x1C80/0x3F80  (no cc86, so low 7' zero)
 	//	   (4) ch1 cc86 108, ch1 cc14 57 ==> iii =  0.45446 =  0x1CEC/0x3F80
-	// 
+	//
 	// NB: Preset files have macros i..vi on ch16 as aliases for i..vi on ch1, but use streams for m7-m90.
-	// NB: On the EaganMatrix Module (E2x) only, macros i..iv are a special case. 
+	// NB: On the EaganMatrix Module (E2x) only, macros i..iv are a special case.
 	//     The E2x receives ccI..ccIV to provide offsets for the E2x i..iv CV inputs (like rotary).
 	//     When the E2x transmits ccI..ccIV, E2x's i..iv CV inputs are added in to the offsets.
 	ccFracIM48 		= 86,		// 7' lsb for subsequent macro i..m48 or ccJack1,ccJack2
 	ccFracM49M90	= 97,		// 7' lsb for subsequent macro m49..m90
-	// cc12..cc17 are i..vi (top 7' of 14' 0..1); 
+	// cc12..cc17 are i..vi (top 7' of 14' 0..1);
 	//     if there is no preceding cc86 ccFracIM48 (low 7') then low 7' are zero
 	ccI=12,ccII=13,ccIII=14,ccIV=15,ccV=16,ccVI=17,
-	// When preceded by cc86 ccFracIM48 (low 7'), cc40..cc63 are m7..m30 (14' -1..1)   
+	// When preceded by cc86 ccFracIM48 (low 7'), cc40..cc63 are m7..m30 (14' -1..1)
 	ccM7=40,ccM8=41,ccM9=42,ccM10=43,ccM11=44,ccM12=45,ccM13=46,ccM14=47,
 	ccM15=48,ccM16=49,ccM17=50,ccM18=51,ccM19=52,ccM20=53,ccM21=54,ccM22=55,
 	ccM23=56,ccM24=57,ccM25=58,ccM26=59,ccM27=60,ccM28=61,ccM29=62,ccM30=63,
@@ -576,23 +576,23 @@ enum {
 	ccReci3			= 22,		// recirc dial 3, in nn units				 				 6.15 7.35
 	ccReci4			= 23,		// recirc dial 4 (see also ccReci5 and ccReci6)				 3.10 7.36
 	ccReciMix	 	= 24,		// recirc mix control  										 7.36
-	ccRoundRate 	= 25,		// round rate  
+	ccRoundRate 	= 25,		// round rate
 	ccPre	 		= 26,		// samples generation level before Master Section
 	ccAtten			= 27,		// rx: audio-out attenuation, only saved on Slims, see idAtten for tx
 	ccRndIni		= 28,		// Round Initial
 	ccJack1			= 29,		// 0..1 14' (with ccFracIM48) from Pedal Jack 1 or Midi in	 7.73 8.28 8.81
-	ccJack2			= 30,		// 0..1 14' (with ccFracIM48) from Pedal Jack 2 or Midi in 
+	ccJack2			= 30,		// 0..1 14' (with ccFracIM48) from Pedal Jack 2 or Midi in
 	ccAdvance		= 31,		// advance to next upreset									 7.70 [HockngH]
-	ccSus			= 64,		// sustain pedal; down = b0 40 7f; up = b0 40 00  
+	ccSus			= 64,		// sustain pedal; down = b0 40 7f; up = b0 40 00
 	ccStretch		= 65,		// 0..127 = normal..twice stretched intervals				10.34 [Suprbth]
 	ccSos			= 66,		// sostenuto pedal, used as first sostenuto on Continuum
 	ccHpLevel		= 67,		// headphone level (for Osmose) 							 8.12 [COVID19]
 	ccLineLevel		= 68,		// line level  	  (for Osmose)								 8.12 [COVID19]
 	ccSos2			= 69,		// hold2 pedal, used as second sostenuto					 1.67
-	ccMin1			= 76,		// minimum data value for pedal 1							 4.15 
-	ccMax1			= 77,		// max data value for pedal 1			
-	ccMin2			= 78,		// minimum data value for pedal 2		
-	ccMax2			= 79,		// max data value for pedal 2			
+	ccMin1			= 76,		// minimum data value for pedal 1							 4.15
+	ccMax1			= 77,		// max data value for pedal 1
+	ccMin2			= 78,		// minimum data value for pedal 2
+	ccMax2			= 79,		// max data value for pedal 2
 	ccEqTilt		= 83,		// Eq Tilt, 64=flat											 9.10 [COVID19]
 	ccEqFreq	    = 84,		// Eq Frequency   0..127 = 120Hz..15kHz						 9.10 [COVID19]
 	ccEqMix			= 85,		// Eq Mix, 0=dry, 127=wet									 9.10 [COVID19]
@@ -670,7 +670,7 @@ enum {
 		cMast5			=  6,	// 5th of 6 assignable Master columns						10.60
 		cMast6			=  7,	// 6th of 6 assignable Master columns						10.60
 		cSM				=  8,	// Master / Dry mix
-		cL				=  9,	// Dry left 
+		cL				=  9,	// Dry left
 		cR				= 10,	// Dry Right
 		cSep			= 11,	// separator column (used for "no column selected")
 		cOscFilIn1		= 12,	// 1st Oscillator/Filter Input
@@ -689,29 +689,29 @@ enum {
 		cOscFilF5		= 25,	// 5th Oscillator/Filter Frequency
 		cOscFilB5		= 26,	// 5th Oscillator/Filter Bandwidth
 		cA1				= 27,	// BankA first column	idBankA selects bankA function
-		cA2				= 28,	//    
-		cA3				= 29,	//    
-		cA4				= 30,	//    
-		cA5				= 31,	//    
-		cA6				= 32,	//    
-		cA7				= 33,	//    
-		cA8				= 34,	//    
+		cA2				= 28,	//
+		cA3				= 29,	//
+		cA4				= 30,	//
+		cA5				= 31,	//
+		cA6				= 32,	//
+		cA7				= 33,	//
+		cA8				= 34,	//
 		cB1				= 35,	// BankB first column	idBankB selects bankB function
-		cB2				= 36,	//    
-		cB3				= 37,	//    
-		cB4				= 38,	//    
-		cB5				= 39,	//    
-		cB6				= 40,	//    
-		cB7				= 41,	//    
-		cB8				= 42,	//    
+		cB2				= 36,	//
+		cB3				= 37,	//
+		cB4				= 38,	//
+		cB5				= 39,	//
+		cB6				= 40,	//
+		cB7				= 41,	//
+		cB8				= 42,	//
 		cC1				= 43,	// BankC first column   idBankC (delays, or alias for certain BankB)
-		cC2				= 44,	//    
-		cC3				= 45,	//    
-		cC4				= 46,	//    
-		cC5				= 47,	//    
-		cC6				= 48,	//    
-		cC7				= 49,	//    
-		cC8				= 50,	//    
+		cC2				= 44,	//
+		cC3				= 45,	//
+		cC4				= 46,	//
+		cC5				= 47,	//
+		cC6				= 48,	//
+		cC7				= 49,	//
+		cC8				= 50,	//
 		cSgF1			= 51,	// 1st Shape Generator Frequency
 		cSgT1			= 52,	// 1st Shape Generator Trigger
 		cSgF2			= 53,	// 2nd Shape Generator Frequency
@@ -812,7 +812,7 @@ enum {
 	ccPolyTrad		= 71,		// tx: external Midi poly (w/o Touch Area / All Fingers)	10.72
 	ccPolyDsp		= 72,		// tx: _DSP polyphony										 6.00
 	ccPolyCvc		= 73,		// tx: _CVC polyphony										 6.00
-	ccTest			= 75,		// for stress test of Midi to/from Editor; data 64..127		 5.64 
+	ccTest			= 75,		// for stress test of Midi to/from Editor; data 64..127		 5.64
 	ccNHyst			= 80,		// note on/off hysteresis, 64 is default value				10.61
 		// NRPN defined by MPE+ to specify related to effective sample rate of X, Y, and Z finger data:
 		//  100  low-pass filter cutoff for X (bend data) in 2 Hz units
@@ -844,7 +844,7 @@ enum {
 		snbnModeBit		= 0x40,	// data is polyphony, plus top data bit indicates ccRxSNBN received
 	ccTask			= 109,		// task request or report
 		// NB: tx to Editor's Center/Left Message Bars use report() or postReport(). 		 5.60
-		// NB: "download" is firmware or data, "archive" is preset in .mid file; despite separate 
+		// NB: "download" is firmware or data, "archive" is preset in .mid file; despite separate
 		//     messages for the two cases here, Editor Message Bar often uses same text for both.
 		// NB: ccTask not stored within an "archive" (preset in .mid file); but some ccDInfo are.
 		downloadOkBoot 	= 0,	// tx: center msg "Please Power Cycle"						 9.31 [COVID19]
@@ -944,12 +944,12 @@ enum {
 		doMidiLog2		= 74,	// rx: dsp2 scrolling ascii "hardware log" via Midi 		 7.40 8.81
 		doMidiLog3		= 75,	// rx: dsp3 scrolling ascii "hardware log" via Midi 		 7.40 8.81
 		burnRecovery489 = 76,	// rx: done recovery firm 2x6x download, write flash
-		//				= 77,	//     retired recovery firm 1x3x 
+		//				= 77,	//     retired recovery firm 1x3x
 		burnRecoveryMini= 78,	// rx: done recovery firm Mini/Micro download, write flash	10.42
 		loadsToMidi 	= 79,	// rx: do "configToMidi" for future preset loads			10.10
-		defFirstTuning	= 80,	// rx: begin first user tuning grid; ccDataL data follows 
-			// 80..87 are for defining user tuning grids					 
-		defLastTuning 	= 87,	// rx: begin last  user tuning grid; ccDataL data follows 
+		defFirstTuning	= 80,	// rx: begin first user tuning grid; ccDataL data follows
+			// 80..87 are for defining user tuning grids
+		defLastTuning 	= 87,	// rx: begin last  user tuning grid; ccDataL data follows
 		//				= 88,	//
 		//				= 89,	//
 		mendDisco		= 90,	// rx: mend discontinuity at note (Sensor Map)				 9.74
@@ -996,11 +996,11 @@ enum {
 		archiveNop		= 119,	// rx: no-op, used as padding in midi files
 		edRecordArchive	= 120,	// tx: replied to Editor when ccCreaArch/cfCreateArchive is received;
 								//     Editor starts recording (which excludes edRecordArchive)
-		cfRetrieveArch  = 121,	// tx: sent to Editor along with edRecordArchive -- 
+		cfRetrieveArch  = 121,	// tx: sent to Editor along with edRecordArchive --
 								// rx: played back from Editor at start of *retrieval* from archive;
 								//     Editor itself does not use this (except to save in archive)
 		archiveEof		= 123,	// tx: last data sent to Editor in archive create; Editor does not
-								// rx: echoed back from Editor as last data in file during *retrieval* 
+								// rx: echoed back from Editor as last data in file during *retrieval*
 								//     -- Continuum verifies message count
 								//     (but does not exit archRetrieve until later at curGloToFlash)
 		archiveToFile	= 124,	// tx: archive *creation*: Editor stops recording, saves to file system
@@ -1015,7 +1015,7 @@ enum {
 		  ledRed		  = 2,	// led color
 		  ledBrightGreen  = 3,	// led color
 		  ledGreen		  = 4,	// led color
-		  ledWhite		  = 5,	// led color 				 calib		
+		  ledWhite		  = 5,	// led color 				 calib
 		  ledYellow		  = 6,	// led color				 download, etc
 		  ledPurple		  = 7,	// led color				 no aes sync, or flashing if cvc0 power off
 		  ledBlueGreen	  = 8,	// led color				 [retired from flawed sensor]	 4.02
@@ -1037,7 +1037,7 @@ enum {
 								// rx: Haken Audio internal utility sensor data mode, values below
 		utTrigger		= 1,	// rx: utility asking for sensor scan data (tx s_UtilData)	10.59 [BahiaH]
 		utRaw			= 2,	// rx: set utTrigger data mode "Raw Sensors"			(tx s_UtilMinMax)
-		utZoomRaw		= 3,	// rx: set utTrigger data mode "Zoom Raw Sensors"		(tx s_UtilMinMax) 
+		utZoomRaw		= 3,	// rx: set utTrigger data mode "Zoom Raw Sensors"		(tx s_UtilMinMax)
 		utSumDiff		= 5, 	// rx: set utTrigger data mode "Difference and Sum"		(null s_UtilMinMax)
 		utNorm			= 4,	// rx: set utTrigger data mode "Normalized Sensors"		(null s_UtilMinMax)
 		utBarZ			= 6,	// rx: set utTrigger data mode "Intermediate and Final" (null s_UtilMinMax)
@@ -1056,7 +1056,7 @@ enum {
 		edsHWlog		= 6,	// bit 6: Hardware Log turned on for one of the dsp			10.61
 	ccArchCnt		= 119,		// count of controller messages in archive definition
 	//ccSoundOff	= 120,		// ccSoundOff is special, cannot use for data communications
-	//				= 121		   
+	//				= 121
 	ccCRC0			= 122,		// internal dsp1 -> dsp2,dsp3: 7 lsbs of config CRC			 6.20
 	ccCRC1			= 123,		// internal dsp1 -> dsp2,dsp3: next 7 bits of config CRC
 	ccCRC2			= 124,		// internal dsp1 -> dsp2,dsp3: next 7 bits of config CRC
@@ -1145,10 +1145,10 @@ enum {
 
 
 // ------------------------------------- s_Form_Poke id Assignments -------------------------------------
-// Assignments of id for s_Form_Poke; these configure formula parameters. 
-// These affect the formula selected by ccFormSel; ccFormSel must precede use of id below. 
+// Assignments of id for s_Form_Poke; these configure formula parameters.
+// These affect the formula selected by ccFormSel; ccFormSel must precede use of id below.
 // For more information, see ccStream and s_Form_Poke definition above.
-	// Formula's operator	   
+	// Formula's operator
 	idFormOp		= 38,		// formula's operator
 		fAdd			= 0,	// W+X+Y+Z
 		fWMul			= 1,	// W*(X+Y+Z)
@@ -1164,7 +1164,7 @@ enum {
 		wSg3			= 4,	// SG 3
 		wSg4			= 5,	// SG 4
 		wSg5			= 6,	// SG 5
-		wSg1b			= 7,	// SG 1b (for dualSG)										 8.22 
+		wSg1b			= 7,	// SG 1b (for dualSG)										 8.22
 		wSg2b			= 8,	// SG 2b
 		wSg3b			= 9,	// SG 3b
 		wSg4b			= 10,	// SG 4b
@@ -1204,7 +1204,7 @@ enum {
 		m100p0			= 5,	// multiply by 100.0
 		m1000p0			= 6,	// multiply by 1000.0
 		mavail			= 7,	// multiplier available (last one in 3-bit field)
-	idScaleW		= 66,		// 
+	idScaleW		= 66,		//
 		wNone			= 0,	// no scaler (1.0)
 		wMacro			= 1,	// scale with macro idSWMacr; result=0..1 (i..vi) or -1..1 (m7..m90)
 		wMacro127		= 2,	// scale with macro idSWMacr; result=0..127 (i..vi) or -127..127
@@ -1248,7 +1248,7 @@ enum {
 	// Z subcomponent of the formula
 	idInitZ			= 6,		// see definitions below									 7.18 8.20 8.21
 		cContinuous		= 0,	// definitions for idInitX/idInitY/idInitZ
-		cInitial		= 1,	   
+		cInitial		= 1,
 		cDerivative		= 2,	// 															 7.19
 		cRelative		= 3,	// for formula's X and Y components only
 		cReleaseF		= 3,	// for formula's Z component only 							 8.20
@@ -1312,12 +1312,12 @@ enum {
 		aLookNo=0,aLookGrph,aLook1st,aLook2nd,aLookGrph48,aLook1st48,aLook2nd48,
 	idAncNN			= 10,		// false = normal, true = do conversion from kHz to nn
 	idAncLimit		= 9,		// false = normal, true = engage matrix column limiter
-	// Interpolation, Persistence, Reluctance   
+	// Interpolation, Persistence, Reluctance
 	idInterp		= 48,		// interpolation value 0..127 								 4.37 [20Anniv]
 		interpDef		= 40,	// default interpolation
 	idPersist		= 63,		// formula persistence 0..127 								10.56
 	idReluct		= 96,		// formula reluctance 0..127 								10.22
-	// Blend.					   
+	// Blend.
 	idBlend			= 39,		// blend control for primary/secondary formula values		 6.10 10.22
 		// idBlend values:		   (NB: psForm and psMacro use value of idBlMacForm)
 		ps0=0,ps1,psForm,psMacro,psCh1Note,psDuplex,psSus,psSos,psSos2,
@@ -1325,7 +1325,7 @@ enum {
 	idHBegBl		= 121,		// beginning blend (horizontal) 0..12;  end of left shelf
 	idHEndBl		= 123,		// ending blend    (horizontal) 0..12;  start of right shelf
 	idTransBl		= 12,		// blend transfer function (see values defined at idTransY)
-	// Secondary Formula Values (used when Blend active)				   
+	// Secondary Formula Values (used when Blend active)
 	idNegW2			= 14,		// true for -idHeightW2; no effect until idHeightW2 received
 	idHeightW2		= 73,		// secondary idHeightW										 6.19
 	idNegBegX2		= 16,		// true for -idVBegX2; no effect until idVBegX2 received
@@ -1364,7 +1364,7 @@ enum {
 	// Midi encoding
 	idBendRange 	= 40, 		// bend range
 		defBendRange	= 96,	// default bend range is max; good for surface display in Editor
-		maxBendRange 	= 96,	// max bend always used internally independent of ccBendRange 
+		maxBendRange 	= 96,	// max bend always used internally independent of ccBendRange
 								// values > 96 select MPE+ ch1's bend range					 8.60
 	idYencode 		= 41, 		// select cc number for Y position
 		xmitNoY			= 0,	// do not transmit y info
@@ -1390,8 +1390,8 @@ enum {
 		MonoLegatoZ		= 1,	// 							Mini substitutes MonoLegatoT	 8.65
 		MonoRetrigZ		= 2,	// 							Mini substitutes MonoLegatoT	 8.65
 		MonoLegatoT		= 3,	// time-based pitch, use most recent finger's Z
-		MonoRetrigT		= 4,	   
-		MonoRetrigTL	= 5,	   
+		MonoRetrigT		= 4,
+		MonoRetrigTL	= 5,
 		MonoLegatoTZ	= 6,	// time-based pitch, use max finger's Z
 		MonoRetrigTZ	= 7,
 		MonoRetrigTLZ	= 8,
@@ -1440,7 +1440,7 @@ enum {
 		rViaYinv		= 3,	// rounding via 1-Y position
 	// CVC, Midi routing, and user-selectable program
 	idCvcCfg		= 63,		// cvc standard voltage configuration (if no CVC bank in use)
-		cvcStdBits		= 0x07,	// cvc standard voltage range selection	
+		cvcStdBits		= 0x07,	// cvc standard voltage range selection
 		cvcZsqBit		= 0x08,	// cvc z squared select										 7.44
 		cvcLayerBit		= 0x10,	// cvc layer bit											 7.44
 		cvcBaseBits		= 0x60, // cvc base voice bits										 7.44
@@ -1473,10 +1473,10 @@ enum {
 	idNoRecirc		= 15,		// true to disable recirculator 							 5.01 5.12
 	idReciType		= 62,		// recirculator type										 7.36
 		R_shortRev		= 0, 	// short reverb		 										 7.44 10.20
-		R_modDel		= 1,	// modulated delay	
+		R_modDel		= 1,	// modulated delay
 		R_swepEcho		= 2, 	// swept echo												 7.35 [Lechwth]
-		R_anaEcho		= 3,	// analog echo	
-		R_digEchoLPF	= 4,	// digital echo	
+		R_anaEcho		= 3,	// analog echo
+		R_digEchoLPF	= 4,	// digital echo
 		R_digEchoHPF	= 5,	// high pass digital echo									 7.36
 		R_longRev		= 6,	// long reverb												 10.12 10.20
 		R_mask			= 0x7,	// this must be > R_lastone, for switch optimization
@@ -1498,7 +1498,7 @@ enum {
 	// Obsolete
 	idReciCol1		= 3,		// obsolete - use idMastCol3								 8.62 [DanielB]
 	idReciCol2		= 4,		// obsolete - use idMastCol4								10.60
-	// Oscillators/Filters 
+	// Oscillators/Filters
 	idOscFilTyp1	= 72,		// oscillator/filter type, see values below
 	idOscFilTyp2	= 73,
 	idOscFilTyp3	= 74,
@@ -1528,9 +1528,9 @@ enum {
 		CRSH			= 16,	// bit crush
 		GDEL			= 17,	// granulate delay tap (pitch shift)
 	idOscFilOpt1	= 77,		// filterCascade/oscillatorOption/ladderVariant, see values below
-	idOscFilOpt2	= 78,		   
-	idOscFilOpt3	= 79,		   
-	idOscFilOpt4	= 80,		   
+	idOscFilOpt2	= 78,
+	idOscFilOpt3	= 79,
+	idOscFilOpt4	= 80,
 	idOscFilOpt5	= 81,		// if oscFilTyp = LP..HP1,  oscFilOpt=0, or 1..3 to cascade filters
 		m_lin			= 0,	// if oscFilTyp = OSCpwm,	oscFilOpt=0 linear pwm			10.40
 		m_exp			= 1,	// if oscFilTyp = OSCpwm,	oscFilOpt=1 exponential pwm		10.40
@@ -1588,7 +1588,7 @@ enum {
 		bq_iit			= 8,	// biq: 0..7 = deflate values for RBJ biquads; 8 = IIT		10.53
 		wave_saw		= 0,	// waveBank: sawtooth
 		wave_square		= 1,	// waveBank: square
-		wave_triangle	= 2,	// waveBank: triangle			
+		wave_triangle	= 2,	// waveBank: triangle
 		wave_LeCaine	= 3,	// waveBank: LeCaine square
 		defBankParam	= 1,	// default deflate 1 (biqBank) or square (waveBank)			 7.60
 	idAliasDelay	= 108,		// true to disable nyquist filtering on delay
@@ -1598,15 +1598,15 @@ enum {
 	idSSetA			= 64,		// HarMan/ModMan/Additive BankA:   select Set				 5.41 [BPK]
 	idSSetB			= 65,		// HarMan/ModMan/Additive BankB/C: select Set				 5.41 [BPK]
 		Live			= 0,	// HarMan: granulate data recorded by VDelay/SDelay, or flash items below
-		  ss_Bell = 1, Drum = 2, ss_KalimbaHard = 3, ss_KalimbaSoft = 4, 
-		  ss_MarimbaHard = 5, ss_MarimbaSoft = 6, ss_mBiraski = 7, ss_Metal = 8, 
-		  ss_Sprong = 9, ss_Noise1 = 10, ss_Noise2 = 11, ss_StringTap1 = 12, 
+		  ss_Bell = 1, Drum = 2, ss_KalimbaHard = 3, ss_KalimbaSoft = 4,
+		  ss_MarimbaHard = 5, ss_MarimbaSoft = 6, ss_mBiraski = 7, ss_Metal = 8,
+		  ss_Sprong = 9, ss_Noise1 = 10, ss_Noise2 = 11, ss_StringTap1 = 12,
 		  ss_StringTap2 = 13, ss_StringTap3 = 14, ss_ViolaLegato = 15, ss_ViolaMarcato = 16,
-		  ss_PizzicatoLoud = 17, ss_PizzicatoSnap = 18, ss_PizzicatoSoft = 19, 
+		  ss_PizzicatoLoud = 17, ss_PizzicatoSnap = 18, ss_PizzicatoSoft = 19,
 		  ss_SpiccatoLoud = 20, ss_SpiccatoSoft = 21, ss_AltoFlute = 22, ss_AltoSax = 23,
-		  ss_Brass = 24, ss_Clarinet1 = 25, ss_Clarinet2 = 26, ss_Flute1 = 27, 
-		  ss_Flute2 = 28, ss_Oboe1 = 29, ss_Oboe2 = 30, ss_Ukulele1 = 31, ss_Ukulele2 = 32, 
-		  ss_Ukulele3 = 33, ss_ToyPiano1Strike = 34, ss_ToyPiano1Release = 35, 
+		  ss_Brass = 24, ss_Clarinet1 = 25, ss_Clarinet2 = 26, ss_Flute1 = 27,
+		  ss_Flute2 = 28, ss_Oboe1 = 29, ss_Oboe2 = 30, ss_Ukulele1 = 31, ss_Ukulele2 = 32,
+		  ss_Ukulele3 = 33, ss_ToyPiano1Strike = 34, ss_ToyPiano1Release = 35,
 		  ss_ToyPiano2Strike = 36, ss_Crystal = 37,
 		  nSSet,				// HarMan and ModMan: number of flash-based Spectral Sets
 		addM			= 0,	// Additive: Mahling Phrase
@@ -1614,27 +1614,27 @@ enum {
 		add2ndDecade	= 2,	// Additive: 2nd decade (11..20) of Additive Analyses
 		add3rdDecade	= 3,	// Additive: 3rd decade (21..30) of Additive Analyses
 		add4thDecade	= 4,	// Additive: 4th decade (31..40) of Additive Analyses
-	// Shape Generators   
+	// Shape Generators
 	idSgTyp1		= 100,		// two bits shape generator type, see below
-	idSgTyp2		= 101,		// 
-	idSgTyp3		= 102,		// 
-	idSgTyp4		= 103,		// 
-	idSgTyp5		= 104,		// 
+	idSgTyp2		= 101,		//
+	idSgTyp3		= 102,		//
+	idSgTyp4		= 103,		//
+	idSgTyp5		= 104,		//
 		contCycle		= 0,	// idSgTypN: sg continuous cycle
 		singleCycle		= 1,	// idSgTypN: sg single cycle
 		phaseInput		= 2,	// idSgTypN: sg direct phase input
 		dualSG			= 3,	// idSgTypN: dual shape generator, Na and Nb
 	idTimeSel		= 105,		// select time delay			 50 ms * 2^n    			 5.01 5.40
-	// Matrix Row options		   
+	// Matrix Row options
 	idRowTyp1		= 106,		// matrix row type (AudioLR rows)
-		rt1Aud			= 0,	// idRowTyp1: Audio L and R 
-		rt1Tap			= 1,	// idRowTyp1: Tap1 and Tap2 
+		rt1Aud			= 0,	// idRowTyp1: Audio L and R
+		rt1Tap			= 1,	// idRowTyp1: Tap1 and Tap2
 		rt1AudTap		= 2, 	// idRowTyp1: Mono Mix Audio, Mono Mix Tap1+Tap2
 	idRowTyp2		= 107,		// matrix row type (SubLR rows)
 		rt2Sub			= 0,	// idRowTyp2: Submix Return L and R
 		rt2Tap			= 1,	// idRowTyp2: Tap3 and Tap4
 		rt2SubTap		= 2,	// idRowTyp2: Mono Mix Submix, Mono Mix Tap3+Tap4
-		rt2Aud			= 3,	// idRowTyp2: Audio L and R 
+		rt2Aud			= 3,	// idRowTyp2: Audio L and R
 		rt2AudTap		= 4,	// idRowTyp2: Mono Mix Audio, Mono Mix Tap3+Tap4
 	// Midi and Global Settings - for all presets
 	idAction		= 12,		// select global settings Action							 4.33
@@ -1711,7 +1711,7 @@ enum {
 	id_k2_not3		= 45,		// BankB property: reserved for future
 	id_k2_not4		= 46,		// BankB property: reserved for future
 	id_k2_not5		= 47,		// BankB property: reserved for future
-	
+
 
 	// ---------------------------------- s_BiqSin_Poke id Assignments -----------------------------------
 	// Assignment of id for s_BiqSin_Poke; these configure BiqBank and SinBank properties.
@@ -1805,11 +1805,11 @@ enum {
 	id_c_wid1		= 17,		// width  for 2nd convolution IR
 	id_c_wid2		= 18,		// width  for 3rd convolution IR
 	id_c_wid3		= 19,		// width  for 4th convolution IR
-	id_c_atL0		= 20,		// attenL for 1st convolution IR	
+	id_c_atL0		= 20,		// attenL for 1st convolution IR
 	id_c_atL1		= 21,		// attenL for 2nd convolution IR
 	id_c_atL2		= 22,		// attenL for 3rd convolution IR
 	id_c_atL3		= 23,		// attenL for 4th convolution IR
-	id_c_atR0		= 24,		// attenR for 1st convolution IR	
+	id_c_atR0		= 24,		// attenR for 1st convolution IR
 	id_c_atR1		= 25,		// attenR for 2nd convolution IR
 	id_c_atR2		= 26,		// attenR for 3rd convolution IR
 	id_c_atR3		= 27,		// attenR for 4th convolution IR
@@ -1827,8 +1827,8 @@ enum {
 	// These are placed in ConField's "side" field by str_xxx macros
 	optCalibrate = 48, optPost, optIntSound, optMidiProgram, optCVC,
 	optRouting, optPoly, optChannelPrio, optBendRange, optY, optZ, optVelocity,
-	optMiddleC, optSplitPoint, optSplitMode, optMonoFunc, optMonoInt, 
-	optRoundInitial, optRoundRate, optTuning, optPedal1, optPedal2, 
+	optMiddleC, optSplitPoint, optSplitMode, optMonoFunc, optMonoInt,
+	optRoundInitial, optRoundRate, optTuning, optPedal1, optPedal2,
 	opti, optii, optiii, optOptions, optSend, optLoad, optStore,
 
 	firstOpt = optCalibrate, lastOpt = optStore,
@@ -1838,7 +1838,7 @@ enum {
 
 	// Options category.
 	optReset = 0,				// reset options selections
-	optMedAction = 1,			// medium action 
+	optMedAction = 1,			// medium action
 	optAesHouse = 2,			// allow slaving of aestx clock to aesrx rate
 	optAes48k = 3,				// 48k internal clock for aestx
 	optTwoOct = 4,				// octave pedal does two octaves (instead of normal 1 octave)
@@ -1860,5 +1860,5 @@ enum { calMLo = 0, calMMid, calMHi, calPts=3 };
 
 
 #endif
-	
+
 

@@ -3,6 +3,8 @@
 ## General
 
 - 10.6+ HakenMidi
+  - Oct Y
+  - Macro XYZ: no docs
   - New Pedal assignments
   - New Y and Z ccs
   - MPE on all channels `MLegacyCh1out` -- affects WXYZ
